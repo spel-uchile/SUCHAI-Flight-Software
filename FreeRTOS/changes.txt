@@ -1,0 +1,12 @@
+================================================================================
+			CHANGES PERFORMED IN FILES AND DIRECTORIES
+    SUCHAI -Calos Gonzalez - carlgonz@ug.uchile.cl - Jun,2013
+================================================================================
+1) 	In the portable.h file (Source/inlude/portable.h) the path to portmacro.h to
+	MPLAB_PIC24_PORT was changed at the UNIX path style (using '/' instead '\')
+		Adding after line 81 the following code
+		#include "../../Source/portable/MPLAB/PIC24_dsPIC/portmacro.h"
+		
+2) 	The project was configured to run under PIC24FJ256GA110
+	4.1) FreeRTOSConfig.h: replacing line 57 by #include <p24FJ256GA110.h>
+	4.2) Replacing the linker scrip by p24FJ256GA110.gld

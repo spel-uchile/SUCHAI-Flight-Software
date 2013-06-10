@@ -15,3 +15,7 @@
 *.exe
 *.out
 *.app
+
+#MPLABX Executables
+SUCHAI.X/build/
+SUCHAI.X/dist/
