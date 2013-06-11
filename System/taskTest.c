@@ -1,4 +1,5 @@
 #include "taskTest.h"
+#include "SUCHAI_config.h"
 
 void taskTest(void *param)
 {
