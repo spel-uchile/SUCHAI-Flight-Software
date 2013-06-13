@@ -8,19 +8,19 @@
       </logicalFolder>
       <logicalFolder name="f1" displayName="FreeRTOS" projectFiles="true">
         <logicalFolder name="f1" displayName="Portable" projectFiles="true">
-          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/portmacro.h</itemPath>
+          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/portmacro.h</itemPath>
         </logicalFolder>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/croutine.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/FreeRTOS.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/list.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/mpu_wrappers.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/portable.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/projdefs.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/queue.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/semphr.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/StackMacros.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/task.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/include/timers.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/croutine.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/FreeRTOS.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/list.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/mpu_wrappers.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/portable.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/projdefs.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/queue.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/semphr.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/StackMacros.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/task.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/include/timers.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="Payloads" projectFiles="true">
         <logicalFolder name="f1" displayName="Cmd" projectFiles="true">
@@ -29,10 +29,10 @@
         </logicalFolder>
       </logicalFolder>
       <logicalFolder name="f4" displayName="System" projectFiles="true">
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/System/include/taskTest.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/include/taskTest.h</itemPath>
       </logicalFolder>
-      <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOSConfig.h</itemPath>
-      <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/SUCHAI_config.h</itemPath>
+      <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOSConfig.h</itemPath>
+      <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/SUCHAI_config.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -45,16 +45,15 @@
       </logicalFolder>
       <logicalFolder name="f2" displayName="FreeRTOS" projectFiles="true">
         <logicalFolder name="f1" displayName="Portable" projectFiles="true">
-          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/portable/MemMang/heap_1.c</itemPath>
-          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c</itemPath>
-          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/portasm_PIC24.S</itemPath>
+          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MemMang/heap_1.c</itemPath>
+          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c</itemPath>
+          <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/portasm_PIC24.S</itemPath>
         </logicalFolder>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/croutine.c</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/list.c</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/queue.c</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/readme.txt</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/tasks.c</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/FreeRTOS/Source/timers.c</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/croutine.c</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/list.c</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/queue.c</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/tasks.c</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/timers.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="Payloads" projectFiles="true">
         <logicalFolder name="f1" displayName="Cmd" projectFiles="true">
@@ -63,9 +62,9 @@
         </logicalFolder>
       </logicalFolder>
       <logicalFolder name="f3" displayName="System" projectFiles="true">
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/System/taskTest.c</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/taskTest.c</itemPath>
       </logicalFolder>
-      <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/SUCHAI/main.c</itemPath>
+      <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/main.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -430,9 +429,9 @@
         <property key="oscillator.auxfrequencyunit" value="Mega"/>
         <property key="oscillator.frequency" value="16"/>
         <property key="oscillator.frequencyunit" value="Mega"/>
-        <property key="oscillator.rcfrequency" value="16"/>
-        <property key="oscillator.rcfrequencyunit" value="Mega"/>
-        <property key="performancedata.show" value="false"/>
+        <property key="oscillator.rcfrequency" value="31"/>
+        <property key="oscillator.rcfrequencyunit" value="Kilo"/>
+        <property key="performancedata.show" value="true"/>
         <property key="periphADC1.altscl" value="false"/>
         <property key="periphADC2.altscl" value="false"/>
         <property key="tracecontrol.select" value="0"/>

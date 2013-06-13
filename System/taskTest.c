@@ -1,16 +1,16 @@
 #include "taskTest.h"
-#include "SUCHAI_config.h"
 
 void taskTest(void *param)
 {
     const unsigned long Delayms = 500 / portTICK_RATE_MS;
+    char *msg = (char *)param;
 
     while(1)
     {
         vTaskDelay(Delayms);
 
         #if SCH_GRL_VERBOSE
-            printf("[Test] running... \r\n");
+            printf("[taskTest] %s\n", msg);
         #endif
     }
 }

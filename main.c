@@ -74,8 +74,9 @@ int main(void)
 
     /* Initializing shared Semaphore */
 
-    /* Crating all task (the others are created inside taskDeployment) */
-    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    /* Crating all tasks */
+    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
+    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T2 Running...", 2, NULL);
 
     /* Configure Peripherals */
 
