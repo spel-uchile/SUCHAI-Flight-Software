@@ -30,6 +30,7 @@
       </logicalFolder>
       <logicalFolder name="f4" displayName="System" projectFiles="true">
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/include/taskTest.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/include/cmdIncludes.h</itemPath>
       </logicalFolder>
       <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOSConfig.h</itemPath>
       <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/SUCHAI_config.h</itemPath>

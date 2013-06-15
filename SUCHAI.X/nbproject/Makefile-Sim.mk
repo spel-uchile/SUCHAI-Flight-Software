@@ -45,11 +45,11 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1728494092/taskTest.o ${OBJECTDIR}/_ext/2014179570/main.o ${OBJECTDIR}/_ext/2067230309/croutine.o ${OBJECTDIR}/_ext/2067230309/list.o ${OBJECTDIR}/_ext/2067230309/queue.o ${OBJECTDIR}/_ext/2067230309/tasks.o ${OBJECTDIR}/_ext/2067230309/timers.o ${OBJECTDIR}/_ext/1932347678/heap_1.o ${OBJECTDIR}/_ext/1963833021/port.o ${OBJECTDIR}/_ext/1963833021/portasm_PIC24.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1728494092/taskTest.o.d ${OBJECTDIR}/_ext/2014179570/main.o.d ${OBJECTDIR}/_ext/2067230309/croutine.o.d ${OBJECTDIR}/_ext/2067230309/list.o.d ${OBJECTDIR}/_ext/2067230309/queue.o.d ${OBJECTDIR}/_ext/2067230309/tasks.o.d ${OBJECTDIR}/_ext/2067230309/timers.o.d ${OBJECTDIR}/_ext/1932347678/heap_1.o.d ${OBJECTDIR}/_ext/1963833021/port.o.d ${OBJECTDIR}/_ext/1963833021/portasm_PIC24.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1932347678/heap_1.o ${OBJECTDIR}/_ext/1963833021/port.o ${OBJECTDIR}/_ext/1963833021/portasm_PIC24.o ${OBJECTDIR}/_ext/2067230309/croutine.o ${OBJECTDIR}/_ext/2067230309/list.o ${OBJECTDIR}/_ext/2067230309/queue.o ${OBJECTDIR}/_ext/2067230309/tasks.o ${OBJECTDIR}/_ext/2067230309/timers.o ${OBJECTDIR}/_ext/1728494092/taskTest.o ${OBJECTDIR}/_ext/2014179570/main.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1932347678/heap_1.o.d ${OBJECTDIR}/_ext/1963833021/port.o.d ${OBJECTDIR}/_ext/1963833021/portasm_PIC24.o.d ${OBJECTDIR}/_ext/2067230309/croutine.o.d ${OBJECTDIR}/_ext/2067230309/list.o.d ${OBJECTDIR}/_ext/2067230309/queue.o.d ${OBJECTDIR}/_ext/2067230309/tasks.o.d ${OBJECTDIR}/_ext/2067230309/timers.o.d ${OBJECTDIR}/_ext/1728494092/taskTest.o.d ${OBJECTDIR}/_ext/2014179570/main.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1728494092/taskTest.o ${OBJECTDIR}/_ext/2014179570/main.o ${OBJECTDIR}/_ext/2067230309/croutine.o ${OBJECTDIR}/_ext/2067230309/list.o ${OBJECTDIR}/_ext/2067230309/queue.o ${OBJECTDIR}/_ext/2067230309/tasks.o ${OBJECTDIR}/_ext/2067230309/timers.o ${OBJECTDIR}/_ext/1932347678/heap_1.o ${OBJECTDIR}/_ext/1963833021/port.o ${OBJECTDIR}/_ext/1963833021/portasm_PIC24.o
+OBJECTFILES=${OBJECTDIR}/_ext/1932347678/heap_1.o ${OBJECTDIR}/_ext/1963833021/port.o ${OBJECTDIR}/_ext/1963833021/portasm_PIC24.o ${OBJECTDIR}/_ext/2067230309/croutine.o ${OBJECTDIR}/_ext/2067230309/list.o ${OBJECTDIR}/_ext/2067230309/queue.o ${OBJECTDIR}/_ext/2067230309/tasks.o ${OBJECTDIR}/_ext/2067230309/timers.o ${OBJECTDIR}/_ext/1728494092/taskTest.o ${OBJECTDIR}/_ext/2014179570/main.o
 
 
 CFLAGS=
@@ -73,17 +73,17 @@ MP_LINKER_FILE_OPTION=,--script=p24FJ256GA110.gld
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/_ext/1728494092/taskTest.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/System/taskTest.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1728494092 
-	@${RM} ${OBJECTDIR}/_ext/1728494092/taskTest.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/taskTest.c"  -o ${OBJECTDIR}/_ext/1728494092/taskTest.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1728494092/taskTest.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1728494092/taskTest.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+${OBJECTDIR}/_ext/1932347678/heap_1.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MemMang/heap_1.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1932347678 
+	@${RM} ${OBJECTDIR}/_ext/1932347678/heap_1.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MemMang/heap_1.c"  -o ${OBJECTDIR}/_ext/1932347678/heap_1.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1932347678/heap_1.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1932347678/heap_1.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/2014179570/main.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/main.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/2014179570 
-	@${RM} ${OBJECTDIR}/_ext/2014179570/main.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/main.c"  -o ${OBJECTDIR}/_ext/2014179570/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2014179570/main.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
-	@${FIXDEPS} "${OBJECTDIR}/_ext/2014179570/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+${OBJECTDIR}/_ext/1963833021/port.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1963833021 
+	@${RM} ${OBJECTDIR}/_ext/1963833021/port.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c"  -o ${OBJECTDIR}/_ext/1963833021/port.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1963833021/port.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1963833021/port.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/2067230309/croutine.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/croutine.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/2067230309 
@@ -115,30 +115,30 @@ ${OBJECTDIR}/_ext/2067230309/timers.o: /mnt/datos/Documentos/Ingenieria/Electric
 	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/timers.c"  -o ${OBJECTDIR}/_ext/2067230309/timers.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2067230309/timers.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
 	@${FIXDEPS} "${OBJECTDIR}/_ext/2067230309/timers.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/1932347678/heap_1.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MemMang/heap_1.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1932347678 
-	@${RM} ${OBJECTDIR}/_ext/1932347678/heap_1.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MemMang/heap_1.c"  -o ${OBJECTDIR}/_ext/1932347678/heap_1.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1932347678/heap_1.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1932347678/heap_1.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/_ext/1963833021/port.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1963833021 
-	@${RM} ${OBJECTDIR}/_ext/1963833021/port.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c"  -o ${OBJECTDIR}/_ext/1963833021/port.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1963833021/port.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1963833021/port.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-else
 ${OBJECTDIR}/_ext/1728494092/taskTest.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/System/taskTest.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1728494092 
 	@${RM} ${OBJECTDIR}/_ext/1728494092/taskTest.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/taskTest.c"  -o ${OBJECTDIR}/_ext/1728494092/taskTest.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1728494092/taskTest.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/taskTest.c"  -o ${OBJECTDIR}/_ext/1728494092/taskTest.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1728494092/taskTest.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1728494092/taskTest.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/2014179570/main.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/2014179570 
 	@${RM} ${OBJECTDIR}/_ext/2014179570/main.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/main.c"  -o ${OBJECTDIR}/_ext/2014179570/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2014179570/main.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/main.c"  -o ${OBJECTDIR}/_ext/2014179570/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2014179570/main.o.d"        -g -D__DEBUG   -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
 	@${FIXDEPS} "${OBJECTDIR}/_ext/2014179570/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+else
+${OBJECTDIR}/_ext/1932347678/heap_1.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MemMang/heap_1.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1932347678 
+	@${RM} ${OBJECTDIR}/_ext/1932347678/heap_1.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MemMang/heap_1.c"  -o ${OBJECTDIR}/_ext/1932347678/heap_1.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1932347678/heap_1.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1932347678/heap_1.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/_ext/1963833021/port.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1963833021 
+	@${RM} ${OBJECTDIR}/_ext/1963833021/port.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c"  -o ${OBJECTDIR}/_ext/1963833021/port.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1963833021/port.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1963833021/port.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/2067230309/croutine.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/croutine.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/2067230309 
@@ -170,17 +170,17 @@ ${OBJECTDIR}/_ext/2067230309/timers.o: /mnt/datos/Documentos/Ingenieria/Electric
 	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/timers.c"  -o ${OBJECTDIR}/_ext/2067230309/timers.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2067230309/timers.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
 	@${FIXDEPS} "${OBJECTDIR}/_ext/2067230309/timers.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/1932347678/heap_1.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MemMang/heap_1.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1932347678 
-	@${RM} ${OBJECTDIR}/_ext/1932347678/heap_1.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MemMang/heap_1.c"  -o ${OBJECTDIR}/_ext/1932347678/heap_1.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1932347678/heap_1.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1932347678/heap_1.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+${OBJECTDIR}/_ext/1728494092/taskTest.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/System/taskTest.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1728494092 
+	@${RM} ${OBJECTDIR}/_ext/1728494092/taskTest.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/taskTest.c"  -o ${OBJECTDIR}/_ext/1728494092/taskTest.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1728494092/taskTest.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1728494092/taskTest.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/1963833021/port.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1963833021 
-	@${RM} ${OBJECTDIR}/_ext/1963833021/port.o.d 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/port.c"  -o ${OBJECTDIR}/_ext/1963833021/port.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1963833021/port.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1963833021/port.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+${OBJECTDIR}/_ext/2014179570/main.o: /mnt/datos/Documentos/Ingenieria/Electrica/Suchai\ Software/main.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/2014179570 
+	@${RM} ${OBJECTDIR}/_ext/2014179570/main.o.d 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  "/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/main.c"  -o ${OBJECTDIR}/_ext/2014179570/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2014179570/main.o.d"        -g -omf=elf -mlarge-code -mlarge-data -mlarge-scalar -mconst-in-code -O0 -fomit-frame-pointer -I".." -I"../Drivers/include" -I"../System/include" -I"../Payloads/Cmd/include" -I"../Payloads/Drivers/include" -I"../FreeRTOS/Source/include" -I"../FreeRTOS/Source/portable/MPLAB/PIC24_dsPIC/" -DMPLAB_PIC24_PORT -msmart-io=1 -Wall -msfr-warn=on
+	@${FIXDEPS} "${OBJECTDIR}/_ext/2014179570/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 
