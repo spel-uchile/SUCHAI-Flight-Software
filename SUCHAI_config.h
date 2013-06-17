@@ -2,7 +2,7 @@
  * @file  SUCHAI_config.h
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com 
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 04-01-2013
+ * @date 2013
  * @copyright GNU GPL v3
  *
  * The purpose of this header is configure several options of the application
@@ -15,6 +15,12 @@
 #define	SUCHAI_CONFIG_H
 
 /* General includes */
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "cmdIncludes.h"
 
 /* System verbose configurations */

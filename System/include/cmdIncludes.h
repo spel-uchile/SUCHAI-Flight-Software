@@ -24,7 +24,7 @@ typedef struct ctrl_command{
     int cmdId;                  ///< Command id, represent the desired command
     int param;                  ///< Command parameter
     int idOrig;                 ///< Metadata: Id of sender subsystem
-    int sysReq;                 ///< Metadata: Level of energy the command requires
+    int sysReq;                 ///< Metadata: Level of energylp the command requires
 }DispCmd;
 
 
