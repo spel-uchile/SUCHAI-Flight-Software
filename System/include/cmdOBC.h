@@ -16,6 +16,8 @@
 
 #define OBC_SYS_RESET() {__asm__ volatile("reset");} ///< processor software reset
 
+#define CMD_OBC 0x10 ///< OBC commands group identifier
+
 /**
  * List of availible commands
  */

@@ -1,7 +1,7 @@
 #include "cmdOBC.h"
 
 cmdFunction obc_Function[OBC_NCMD];
-int ppc_sysReq[OBC_NCMD];
+int obc_sysReq[OBC_NCMD];
 
 /**
  * This function registers the list of command in the system, initializing the
@@ -10,10 +10,10 @@ int ppc_sysReq[OBC_NCMD];
 void obc_onResetCmdOBC(void)
 {
     obc_Function[(unsigned char)obc_id_reset] = obc_reset;
-    ppc_sysReq[(unsigned char)obc_id_reset]  = CMD_SYSREQ_MIN;
+    obc_sysReq[(unsigned char)obc_id_reset]  = CMD_SYSREQ_MIN;
     
     obc_Function[(unsigned char)obc_id_get_rtos_memory] = obc_get_rtos_memory;
-    ppc_sysReq[(unsigned char)obc_id_get_rtos_memory]  = CMD_SYSREQ_MIN;
+    obc_sysReq[(unsigned char)obc_id_get_rtos_memory]  = CMD_SYSREQ_MIN;
 }
 
 /**

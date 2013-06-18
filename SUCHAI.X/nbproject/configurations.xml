@@ -32,6 +32,7 @@
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/include/taskTest.h</itemPath>
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/include/cmdIncludes.h</itemPath>
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/include/cmdOBC.h</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/include/cmdRepository.h</itemPath>
       </logicalFolder>
       <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/FreeRTOSConfig.h</itemPath>
       <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/SUCHAI_config.h</itemPath>
@@ -66,6 +67,7 @@
       <logicalFolder name="f3" displayName="System" projectFiles="true">
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/taskTest.c</itemPath>
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/cmdOBC.c</itemPath>
+        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/System/cmdRepository.c</itemPath>
       </logicalFolder>
       <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai Software/main.c</itemPath>
     </logicalFolder>
