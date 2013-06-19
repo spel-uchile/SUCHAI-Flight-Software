@@ -1,3 +1,13 @@
+/**
+ * @file  cmdRepoitory.h
+ * @author Tomas Opazo T - tomas.opazo.t@gmail.com
+ * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
+ * @date 2012
+ * @copyright GNU GPL v3
+ *
+ * This header have definitions related to command repository
+ */
+
 #ifndef CMD_REPO_H
 #define CMD_REPO_H
 
