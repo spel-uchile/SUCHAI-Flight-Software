@@ -68,11 +68,15 @@
 #pragma config GCP = OFF                // General Code Segment Code Protect (Code protection is disabled)
 #pragma config JTAGEN = OFF             // JTAG Port Enable (JTAG port is disabled)
 
+/* Global variables */
+xSemaphoreHandle dataRepositorySem;
+
 int main(void)
 {
     /* Initializing shared Queues */
 
     /* Initializing shared Semaphore */
+    dataRepositorySem = xSemaphoreCreateMutex();
 
     /* Crating all tasks */
     xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);

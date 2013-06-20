@@ -20,11 +20,17 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 
 #include "cmdIncludes.h"
 
+/* General system configurations */
+
+/* Data repository configurations */
+#define SCH_STATUS_REPO_MODE    0   ///< Status repository location. (0) Internal, (1) Single external.
+
 /* System verbose configurations */
-#define SCH_GRL_VERBOSE     1
+#define SCH_GRL_VERBOSE         1   ///< Activates verbose debug mode
 
 
 #endif	/* SUCHAI_CONFIG_H */
