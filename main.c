@@ -41,6 +41,7 @@
 
 /* Task includes */
 #include "taskTest.h"
+#include "taskDispatcher.h"
 
 /* Config Words */
 // CONFIG3
@@ -70,15 +71,22 @@
 
 /* Global variables */
 xSemaphoreHandle dataRepositorySem;
+xQueueHandle dispatcherQueue, executerCmdQueue, executerStatQueue;
 
 int main(void)
 {
     /* Initializing shared Queues */
+    dispatcherQueue = xQueueCreate(25,sizeof(DispCmd));
+    executerCmdQueue = xQueueCreate(1,sizeof(ExeCmd));
+    executerStatQueue = xQueueCreate(1,sizeof(int));
 
     /* Initializing shared Semaphore */
     dataRepositorySem = xSemaphoreCreateMutex();
 
     /* Crating all tasks */
+    xTaskCreate(taskDispatcher, (signed char *)"dispatcher", 2*configMINIMAL_STACK_SIZE, NULL, 3, NULL);
+
+
     xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
     xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T2 Running...", 2, NULL);
 
