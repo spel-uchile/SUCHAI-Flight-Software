@@ -42,6 +42,7 @@
 /* Task includes */
 #include "taskTest.h"
 #include "taskDispatcher.h"
+#include "taskExecuter.h"
 
 /* Config Words */
 // CONFIG3
@@ -85,7 +86,7 @@ int main(void)
 
     /* Crating all tasks */
     xTaskCreate(taskDispatcher, (signed char *)"dispatcher", 2*configMINIMAL_STACK_SIZE, NULL, 3, NULL);
-
+    xTaskCreate(taskExecuter, (signed char *)"executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, NULL);
 
     xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
     xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T2 Running...", 2, NULL);
