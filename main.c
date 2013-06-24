@@ -43,6 +43,7 @@
 #include "taskTest.h"
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
+#include "taskHouskeeping.h"
 
 /* Config Words */
 // CONFIG3
@@ -74,6 +75,8 @@
 xSemaphoreHandle dataRepositorySem;
 xQueueHandle dispatcherQueue, executerCmdQueue, executerStatQueue;
 
+static void on_reset(void);
+
 int main(void)
 {
     /* Initializing shared Queues */
@@ -87,14 +90,20 @@ int main(void)
     /* Crating all tasks */
     xTaskCreate(taskDispatcher, (signed char *)"dispatcher", 2*configMINIMAL_STACK_SIZE, NULL, 3, NULL);
     xTaskCreate(taskExecuter, (signed char *)"executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, NULL);
+    xTaskCreate(taskHouskeeping, (signed char *)"housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
-    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
-    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T2 Running...", 2, NULL);
+
+//    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
+//    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T2 Running...", 2, NULL);
 
     /* Configure Peripherals */
 
+    /* On reset */
+    on_reset();
+
+
     /* Start the scheduler. Should never return */
-    printf(">>Starting FreeRTOS scheduler [->]\r\n");
+    printf(">>Starting FreeRTOS [->]\r\n");
     vTaskStartScheduler();
 
     while(1)
@@ -127,4 +136,13 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
     
     /* Stack overflow handle */
     while(1);
+}
+
+/**
+ * Performs initialization actions
+ */
+void on_reset(void)
+{
+    repo_onResetCmdRepo(); //Command repository initialization
+    dat_onResetCubesatVar(); //Update status repository
 }

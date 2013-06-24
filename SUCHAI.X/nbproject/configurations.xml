@@ -36,6 +36,8 @@
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai_Software/System/include/dataRepository.h</itemPath>
         <itemPath>../System/include/taskDispatcher.h</itemPath>
         <itemPath>../System/include/taskExecuter.h</itemPath>
+        <itemPath>../System/include/taskHouskeeping.h</itemPath>
+        <itemPath>../System/include/cmdDRP.h</itemPath>
       </logicalFolder>
       <itemPath>../FreeRTOSConfig.h</itemPath>
       <itemPath>../SUCHAI_config.h</itemPath>
@@ -74,6 +76,8 @@
         <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai_Software/System/dataRepository.c</itemPath>
         <itemPath>../System/taskDispatcher.c</itemPath>
         <itemPath>../System/taskExecuter.c</itemPath>
+        <itemPath>../System/taskHousekeeping.c</itemPath>
+        <itemPath>../System/cmdDRP.c</itemPath>
       </logicalFolder>
       <itemPath>../main.c</itemPath>
     </logicalFolder>

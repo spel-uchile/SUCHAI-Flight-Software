@@ -51,7 +51,7 @@ void taskDispatcher(void *param)
             /* Check if command is eecutable */
             if(check_if_executable(&newCmd))
             {
-				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X", cmdId, cmdParam, idOrig);
+				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X\n", cmdId, cmdParam, idOrig);
 
 				/* Fill the executer command */
 				exeCmd.fnct = repo_getCmd(newCmd.cmdId);
@@ -78,7 +78,7 @@ int check_if_executable(DispCmd *newCmd)
 
     if(cmdId == CMD_CMDNULL)
     {
-        printf("[Dispatcher] Cmd: %X from %X refused because was NULL", cmdId, idOrig);
+        printf("[Dispatcher] Cmd: %X from %X refused because was NULL\n", cmdId, idOrig);
         return 0;
     }
 
@@ -87,9 +87,9 @@ int check_if_executable(DispCmd *newCmd)
     #endif
 
     // Compare sysReq with SOC
-    if(dat_getCubesatVar(dat_eps_soc) < sysReq)
+    if(sysReq < dat_getCubesatVar(dat_eps_soc))
     {
-        printf("[Dispatcher] Cmd: %X from %X refused because of SOC", cmdId, idOrig);
+        printf("[Dispatcher] Cmd: %X from %X refused because of SOC\n", cmdId, idOrig);
         return 0;
     }
 

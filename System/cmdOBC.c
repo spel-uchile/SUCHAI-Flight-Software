@@ -61,7 +61,7 @@ int obc_reset(void* param)
 int obc_get_rtos_memory(void *param)
 {
     size_t mem_heap = xPortGetFreeHeapSize();
-    printf("Free RTOS memory: %d", mem_heap);
+    printf("Free RTOS memory: %d\n", mem_heap);
 
     return mem_heap;
 }

@@ -43,7 +43,7 @@ void taskExecuter(void *param)
 
             /* Execute the command */
             cmdParam = RunCmd.param;
-            cmdStat = RunCmd.fnct((void *)&param);
+            cmdStat = RunCmd.fnct((void *)&cmdParam);
 
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();

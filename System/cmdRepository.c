@@ -22,7 +22,10 @@
 
 /* Add external cmd arrays */
 extern cmdFunction obc_Function[];
+extern cmdFunction drp_Function[];
+
 extern int obc_sysReq[];
+extern int drp_sysReq[];
 
 /**
  * Returns the energy level asociated to each command
@@ -46,7 +49,14 @@ int repo_getsysReq(int cmdID)
             else
                 result = obc_sysReq[cmdNum];
             break;
-        
+
+        case CMD_DRP:
+            if(cmdNum >= DRP_NCMD)
+                result = CMD_SYSREQ_MIN;
+            else
+                result = drp_sysReq[cmdNum];
+            break;
+            
         default:
             result = CMD_SYSREQ_MIN;
             break;
@@ -74,9 +84,16 @@ cmdFunction repo_getCmd(int cmdID)
     {
         case CMD_OBC:
             if(cmdNum >= OBC_NCMD)
-                result=cmdNULL;
+                result = cmdNULL;
             else
                 result = obc_Function[cmdNum];
+            break;
+
+        case CMD_DRP:
+            if(cmdNum >= DRP_NCMD)
+                result = cmdNULL;
+            else
+                result = drp_Function[cmdNum];
             break;
         
         default:
@@ -95,6 +112,7 @@ cmdFunction repo_getCmd(int cmdID)
 int repo_onResetCmdRepo(void)
 {
     obc_onResetCmdOBC();
+    drp_onResetCmdDRP();
 
     return 1;
 }

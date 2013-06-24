@@ -25,10 +25,10 @@ typedef enum{
     obc_id_reset = 0x1000, ///< @cmd_first
     obc_id_get_rtos_memory, ///< @cmd
         
-    ppc_id_last_one    // Dummy element
+    obc_id_last_one    // Dummy element
 }OBC_CmdIndx;
 
-#define OBC_NCMD ((unsigned char)ppc_id_last_one)
+#define OBC_NCMD ((unsigned char)obc_id_last_one)
 
 void obc_onResetCmdOBC(void);
 
