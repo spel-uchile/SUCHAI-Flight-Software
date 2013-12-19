@@ -25,6 +25,7 @@
 #endif
 
 #include <stdio.h>
+#include <PPS.h>
 
 /* Drivers includes */
 
@@ -72,7 +73,7 @@
 #pragma config JTAGEN = OFF             // JTAG Port Enable (JTAG port is disabled)
 
 /* Global variables */
-xSemaphoreHandle dataRepositorySem;
+xSemaphoreHandle dataRepositorySem, consolePrintfSem;
 xQueueHandle dispatcherQueue, executerCmdQueue, executerStatQueue;
 
 static void on_reset(void);
@@ -86,8 +87,11 @@ int main(void)
 
     /* Initializing shared Semaphore */
     dataRepositorySem = xSemaphoreCreateMutex();
+    consolePrintfSem = xSemaphoreCreateMutex();
 
     /* Crating all tasks */
+//    int node = 1;
+//    xTaskCreate(taskTestCSP, (signed char *)"CSP", 2*configMINIMAL_STACK_SIZE, (void *)(&node), 3, NULL);
     xTaskCreate(taskDispatcher, (signed char *)"dispatcher", 2*configMINIMAL_STACK_SIZE, NULL, 3, NULL);
     xTaskCreate(taskExecuter, (signed char *)"executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, NULL);
     xTaskCreate(taskHouskeeping, (signed char *)"housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, NULL);
@@ -108,7 +112,7 @@ int main(void)
 
     while(1)
     {
-        printf(">>\nFreeRTOS [FAIL]\n");
+        printf("\n>>FreeRTOS [FAIL]\n");
     }
     
     return 0;
@@ -138,11 +142,75 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
     while(1);
 }
 
+void configure_ports(void)
+{
+    /* CUBESAT KIT MB CONFIGURATION */
+    //-OE_USB -INT //6	RPI38/CN45/RC1	=> pin es RC1
+    _TRISC1=0; 			//pin 0-output 1-input.
+    //-OE_MHX //98	CN60/PMD2/RE2	=> pin es RE2
+    _TRISE2=0; 			//pin 0-output 1-input.
+    //-ON_MHX //99	CN61/PMD3/RE3	=> pin es RE3
+    _TRISE3=0; 			//pin 0-output 1-input.
+    //-ON_SD //100	CN62/PMD4/RE4	=> pin es RE4
+    _TRISE4=0; 			//pin 0-output 1-input.
+
+    _LATE2 = 1; 		/* -OE_MHX OFF */
+    _LATE3 = 0; 		/* -ON_MHX ON */
+    _LATC1 = 0; 		/* -OE_USB ON */
+
+    //Conifg para Consola:
+    // H1.17 - U1RX - RP10 - IO.7 - UART 1 PARA CONSOLA SERIAL
+    iPPSInput(IN_FN_PPS_U1RX,IN_PIN_PPS_RP10);
+    // H1.18 - U1TX - RP17 - IO.6 - UART 1 PARA CONSOLA SERIAL
+    iPPSOutput(OUT_PIN_PPS_RP17,OUT_FN_PPS_U1TX);
+}
+
 /**
  * Performs initialization actions
  */
 void on_reset(void)
 {
+    configure_ports(); //Configure hardware
     repo_onResetCmdRepo(); //Command repository initialization
     dat_onResetCubesatVar(); //Update status repository
+
+    /* UART1 - CONSOLE - 19200, 8, N, 1 */
+    ConfigRS232(51, RS2_M_UART1);
+    EnableIntU1RX;
+    SetPriorityIntU1RX(5);
+}
+
+
+#define STDIN   0
+#define STDOUT  1
+#define STDERR  2
+#define LF   '\n'
+#define CR   '\r'
+
+void    mon_putc(char ch);
+
+int __attribute__((__weak__, __section__(".libc")))
+write(int handle, void * buffer, unsigned int len)
+{
+    int i = 0;
+    switch (handle)
+    {
+        case STDOUT:
+        case STDERR:
+            while (i < len)
+                mon_putc(((char*)buffer)[i++]);
+            break;
+    }
+    return (len);  // number of characters written
+}
+
+#define STDOUT_NO_CR_WITH_LF
+void mon_putc(char ch)
+{
+    while(U1STAbits.UTXBF);  /* wait if the buffer is full */
+#ifndef STDOUT_NO_CR_WITH_LF
+    if (LF == ch)
+        putcUART1(CR);
+#endif
+    putcUART1(ch);
 }

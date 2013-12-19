@@ -16,9 +16,11 @@
 /* Add files with commands */
 #include "cmdOBC.h"
 #include "cmdDRP.h"
+#include "cmdConsole.h"
 
 /* Defines */
 #define CMD_IDORIG_THOUSEKEEPING    0x1001
+#define CMD_IDORIG_TCONSOLE    0x1002
 
 int cmdNULL(void *param);
 

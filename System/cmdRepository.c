@@ -23,6 +23,7 @@
 /* Add external cmd arrays */
 extern cmdFunction obc_Function[];
 extern cmdFunction drp_Function[];
+extern cmdFunction conFunction[];
 
 extern int obc_sysReq[];
 extern int drp_sysReq[];
