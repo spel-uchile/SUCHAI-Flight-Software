@@ -5,6 +5,9 @@
                    displayName="Header Files"
                    projectFiles="true">
       <logicalFolder name="f2" displayName="Drivers" projectFiles="true">
+        <itemPath>../Drivers/include/console.h</itemPath>
+        <itemPath>../Drivers/include/i2c_comm.h</itemPath>
+        <itemPath>../Drivers/include/rs232_suchai.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="FreeRTOS" projectFiles="true">
         <logicalFolder name="f1" displayName="Portable" projectFiles="true">
@@ -33,11 +36,14 @@
         <itemPath>../System/include/cmdIncludes.h</itemPath>
         <itemPath>../System/include/cmdOBC.h</itemPath>
         <itemPath>../System/include/cmdRepository.h</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai_Software/System/include/dataRepository.h</itemPath>
         <itemPath>../System/include/taskDispatcher.h</itemPath>
         <itemPath>../System/include/taskExecuter.h</itemPath>
         <itemPath>../System/include/taskHouskeeping.h</itemPath>
         <itemPath>../System/include/cmdDRP.h</itemPath>
+        <itemPath>../System/include/cmdConsole.h</itemPath>
+        <itemPath>../System/include/dataRepository.h</itemPath>
+        <itemPath>../System/include/DebugIncludes.h</itemPath>
+        <itemPath>../System/include/taskConsole.h</itemPath>
       </logicalFolder>
       <itemPath>../FreeRTOSConfig.h</itemPath>
       <itemPath>../SUCHAI_config.h</itemPath>
@@ -50,6 +56,9 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="f1" displayName="Drivers" projectFiles="true">
+        <itemPath>../Drivers/console.c</itemPath>
+        <itemPath>../Drivers/i2c_comm.c</itemPath>
+        <itemPath>../Drivers/rs232_suchai.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="FreeRTOS" projectFiles="true">
         <logicalFolder name="f1" displayName="Portable" projectFiles="true">
@@ -73,11 +82,13 @@
         <itemPath>../System/taskTest.c</itemPath>
         <itemPath>../System/cmdOBC.c</itemPath>
         <itemPath>../System/cmdRepository.c</itemPath>
-        <itemPath>/mnt/datos/Documentos/Ingenieria/Electrica/Suchai_Software/System/dataRepository.c</itemPath>
         <itemPath>../System/taskDispatcher.c</itemPath>
         <itemPath>../System/taskExecuter.c</itemPath>
         <itemPath>../System/taskHousekeeping.c</itemPath>
         <itemPath>../System/cmdDRP.c</itemPath>
+        <itemPath>../System/cmdConsole.c</itemPath>
+        <itemPath>../System/dataRepository.c</itemPath>
+        <itemPath>../System/taskConsole.c</itemPath>
       </logicalFolder>
       <itemPath>../main.c</itemPath>
     </logicalFolder>
@@ -87,6 +98,10 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../Libs/libcsp/src</Elem>
+    <Elem>../Libs/libcsp/include</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">

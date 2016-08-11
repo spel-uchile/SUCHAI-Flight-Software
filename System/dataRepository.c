@@ -35,7 +35,7 @@ extern xSemaphoreHandle dataRepositorySem;  // Mutex for status repository
 void dat_setCubesatVar(DAT_CubesatVar indxVar, int value)
 {
     xSemaphoreTake(dataRepositorySem, portMAX_DELAY);
-    #if SCH_STATUSCH_STATUS_REPO_MODE == 0
+    #if SCH_STATUS_REPO_MODE == 0
         //Uses internal memory
         DAT_CUBESAT_VAR_BUFF[indxVar] = value;
     #else
@@ -56,7 +56,7 @@ int dat_getCubesatVar(DAT_CubesatVar indxVar)
     int value = 0;
 
     xSemaphoreTake(dataRepositorySem, portMAX_DELAY);
-    #if SCH_STATUSCH_STATUS_REPO_MODE == 0
+    #if SCH_STATUS_REPO_MODE == 0
         //Uses internal memory
         value = DAT_CUBESAT_VAR_BUFF[indxVar];
     #else
