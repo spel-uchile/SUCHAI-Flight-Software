@@ -73,7 +73,7 @@ int check_if_executable(DispCmd *newCmd)
 
     cmdId = newCmd->cmdId;
     idOrig = newCmd->idOrig;
-    sysReq = newCmd->sysReq;
+    sysReq = repo_getsysReq(cmdId);
     param = newCmd->param;
 
     if(cmdId == CMD_CMDNULL)
@@ -87,9 +87,9 @@ int check_if_executable(DispCmd *newCmd)
     #endif
 
     // Compare sysReq with SOC
-    if(sysReq < dat_getCubesatVar(dat_eps_soc))
+    if(dat_getCubesatVar(dat_eps_soc) < sysReq)
     {
-        printf("[Dispatcher] Cmd: %X from %X refused because of SOC\n", cmdId, idOrig);
+        printf("[Dispatcher] Cmd: %X from %X sysReq %d refused because of SOC %d\n", cmdId, idOrig, sysReq, dat_getCubesatVar(dat_eps_soc));
         return 0;
     }
 
