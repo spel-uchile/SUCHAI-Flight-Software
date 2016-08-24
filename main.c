@@ -97,9 +97,9 @@ int main(void)
     /* Crating all tasks */
 //    int node = 1;
 //    xTaskCreate(taskTestCSP, (signed char *)"CSP", 2*configMINIMAL_STACK_SIZE, (void *)(&node), 3, NULL);
-    xTaskCreate(taskDispatcher, (signed char *)"dispatcher", 2*configMINIMAL_STACK_SIZE, NULL, 3, NULL);
-    xTaskCreate(taskExecuter, (signed char *)"executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, NULL);
-    xTaskCreate(taskHouskeeping, (signed char *)"housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+    xTaskCreate(taskDispatcher, "dispatcher", 2*configMINIMAL_STACK_SIZE, NULL, 3, NULL);
+    xTaskCreate(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, NULL);
+    xTaskCreate(taskHouskeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
 
 //    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
