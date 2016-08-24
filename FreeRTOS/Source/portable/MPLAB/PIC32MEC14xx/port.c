@@ -68,53 +68,68 @@
 */
 
 /*-----------------------------------------------------------
- * Implementation of functions defined in portable.h for the PIC32MX port.
-  *----------------------------------------------------------*/
-
-#ifndef __XC
-    #error This port is designed to work with XC32.  Please update your C compiler version.
-#endif
+ * Implementation of functions defined in portable.h for the PIC32MEC14xx  port.
+ *----------------------------------------------------------*/
 
 /* Scheduler include files. */
 #include "FreeRTOS.h"
 #include "task.h"
 
-/* Hardware specifics. */
-#define portTIMER_PRESCALE	8
-#define portPRESCALE_BITS	1
+/* Microchip includes. */
+#include <xc.h>
+#include <cp0defs.h>
+
+#if !defined(__MEC__)
+	#error This port is designed to work with XC32 on MEC14xx.  Please update your C compiler version or settings.
+#endif
+
+#if( ( configMAX_SYSCALL_INTERRUPT_PRIORITY >= 0x7 ) || ( configMAX_SYSCALL_INTERRUPT_PRIORITY == 0 ) )
+	#error configMAX_SYSCALL_INTERRUPT_PRIORITY must be less than 7 and greater than 0
+#endif
 
 /* Bits within various registers. */
-#define portIE_BIT						( 0x00000001 )
-#define portEXL_BIT						( 0x00000002 )
-
-/* Bits within the CAUSE register. */
-#define portCORE_SW_0					( 0x00000100 )
-#define portCORE_SW_1					( 0x00000200 )
+#define portIE_BIT					( 0x00000001 )
+#define portEXL_BIT					( 0x00000002 )
 
 /* The EXL bit is set to ensure interrupts do not occur while the context of
-the first task is being restored. */
-#define portINITIAL_SR					( portIE_BIT | portEXL_BIT )
+the first task is being restored.  MEC14xx does not have DSP HW. */
+#define portINITIAL_SR				( portIE_BIT | portEXL_BIT )
+
+/* MEC14xx RTOS Timer MMCR's. */
+#define portMMCR_RTMR_PRELOAD	*((volatile uint32_t *)(0xA0007404ul))
+#define portMMCR_RTMR_CONTROL	*((volatile uint32_t *)(0xA0007408ul))
+
+/* MEC14xx JTVIC external interrupt controller is mapped to M14K closely-coupled
+peripheral space. */
+#define portGIRQ23_RTOS_TIMER_BITPOS	( 4 )
+#define portGIRQ23_RTOS_TIMER_MASK		( 1ul << ( portGIRQ23_RTOS_TIMER_BITPOS ) )
+#define portMMCR_JTVIC_GIRQ23_SRC		*((volatile uint32_t *)(0xBFFFC0F0ul))
+#define portMMCR_JTVIC_GIRQ23_SETEN		*((volatile uint32_t *)(0xBFFFC0F4ul))
+#define portMMCR_JTVIC_GIRQ23_PRIA		*((volatile uint32_t *)(0xBFFFC3F0ul))
+
+/* MIPS Software Interrupts are routed through JTVIC GIRQ24 */
+#define portGIRQ24_M14K_SOFTIRQ0_BITPOS	( 1 )
+#define portGIRQ24_M14K_SOFTIRQ0_MASK	( 1ul << ( portGIRQ24_M14K_SOFTIRQ0_BITPOS ) )
+#define portMMCR_JTVIC_GIRQ24_SRC		*((volatile uint32_t *)(0xBFFFC100ul))
+#define portMMCR_JTVIC_GIRQ24_SETEN		*((volatile uint32_t *)(0xBFFFC104ul))
+#define portMMCR_JTVIC_GIRQ24_PRIA		*((volatile uint32_t *)(0xBFFFC400ul))
 
 /*
-By default port.c generates its tick interrupt from TIMER1.  The user can
-override this behaviour by:
+By default port.c generates its tick interrupt from the RTOS timer.  The user
+can override this behaviour by:
 	1: Providing their own implementation of vApplicationSetupTickTimerInterrupt(),
 	   which is the function that configures the timer.  The function is defined
 	   as a weak symbol in this file so if the same function name is used in the
 	   application code then the version in the application code will be linked
 	   into the application in preference to the version defined in this file.
-	2: Define configTICK_INTERRUPT_VECTOR to the vector number of the timer used
-	   to generate the tick interrupt.  For example, when timer 1 is used then
-	   configTICK_INTERRUPT_VECTOR is set to _TIMER_1_VECTOR.
-	   configTICK_INTERRUPT_VECTOR should be defined in FreeRTOSConfig.h.
-	3: Define configCLEAR_TICK_TIMER_INTERRUPT() to clear the interrupt in the
-	   timer used to generate the tick interrupt.  For example, when timer 1 is
-	   used configCLEAR_TICK_TIMER_INTERRUPT() is defined to
-	   IFS0CLR = _IFS0_T1IF_MASK.
+	2: Provide a vector implementation in port_asm.S that overrides the default
+	   behaviour for the specified interrupt vector.
+	3: Specify the correct bit to clear the interrupt during the timer interrupt
+	   handler.
 */
 #ifndef configTICK_INTERRUPT_VECTOR
-	#define configTICK_INTERRUPT_VECTOR _TIMER_1_VECTOR
-	#define configCLEAR_TICK_TIMER_INTERRUPT() IFS0CLR = _IFS0_T1IF_MASK
+	#define configTICK_INTERRUPT_VECTOR girq23_b4
+	#define configCLEAR_TICK_TIMER_INTERRUPT() portMMCR_JTVIC_GIRQ23_SRC = portGIRQ23_RTOS_TIMER_MASK
 #else
 	#ifndef configCLEAR_TICK_TIMER_INTERRUPT
 		#error If configTICK_INTERRUPT_VECTOR is defined in application code then configCLEAR_TICK_TIMER_INTERRUPT must also be defined in application code.
@@ -122,8 +137,8 @@ override this behaviour by:
 #endif
 
 /* Let the user override the pre-loading of the initial RA with the address of
-prvTaskExitError() in case it messes up unwinding of the stack in the
-debugger - in which case configTASK_RETURN_ADDRESS can be defined as 0 (NULL). */
+prvTaskExitError() in case it messes up unwinding of the stack in the debugger -
+in which case configTASK_RETURN_ADDRESS can be defined as 0 (NULL). */
 #ifdef configTASK_RETURN_ADDRESS
 	#define portTASK_RETURN_ADDRESS	configTASK_RETURN_ADDRESS
 #else
@@ -136,17 +151,17 @@ stack overflow hook function (because the stack overflow hook is specific to a
 task stack, not the ISR stack). */
 #if( configCHECK_FOR_STACK_OVERFLOW > 2 )
 
-	/* Don't use 0xa5 as the stack fill bytes as that is used by the kernerl for
+	/* Don't use 0xa5 as the stack fill bytes as that is used by the kernel for
 	the task stacks, and so will legitimately appear in many positions within
 	the ISR stack. */
-	#define portISR_STACK_FILL_BYTE	0xee
+    #define portISR_STACK_FILL_BYTE	0xee
 
 	static const uint8_t ucExpectedStackBytes[] = {
-									portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
-									portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
-									portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
-									portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
-									portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE };	\
+							portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
+							portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
+							portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
+							portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE,		\
+							portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE, portISR_STACK_FILL_BYTE };	\
 
 	#define portCHECK_ISR_STACK() configASSERT( ( memcmp( ( void * ) xISRStack, ( void * ) ucExpectedStackBytes, sizeof( ucExpectedStackBytes ) ) == 0 ) )
 #else
@@ -154,24 +169,8 @@ task stack, not the ISR stack). */
 	#define portCHECK_ISR_STACK()
 #endif /* configCHECK_FOR_STACK_OVERFLOW > 2 */
 
+
 /*-----------------------------------------------------------*/
-
-
-/*
- * Place the prototype here to ensure the interrupt vector is correctly installed.
- * Note that because the interrupt is written in assembly, the IPL setting in the
- * following line of code has no effect.  The interrupt priority is set by the
- * call to ConfigIntTimer1() in vApplicationSetupTickTimerInterrupt().
- */
-extern void __attribute__( (interrupt(IPL1AUTO), vector( configTICK_INTERRUPT_VECTOR ))) vPortTickInterruptHandler( void );
-
-/*
- * The software interrupt handler that performs the yield.  Note that, because
- * the interrupt is written in assembly, the IPL setting in the following line of
- * code has no effect.  The interrupt priority is set by the call to
- * mConfigIntCoreSW0() in xPortStartScheduler().
- */
-void __attribute__( (interrupt(IPL1AUTO), vector(_CORE_SOFTWARE_0_VECTOR))) vPortYieldISR( void );
 
 /*
  * Used to catch tasks that attempt to return from their implementing function.
@@ -210,10 +209,10 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 	*pxTopOfStack = (StackType_t) 0x12345678;	/* Word to which the stack pointer will be left pointing after context restore. */
 	pxTopOfStack--;
 
-	*pxTopOfStack = (StackType_t) _CP0_GET_CAUSE();
+	*pxTopOfStack = (StackType_t) ulPortGetCP0Cause();
 	pxTopOfStack--;
 
-	*pxTopOfStack = (StackType_t) portINITIAL_SR;/* CP0_STATUS */
+	*pxTopOfStack = (StackType_t) portINITIAL_SR;	/* CP0_STATUS */
 	pxTopOfStack--;
 
 	*pxTopOfStack = (StackType_t) pxCode; 		/* CP0_EPC */
@@ -226,6 +225,15 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 	pxTopOfStack -= 15;
 
 	return pxTopOfStack;
+}
+/*-----------------------------------------------------------*/
+
+static __inline uint32_t prvDisableInterrupt( void )
+{
+uint32_t prev_state;
+
+	__asm volatile( "di %0; ehb" : "=r" ( prev_state ) :: "memory" );
+	return prev_state;
 }
 /*-----------------------------------------------------------*/
 
@@ -244,31 +252,32 @@ static void prvTaskExitError( void )
 /*-----------------------------------------------------------*/
 
 /*
- * Setup a timer for a regular tick.  This function uses peripheral timer 1.
+ * Setup a timer for a regular tick.  This function uses the RTOS timer.
  * The function is declared weak so an application writer can use a different
  * timer by redefining this implementation.  If a different timer is used then
  * configTICK_INTERRUPT_VECTOR must also be defined in FreeRTOSConfig.h to
  * ensure the RTOS provided tick interrupt handler is installed on the correct
- * vector number.  When Timer 1 is used the vector number is defined as
- * _TIMER_1_VECTOR.
+ * vector number.
  */
 __attribute__(( weak )) void vApplicationSetupTickTimerInterrupt( void )
 {
-const uint32_t ulCompareMatch = ( (configPERIPHERAL_CLOCK_HZ / portTIMER_PRESCALE) / configTICK_RATE_HZ ) - 1;
+/* MEC14xx RTOS Timer whose input clock is 32KHz. */
+const uint32_t ulPreload = ( 32768ul / ( configTICK_RATE_HZ ) );
 
-	T1CON = 0x0000;
-	T1CONbits.TCKPS = portPRESCALE_BITS;
-	PR1 = ulCompareMatch;
-	IPC1bits.T1IP = configKERNEL_INTERRUPT_PRIORITY;
+	configASSERT( ulPreload != 0UL );
 
-	/* Clear the interrupt as a starting condition. */
-	IFS0bits.T1IF = 0;
+	/* Configure the RTOS timer. */
+	portMMCR_RTMR_CONTROL = 0ul;
+	portMMCR_RTMR_PRELOAD = ulPreload;
 
-	/* Enable the interrupt. */
-	IEC0bits.T1IE = 1;
+	/* Configure interrupts from the RTOS timer. */
+	portMMCR_JTVIC_GIRQ23_SRC = ( portGIRQ23_RTOS_TIMER_MASK );
+	portMMCR_JTVIC_GIRQ23_PRIA &= ~( 0x0Ful << 16 );
+	portMMCR_JTVIC_GIRQ23_PRIA |= ( ( portIPL_TO_CODE( configKERNEL_INTERRUPT_PRIORITY ) ) << 16 );
+	portMMCR_JTVIC_GIRQ23_SETEN = ( portGIRQ23_RTOS_TIMER_MASK );
 
-	/* Start the timer. */
-	T1CONbits.TON = 1;
+	/* Enable the RTOS timer. */
+	portMMCR_RTMR_CONTROL = 0x0Fu;
 }
 /*-----------------------------------------------------------*/
 
@@ -293,22 +302,22 @@ extern void *pxCurrentTCB;
 	#endif /* configCHECK_FOR_STACK_OVERFLOW > 2 */
 
 	/* Clear the software interrupt flag. */
-	IFS0CLR = _IFS0_CS0IF_MASK;
+	portMMCR_JTVIC_GIRQ24_SRC = (portGIRQ24_M14K_SOFTIRQ0_MASK);
 
-	/* Set software timer priority. */
-	IPC0CLR = _IPC0_CS0IP_MASK;
-	IPC0SET = ( configKERNEL_INTERRUPT_PRIORITY << _IPC0_CS0IP_POSITION );
+	/* Set software timer priority.  Each GIRQn has one nibble containing its
+	priority */
+	portMMCR_JTVIC_GIRQ24_PRIA &= ~(0xF0ul);
+	portMMCR_JTVIC_GIRQ24_PRIA |= ( portIPL_TO_CODE( configKERNEL_INTERRUPT_PRIORITY ) << 4 );
 
 	/* Enable software interrupt. */
-	IEC0CLR = _IEC0_CS0IE_MASK;
-	IEC0SET = 1 << _IEC0_CS0IE_POSITION;
+	portMMCR_JTVIC_GIRQ24_SETEN = ( portGIRQ24_M14K_SOFTIRQ0_MASK );
 
-	/* Setup the timer to generate the tick.  Interrupts will have been
-	disabled by the time we get here. */
+	/* Setup the timer to generate the tick.  Interrupts will have been disabled
+	by the time we get here. */
 	vApplicationSetupTickTimerInterrupt();
 
-	/* Kick off the highest priority task that has been created so far.
-	Its stack location is loaded into uxSavedTaskStackPointer. */
+	/* Start the highest priority task that has been created so far.  Its stack
+	location is loaded into uxSavedTaskStackPointer. */
 	uxSavedTaskStackPointer = *( UBaseType_t * ) pxCurrentTCB;
 	vPortStartFirstTask();
 
@@ -325,13 +334,16 @@ extern void *pxCurrentTCB;
 void vPortIncrementTick( void )
 {
 UBaseType_t uxSavedStatus;
+uint32_t ulCause;
 
 	uxSavedStatus = uxPortSetInterruptMaskFromISR();
 	{
 		if( xTaskIncrementTick() != pdFALSE )
 		{
 			/* Pend a context switch. */
-			_CP0_BIS_CAUSE( portCORE_SW_0 );
+			ulCause = ulPortGetCP0Cause();
+			ulCause |= ( 1ul << 8UL );
+			vPortSetCP0Cause( ulCause );
 		}
 	}
 	vPortClearInterruptMaskFromISR( uxSavedStatus );
@@ -348,15 +360,16 @@ UBaseType_t uxPortSetInterruptMaskFromISR( void )
 {
 UBaseType_t uxSavedStatusRegister;
 
-	__builtin_disable_interrupts();
-	uxSavedStatusRegister = _CP0_GET_STATUS() | 0x01;
+	prvDisableInterrupt();
+	uxSavedStatusRegister = ulPortGetCP0Status() | 0x01;
+
 	/* This clears the IPL bits, then sets them to
 	configMAX_SYSCALL_INTERRUPT_PRIORITY.  This function should not be called
 	from an interrupt that has a priority above
 	configMAX_SYSCALL_INTERRUPT_PRIORITY so, when used correctly, the action
 	can only result in the IPL being unchanged or raised, and therefore never
 	lowered. */
-	_CP0_SET_STATUS( ( ( uxSavedStatusRegister & ( ~portALL_IPL_BITS ) ) ) | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) );
+	vPortSetCP0Status( ( ( uxSavedStatusRegister & ( ~portALL_IPL_BITS ) ) ) | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) );
 
 	return uxSavedStatusRegister;
 }
@@ -364,7 +377,7 @@ UBaseType_t uxSavedStatusRegister;
 
 void vPortClearInterruptMaskFromISR( UBaseType_t uxSavedStatusRegister )
 {
-	_CP0_SET_STATUS( uxSavedStatusRegister );
+	vPortSetCP0Status( uxSavedStatusRegister );
 }
 /*-----------------------------------------------------------*/
 

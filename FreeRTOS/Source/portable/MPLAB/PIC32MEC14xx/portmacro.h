@@ -70,9 +70,6 @@
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
-/* System include files */
-#include <xc.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -88,13 +85,13 @@ extern "C" {
  */
 
 /* Type definitions. */
-#define portCHAR		char
-#define portFLOAT		float
-#define portDOUBLE		double
-#define portLONG		long
-#define portSHORT		short
-#define portSTACK_TYPE	uint32_t
-#define portBASE_TYPE	long
+#define portCHAR        char
+#define portFLOAT       float
+#define portDOUBLE      double
+#define portLONG        long
+#define portSHORT       short
+#define portSTACK_TYPE  uint32_t
+#define portBASE_TYPE   long
 
 typedef portSTACK_TYPE StackType_t;
 typedef long BaseType_t;
@@ -106,23 +103,79 @@ typedef unsigned long UBaseType_t;
 #else
 	typedef uint32_t TickType_t;
 	#define portMAX_DELAY ( TickType_t ) 0xffffffffUL
-
-	/* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
-	not need to be guarded with a critical section. */
-	#define portTICK_TYPE_IS_ATOMIC 1
 #endif
 /*-----------------------------------------------------------*/
 
 /* Hardware specifics. */
-#define portBYTE_ALIGNMENT			8
-#define portSTACK_GROWTH			-1
-#define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / configTICK_RATE_HZ )
+#define portBYTE_ALIGNMENT  8
+#define portSTACK_GROWTH    -1
+#define portTICK_PERIOD_MS  ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 /*-----------------------------------------------------------*/
 
 /* Critical section management. */
-#define portIPL_SHIFT				( 10UL )
-#define portALL_IPL_BITS			( 0x3fUL << portIPL_SHIFT )
-#define portSW0_BIT					( 0x01 << 8 )
+#define portIPL_SHIFT       ( 10UL )
+/* Don't straddle the CEE bit.  Interrupts calling FreeRTOS functions should
+never have higher IPL bits set anyway. */
+#define portALL_IPL_BITS    ( 0x7FUL << portIPL_SHIFT )
+#define portSW0_BIT         ( 0x01 << 8 )
+
+/* Interrupt priority conversion */
+#define portIPL_TO_CODE( iplNumber )    ( ( iplNumber >> 1 ) & 0x03ul )
+#define portCODE_TO_IPL( iplCode )      ( ( iplCode << 1 ) | 0x01ul )
+
+/*-----------------------------------------------------------*/
+
+static inline uint32_t ulPortGetCP0Status( void )
+{
+uint32_t rv;
+
+	__asm volatile(
+			"\n\t"
+			"mfc0 %0,$12,0      \n\t"
+			: "=r" ( rv ) :: );
+
+	return rv;
+}
+/*-----------------------------------------------------------*/
+
+static inline void vPortSetCP0Status( uint32_t new_status)
+{
+	( void ) new_status;
+
+	__asm__ __volatile__(
+			"\n\t"
+			"mtc0 %0,$12,0      \n\t"
+			"ehb                \n\t"
+			:
+			:"r" ( new_status ) : );
+}
+/*-----------------------------------------------------------*/
+
+static inline uint32_t ulPortGetCP0Cause( void )
+{
+uint32_t rv;
+
+	__asm volatile(
+			"\n\t"
+			"mfc0 %0,$13,0      \n\t"
+			: "=r" ( rv ) :: );
+
+    return rv;
+}
+/*-----------------------------------------------------------*/
+
+static inline void vPortSetCP0Cause( uint32_t new_cause )
+{
+	( void ) new_cause;
+
+	__asm__ __volatile__(
+			"\n\t"
+			"mtc0 %0,$13,0      \n\t"
+			"ehb                \n\t"
+			:
+			:"r" ( new_cause ) : );
+}
+/*-----------------------------------------------------------*/
 
 /* This clears the IPL bits, then sets them to
 configMAX_SYSCALL_INTERRUPT_PRIORITY.  An extra check is performed if
@@ -133,40 +186,36 @@ safe FreeRTOS API function was executed.  ISR safe FreeRTOS API functions are
 those that end in FromISR.  FreeRTOS maintains a separate interrupt API to
 ensure API function and interrupt entry is as fast and as simple as possible. */
 #ifdef configASSERT
-	#define portDISABLE_INTERRUPTS()											\
-	{																			\
-	uint32_t ulStatus;														\
-																				\
-		/* Mask interrupts at and below the kernel interrupt priority. */		\
-		ulStatus = _CP0_GET_STATUS();											\
-																				\
-		/* Is the current IPL below configMAX_SYSCALL_INTERRUPT_PRIORITY? */	\
-		if( ( ( ulStatus & portALL_IPL_BITS ) >> portIPL_SHIFT ) < configMAX_SYSCALL_INTERRUPT_PRIORITY ) \
-		{																		\
-			ulStatus &= ~portALL_IPL_BITS;										\
-			_CP0_SET_STATUS( ( ulStatus | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) ) ); \
-		}																		\
-	}
+    #define portDISABLE_INTERRUPTS() 																			\
+	{ 																											\
+	uint32_t ulStatus; 																							\
+		/* Mask interrupts at and below the kernel interrupt priority. */  										\
+		ulStatus = ulPortGetCP0Status(); 																		\
+		/* Is the current IPL below configMAX_SYSCALL_INTERRUPT_PRIORITY? */ 									\
+		if( ( ( ulStatus & portALL_IPL_BITS ) >> portIPL_SHIFT ) < configMAX_SYSCALL_INTERRUPT_PRIORITY ) 		\
+		{ 																										\
+			ulStatus &= ~portALL_IPL_BITS;  																	\
+			vPortSetCP0Status( ( ulStatus | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) ) ); 		\
+		} 																										\
+    }
 #else /* configASSERT */
-	#define portDISABLE_INTERRUPTS()										\
-	{																		\
-	uint32_t ulStatus;													\
-																			\
-		/* Mask interrupts at and below the kernel interrupt priority. */	\
-		ulStatus = _CP0_GET_STATUS();										\
-		ulStatus &= ~portALL_IPL_BITS;										\
-		_CP0_SET_STATUS( ( ulStatus | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) ) ); \
+	#define portDISABLE_INTERRUPTS() 																			\
+	{ 																											\
+	uint32_t ulStatus;  																						\
+		/* Mask interrupts at and below the kernel interrupt priority. */ 										\
+		ulStatus = ulPortGetCP0Status(); 																		\
+		ulStatus &= ~portALL_IPL_BITS; 																			\
+		vPortSetCP0Status( ( ulStatus | ( configMAX_SYSCALL_INTERRUPT_PRIORITY << portIPL_SHIFT ) ) ); 			\
 	}
 #endif /* configASSERT */
 
-#define portENABLE_INTERRUPTS()											\
-{																		\
-uint32_t ulStatus;													\
-																		\
-	/* Unmask all interrupts. */										\
-	ulStatus = _CP0_GET_STATUS();										\
-	ulStatus &= ~portALL_IPL_BITS;										\
-	_CP0_SET_STATUS( ulStatus );										\
+#define portENABLE_INTERRUPTS() 			\
+{ 											\
+uint32_t ulStatus; 							\
+	/* Unmask all interrupts. */ 			\
+	ulStatus = ulPortGetCP0Status(); 		\
+	ulStatus &= ~portALL_IPL_BITS; 			\
+	vPortSetCP0Status( ulStatus ); 			\
 }
 
 
@@ -206,20 +255,19 @@ extern void vPortClearInterruptMaskFromISR( UBaseType_t );
 
 /* Task utilities. */
 
-#define portYIELD()								\
-{												\
-uint32_t ulCause;							\
-												\
-	/* Trigger software interrupt. */			\
-	ulCause = _CP0_GET_CAUSE();					\
-	ulCause |= portSW0_BIT;						\
-	_CP0_SET_CAUSE( ulCause );					\
+#define portYIELD() 						\
+{ 											\
+uint32_t ulCause; 							\
+	/* Trigger software interrupt. */ 		\
+	ulCause = ulPortGetCP0Cause(); 			\
+	ulCause |= portSW0_BIT; 				\
+	vPortSetCP0Cause( ulCause ); 			\
 }
 
 extern volatile UBaseType_t uxInterruptNesting;
 #define portASSERT_IF_IN_ISR() configASSERT( uxInterruptNesting == 0 )
 
-#define portNOP()	__asm volatile ( "nop" )
+#define portNOP() __asm volatile ( "nop" )
 
 /*-----------------------------------------------------------*/
 
@@ -228,14 +276,14 @@ extern volatile UBaseType_t uxInterruptNesting;
 #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
 /*-----------------------------------------------------------*/
 
-#define portEND_SWITCHING_ISR( xSwitchRequired )	if( xSwitchRequired )	\
-													{						\
+#define portEND_SWITCHING_ISR( xSwitchRequired ) 	if( xSwitchRequired )	\
+													{ 						\
 														portYIELD();		\
 													}
 
 /* Required by the kernel aware debugger. */
 #ifdef __DEBUG
-	#define portREMOVE_STATIC_QUALIFIER
+    #define portREMOVE_STATIC_QUALIFIER
 #endif
 
 #ifdef __cplusplus

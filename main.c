@@ -47,6 +47,8 @@
 #include "taskHouskeeping.h"
 
 /* Config Words */
+
+
 // CONFIG3
 #pragma config WPFP = WPFP511           // Write Protection Flash Page Segment Boundary (Highest Page (same as page 170))
 #pragma config WPDIS = WPDIS            // Segment Write Protection Disable bit (Segmented code protection disabled)
@@ -71,6 +73,9 @@
 #pragma config GWRP = OFF               // General Code Segment Write Protect (Writes to program memory are allowed)
 #pragma config GCP = OFF                // General Code Segment Code Protect (Code protection is disabled)
 #pragma config JTAGEN = OFF             // JTAG Port Enable (JTAG port is disabled)
+
+
+
 
 /* Global variables */
 xSemaphoreHandle dataRepositorySem, consolePrintfSem;

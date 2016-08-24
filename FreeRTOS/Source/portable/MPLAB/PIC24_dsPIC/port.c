@@ -1,75 +1,70 @@
 /*
-    FreeRTOS V7.4.2 - Copyright (C) 2013 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
+    All rights reserved
 
-    FEATURES AND PORTS ARE ADDED TO FREERTOS ALL THE TIME.  PLEASE VISIT
-    http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
-
-    ***************************************************************************
-     *                                                                       *
-     *    FreeRTOS tutorial books are available in pdf and paperback.        *
-     *    Complete, revised, and edited pdf reference manuals are also       *
-     *    available.                                                         *
-     *                                                                       *
-     *    Purchasing FreeRTOS documentation will not only help you, by       *
-     *    ensuring you get running as quickly as possible and with an        *
-     *    in-depth knowledge of how to use FreeRTOS, it will also help       *
-     *    the FreeRTOS project to continue with its mission of providing     *
-     *    professional grade, cross platform, de facto standard solutions    *
-     *    for microcontrollers - completely free of charge!                  *
-     *                                                                       *
-     *    >>> See http://www.FreeRTOS.org/Documentation for details. <<<     *
-     *                                                                       *
-     *    Thank you for using FreeRTOS, and thank you for your support!      *
-     *                                                                       *
-    ***************************************************************************
-
+    VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
 
     This file is part of the FreeRTOS distribution.
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
+    Free Software Foundation >>>> AND MODIFIED BY <<<< the FreeRTOS exception.
 
-    >>>>>>NOTE<<<<<< The modification to the GPL is included to allow you to
-    distribute a combined work that includes FreeRTOS without being obliged to
-    provide the source code for proprietary components outside of the FreeRTOS
-    kernel.
+    ***************************************************************************
+    >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+    >>!   distribute a combined work that includes FreeRTOS without being   !<<
+    >>!   obliged to provide the source code for proprietary components     !<<
+    >>!   outside of the FreeRTOS kernel.                                   !<<
+    ***************************************************************************
 
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-    details. You should have received a copy of the GNU General Public License
-    and the FreeRTOS license exception along with FreeRTOS; if not it can be
-    viewed here: http://www.freertos.org/a00114.html and also obtained by
-    writing to Real Time Engineers Ltd., contact details for whom are available
-    on the FreeRTOS WEB site.
-
-    1 tab == 4 spaces!
+    FOR A PARTICULAR PURPOSE.  Full license text is available on the following
+    link: http://www.freertos.org/a00114.html
 
     ***************************************************************************
      *                                                                       *
-     *    Having a problem?  Start by reading the FAQ "My application does   *
-     *    not run, what could be wrong?"                                     *
+     *    FreeRTOS provides completely free yet professionally developed,    *
+     *    robust, strictly quality controlled, supported, and cross          *
+     *    platform software that is more than just the market leader, it     *
+     *    is the industry's de facto standard.                               *
      *                                                                       *
-     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *    Help yourself get started quickly while simultaneously helping     *
+     *    to support the FreeRTOS project by purchasing a FreeRTOS           *
+     *    tutorial book, reference manual, or both:                          *
+     *    http://www.FreeRTOS.org/Documentation                              *
      *                                                                       *
     ***************************************************************************
 
+    http://www.FreeRTOS.org/FAQHelp.html - Having a problem?  Start by reading
+    the FAQ page "My application does not run, what could be wrong?".  Have you
+    defined configASSERT()?
 
-    http://www.FreeRTOS.org - Documentation, books, training, latest versions, 
-    license and Real Time Engineers Ltd. contact details.
+    http://www.FreeRTOS.org/support - In return for receiving this top quality
+    embedded software for free we request you assist our global community by
+    participating in the support forum.
+
+    http://www.FreeRTOS.org/training - Investing in training allows your team to
+    be as productive as possible as early as possible.  Now you can receive
+    FreeRTOS training directly from Richard Barry, CEO of Real Time Engineers
+    Ltd, and the world's leading authority on the world's leading RTOS.
 
     http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
-    including FreeRTOS+Trace - an indispensable productivity tool, and our new
-    fully thread aware and reentrant UDP/IP stack.
+    including FreeRTOS+Trace - an indispensable productivity tool, a DOS
+    compatible FAT file system, and our tiny thread aware UDP/IP stack.
 
-    http://www.OpenRTOS.com - Real Time Engineers ltd license FreeRTOS to High 
-    Integrity Systems, who sell the code with commercial support, 
-    indemnification and middleware, under the OpenRTOS brand.
-    
-    http://www.SafeRTOS.com - High Integrity Systems also provide a safety 
-    engineered and independently SIL3 certified version for use in safety and 
+    http://www.FreeRTOS.org/labs - Where new FreeRTOS products go to incubate.
+    Come and try FreeRTOS+TCP, our new open source TCP/IP stack for FreeRTOS.
+
+    http://www.OpenRTOS.com - Real Time Engineers ltd. license FreeRTOS to High
+    Integrity Systems ltd. to sell under the OpenRTOS brand.  Low cost OpenRTOS
+    licenses offer ticketed support, indemnification and commercial middleware.
+
+    http://www.SafeRTOS.com - High Integrity Systems also provide a safety
+    engineered and independently SIL3 certified version for use in safety and
     mission critical applications that require provable dependability.
+
+    1 tab == 4 spaces!
 */
 
 /*
@@ -97,17 +92,23 @@ FreeRTOS.org V4.3.0. */
 	#define configKERNEL_INTERRUPT_PRIORITY 1
 #endif
 
+/* Use _T1Interrupt as the interrupt handler name if the application writer has
+not provided their own. */
+#ifndef configTICK_INTERRUPT_HANDLER
+	#define configTICK_INTERRUPT_HANDLER _T1Interrupt
+#endif /* configTICK_INTERRUPT_HANDLER */
+
 /* The program counter is only 23 bits. */
 #define portUNUSED_PR_BITS	0x7f
 
 /* Records the nesting depth of calls to portENTER_CRITICAL(). */
-unsigned portBASE_TYPE uxCriticalNesting = 0xef;
+UBaseType_t uxCriticalNesting = 0xef;
 
 #if configKERNEL_INTERRUPT_PRIORITY != 1
 	#error If configKERNEL_INTERRUPT_PRIORITY is not 1 then the #32 in the following macros needs changing to equal the portINTERRUPT_BITS value, which is ( configKERNEL_INTERRUPT_PRIORITY << 5 )
 #endif
 
-#ifdef MPLAB_PIC24_PORT
+#if defined( __PIC24E__ ) || defined ( __PIC24F__ ) || defined( __PIC24FK__ ) || defined( __PIC24H__ )
 
     #ifdef __HAS_EDS__
 		#define portRESTORE_CONTEXT()																						\
@@ -151,7 +152,7 @@ unsigned portBASE_TYPE uxCriticalNesting = 0xef;
 		#endif /* __HAS_EDS__ */
 #endif /* MPLAB_PIC24_PORT */
 
-#ifdef MPLAB_DSPIC_PORT
+#if defined( __dsPIC30F__ ) || defined( __dsPIC33F__ )
 
 	#define portRESTORE_CONTEXT()																						\
 		asm volatile(	"MOV	_pxCurrentTCB, W0		\n"	/* Restore the stack pointer for the task. */				\
@@ -185,20 +186,27 @@ unsigned portBASE_TYPE uxCriticalNesting = 0xef;
 
 #endif /* MPLAB_DSPIC_PORT */
 
+#ifndef portRESTORE_CONTEXT
+	#error Unrecognised device selected
+
+	/* Note:  dsPIC parts with EDS are not supported as there is no easy way to
+	recover the hardware stacked copies for DOCOUNT, DOHIGH, DOLOW. */
+#endif
+
 /*
  * Setup the timer used to generate the tick interrupt.
  */
-static void prvSetupTimerInterrupt( void );
+void vApplicationSetupTickTimerInterrupt( void );
 
 /*
  * See header file for description.
  */
-portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvParameters )
+StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
 {
-unsigned short usCode;
-portBASE_TYPE i;
+uint16_t usCode;
+UBaseType_t i;
 
-const portSTACK_TYPE xInitialStack[] =
+const StackType_t xInitialStack[] =
 {
 	0x1111,	/* W1 */
 	0x2222, /* W2 */
@@ -236,14 +244,14 @@ const portSTACK_TYPE xInitialStack[] =
 	/* Setup the stack as if a yield had occurred.
 
 	Save the low bytes of the program counter. */
-	usCode = ( unsigned short ) pxCode;
-	*pxTopOfStack = ( portSTACK_TYPE ) usCode;
+	usCode = ( uint16_t ) pxCode;
+	*pxTopOfStack = ( StackType_t ) usCode;
 	pxTopOfStack++;
 
 	/* Save the high byte of the program counter.  This will always be zero
 	here as it is passed in a 16bit pointer.  If the address is greater than
 	16 bits then the pointer will point to a jump table. */
-	*pxTopOfStack = ( portSTACK_TYPE ) 0;
+	*pxTopOfStack = ( StackType_t ) 0;
 	pxTopOfStack++;
 
 	/* Status register with interrupts enabled. */
@@ -251,10 +259,10 @@ const portSTACK_TYPE xInitialStack[] =
 	pxTopOfStack++;
 
 	/* Parameters are passed in W0. */
-	*pxTopOfStack = ( portSTACK_TYPE ) pvParameters;
+	*pxTopOfStack = ( StackType_t ) pvParameters;
 	pxTopOfStack++;
 
-	for( i = 0; i < ( sizeof( xInitialStack ) / sizeof( portSTACK_TYPE ) ); i++ )
+	for( i = 0; i < ( sizeof( xInitialStack ) / sizeof( StackType_t ) ); i++ )
 	{
 		*pxTopOfStack = xInitialStack[ i ];
 		pxTopOfStack++;
@@ -281,10 +289,10 @@ const portSTACK_TYPE xInitialStack[] =
 }
 /*-----------------------------------------------------------*/
 
-portBASE_TYPE xPortStartScheduler( void )
+BaseType_t xPortStartScheduler( void )
 {
 	/* Setup a timer for the tick ISR. */
-	prvSetupTimerInterrupt();
+	vApplicationSetupTickTimerInterrupt();
 
 	/* Restore the context of the first task to run. */
 	portRESTORE_CONTEXT();
@@ -299,24 +307,24 @@ portBASE_TYPE xPortStartScheduler( void )
 
 void vPortEndScheduler( void )
 {
-	/* It is unlikely that the scheduler for the PIC port will get stopped
-	once running.  If required disable the tick interrupt here, then return
-	to xPortStartScheduler(). */
+	/* Not implemented in ports where there is nothing to return to.
+	Artificially force an assert. */
+	configASSERT( uxCriticalNesting == 1000UL );
 }
 /*-----------------------------------------------------------*/
 
 /*
  * Setup a timer for a regular tick.
  */
-static void prvSetupTimerInterrupt( void )
+__attribute__(( weak )) void vApplicationSetupTickTimerInterrupt( void )
 {
-const unsigned long ulCompareMatch = ( ( configCPU_CLOCK_HZ / portTIMER_PRESCALE ) / configTICK_RATE_HZ ) - 1;
+const uint32_t ulCompareMatch = ( ( configCPU_CLOCK_HZ / portTIMER_PRESCALE ) / configTICK_RATE_HZ ) - 1;
 
 	/* Prescale of 8. */
 	T1CON = 0;
 	TMR1 = 0;
 
-	PR1 = ( unsigned short ) ulCompareMatch;
+	PR1 = ( uint16_t ) ulCompareMatch;
 
 	/* Setup timer 1 interrupt priority. */
 	IPC0bits.T1IP = configKERNEL_INTERRUPT_PRIORITY;
@@ -345,6 +353,7 @@ void vPortEnterCritical( void )
 
 void vPortExitCritical( void )
 {
+	configASSERT( uxCriticalNesting );
 	uxCriticalNesting--;
 	if( uxCriticalNesting == 0 )
 	{
@@ -353,14 +362,14 @@ void vPortExitCritical( void )
 }
 /*-----------------------------------------------------------*/
 
-void __attribute__((__interrupt__, auto_psv)) _T1Interrupt( void )
+void __attribute__((__interrupt__, auto_psv)) configTICK_INTERRUPT_HANDLER( void )
 {
 	/* Clear the timer interrupt. */
 	IFS0bits.T1IF = 0;
 
-	vTaskIncrementTick();
-
-	#if configUSE_PREEMPTION == 1
+	if( xTaskIncrementTick() != pdFALSE )
+	{
 		portYIELD();
-	#endif
+	}
 }
+
