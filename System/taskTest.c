@@ -1,18 +1,28 @@
 #include "taskTest.h"
-#include "i2c.h"
+#include <i2c.h>
 
 void taskTest(void *param)
 {
     const unsigned long Delayms = 500 / portTICK_RATE_MS;
-    char *msg = (char *)param;
 
+    #if SCH_GRL_VERBOSE
+        printf("[TaskTest] %s\n", (char*)param);
+    #endif
+    
+    cmd_print_all();
+    cmd_t cmd;
+    
     while(1)
     {
         vTaskDelay(Delayms);
-
-        #if SCH_GRL_VERBOSE
-            printf("[taskTest] %s\n", msg);
-        #endif
+        cmd = cmd_get_str("test");
+        printf("[taskTest] New cmd: %s, %i.\n", cmd.name, cmd.id);
+        cmd.function((void *)"1");
+        
+        vTaskDelay(Delayms);
+        cmd = cmd_get_str("none");
+        printf("[taskTest] New cmd: %s, %i.\n", cmd.name, cmd.id);
+        cmd.function(NULL);
     }
 }
 

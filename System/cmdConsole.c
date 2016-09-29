@@ -18,6 +18,7 @@
  */
 
 #include "cmdConsole.h"
+#include "cmdRepository.h"
 
 cmdFunction conFunction[CON_NCMD];
 int con_sysReq[CON_NCMD];
@@ -37,6 +38,11 @@ void con_onResetCmdCON(void){
     con_sysReq[(unsigned char)con_id_error_invalid_arg]  = CMD_SYSREQ_MIN;
     conFunction[(unsigned char)con_id_error_count_arg] = con_error_count_arg;
     con_sysReq[(unsigned char)con_id_error_count_arg]  = CMD_SYSREQ_MIN;
+    
+    cmd_add("test", con_debug_msg, "");
+    cmd_add("none", con_error_unknown_cmd, "");
+    cmd_add("none1", con_error_unknown_cmd, "");
+    cmd_add("none2", con_error_unknown_cmd, "");
 }
 
 /**
@@ -46,7 +52,7 @@ void con_onResetCmdCON(void){
  */
 int con_error_count_arg(void *param)
 {
-    con_printf("[Console Error] Arguments quantity dismatch\r\n"); //Type con_help for available commands\r\n");
+    printf("[Console Error] Arguments quantity dismatch\r\n"); //Type con_help for available commands\r\n");
     return 1;
 }
 
@@ -57,7 +63,7 @@ int con_error_count_arg(void *param)
  */
 int con_error_invalid_arg(void *param)
 {
-    con_printf("[Console Error] Arguments invalid\r\n"); //Type con_help for available commands\r\n");
+    printf("[Console Error] Arguments invalid\r\n"); //Type con_help for available commands\r\n");
     return 1;
 }
 
@@ -68,7 +74,7 @@ int con_error_invalid_arg(void *param)
  */
 int  con_error_unknown_cmd(void *param)
 {
-    con_printf("[Console Error] Unknown command\r\n"); //Type con_help for available commands\r\n");
+    printf("[Console Error] Unknown command\r\n"); //Type con_help for available commands\r\n");
     return 1;
 }
 
@@ -79,7 +85,7 @@ int  con_error_unknown_cmd(void *param)
  */
 int  con_error_cmd_toolong(void *param)
 {
-    con_printf("[Console Error] Command too long\r\n"); //Type con_help for available commands\r\n");
+    printf("[Console Error] Command too long\r\n"); //Type con_help for available commands\r\n");
     return 1;
 }
 
@@ -93,9 +99,9 @@ int  con_debug_msg(void *param)
     char *msg = (char *)param;
     if(msg)
     {
-        con_printf("[Debug Msg] ");
-        //con_printf(msg);
-        con_printf("Test MSG\r\n");
+        printf("[Debug Msg] ");
+        printf((char *) msg);
+        printf("\r\n");
         return 1;
     }
     return 0;
@@ -110,18 +116,18 @@ int  con_debug_msg(void *param)
  */
 int con_help(void *param)
 {
-    con_printf("=================== CONSOLE HELP ===================\r\n");
+    printf("=================== CONSOLE HELP ===================\r\n");
     /*--------------------- PPC HELP ------------------*/
-    con_printf("ppc_reset          = Software resets the PIC.\r\n");
-    con_printf("ppc_newosc <arg1>  = Set a new Oscillator source for Fcy.\r\n");
-    con_printf("ppc_osc            = Returns the Oscillator source of Fcy.\r\n");
-    con_printf("ppc_enwdt <arg1>   = Enable or disable the WDT.\r\n");
+    printf("ppc_reset          = Software resets the PIC.\r\n");
+    printf("ppc_newosc <arg1>  = Set a new Oscillator source for Fcy.\r\n");
+    printf("ppc_osc            = Returns the Oscillator source of Fcy.\r\n");
+    printf("ppc_enwdt <arg1>   = Enable or disable the WDT.\r\n");
     /*--------------------- CON HELP ------------------*/
-    con_printf("con_hist [arg1]    = Show history of cmd or use a listed cmd.\r\n");
-    con_printf("con_help           = Show this help. con_help\r\n");
-    con_printf("====================================================\r\n");
+    printf("con_hist [arg1]    = Show history of cmd or use a listed cmd.\r\n");
+    printf("con_help           = Show this help. con_help\r\n");
+    printf("====================================================\r\n");
     
-    //con_printf("\r\n>>");
+    //printf("\r\n>>");
 
     return 1;
 }
@@ -133,6 +139,6 @@ int con_help(void *param)
  */
 int con_promt(void *param)
 {
-    con_printf(">>");
+    printf(">>");
     return 1;
 }

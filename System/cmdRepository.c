@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include "cmdRepository.h"
 
 /* Add external cmd arrays */
@@ -27,6 +29,73 @@ extern cmdFunction conFunction[];
 
 extern int obc_sysReq[];
 extern int drp_sysReq[];
+
+# define CMD_MAX_LEN 100
+
+cmd_t cmd_list[CMD_MAX_LEN];
+int cmd_index = 0;
+
+/**
+ * Register a command in the system
+ * 
+ * @param name Str. Name of the comand, max CMD_NAME_LEN characters
+ * @param function Pointer to command function
+ * @param params Str. to define command parameters
+ * @return None
+ */
+void cmd_add(char *name, cmdFunction function, char *params)
+{    
+   
+    // Create new command 
+    cmd_t cmd_new;
+    cmd_new.function = function;
+    cmd_new.id = cmd_index;
+    strncpy(cmd_new.name, name, CMD_NAME_LEN);
+    strncpy(cmd_new.params, params, CMD_NAME_LEN);
+    
+    // Copy to command buffer
+    if (cmd_index < CMD_MAX_LEN){
+        cmd_list[cmd_index] = cmd_new;
+    }
+    
+    cmd_index++;
+}
+
+/**
+ * Get command by name
+ * 
+ * @param name Str. Command name
+ * @return cmd_t Command structure. Null if command does not exists.
+ */
+cmd_t cmd_get_str(char *name)
+{
+    cmd_t cmd_new;
+    
+    //Find inside command buffer
+    int i, ok;
+    for(i=0; i<CMD_MAX_LEN; i++)
+    {
+        ok = strncmp(name, cmd_list[i].name, CMD_MAX_LEN);
+        if(ok == 0)
+        {
+            cmd_new = cmd_list[i];
+            return cmd_new;
+        }
+    }
+
+    return cmd_new;
+}
+
+/**
+ * Print the list registered commands
+ */
+void cmd_print_all(void){
+    int i;
+    for(i=0; i<cmd_index; i++)
+    {
+        printf("Cmd: %s. Id: %d. Par:%s\n", cmd_list[i].name, cmd_list[i].id, cmd_list[i].params);
+    }
+}
 
 /**
  * Returns the energy level asociated to each command
@@ -114,6 +183,7 @@ int repo_onResetCmdRepo(void)
 {
     obc_onResetCmdOBC();
     drp_onResetCmdDRP();
+    con_onResetCmdCON();
 
     return 1;
 }

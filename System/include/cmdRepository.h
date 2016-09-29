@@ -22,6 +22,10 @@
 #define CMD_IDORIG_THOUSEKEEPING    0x1001
 #define CMD_IDORIG_TCONSOLE    0x1002
 
+void cmd_add(char *name, cmdFunction function, char *params);
+cmd_t cmd_get_str(char *name);
+void cmd_print_all(void);
+
 int cmdNULL(void *param);
 
 cmdFunction repo_getCmd(int cmdID);

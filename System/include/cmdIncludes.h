@@ -38,6 +38,16 @@ typedef struct ctrl_command{
     int sysReq;                 ///< Metadata: Level of energylp the command requires
 }DispCmd;
 
+#define CMD_NAME_LEN 10
+
+typedef struct cmd_type{
+    int id;                     ///< Command id
+    int nparam;                 ///< Number of parameters
+    cmdFunction function;       ///< Command function
+    char name[CMD_NAME_LEN];    ///< Command name
+    char params[CMD_NAME_LEN];               ///< List of params types
+} cmd_t;
+
 
 #define CMD_CMDNULL     (0xFFFF)    ///< Dummy command id. Represent a null command
 

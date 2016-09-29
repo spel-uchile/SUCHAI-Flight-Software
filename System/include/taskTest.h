@@ -7,6 +7,7 @@
 #include "task.h"
 
 #include "SUCHAI_config.h"
+#include "cmdRepository.h"
 
 //#include "csp.h"
 //#include "csp_if_i2c.h"
