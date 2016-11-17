@@ -27,31 +27,30 @@ void taskExecuter(void *param)
 {
     printf(">>[Executer] Started\n");
 
-    ExeCmd RunCmd;
-    int cmdStat, queueStat, cmdParam;
+    cmd_t run_cmd;
+    int cmd_stat, queue_stat;
         
     while(1)
     {
         /* Read the CMD that Dispatcher sent - BLOCKING */
-        queueStat = xQueueReceive(executerCmdQueue, &RunCmd, portMAX_DELAY);
+        queue_stat = xQueueReceive(executerCmdQueue, &run_cmd, portMAX_DELAY);
         
-        if(queueStat == pdPASS)
+        if(queue_stat == pdPASS)
         {
             printf("[Executer] Running a command...\n");
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();
 
             /* Execute the command */
-            cmdParam = RunCmd.param;
-            cmdStat = RunCmd.fnct((void *)&cmdParam);
+            cmd_stat = run_cmd.function(run_cmd.nparam, run_cmd.params);
 
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();
             
-            printf("[Executer] Command result: %d\n", cmdStat);
+            printf("[Executer] Command result: %d\n", cmd_stat);
             
             /* Send the result to Dispatcher - BLOCKING */
-            xQueueSend(executerStatQueue, &cmdStat, portMAX_DELAY);
+            xQueueSend(executerStatQueue, &cmd_stat, portMAX_DELAY);
 
         }
     }

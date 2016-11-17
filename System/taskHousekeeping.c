@@ -25,7 +25,7 @@ extern xQueueHandle dispatcherQueue; /* Commands queue */
 
 void taskHouskeeping(void *param)
 {
-    printf(">>[Houskeeping] Started\r\n");
+    printf(">>[Housekeeping] Started\r\n");
     
     portTickType delay_ms    = 1000;    //Task period in [ms]
     portTickType delay_ticks = delay_ms / portTICK_RATE_MS; //Task period in ticks
@@ -37,6 +37,8 @@ void taskHouskeeping(void *param)
 
     DispCmd NewCmd;
     NewCmd.idOrig = CMD_IDORIG_THOUSEKEEPING; //Housekeeping
+    
+    cmd_t new_cmd;
 
     portTickType xLastWakeTime = xTaskGetTickCount();
     
@@ -48,30 +50,30 @@ void taskHouskeeping(void *param)
         /* 10 seconds actions */
         if((elapsed_sec % _10sec_check) == 0)
         {
-            printf("[Houskeeping] _10sec_check\n");
-
-            NewCmd.cmdId = obc_id_get_rtos_memory;
-            NewCmd.param = 0;
-            xQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
+            printf("[Housekeeping] _10sec_check\n");
+            new_cmd = cmd_get_str("get_mem");
+            xQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
         }
 
         /* 10 minutes actions */
         if((elapsed_sec % _10min_check) == 0)
         {
-            printf("[Houskeeping] _10min_check\n");
-            NewCmd.cmdId = drp_id_print_CubesatVar;
-            NewCmd.param = 0;
-            xQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
+            printf("[Housekeeping] _10min_check\n");
+            new_cmd = cmd_get_str("print_vars");
+            xQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
         }
 
         /* 1 hours actions */
         if((elapsed_sec % _1hour_check) == 0)
         {
-            printf("[Houskeeping] _1hour_check\n");
+            printf("[Housekeeping] _1hour_check\n");
 
-            NewCmd.cmdId = drp_id_update_dat_CubesatVar_hoursWithoutReset;
-            NewCmd.param = 1; //Add 1 hour
-            xQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
+//            NewCmd.cmdId = drp_id_update_dat_CubesatVar_hoursWithoutReset;
+//            NewCmd.param = 1; //Add 1 hour
+            new_cmd = cmd_get_str("update_hours");
+            int param[] = {1};
+            new_cmd.params = param;
+            xQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
         }
     }
 }

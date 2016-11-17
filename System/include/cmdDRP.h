@@ -37,7 +37,7 @@ typedef enum{
 
 void drp_onResetCmdDRP(void);
 
-int drp_update_dat_CubesatVar_hoursWithoutReset(void *param);
-int drp_print_dat_CubesatVar(void *param);
+int drp_update_dat_CubesatVar_hoursWithoutReset(int nparam, void *param);
+int drp_print_dat_CubesatVar(int nparam, void *param);
 
 #endif /* CMD_PCC_H */

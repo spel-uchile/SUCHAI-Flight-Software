@@ -34,6 +34,9 @@ void obc_onResetCmdOBC(void)
     
     obc_Function[(unsigned char)obc_id_get_rtos_memory] = obc_get_rtos_memory;
     obc_sysReq[(unsigned char)obc_id_get_rtos_memory]  = CMD_SYSREQ_MIN;
+    
+//    cmd_add("reset", obc_reset, "");
+//    cmd_add("get_mem", obc_get_rtos_memory, "");
 }
 
 /**
@@ -42,7 +45,7 @@ void obc_onResetCmdOBC(void)
  * @param param Not used
  * @return 1, but function never returns
  */
-int obc_reset(void* param)
+int obc_reset(int nparam, void* param)
 {
     printf("Resetting system NOW!!\n");
 
@@ -58,7 +61,7 @@ int obc_reset(void* param)
  * @param param Not used
  * @return Availible heap memory in bytes
  */
-int obc_get_rtos_memory(void *param)
+int obc_get_rtos_memory(int nparam, void *param)
 {
     size_t mem_heap = xPortGetFreeHeapSize();
     printf("Free RTOS memory: %d\n", mem_heap);

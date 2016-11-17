@@ -43,8 +43,8 @@ int con_error_cmd_toolong(void *param);
 int con_error_count_arg(void *param);
 int con_error_invalid_arg(void *param);
 int con_error_unknown_cmd(void *param);
-int con_debug_msg(void *param);
-int con_help(void *param);
+int con_debug_msg(int nparam, void *param);
+int con_help(int nparam, void *param);
 
 int con_promt(void *param);
 

@@ -22,15 +22,11 @@
 #define CMD_IDORIG_THOUSEKEEPING    0x1001
 #define CMD_IDORIG_TCONSOLE    0x1002
 
-void cmd_add(char *name, cmdFunction function, char *params);
+void cmd_add(char *name, cmdFunction function, int nparam);
 cmd_t cmd_get_str(char *name);
+cmd_t cmd_get_idx(int idx);
 void cmd_print_all(void);
-
-int cmdNULL(void *param);
-
-cmdFunction repo_getCmd(int cmdID);
-int repo_getsysReq(int cmdID);
-
-int repo_onResetCmdRepo(void);
+int cmd_init(void);
+int cmd_null(int nparam, void *param);
 
 #endif /* CMD_REPO_H */

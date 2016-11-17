@@ -24,25 +24,23 @@ cmdFunction conFunction[CON_NCMD];
 int con_sysReq[CON_NCMD];
 
 void con_onResetCmdCON(void){
-    conFunction[(unsigned char)con_id_help] = con_help;
-    con_sysReq[(unsigned char)con_id_help]  = CMD_SYSREQ_MIN;
-    conFunction[(unsigned char)con_id_promt] = con_promt;
-    con_sysReq[(unsigned char)con_id_promt]  = CMD_SYSREQ_MIN;
-    conFunction[(unsigned char)con_id_error_cmd_toolong] = con_error_cmd_toolong;
-    con_sysReq[(unsigned char)con_id_error_cmd_toolong]  = CMD_SYSREQ_MIN;
-    conFunction[(unsigned char)con_id_debug_msg] = con_debug_msg;
-    con_sysReq[(unsigned char)con_id_debug_msg]  = CMD_SYSREQ_MIN;
-    conFunction[(unsigned char)con_id_error_unknown_cmd] = con_error_unknown_cmd;
-    con_sysReq[(unsigned char)con_id_error_unknown_cmd]  = CMD_SYSREQ_MIN;
-    conFunction[(unsigned char)con_id_error_invalid_arg] = con_error_invalid_arg;
-    con_sysReq[(unsigned char)con_id_error_invalid_arg]  = CMD_SYSREQ_MIN;
-    conFunction[(unsigned char)con_id_error_count_arg] = con_error_count_arg;
-    con_sysReq[(unsigned char)con_id_error_count_arg]  = CMD_SYSREQ_MIN;
+//    conFunction[(unsigned char)con_id_help] = con_help;
+//    con_sysReq[(unsigned char)con_id_help]  = CMD_SYSREQ_MIN;
+//    conFunction[(unsigned char)con_id_promt] = con_promt;
+//    con_sysReq[(unsigned char)con_id_promt]  = CMD_SYSREQ_MIN;
+//    conFunction[(unsigned char)con_id_error_cmd_toolong] = con_error_cmd_toolong;
+//    con_sysReq[(unsigned char)con_id_error_cmd_toolong]  = CMD_SYSREQ_MIN;
+////    conFunction[(unsigned char)con_id_debug_msg] = con_debug_msg;
+////    con_sysReq[(unsigned char)con_id_debug_msg]  = CMD_SYSREQ_MIN;
+//    conFunction[(unsigned char)con_id_error_unknown_cmd] = con_error_unknown_cmd;
+//    con_sysReq[(unsigned char)con_id_error_unknown_cmd]  = CMD_SYSREQ_MIN;
+//    conFunction[(unsigned char)con_id_error_invalid_arg] = con_error_invalid_arg;
+//    con_sysReq[(unsigned char)con_id_error_invalid_arg]  = CMD_SYSREQ_MIN;
+//    conFunction[(unsigned char)con_id_error_count_arg] = con_error_count_arg;
+//    con_sysReq[(unsigned char)con_id_error_count_arg]  = CMD_SYSREQ_MIN;
     
-    cmd_add("test", con_debug_msg, "");
-    cmd_add("none", con_error_unknown_cmd, "");
-    cmd_add("none1", con_error_unknown_cmd, "");
-    cmd_add("none2", con_error_unknown_cmd, "");
+    cmd_add("test", con_debug_msg, 1);
+    cmd_add("help", con_help, 0);
 }
 
 /**
@@ -94,7 +92,7 @@ int  con_error_cmd_toolong(void *param)
  * @param param void message as char array
  * @return 1 - OK, 0 fail
  */
-int  con_debug_msg(void *param)
+int con_debug_msg(int nparam, void *param)
 {
     char *msg = (char *)param;
     if(msg)
@@ -114,21 +112,10 @@ int  con_debug_msg(void *param)
  * @param param void
  * @return 1 - OK
  */
-int con_help(void *param)
+int con_help(int nparam, void *param)
 {
-    printf("=================== CONSOLE HELP ===================\r\n");
-    /*--------------------- PPC HELP ------------------*/
-    printf("ppc_reset          = Software resets the PIC.\r\n");
-    printf("ppc_newosc <arg1>  = Set a new Oscillator source for Fcy.\r\n");
-    printf("ppc_osc            = Returns the Oscillator source of Fcy.\r\n");
-    printf("ppc_enwdt <arg1>   = Enable or disable the WDT.\r\n");
-    /*--------------------- CON HELP ------------------*/
-    printf("con_hist [arg1]    = Show history of cmd or use a listed cmd.\r\n");
-    printf("con_help           = Show this help. con_help\r\n");
-    printf("====================================================\r\n");
-    
-    //printf("\r\n>>");
-
+    printf("List of commands:\n");
+    cmd_print_all();
     return 1;
 }
 

@@ -78,7 +78,7 @@
 
 
 /* Global variables */
-xSemaphoreHandle dataRepositorySem, consolePrintfSem;
+xSemaphoreHandle dataRepositorySem, consolePrintfSem, t_mutex;
 xQueueHandle dispatcherQueue, executerCmdQueue, executerStatQueue;
 
 static void on_reset(void);
@@ -86,24 +86,25 @@ static void on_reset(void);
 int main(void)
 {
     /* Initializing shared Queues */
-    dispatcherQueue = xQueueCreate(25,sizeof(DispCmd));
-    executerCmdQueue = xQueueCreate(1,sizeof(ExeCmd));
+    dispatcherQueue = xQueueCreate(25,sizeof(cmd_t));
+    executerCmdQueue = xQueueCreate(1,sizeof(cmd_t));
     executerStatQueue = xQueueCreate(1,sizeof(int));
 
     /* Initializing shared Semaphore */
     dataRepositorySem = xSemaphoreCreateMutex();
     consolePrintfSem = xSemaphoreCreateMutex();
+    t_mutex = xSemaphoreCreateMutex();
 
     /* Crating all tasks */
 //    int node = 1;
-//    xTaskCreate(taskTestCSP, (signed char *)"CSP", 2*configMINIMAL_STACK_SIZE, (void *)(&node), 3, NULL);
+//    xTaskCreate(taskTestCSP, "CSP", 2*configMINIMAL_STACK_SIZE, (void *)(&node), 3, NULL);
 //    xTaskCreate(taskDispatcher, "dispatcher", 2*configMINIMAL_STACK_SIZE, NULL, 3, NULL);
 //    xTaskCreate(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, NULL);
 //    xTaskCreate(taskHouskeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
 
-    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
-//    xTaskCreate(taskTest, (signed char*)"taskTest", configMINIMAL_STACK_SIZE, (void *)"T2 Running...", 2, NULL);
+    xTaskCreate(taskTest, "taskTest", configMINIMAL_STACK_SIZE, (void *)"T1 Running...", 1, NULL);
+    xTaskCreate(taskTest, "taskTest", configMINIMAL_STACK_SIZE, (void *)"T2 Running...", 2, NULL);
 
     /* Configure Peripherals */
 
@@ -176,7 +177,7 @@ void configure_ports(void)
 void on_reset(void)
 {
     configure_ports(); //Configure hardware
-    repo_onResetCmdRepo(); //Command repository initialization
+    cmd_init(); //Command repository initialization
     dat_onResetCubesatVar(); //Update status repository
 
     /* UART1 - CONSOLE - 19200, 8, N, 1 */

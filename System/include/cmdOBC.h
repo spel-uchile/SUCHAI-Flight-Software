@@ -32,8 +32,8 @@ typedef enum{
 
 void obc_onResetCmdOBC(void);
 
-int obc_reset(void* param);
-int obc_get_rtos_memory(void *param);
+int obc_reset(int nparam, void* param);
+int obc_get_rtos_memory(int nparam, void *param);
 
 
 #endif /* CMD_PCC_H */

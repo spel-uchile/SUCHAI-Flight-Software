@@ -30,68 +30,56 @@ void taskDispatcher(void *param)
 
     portBASE_TYPE status; /* Status of cmd reading operation */
 
-    DispCmd newCmd; /* The new cmd readed */
-    ExeCmd exeCmd; /* Strucutre to executer */
-
-    int cmdId, cmdParam, idOrig, sysReq, cmdResult; /* Cmd metadata */
+    cmd_t new_cmd; /* The new cmd readed */
+    int cmd_result;
 
     while(1)
     {
         /* Read newCmd from Queue - Blocking */
-        status = xQueueReceive(dispatcherQueue, &newCmd, portMAX_DELAY);
+        status = xQueueReceive(dispatcherQueue, &new_cmd, portMAX_DELAY);
 
         if(status == pdPASS)
         {
-			/* Gets command metadata*/
-            cmdId = newCmd.cmdId;
-            idOrig = newCmd.idOrig;
-            sysReq = newCmd.sysReq;
-            cmdParam = newCmd.param;
-
             /* Check if command is eecutable */
-            if(check_if_executable(&newCmd))
+            if(check_if_executable(&new_cmd))
             {
-				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X\n", cmdId, cmdParam, idOrig);
-
-				/* Fill the executer command */
-				exeCmd.fnct = repo_getCmd(newCmd.cmdId);
-				exeCmd.param = cmdParam;
+				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X\n", new_cmd.id, new_cmd.nparam, -1);
 
                 /* Send the command to executer Queue - BLOCKING */
-                xQueueSend(executerCmdQueue, &exeCmd, portMAX_DELAY);
+                xQueueSend(executerCmdQueue, &new_cmd, portMAX_DELAY);
 
                 /* Get the result from Executer Stat Queue - BLOCKING */
-                xQueueReceive(executerStatQueue, &cmdResult, portMAX_DELAY);
+                xQueueReceive(executerStatQueue, &cmd_result, portMAX_DELAY);
             }
         }
     }
 }
 
-int check_if_executable(DispCmd *newCmd)
+int check_if_executable(cmd_t *newCmd)
 {
-    int cmdId, idOrig, sysReq, param; /* Cmd metadata */
-
-    cmdId = newCmd->cmdId;
-    idOrig = newCmd->idOrig;
-    sysReq = repo_getsysReq(cmdId);
-    param = newCmd->param;
-
-    if(cmdId == CMD_CMDNULL)
-    {
-        printf("[Dispatcher] Cmd: %X from %X refused because was NULL\n", cmdId, idOrig);
-        return 0;
-    }
-
-    #if (SCH_CHECK_IF_EXECUTABLE_SOC == 0)
-        dat_setCubesatVar(dat_eps_soc, CMD_SYSREQ_MAX);
-    #endif
-
-    // Compare sysReq with SOC
-    if(dat_getCubesatVar(dat_eps_soc) < sysReq)
-    {
-        printf("[Dispatcher] Cmd: %X from %X sysReq %d refused because of SOC %d\n", cmdId, idOrig, sysReq, dat_getCubesatVar(dat_eps_soc));
-        return 0;
-    }
+//    int cmdId, idOrig, sysReq, param; /* Cmd metadata */
+//
+//    cmdId = newCmd->cmdId;
+//    idOrig = newCmd->idOrig;
+//    sysReq = 0; //repo_getsysReq(cmdId);
+//    param = newCmd->param;
+//
+//    if(cmdId == CMD_CMDNULL)
+//    {
+//        printf("[Dispatcher] Cmd: %X from %X refused because was NULL\n", cmdId, idOrig);
+//        return 0;
+//    }
+//
+//    #if (SCH_CHECK_IF_EXECUTABLE_SOC == 0)
+//        dat_setCubesatVar(dat_eps_soc, CMD_SYSREQ_MAX);
+//    #endif
+//
+//    // Compare sysReq with SOC
+//    if(dat_getCubesatVar(dat_eps_soc) < sysReq)
+//    {
+//        printf("[Dispatcher] Cmd: %X from %X sysReq %d refused because of SOC %d\n", cmdId, idOrig, sysReq, dat_getCubesatVar(dat_eps_soc));
+//        return 0;
+//    }
 
     return 1;
 }

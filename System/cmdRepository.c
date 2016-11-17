@@ -22,16 +22,7 @@
 
 #include "cmdRepository.h"
 
-/* Add external cmd arrays */
-extern cmdFunction obc_Function[];
-extern cmdFunction drp_Function[];
-extern cmdFunction conFunction[];
-
-extern int obc_sysReq[];
-extern int drp_sysReq[];
-
 # define CMD_MAX_LEN 100
-
 cmd_t cmd_list[CMD_MAX_LEN];
 int cmd_index = 0;
 
@@ -43,15 +34,15 @@ int cmd_index = 0;
  * @param params Str. to define command parameters
  * @return None
  */
-void cmd_add(char *name, cmdFunction function, char *params)
+void cmd_add(char* name, cmdFunction function, int nparam)
 {    
    
     // Create new command 
     cmd_t cmd_new;
     cmd_new.function = function;
     cmd_new.id = cmd_index;
-    strncpy(cmd_new.name, name, CMD_NAME_LEN);
-    strncpy(cmd_new.params, params, CMD_NAME_LEN);
+    cmd_new.nparam = nparam; 
+   strncpy(cmd_new.name, name, CMD_NAME_LEN);
     
     // Copy to command buffer
     if (cmd_index < CMD_MAX_LEN){
@@ -87,104 +78,61 @@ cmd_t cmd_get_str(char *name)
 }
 
 /**
+ * Get command by index or id
+ * 
+ * @param idx Int command index or Id.
+ * @return cmd_t Command structure. Null if command does not exists. 
+ */
+cmd_t cmd_get_idx(int idx)
+{
+    cmd_t cmd_new;
+    
+    if (idx < CMD_MAX_LEN)
+    {
+        cmd_new = cmd_list[idx];
+    }
+    
+    return cmd_new;
+}
+
+/**
  * Print the list registered commands
  */
 void cmd_print_all(void){
+    
+    printf("Name\t; Index\t; Params\n");
     int i;
     for(i=0; i<cmd_index; i++)
     {
-        printf("Cmd: %s. Id: %d. Par:%s\n", cmd_list[i].name, cmd_list[i].id, cmd_list[i].params);
+        printf("%s\t; %d\t; %d\n", cmd_list[i].name, cmd_list[i].id, cmd_list[i].nparam);
     }
 }
 
 /**
- * Returns the energy level asociated to each command
- *
- * @param cmdID Command intentifier
- * @return Requiered energy level
+ * Initializes the command buffer adding null_cmd
+ * 
+ * @return 1
  */
-int repo_getsysReq(int cmdID)
+int cmd_init(void)
 {
-    int cmdOwn, cmdNum;
-    int result;
-
-    cmdNum = (unsigned char)cmdID;
-    cmdOwn = (unsigned char)(cmdID>>8);
-
-    switch (cmdOwn)
-    {
-        case CMD_OBC:
-            if(cmdNum >= OBC_NCMD)
-                result = CMD_SYSREQ_MIN;
-            else
-                result = obc_sysReq[cmdNum];
-            break;
-
-        case CMD_DRP:
-            if(cmdNum >= DRP_NCMD)
-                result = CMD_SYSREQ_MIN;
-            else
-                result = drp_sysReq[cmdNum];
-            break;
-            
-        default:
-            result = CMD_SYSREQ_MIN;
-            break;
+    // Create a null command 
+    cmd_t cnull;
+    cnull.function = cmd_null;
+    cnull.id = cmd_index;
+    cnull.nparam = 0;
+    strncpy(cnull.name, "null", CMD_NAME_LEN);
+    
+    // Reset the command buufer
+    int i;
+    for(i=0; i < CMD_MAX_LEN; i++){
+        cmd_list[i] = cnull;
     }
-
-    return result;
-}
-
-/**
- * Returns a pointer with the function asociated to each cmdID. If the id is not
- * registered, returns the standar null command.
- *
- * @param cmdID Command id
- * @return Pointer to function of type cmdFunction
- */
-cmdFunction repo_getCmd(int cmdID)
-{
-    int cmdOwn, cmdNum;
-    cmdFunction result;
-
-    cmdNum = (unsigned char)cmdID;
-    cmdOwn = (unsigned char)(cmdID>>8);
-
-    switch (cmdOwn)
-    {
-        case CMD_OBC:
-            if(cmdNum >= OBC_NCMD)
-                result = cmdNULL;
-            else
-                result = obc_Function[cmdNum];
-            break;
-
-        case CMD_DRP:
-            if(cmdNum >= DRP_NCMD)
-                result = cmdNULL;
-            else
-                result = drp_Function[cmdNum];
-            break;
-        
-        default:
-            result = cmdNULL;
-            break;
-    }
-
-    return result;
-}
-
-/**
- * Initializes all cmd arrays
- *
- * @return 1, allways successful
- */
-int repo_onResetCmdRepo(void)
-{
+    
+    // Init repos
     obc_onResetCmdOBC();
     drp_onResetCmdDRP();
     con_onResetCmdCON();
-
+    
     return 1;
 }
 
@@ -194,11 +142,8 @@ int repo_onResetCmdRepo(void)
  * @param param Not used
  * @return 1, allways successful
  */
-int cmdNULL(void *param)
+int cmd_null(int nparam, void *param)
 {
-    int arg=*( (int *)param );
-    printf("cmdNULL was used with param %d\n", arg);
-
+    printf("cmd_null was used with %d params at 0x%X\n", nparam, (int)&param);
     return 1;
 }
-

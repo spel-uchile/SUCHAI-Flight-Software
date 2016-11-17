@@ -1,9 +1,12 @@
 #include "taskTest.h"
 #include <i2c.h>
 
+extern xSemaphoreHandle t_mutex;
+
 void taskTest(void *param)
 {
     const unsigned long Delayms = 500 / portTICK_RATE_MS;
+    xSemaphoreGive(t_mutex);
 
     #if SCH_GRL_VERBOSE
         printf("[TaskTest] %s\n", (char*)param);
@@ -17,12 +20,16 @@ void taskTest(void *param)
         vTaskDelay(Delayms);
         cmd = cmd_get_str("test");
         printf("[taskTest] New cmd: %s, %i.\n", cmd.name, cmd.id);
-        cmd.function((void *)"1");
+        xSemaphoreTake(t_mutex, portMAX_DELAY);
+        cmd.function(1, (void *)param);
+//        xSemaphoreGive(t_mutex);
         
         vTaskDelay(Delayms);
-        cmd = cmd_get_str("none");
+        cmd = cmd_get_idx(2);
         printf("[taskTest] New cmd: %s, %i.\n", cmd.name, cmd.id);
-        cmd.function(NULL);
+//        xSemaphoreTake(t_mutex, portMAX_DELAY);
+        cmd.function(0, NULL);
+        xSemaphoreGive(t_mutex);
     }
 }
 

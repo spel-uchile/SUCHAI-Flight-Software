@@ -17,4 +17,4 @@
 #include "dataRepository.h"
 
 void taskDispatcher(void *param);
-int check_if_executable(DispCmd *newCmd);
+int check_if_executable(cmd_t *newCmd);
