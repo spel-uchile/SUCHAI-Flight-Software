@@ -12,6 +12,11 @@
  * message to dispatcher with the result of the execution
  */
 
-#include "SUCHAI_config.h"
+#ifndef T_EXECUTER_H
+#define T_EXECUTER_H
+
+#include "../../SUCHAI_config.h"
 
 void taskExecuter(void *param);
+
+#endif

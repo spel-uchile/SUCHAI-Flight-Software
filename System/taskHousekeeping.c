@@ -18,17 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskHouskeeping.h"
-#include "cmdDRP.h"
+#include "include/taskHousekeeping.h"
 
-extern xQueueHandle dispatcherQueue; /* Commands queue */
+extern osQueue dispatcherQueue; /* Commands queue */
 
-void taskHouskeeping(void *param)
+void taskHousekeeping(void *param)
 {
     printf(">>[Houskeeping] Started\r\n");
     
-    portTickType delay_ms    = 1000;    //Task period in [ms]
-    portTickType delay_ticks = delay_ms / portTICK_RATE_MS; //Task period in ticks
+    portTick delay_ms    = 1000;    //Task period in [ms]
+    portTick delay_ticks = osDefineTime(delay_ms); //Task period in ticks
 
     unsigned int elapsed_sec = 0;       // Seconds count
     unsigned int _10sec_check = 1;//10;     //10[s] condition
@@ -38,11 +37,12 @@ void taskHouskeeping(void *param)
     DispCmd NewCmd;
     NewCmd.idOrig = CMD_IDORIG_THOUSEKEEPING; //Housekeeping
 
-    portTickType xLastWakeTime = xTaskGetTickCount();
+    portTick xLastWakeTime = osTaskGetTickCount();
     
     while(1)
     {
-        vTaskDelayUntil(&xLastWakeTime, delay_ticks); //Suspend task
+
+        osTaskDelayUntil(&xLastWakeTime, delay_ticks); //Suspend task
         elapsed_sec += delay_ms/1000; //Update seconds counts
 
         /* 10 seconds actions */
@@ -52,7 +52,7 @@ void taskHouskeeping(void *param)
 
             NewCmd.cmdId = obc_id_get_rtos_memory;
             NewCmd.param = 0;
-            xQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
+            osQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
         }
 
         /* 10 minutes actions */
@@ -61,7 +61,7 @@ void taskHouskeeping(void *param)
             printf("[Houskeeping] _10min_check\n");
             NewCmd.cmdId = drp_id_print_CubesatVar;
             NewCmd.param = 0;
-            xQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
+            osQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
         }
 
         /* 1 hours actions */
@@ -71,7 +71,7 @@ void taskHouskeeping(void *param)
 
             NewCmd.cmdId = drp_id_update_dat_CubesatVar_hoursWithoutReset;
             NewCmd.param = 1; //Add 1 hour
-            xQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
+            osQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
         }
     }
 }

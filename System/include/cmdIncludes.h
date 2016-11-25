@@ -8,7 +8,7 @@
  * This header have general definitions about commands prototipes and related
  * data structures.
  */
-
+ 
 #ifndef CMD_INCLUDES_H
 #define CMD_INCLUDES_H
 
@@ -35,7 +35,7 @@ typedef struct ctrl_command{
     int cmdId;                  ///< Command id, represent the desired command
     int param;                  ///< Command parameter
     int idOrig;                 ///< Metadata: Id of sender subsystem
-    int sysReq;                 ///< Metadata: Level of energylp the command requires
+    int sysReq;                 ///< Metadata: Level of energy the command requires
 }DispCmd;
 
 

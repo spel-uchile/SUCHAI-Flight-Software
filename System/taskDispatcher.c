@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskDispatcher.h"
+#include "include/taskDispatcher.h"
 
-extern xQueueHandle dispatcherQueue; /* Commands queue */
-extern xQueueHandle executerCmdQueue; /* Executer commands queue */
-extern xQueueHandle executerStatQueue; /* Executer result queue */
+extern osQueue dispatcherQueue; /* Commands queue */
+extern osQueue executerCmdQueue; /* Executer commands queue */
+extern osQueue executerStatQueue; /* Executer result queue */
 
 void taskDispatcher(void *param)
 {
@@ -38,7 +38,7 @@ void taskDispatcher(void *param)
     while(1)
     {
         /* Read newCmd from Queue - Blocking */
-        status = xQueueReceive(dispatcherQueue, &newCmd, portMAX_DELAY);
+        status = osQueueReceive(dispatcherQueue, &newCmd, portMAX_DELAY);
 
         if(status == pdPASS)
         {
@@ -48,7 +48,7 @@ void taskDispatcher(void *param)
             sysReq = newCmd.sysReq;
             cmdParam = newCmd.param;
 
-            /* Check if command is eecutable */
+            /* Check if command is executable */
             if(check_if_executable(&newCmd))
             {
 				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X\n", cmdId, cmdParam, idOrig);
@@ -58,10 +58,10 @@ void taskDispatcher(void *param)
 				exeCmd.param = cmdParam;
 
                 /* Send the command to executer Queue - BLOCKING */
-                xQueueSend(executerCmdQueue, &exeCmd, portMAX_DELAY);
+                osQueueSend(executerCmdQueue, &exeCmd, portMAX_DELAY);
 
                 /* Get the result from Executer Stat Queue - BLOCKING */
-                xQueueReceive(executerStatQueue, &cmdResult, portMAX_DELAY);
+                osQueueReceive(executerStatQueue, &cmdResult, portMAX_DELAY);
             }
         }
     }
@@ -73,7 +73,7 @@ int check_if_executable(DispCmd *newCmd)
 
     cmdId = newCmd->cmdId;
     idOrig = newCmd->idOrig;
-    sysReq = repo_getsysReq(cmdId);
+    sysReq = newCmd->sysReq;
     param = newCmd->param;
 
     if(cmdId == CMD_CMDNULL)
@@ -86,12 +86,12 @@ int check_if_executable(DispCmd *newCmd)
         dat_setCubesatVar(dat_eps_soc, CMD_SYSREQ_MAX);
     #endif
 
-    // Compare sysReq with SOC
-    if(dat_getCubesatVar(dat_eps_soc) < sysReq)
+    // Compare sysReq with SOC  
+    if(sysReq > dat_getCubesatVar(dat_eps_soc))
     {
-        printf("[Dispatcher] Cmd: %X from %X sysReq %d refused because of SOC %d\n", cmdId, idOrig, sysReq, dat_getCubesatVar(dat_eps_soc));
+        printf("[Dispatcher] Cmd: %X from %X refused because of SOC\n", cmdId, idOrig);
         return 0;
     }
-
+        
     return 1;
 }

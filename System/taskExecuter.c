@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskExecuter.h"
+#include "include/taskExecuter.h"
 
-extern xQueueHandle executerCmdQueue; /* Comands queue*/
-extern xQueueHandle executerStatQueue; /* Comands queue*/
+extern osQueue executerCmdQueue; /* Comands queue*/
+extern osQueue executerStatQueue; /* Comands queue*/
 
 void taskExecuter(void *param)
 {
@@ -33,7 +33,7 @@ void taskExecuter(void *param)
     while(1)
     {
         /* Read the CMD that Dispatcher sent - BLOCKING */
-        queueStat = xQueueReceive(executerCmdQueue, &RunCmd, portMAX_DELAY);
+        queueStat = osQueueReceive(executerCmdQueue, &RunCmd, portMAX_DELAY);
         
         if(queueStat == pdPASS)
         {
@@ -51,7 +51,7 @@ void taskExecuter(void *param)
             printf("[Executer] Command result: %d\n", cmdStat);
             
             /* Send the result to Dispatcher - BLOCKING */
-            xQueueSend(executerStatQueue, &cmdStat, portMAX_DELAY);
+            osQueueSend(executerStatQueue, &cmdStat, portMAX_DELAY);
 
         }
     }
