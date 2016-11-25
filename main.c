@@ -93,7 +93,7 @@ int main(void)
     /* Initializing shared Semaphore */
     dataRepositorySem = xSemaphoreCreateMutex();
     consolePrintfSem = xSemaphoreCreateMutex();
-    t_mutex = xSemaphoreCreateMutex();
+    t_mutex = xSemaphoreCreateBinary();
 
     /* Crating all tasks */
 //    int node = 1;

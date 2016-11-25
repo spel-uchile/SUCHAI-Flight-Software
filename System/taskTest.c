@@ -14,6 +14,7 @@ void taskTest(void *param)
     
     cmd_print_all();
     cmd_t cmd;
+    char text[] = "TEST";
     
     while(1)
     {
@@ -21,13 +22,13 @@ void taskTest(void *param)
         cmd = cmd_get_str("test");
         printf("[taskTest] New cmd: %s, %i.\n", cmd.name, cmd.id);
         xSemaphoreTake(t_mutex, portMAX_DELAY);
-        cmd.function(1, (void *)param);
-//        xSemaphoreGive(t_mutex);
+        cmd.function(1, (void *)text);
+        xSemaphoreGive(t_mutex);
         
         vTaskDelay(Delayms);
         cmd = cmd_get_idx(2);
         printf("[taskTest] New cmd: %s, %i.\n", cmd.name, cmd.id);
-//        xSemaphoreTake(t_mutex, portMAX_DELAY);
+        xSemaphoreTake(t_mutex, portMAX_DELAY);
         cmd.function(0, NULL);
         xSemaphoreGive(t_mutex);
     }
