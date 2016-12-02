@@ -32,7 +32,8 @@
 #include "OS/include/osThread.h"
 #include "OS/include/osScheduler.h"
 #include "OS/include/osQueue.h"
-#include "OS/include/osSemphr.h" 
+#include "OS/include/osSemphr.h"
+#include "globals.h"
 
 
 #if !__linux__
@@ -81,7 +82,7 @@
 
 /* Global variables */
 osSemaphore repoDataSem;
-osQueue dispatcherQueue, executerCmdQueue, executerStatQueue;
+//osQueue dispatcherQueue, executerCmdQueue, executerStatQueue;
 
 static void on_reset(void);
 

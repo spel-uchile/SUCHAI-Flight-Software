@@ -20,6 +20,7 @@
 
 #include "console.h"
 #include "cmdIncludes.h"
+#include "globals.h"
 
 void taskConsole(void *param);
 

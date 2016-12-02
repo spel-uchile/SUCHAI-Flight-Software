@@ -19,6 +19,7 @@
 #include "../../SUCHAI_config.h"
 
 #include "repoCommand.h"
+#include <globals.h>
 
 void taskHousekeeping(void *param);
 

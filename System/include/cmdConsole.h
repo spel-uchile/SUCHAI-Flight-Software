@@ -13,8 +13,6 @@
 #ifndef CMD_CONSOLE_H
 #define CMD_CONSOLE_H
 
-#include "console.h"
-
 #define CMD_CON 0x20 ///< OBC commands group identifier
 
 

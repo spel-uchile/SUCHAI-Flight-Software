@@ -20,7 +20,7 @@
 
 #include "taskConsole.h"
 
-extern xQueueHandle dispatcherQueue;
+//extern xQueueHandle dispatcherQueue;
 
 
 

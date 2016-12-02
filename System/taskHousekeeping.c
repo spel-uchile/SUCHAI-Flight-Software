@@ -20,7 +20,7 @@
 
 #include "include/taskHousekeeping.h"
 
-extern osQueue dispatcherQueue; /* Commands queue */
+//extern osQueue dispatcherQueue; /* Commands queue */
 
 void taskHousekeeping(void *param)
 {

@@ -26,7 +26,7 @@
 #include "rs232_suchai.h"
 #include "DebugIncludes.h"  //para con_printf
 
-#include "cmdRepository.h"
+#include "repoCommand.h"
 
 #define CON_BUF_WIDTH 32
 #define CON_ARG_WIDTH 8

@@ -20,9 +20,9 @@
 
 #include "include/taskDispatcher.h"
 
-extern osQueue dispatcherQueue; /* Commands queue */
-extern osQueue executerCmdQueue; /* Executer commands queue */
-extern osQueue executerStatQueue; /* Executer result queue */
+//extern osQueue dispatcherQueue; /* Commands queue */
+//extern osQueue executerCmdQueue; /* Executer commands queue */
+//extern osQueue executerStatQueue; /* Executer result queue */
 
 void taskDispatcher(void *param)
 {
