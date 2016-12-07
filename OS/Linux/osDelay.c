@@ -15,7 +15,8 @@ void osDelay(long milisegundos){
 }
 
 portTick osDefineTime(long delayms){
-    return delayms*1000;
+    /* FIXME: provide a proper implementation and doc*/
+    return (portTick) delayms*1000;
 }
 
 portTick osTaskGetTickCount(){

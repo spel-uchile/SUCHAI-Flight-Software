@@ -25,9 +25,10 @@
 
 /* Task includes */
 #include "System/include/taskTest.h"
-#include "System/include/taskDispatcher.h"
-#include "System/include/taskExecuter.h"
-#include "System/include/taskHousekeeping.h"
+#include "taskDispatcher.h"
+#include "taskExecuter.h"
+#include "taskHousekeeping.h"
+#include "taskConsole.h"
 
 #include "OS/include/osThread.h"
 #include "OS/include/osScheduler.h"
@@ -88,30 +89,32 @@ static void on_reset(void);
 
 int main(void)
 {
-        //lenguaje C orientado a microcontroladores rev 1
-        //quidel.inele.ufro.cl
-        //cc5x
-        //printf("%i\n",0xFFFFFFFF);
-        /* Initializing shared Queues */
-        dispatcherQueue = osQueueCreate(25,sizeof(DispCmd));
-        executerCmdQueue = osQueueCreate(1,sizeof(ExeCmd));
-        executerStatQueue = osQueueCreate(1,sizeof(int));
+    //lenguaje C orientado a microcontroladores rev 1
+    //quidel.inele.ufro.cl
+    //cc5x
+    //printf("%i\n",0xFFFFFFFF);
+    /* Initializing shared Queues */
+    dispatcherQueue = osQueueCreate(25,sizeof(DispCmd));
+    executerCmdQueue = osQueueCreate(1,sizeof(ExeCmd));
+    executerStatQueue = osQueueCreate(1,sizeof(int));
 
-        /* Initializing shared Semaphore */
-        osSemaphoreCreate(&repoDataSem);
+    /* Initializing shared Semaphore */
+    osSemaphoreCreate(&repoDataSem);
 
-        /* Crating all task (the others are created inside taskDeployment) */
-        osCreateTask(taskDispatcher,"dispatcher",2*configMINIMAL_STACK_SIZE,NULL,3);
-        osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4);
-        osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2);
-        
-        /* Configure Peripherals */
-        
-        /* On reset */
-        on_reset();
+    /* Crating all task (the others are created inside taskDeployment) */
+    osCreateTask(taskDispatcher,"dispatcher",2*configMINIMAL_STACK_SIZE,NULL,3);
+    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4);
 
-        /* Start the scheduler. Should never return */
-        osScheduler();
+    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2);
+    osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2);
+
+    /* Configure Peripherals */
+
+    /* On reset */
+    on_reset();
+
+    /* Start the scheduler. Should never return */
+    osScheduler();
 
     return 0;
 }

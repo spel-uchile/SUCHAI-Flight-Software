@@ -26,7 +26,7 @@ void taskHousekeeping(void *param)
 {
     printf(">>[Houskeeping] Started\r\n");
     
-    portTick delay_ms    = 1000;    //Task period in [ms]
+    portTick delay_ms    = 10000;    //Task period in [ms]
     portTick delay_ticks = osDefineTime(delay_ms); //Task period in ticks
 
     unsigned int elapsed_sec = 0;       // Seconds count

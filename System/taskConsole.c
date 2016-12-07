@@ -22,7 +22,7 @@
 
 //extern xQueueHandle dispatcherQueue;
 
-
+#define CON_BUFF_LEN 100
 
 const char console_baner[] =   
 "______________________________________________________________________________\n\
@@ -38,44 +38,79 @@ ______________________________________________________________________________\n
 void taskConsole(void *param)
 {
 #if (SCH_GRL_VERBOSE)
-    con_printf(">>[Console] Started\r\n");
-    char ret[10];
+    printf(">>[Console] Started\r\n");
 #endif
 
-    const unsigned int Delayms = 250 / portTICK_RATE_MS;
-    DispCmd NewCmd;
-    NewCmd.idOrig = CMD_IDORIG_TCONSOLE; /* Consola */
-    NewCmd.cmdId = CMD_CMDNULL;  /* cmdNULL */
-    NewCmd.param = 0;
+    portTick Delayms = osDefineTime(250);
+    DispCmd new_cmd;
+    new_cmd.idOrig = 0x0011; /* Consola */
+    new_cmd.cmdId = CMD_CMDNULL;  /* cmdNULL */
+    new_cmd.param = 0;
+    char buffer[CON_BUFF_LEN];
 
     /* Initializing console */
-    con_init();
+    console_init();
 
 #if (SCH_GRL_VERBOSE>=1)
-    con_printf((char *)console_baner);
+    printf(console_baner);
 #endif
 
     while(1)
     {
-        vTaskDelay(Delayms);
+        osDelay(Delayms);
 
-        /* Parsing command - return CmdDisp structure*/
-        NewCmd = con_cmd_handler();
+        /* Read console and parse commands (blocking) */
+        console_read(buffer, CON_BUFF_LEN);
+        console_parse(buffer, &new_cmd);
 
         /* cmdId = 0xFFFF means no new command */
-        if(NewCmd.cmdId != CMD_CMDNULL)
+        if(new_cmd.cmdId != CMD_CMDNULL)
         {
-            con_printf("\r\n");
+            printf("\r\n");
 
             #if (SCH_GRL_VERBOSE >=1)
                 /* Print the command code */
-                sprintf( ret, "0x%X", (unsigned int)NewCmd.cmdId );
-                con_printf("[Console] Se genera comando: ");
-                con_printf(ret); con_printf("\n\0");
+                printf("[Console] Se genera comando: %d\n", new_cmd.cmdId);
             #endif
 
             /* Queue NewCmd - Blocking */
-            xQueueSend(dispatcherQueue, &NewCmd, portMAX_DELAY);
-        }        
+            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+        }
     }
+}
+
+int console_init(void)
+{
+    printf("[Console] Init...\n");
+    return 0;
+}
+
+int console_read(char *buffer, int len)
+{
+    /* FIXME: Move to drivers to support different systems */
+    fgets(buffer, len-1, stdin);
+    return 0;
+}
+
+int console_parse(char *buffer, DispCmd *new_cmd)
+{
+    char tmp_str[CON_BUFF_LEN];
+    int tmp_cmd;
+    int tmp_arg;
+    int n_args;
+
+    printf("[Console] Parsing: %s\n", buffer);
+    n_args = sscanf(buffer, "%s %X %d", tmp_str, &tmp_cmd, &tmp_arg);
+    printf("[Console] Parsed: %s, 0x%X, %d\n", tmp_str, tmp_cmd, tmp_arg);
+
+    if (n_args != 3) return 0;
+
+    if(strcmp(tmp_str, "exe_cmd") == 0)
+    {
+        new_cmd->cmdId = tmp_cmd;
+        new_cmd->param = tmp_arg;
+        return 1;
+    }
+
+    return 0;
 }
