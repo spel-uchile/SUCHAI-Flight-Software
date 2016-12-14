@@ -12,16 +12,17 @@ set(SOURCE_FILES
         OS/Linux/pthread_queue.c
         System/cmdDRP.c
         System/cmdOBC.c
+        System/cmdConsole.c
         System/repoCommand.c
         System/repoData.c
         System/taskDispatcher.c
         System/taskExecuter.c
         System/taskHousekeeping.c
         System/taskConsole.c
-        main.c
-        SUCHAI_config.h)
+        main.c)
 
 include_directories(
+        .
         System/include/
         OS/include)
 

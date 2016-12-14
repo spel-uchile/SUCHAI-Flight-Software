@@ -35,42 +35,34 @@ void taskDispatcher(void *param)
 
     while(1)
     {
-        /* Read newCmd from Queue - Blocking */
-        status = osQueueReceive(dispatcherQueue, &newCmd, portMAX_DELAY);
+        /* Read new_cmd from Queue - Blocking */
+        status = osQueueReceive(dispatcherQueue, &new_cmd, portMAX_DELAY);
 
         if(status == pdPASS)
         {
-			/* Gets command metadata*/
-            cmdId = newCmd.cmdId;
-            idOrig = newCmd.idOrig;
-            sysReq = newCmd.sysReq;
-            cmdParam = newCmd.param;
-
             /* Check if command is executable */
-            if(check_if_executable(&newCmd))
+            if(check_if_executable(&new_cmd))
             {
 				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X\n", new_cmd.id, new_cmd.nparam, -1);
 
                 /* Send the command to executer Queue - BLOCKING */
-                xQueueSend(executerCmdQueue, &new_cmd, portMAX_DELAY);
-                osQueueSend(executerCmdQueue, &exeCmd, portMAX_DELAY);
+                osQueueSend(executerCmdQueue, &new_cmd, portMAX_DELAY);
 
                 /* Get the result from Executer Stat Queue - BLOCKING */
-                osQueueReceive(executerStatQueue, &cmdResult, portMAX_DELAY);
-                xQueueReceive(executerStatQueue, &cmd_result, portMAX_DELAY);
+                osQueueReceive(executerStatQueue, &cmd_result, portMAX_DELAY);
             }
         }
     }
 }
 
-int check_if_executable(cmd_t *newCmd)
+int check_if_executable(cmd_t *new_cmd)
 {
 //    int cmdId, idOrig, sysReq, param; /* Cmd metadata */
 //
-//    cmdId = newCmd->cmdId;
-//    idOrig = newCmd->idOrig;
+//    cmdId = new_cmd->cmdId;
+//    idOrig = new_cmd->idOrig;
 //    sysReq = 0; //repo_getsysReq(cmdId);
-//    param = newCmd->param;
+//    param = new_cmd->param;
 //
 //    if(cmdId == CMD_CMDNULL)
 //    {

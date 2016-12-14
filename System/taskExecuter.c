@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/taskExecuter.h"
+#include "taskExecuter.h"
 
 extern osQueue executerCmdQueue; /* Comands queue*/
 extern osQueue executerStatQueue; /* Comands queue*/
@@ -33,9 +33,9 @@ void taskExecuter(void *param)
     while(1)
     {
         /* Read the CMD that Dispatcher sent - BLOCKING */
-        queueStat = osQueueReceive(executerCmdQueue, &RunCmd, portMAX_DELAY);
+        queue_stat = osQueueReceive(executerCmdQueue, &run_cmd, portMAX_DELAY);
 
-        if(queueStat == pdPASS)
+        if(queue_stat == pdPASS)
         {
             printf("[Executer] Running a command...\n");
             /* Commands may take a long time, so reset the WDT */
@@ -50,7 +50,7 @@ void taskExecuter(void *param)
             printf("[Executer] Command result: %d\n", cmd_stat);
             
             /* Send the result to Dispatcher - BLOCKING */
-            osQueueSend(executerStatQueue, &cmdStat, portMAX_DELAY);
+            osQueueSend(executerStatQueue, &cmd_stat, portMAX_DELAY);
 
         }
     }

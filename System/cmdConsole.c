@@ -18,7 +18,6 @@
  */
 
 #include "cmdConsole.h"
-#include "cmdRepository.h"
 
 cmdFunction conFunction[CON_NCMD];
 int con_sysReq[CON_NCMD];
@@ -97,9 +96,7 @@ int con_debug_msg(int nparam, void *param)
     char *msg = (char *)param;
     if(msg)
     {
-        printf("[Debug Msg] ");
-        printf((char *) msg);
-        printf("\r\n");
+        printf("[Debug Msg] %s\n", msg);
         return 1;
     }
     return 0;

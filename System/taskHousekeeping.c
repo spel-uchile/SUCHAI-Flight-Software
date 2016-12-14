@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/taskHousekeeping.h"
+#include "taskHousekeeping.h"
 
 //extern osQueue dispatcherQueue; /* Commands queue */
 
@@ -33,9 +33,6 @@ void taskHousekeeping(void *param)
     unsigned int _10sec_check = 1;//10;     //10[s] condition
     unsigned int _10min_check = 2;//10*60;  //10[m] condition
     unsigned int _1hour_check = 3;//60*60;  //1[h] condition
-
-    DispCmd NewCmd;
-    NewCmd.idOrig = CMD_IDORIG_THOUSEKEEPING; //Housekeeping
 
     cmd_t new_cmd;
 
@@ -52,7 +49,7 @@ void taskHousekeeping(void *param)
         {
             printf("[Housekeeping] _10sec_check\n");
             new_cmd = cmd_get_str("get_mem");
-            xQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
         }
 
         /* 10 minutes actions */
@@ -60,7 +57,7 @@ void taskHousekeeping(void *param)
         {
             printf("[Housekeeping] _10min_check\n");
             new_cmd = cmd_get_str("print_vars");
-            xQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
         }
 
         /* 1 hours actions */
@@ -73,7 +70,7 @@ void taskHousekeeping(void *param)
             new_cmd = cmd_get_str("update_hours");
             int param[] = {1};
             new_cmd.params = param;
-            xQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
         }
     }
 }

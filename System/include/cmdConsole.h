@@ -15,6 +15,7 @@
 
 #define CMD_CON 0x20 ///< OBC commands group identifier
 
+#include "repoCommand.h"
 
 /**
  * Lista de comandos disponibles.

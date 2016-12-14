@@ -24,16 +24,16 @@
 #include "SUCHAI_config.h"
 
 /* Task includes */
-#include "System/include/taskTest.h"
+#include "taskTest.h"
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
 #include "taskHousekeeping.h"
 #include "taskConsole.h"
 
-#include "OS/include/osThread.h"
-#include "OS/include/osScheduler.h"
-#include "OS/include/osQueue.h"
-#include "OS/include/osSemphr.h"
+#include "osThread.h"
+#include "osScheduler.h"
+#include "osQueue.h"
+#include "osSemphr.h"
 #include "globals.h"
 
 /* FIXME: Fix includes in RTOS */
@@ -86,7 +86,7 @@
 
 /* Global variables */
 osSemaphore repoDataSem;
-//osQueue dispatcherQueue, executerCmdQueue, executerStatQueue;
+//osQueue dispatcherQueue, executerCmdQueue, executerStatQueue; // Moved to globals.h
 
 static void on_reset(void);
 
@@ -151,7 +151,7 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
 void on_reset(void)
 {
     /* FIXME: Check inits */
-    repo_onResetCmdRepo(); //Command repository initialization
+//    repo_onResetCmdRepo(); //Command repository initialization
     cmd_init(); //Command repository initialization
     dat_onResetCubesatVar(); //Update status repository
 }
