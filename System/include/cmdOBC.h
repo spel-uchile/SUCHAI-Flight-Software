@@ -12,9 +12,13 @@
 #ifndef CMD_OBC_H
 #define CMD_OBC_H
 
-#include "SUCHAI_config.h"
+#include "../../SUCHAI_config.h"
 
-#define OBC_SYS_RESET() {__asm__ volatile("reset");} ///< processor software reset
+#if __linux__
+	#define OBC_SYS_RESET() { printf("reset\n");}///< processor software reset
+#else
+	#define OBC_SYS_RESET() { __asm__ volatile("reset");}///< processor software reset
+#endif
 
 #define CMD_OBC 0x10 ///< OBC commands group identifier
 
@@ -24,7 +28,7 @@
 typedef enum{
     obc_id_reset = 0x1000, ///< @cmd_first
     obc_id_get_rtos_memory, ///< @cmd
-        
+
     obc_id_last_one    // Dummy element
 }OBC_CmdIndx;
 

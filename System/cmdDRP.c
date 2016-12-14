@@ -18,9 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cmdDRP.h"
-#include "dataRepository.h"
-#include "cmdRepository.h"
+#include "include/cmdDRP.h"
 
 cmdFunction drp_Function[DRP_NCMD];
 int drp_sysReq[DRP_NCMD];
@@ -35,7 +33,7 @@ void drp_onResetCmdDRP(void)
     drp_sysReq[(unsigned char)drp_id_update_dat_CubesatVar_hoursWithoutReset]  = CMD_SYSREQ_MIN;
     drp_Function[(unsigned char)drp_id_print_CubesatVar] = drp_print_dat_CubesatVar;
     drp_sysReq[(unsigned char)drp_id_print_CubesatVar]  = CMD_SYSREQ_MIN;
-    
+
 //    cmd_add("update_hours", drp_update_dat_CubesatVar_hoursWithoutReset, "%d");
 //    cmd_add("print_vars", drp_print_dat_CubesatVar, "");
 }

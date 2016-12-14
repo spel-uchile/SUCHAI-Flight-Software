@@ -14,13 +14,16 @@
 #define T_CONSOLE_H
 
 
-#include "FreeRTOS.h"
-#include "queue.h"
-//#include "task.h"
+#include "osQueue.h"
+#include "osDelay.h"
 
-#include "console.h"
+
+#include "globals.h"
 #include "cmdIncludes.h"
 
 void taskConsole(void *param);
+int console_init(void);
+int console_read(char *buffer, int len);
+int console_parse(char *buffer, DispCmd *new_cmd);
 
 #endif //T_CONSOLE_H

@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "cmdOBC.h"
+ 
+#include "include/cmdOBC.h"
 
 cmdFunction obc_Function[OBC_NCMD];
 int obc_sysReq[OBC_NCMD];
@@ -63,8 +63,13 @@ int obc_reset(int nparam, void* param)
  */
 int obc_get_rtos_memory(int nparam, void *param)
 {
-    size_t mem_heap = xPortGetFreeHeapSize();
-    printf("Free RTOS memory: %d\n", mem_heap);
-
+    #if __linux__
+        int mem_heap = 666;
+        printf("Linux memory: %d\n", mem_heap);
+    #else
+        size_t mem_heap = xPortGetFreeHeapSize();
+        printf("Free RTOS memory: %d\n", mem_heap);
+    #endif
+        
     return mem_heap;
 }

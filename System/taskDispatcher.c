@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskDispatcher.h"
+#include "include/taskDispatcher.h"
 
-extern xQueueHandle dispatcherQueue; /* Commands queue */
-extern xQueueHandle executerCmdQueue; /* Executer commands queue */
-extern xQueueHandle executerStatQueue; /* Executer result queue */
+//extern osQueue dispatcherQueue; /* Commands queue */
+//extern osQueue executerCmdQueue; /* Executer commands queue */
+//extern osQueue executerStatQueue; /* Executer result queue */
 
 void taskDispatcher(void *param)
 {
@@ -36,19 +36,27 @@ void taskDispatcher(void *param)
     while(1)
     {
         /* Read newCmd from Queue - Blocking */
-        status = xQueueReceive(dispatcherQueue, &new_cmd, portMAX_DELAY);
+        status = osQueueReceive(dispatcherQueue, &newCmd, portMAX_DELAY);
 
         if(status == pdPASS)
         {
-            /* Check if command is eecutable */
-            if(check_if_executable(&new_cmd))
+			/* Gets command metadata*/
+            cmdId = newCmd.cmdId;
+            idOrig = newCmd.idOrig;
+            sysReq = newCmd.sysReq;
+            cmdParam = newCmd.param;
+
+            /* Check if command is executable */
+            if(check_if_executable(&newCmd))
             {
 				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X\n", new_cmd.id, new_cmd.nparam, -1);
 
                 /* Send the command to executer Queue - BLOCKING */
                 xQueueSend(executerCmdQueue, &new_cmd, portMAX_DELAY);
+                osQueueSend(executerCmdQueue, &exeCmd, portMAX_DELAY);
 
                 /* Get the result from Executer Stat Queue - BLOCKING */
+                osQueueReceive(executerStatQueue, &cmdResult, portMAX_DELAY);
                 xQueueReceive(executerStatQueue, &cmd_result, portMAX_DELAY);
             }
         }
