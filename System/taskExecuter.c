@@ -43,6 +43,7 @@ void taskExecuter(void *param)
 
             /* Execute the command */
             cmd_stat = run_cmd.function(run_cmd.nparam, run_cmd.params);
+            free(run_cmd.params);
 
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();

@@ -12,7 +12,8 @@
 #ifndef CMD_OBC_H
 #define CMD_OBC_H
 
-#include "../../SUCHAI_config.h"
+#include "SUCHAI_config.h"
+#include "repoCommand.h"
 
 #if __linux__
 	#define OBC_SYS_RESET() { printf("reset\n");}///< processor software reset

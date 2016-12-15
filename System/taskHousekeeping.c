@@ -26,13 +26,13 @@ void taskHousekeeping(void *param)
 {
     printf(">>[Housekeeping] Started\r\n");
     
-    portTick delay_ms    = 10000;    //Task period in [ms]
+    portTick delay_ms    = 1000;    //Task period in [ms]
     portTick delay_ticks = osDefineTime(delay_ms); //Task period in ticks
 
     unsigned int elapsed_sec = 0;       // Seconds count
     unsigned int _10sec_check = 1;//10;     //10[s] condition
-    unsigned int _10min_check = 2;//10*60;  //10[m] condition
-    unsigned int _1hour_check = 3;//60*60;  //1[h] condition
+    unsigned int _10min_check = 1;//10*60;  //10[m] condition
+    unsigned int _1hour_check = 1;//60*60;  //1[h] condition
 
     cmd_t new_cmd;
 
@@ -56,21 +56,20 @@ void taskHousekeeping(void *param)
         if((elapsed_sec % _10min_check) == 0)
         {
             printf("[Housekeeping] _10min_check\n");
-            new_cmd = cmd_get_str("print_vars");
-            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+            cmd_t new_cmd_a = cmd_get_str("test");
+            new_cmd_a.params = (char *)malloc(sizeof(char)*10);
+            strcpy(new_cmd_a.params, "BYE");
+            osQueueSend(dispatcherQueue, &new_cmd_a, portMAX_DELAY);
         }
 
         /* 1 hours actions */
         if((elapsed_sec % _1hour_check) == 0)
         {
             printf("[Housekeeping] _1hour_check\n");
-
-//            NewCmd.cmdId = drp_id_update_dat_CubesatVar_hoursWithoutReset;
-//            NewCmd.param = 1; //Add 1 hour
-            new_cmd = cmd_get_str("update_hours");
-            int param[] = {1};
-            new_cmd.params = param;
-            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+            cmd_t new_cmd_b = cmd_get_str("test");
+            new_cmd_b.params = (char *)malloc(sizeof(char)*10);
+            strcpy(new_cmd_b.params, "HELLO");
+            osQueueSend(dispatcherQueue, &new_cmd_b, portMAX_DELAY);
         }
     }
 }

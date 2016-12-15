@@ -42,10 +42,8 @@ void taskConsole(void *param)
 #endif
 
     portTick Delayms = osDefineTime(250);
-    DispCmd new_cmd;
-    new_cmd.idOrig = 0x0011; /* Consola */
-    new_cmd.cmdId = CMD_CMDNULL;  /* cmdNULL */
-    new_cmd.param = 0;
+    cmd_t new_cmd;
+    int parse_ok;
     char buffer[CON_BUFF_LEN];
 
     /* Initializing console */
@@ -61,16 +59,14 @@ void taskConsole(void *param)
 
         /* Read console and parse commands (blocking) */
         console_read(buffer, CON_BUFF_LEN);
-        console_parse(buffer, &new_cmd);
+        parse_ok = console_parse(buffer, &new_cmd);
 
         /* cmdId = 0xFFFF means no new command */
-        if(new_cmd.cmdId != CMD_CMDNULL)
+        if(parse_ok)
         {
-            printf("\r\n");
-
             #if (SCH_GRL_VERBOSE >=1)
-                /* Print the command code */
-                printf("[Console] Se genera comando: %d\n", new_cmd.cmdId);
+                /* Print the parsed command */
+                printf("[Console] Se genera comando: %s\n", new_cmd.name);
             #endif
 
             /* Queue NewCmd - Blocking */
@@ -82,6 +78,7 @@ void taskConsole(void *param)
 int console_init(void)
 {
     printf("[Console] Init...\n");
+    cmd_print_all();
     return 0;
 }
 
@@ -92,25 +89,25 @@ int console_read(char *buffer, int len)
     return 0;
 }
 
-int console_parse(char *buffer, DispCmd *new_cmd)
+int console_parse(char *buffer, cmd_t *new_cmd)
 {
-    char tmp_str[CON_BUFF_LEN];
-    int tmp_cmd;
-    int tmp_arg;
+    char tmp_cmd[CON_BUFF_LEN];
+    char tmp_arg[CON_BUFF_LEN];
     int n_args;
 
     printf("[Console] Parsing: %s\n", buffer);
-    n_args = sscanf(buffer, "%s %X %d", tmp_str, &tmp_cmd, &tmp_arg);
-    printf("[Console] Parsed: %s, 0x%X, %d\n", tmp_str, tmp_cmd, tmp_arg);
+    n_args = sscanf(buffer, "%s %s", tmp_cmd, tmp_arg);
+    printf("[Console] Parsed: %s, %s\n", tmp_cmd, tmp_arg);
 
-    if (n_args != 3) return 0;
+    if (n_args != 2) return 0;
 
-    if(strcmp(tmp_str, "exe_cmd") == 0)
-    {
-        new_cmd->cmdId = tmp_cmd;
-        new_cmd->param = tmp_arg;
-        return 1;
-    }
+    *new_cmd = cmd_get_str(tmp_cmd);
 
-    return 0;
+    if(strcmp(new_cmd->name, "null") == 0) return 0;
+
+    /* TODO: Parse args according to command */
+    new_cmd->params = (char *)malloc(sizeof(char)*(strlen(tmp_arg)+1));
+    strcpy(new_cmd->params, tmp_arg);
+
+    return 1;
 }

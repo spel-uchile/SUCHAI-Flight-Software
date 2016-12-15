@@ -13,6 +13,8 @@
 #ifndef T_HOUSEKEEPING_H
 #define T_HOUSEKEEPING_H
 
+#include <stdlib.h>
+
 #include "SUCHAI_config.h"
 #include "globals.h"
 

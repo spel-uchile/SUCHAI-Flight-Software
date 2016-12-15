@@ -16,6 +16,7 @@
 /* Add files with commands */
 #include "cmdOBC.h"
 #include "cmdDRP.h"
+#include "cmdConsole.h"
 
 /* Defines */
 #define CMD_IDORIG_THOUSEKEEPING    0x1001

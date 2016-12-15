@@ -44,9 +44,9 @@ typedef struct cmd_type{
     int id;                     ///< Command id
     int nparam;                 ///< Number of parameters
     void *params;               ///< List of parameters (use malloc)
+    char *name;                 ///< Command name
     cmdFunction function;       ///< Command function
-    char name[CMD_NAME_LEN];    ///< Command name
-    
+
 } cmd_t;
 
 #define CMD_CMDNULL     (0xFFFF)    ///< Dummy command id. Represent a null command

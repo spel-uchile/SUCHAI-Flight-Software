@@ -17,13 +17,13 @@
 #include "osQueue.h"
 #include "osDelay.h"
 
-
 #include "globals.h"
 #include "cmdIncludes.h"
+#include "repoCommand.h"
 
 void taskConsole(void *param);
 int console_init(void);
 int console_read(char *buffer, int len);
-int console_parse(char *buffer, DispCmd *new_cmd);
+int console_parse(char *buffer, cmd_t *new_cmd);
 
 #endif //T_CONSOLE_H

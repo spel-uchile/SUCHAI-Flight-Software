@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/repoCommand.h"
+#include "repoCommand.h"
 
 # define CMD_MAX_LEN 100
 cmd_t cmd_list[CMD_MAX_LEN];
@@ -34,20 +34,22 @@ int cmd_index = 0;
  */
 void cmd_add(char* name, cmdFunction function, int nparam)
 {
-
-    // Create new command
-    cmd_t cmd_new;
-    cmd_new.function = function;
-    cmd_new.id = cmd_index;
-    cmd_new.nparam = nparam;
-   strncpy(cmd_new.name, name, CMD_NAME_LEN);
-
-    // Copy to command buffer
     if (cmd_index < CMD_MAX_LEN){
-        cmd_list[cmd_index] = cmd_new;
-    }
+        // Create new command
+        size_t l_name = strlen(name);
+        cmd_t cmd_new;
+        cmd_new.id = cmd_index;
+        cmd_new.nparam = nparam;
+        cmd_new.params = NULL;
+        cmd_new.function = (cmdFunction)malloc(sizeof(cmdFunction));
+        cmd_new.function = function;
+        cmd_new.name = (char *)malloc(sizeof(char)*(l_name+1));
+        strncpy(cmd_new.name, name, l_name+1);
 
-    cmd_index++;
+        // Copy to command buffer
+        cmd_list[cmd_index] = cmd_new;
+        cmd_index++;
+    }
 }
 
 /**
@@ -114,13 +116,18 @@ void cmd_print_all(void){
 int cmd_init(void)
 {
     // Create a null command
+    char *name = "null";
+    size_t l_name = strlen(name);
     cmd_t cnull;
-    cnull.function = cmd_null;
     cnull.id = cmd_index;
     cnull.nparam = 0;
-    strncpy(cnull.name, "null", CMD_NAME_LEN);
+    cnull.params = NULL;
+    cnull.function = (cmdFunction)malloc(sizeof(cmdFunction));
+    cnull.function = cmd_null;
+    cnull.name = (char *)malloc(sizeof(char)*(l_name+1));
+    strncpy(cnull.name, "null", l_name+1);
 
-    // Reset the command buufer
+    // Reset the command buffer
     int i;
     for(i=0; i < CMD_MAX_LEN; i++){
         cmd_list[i] = cnull;
@@ -142,6 +149,6 @@ int cmd_init(void)
  */
 int cmd_null(int nparam, void *param)
 {
-    printf("cmd_null was used with %d params at 0x%X\n", nparam, (int)&param);
+    printf("cmd_null was used with %d params at 0x%X\n", nparam, *(int *)param);
     return 1;
 }

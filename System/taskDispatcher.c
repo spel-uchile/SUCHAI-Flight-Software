@@ -28,7 +28,7 @@ void taskDispatcher(void *param)
 {
 	printf(">>[Dispatcher] Started\n");
 
-    portBASE_TYPE status; /* Status of cmd reading operation */
+    int status; /* Status of cmd reading operation */
 
     cmd_t new_cmd; /* The new cmd readed */
     int cmd_result;
@@ -43,7 +43,7 @@ void taskDispatcher(void *param)
             /* Check if command is executable */
             if(check_if_executable(&new_cmd))
             {
-				printf("[Dispatcher] Cmd: %X, Param: %d, Orig: %X\n", new_cmd.id, new_cmd.nparam, -1);
+				printf("[Dispatcher] Cmd: %X, Param: %p, Orig: %X\n", new_cmd.id, new_cmd.params, -1);
 
                 /* Send the command to executer Queue - BLOCKING */
                 osQueueSend(executerCmdQueue, &new_cmd, portMAX_DELAY);
