@@ -34,7 +34,7 @@ void taskHousekeeping(void *param)
     unsigned int _10min_check = 1;//10*60;  //10[m] condition
     unsigned int _1hour_check = 1;//60*60;  //1[h] condition
 
-    cmd_t new_cmd;
+    char *task_name = (char *)param;
 
     portTick xLastWakeTime = osTaskGetTickCount();
     
@@ -48,28 +48,30 @@ void taskHousekeeping(void *param)
         if((elapsed_sec % _10sec_check) == 0)
         {
             printf("[Housekeeping] _10sec_check\n");
-            new_cmd = cmd_get_str("get_mem");
-            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+            cmd_t *cmd_10s = cmd_get_str("get_mem");
+            osQueueSend(dispatcherQueue, &cmd_10s, portMAX_DELAY);
         }
 
         /* 10 minutes actions */
         if((elapsed_sec % _10min_check) == 0)
         {
             printf("[Housekeeping] _10min_check\n");
-            cmd_t new_cmd_a = cmd_get_str("test");
-            new_cmd_a.params = (char *)malloc(sizeof(char)*10);
-            strcpy(new_cmd_a.params, "BYE");
-            osQueueSend(dispatcherQueue, &new_cmd_a, portMAX_DELAY);
+            cmd_t *cmd_10m = cmd_get_str("test");
+            cmd_10m->params = (char *)malloc(sizeof(char)*20);
+            strcpy(cmd_10m->params, "BYE ");
+            strcat(cmd_10m->params, task_name);
+            osQueueSend(dispatcherQueue, &cmd_10m, portMAX_DELAY);
         }
 
         /* 1 hours actions */
         if((elapsed_sec % _1hour_check) == 0)
         {
             printf("[Housekeeping] _1hour_check\n");
-            cmd_t new_cmd_b = cmd_get_str("test");
-            new_cmd_b.params = (char *)malloc(sizeof(char)*10);
-            strcpy(new_cmd_b.params, "HELLO");
-            osQueueSend(dispatcherQueue, &new_cmd_b, portMAX_DELAY);
+            cmd_t *cmd_1h = cmd_get_str("test");
+            cmd_1h->params = (char *)malloc(sizeof(char)*20);
+            strcpy(cmd_1h->params, "HELLO ");
+            strcat(cmd_1h->params, task_name);
+            osQueueSend(dispatcherQueue, &cmd_1h, portMAX_DELAY);
         }
     }
 }

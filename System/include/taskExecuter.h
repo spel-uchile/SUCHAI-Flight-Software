@@ -17,6 +17,7 @@
 
 #include "SUCHAI_config.h"
 #include "osQueue.h"
+#include "repoCommand.h"
 
 void taskExecuter(void *param);
 

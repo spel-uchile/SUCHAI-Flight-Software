@@ -42,8 +42,7 @@ void taskConsole(void *param)
 #endif
 
     portTick Delayms = osDefineTime(250);
-    cmd_t new_cmd;
-    int parse_ok;
+    cmd_t *new_cmd =  NULL;
     char buffer[CON_BUFF_LEN];
 
     /* Initializing console */
@@ -59,14 +58,13 @@ void taskConsole(void *param)
 
         /* Read console and parse commands (blocking) */
         console_read(buffer, CON_BUFF_LEN);
-        parse_ok = console_parse(buffer, &new_cmd);
+        new_cmd = console_parse(buffer);
 
-        /* cmdId = 0xFFFF means no new command */
-        if(parse_ok)
+        if(new_cmd != NULL)
         {
             #if (SCH_GRL_VERBOSE >=1)
                 /* Print the parsed command */
-                printf("[Console] Se genera comando: %s\n", new_cmd.name);
+                printf("[Console] Se genera comando: %d\n", new_cmd->id);
             #endif
 
             /* Queue NewCmd - Blocking */
@@ -89,7 +87,7 @@ int console_read(char *buffer, int len)
     return 0;
 }
 
-int console_parse(char *buffer, cmd_t *new_cmd)
+cmd_t * console_parse(char *buffer)
 {
     char tmp_cmd[CON_BUFF_LEN];
     char tmp_arg[CON_BUFF_LEN];
@@ -101,13 +99,13 @@ int console_parse(char *buffer, cmd_t *new_cmd)
 
     if (n_args != 2) return 0;
 
-    *new_cmd = cmd_get_str(tmp_cmd);
+    cmd_t *new_cmd = cmd_get_str(tmp_cmd);
 
-    if(strcmp(new_cmd->name, "null") == 0) return 0;
+    if(new_cmd == NULL) return 0;
 
     /* TODO: Parse args according to command */
     new_cmd->params = (char *)malloc(sizeof(char)*(strlen(tmp_arg)+1));
     strcpy(new_cmd->params, tmp_arg);
 
-    return 1;
+    return new_cmd;
 }

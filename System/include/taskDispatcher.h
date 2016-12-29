@@ -15,10 +15,10 @@
 #ifndef T_DISPATCHER_H
 #define T_DISPATCHER_H
 
-#include "../../SUCHAI_config.h"
+#include "SUCHAI_config.h"
+#include "globals.h"
 #include "repoCommand.h"
 #include "repoData.h"
-#include "globals.h"
 
 void taskDispatcher(void *param);
 int check_if_executable(cmd_t *newCmd);
