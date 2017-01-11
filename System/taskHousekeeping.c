@@ -31,8 +31,8 @@ void taskHousekeeping(void *param)
 
     unsigned int elapsed_sec = 0;       // Seconds count
     unsigned int _10sec_check = 1;//10;     //10[s] condition
-    unsigned int _10min_check = 1;//10*60;  //10[m] condition
-    unsigned int _1hour_check = 1;//60*60;  //1[h] condition
+    unsigned int _10min_check = 2;//10*60;  //10[m] condition
+    unsigned int _1hour_check = 3;//60*60;  //1[h] condition
 
     cmd_t new_cmd;
 
