@@ -34,7 +34,7 @@ void taskHousekeeping(void *param)
     unsigned int _10min_check = 2;//10*60;  //10[m] condition
     unsigned int _1hour_check = 3;//60*60;  //1[h] condition
 
-    char *task_name = (char *)param;
+    char *task_name = param != NULL ? (char *)param : "HSK";
 
     portTick xLastWakeTime = osTaskGetTickCount();
     
