@@ -1,6 +1,6 @@
 /**
  * @file  FreeRTOS/delay.c
- * @author Ignacio Ibañez Aliaga 
+ * @author Ignacio Ibaï¿½ez Aliaga 
  * @date 26-10-2016
  * @copyright GNU Public License.
  *
@@ -9,8 +9,8 @@
  */
 #include "../include/osDelay.h"
 
-void osDelay(long milisegundos){
-    vTaskDelay(milisegundos);
+void osDelay(long milliseconds){
+    vTaskDelay(milliseconds);
 }
 
 portTick osDefineTime(long delayms){

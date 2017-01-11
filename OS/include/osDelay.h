@@ -1,6 +1,6 @@
 /**
  * @file  delay.h
- * @author Ignacio Ibañez Aliaga 
+ * @author Ignacio Ibaï¿½ez Aliaga 
  * @date 26-10-2016
  * @copyright GNU Public License.
  *
@@ -14,13 +14,14 @@
 #include "../../SUCHAI_config.h"
 
 #if __linux__
-    #include <unistd.h> 
+    #include <unistd.h>
+    #include <time.h>
  	typedef int portTick;
 #else
  	typedef portTickType portTick;
 #endif
 
-void osDelay(long milisegundos);
+void osDelay(long milliseconds);
 portTick osDefineTime(long delayms);
 portTick osTaskGetTickCount();
 void osTaskDelayUntil(portTick* lastTime, portTick delay_ticks);
