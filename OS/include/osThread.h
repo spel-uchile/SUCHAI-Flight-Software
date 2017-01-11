@@ -1,6 +1,6 @@
 /**
  * @file  thread.h
- * @author Ignacio Ibañez Aliaga 
+ * @author Ignacio Ibaï¿½ez Aliaga 
  * @date 26-10-2016
  * @copyright GNU Public License.
  *
@@ -15,11 +15,13 @@
 
 #if __linux__
     #include <pthread.h>
+    typedef pthread_t os_thread;
 #else
     #include "../../FreeRTOSConfig.h"
+    typedef BaseType_t os_thread;
 #endif
 
 
-void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority);
+void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority, os_thread* thread);
 
 #endif

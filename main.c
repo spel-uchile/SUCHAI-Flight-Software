@@ -100,12 +100,15 @@ int main(void)
     /* Initializing shared Semaphore */
     osSemaphoreCreate(&repoDataSem);
 
+    //os_thread dispatcher, executer, housekeeping, console;
+    int n_thread = 4;
+    os_thread* thread_id = malloc(sizeof(os_thread)*n_thread);
     /* Crating all task (the others are created inside taskDeployment) */
-    osCreateTask(taskDispatcher,"dispatcher",2*configMINIMAL_STACK_SIZE,NULL,3);
-    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4);
+    osCreateTask(taskDispatcher,"dispatcher",2*configMINIMAL_STACK_SIZE,NULL,3, &thread_id[0]);
+    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &thread_id[1]);
 
-    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2);
-    osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2);
+    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &thread_id[2]);
+    osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &thread_id[3]);
 
     /* Configure Peripherals */
 
@@ -113,7 +116,7 @@ int main(void)
     on_reset();
 
     /* Start the scheduler. Should never return */
-    osScheduler();
+    osScheduler(&thread_id, n_thread);
 
     return 0;
 }

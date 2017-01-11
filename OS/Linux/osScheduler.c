@@ -13,15 +13,18 @@
 /**
  * starts the scheduler of the system operating
  */
-void osScheduler(){
+void osScheduler(os_thread** thread_id, int n_thread){
     printf(">>Starting Linux scheduler [->]\r\n");
 
-    /* FIXME: Whait other thread to finish */
-    while(1){}
+    int i;
+    for(i = 0; i < n_thread; i++){
+        pthread_join(*thread_id[i], NULL);
+    }
     
     /* FIXME: In case of error the application should be closed */
     /* FIXME: Catch term or exit or kill signal to do a clean exit */
-    while(1){
-    	printf("\n>>Linux [FAIL]\n");
-    }
+    /*for(i = 0; i < n_thread; i++){
+        free(*thread_id[i]);
+    }*/
+    exit(0);
 }

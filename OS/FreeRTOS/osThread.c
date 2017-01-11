@@ -1,6 +1,6 @@
 /**
  * @file  FreeRTOS/thread.c
- * @author Ignacio Ibañez Aliaga 
+ * @author Ignacio Ibaï¿½ez Aliaga 
  * @date 26-10-2016
  * @copyright GNU Public License.
  *
@@ -12,6 +12,6 @@
 /**
  * create a task in FreeRTOS
  */
-void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority){
+void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority, os_thread thread){
     xTaskCreate((*functionTask), name, size, parameters, priority, NULL);
 }

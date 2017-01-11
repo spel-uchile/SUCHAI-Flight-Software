@@ -1,6 +1,6 @@
 /**
  * @file  FreeRTOS/scheduler.c
- * @author Ignacio Ibañez Aliaga 
+ * @author Ignacio Ibaï¿½ez Aliaga 
  * @date 26-10-2016
  * @copyright GNU Public License.
  *
@@ -12,7 +12,7 @@
 /**
  * starts the scheduler of the system operating
  */
-void osScheduler(){
+void osScheduler(os_thread* thread){
     printf(">>Starting FreeRTOS scheduler [->]\r\n");
     vTaskStartScheduler();
 
