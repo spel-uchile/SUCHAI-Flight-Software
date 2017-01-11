@@ -49,8 +49,8 @@ typedef struct pthread_queue_s {
 #define PTHREAD_QUEUE_OK 1
 
 pthread_queue_t * pthread_queue_create(int length, size_t item_size);
-int pthread_queue_send(pthread_queue_t * queue, void * value, int timeout);
-int pthread_queue_receive(pthread_queue_t * queue, void * buf, int timeout);
+int pthread_queue_send(pthread_queue_t * queue, void * value, uint32_t timeout);
+int pthread_queue_receive(pthread_queue_t * queue, void * buf, uint32_t timeout);
 
 #endif 
 

@@ -1,10 +1,14 @@
 #include "../include/osSemphr.h"
 
-void osSemaphoreCreate(osSemaphore* mutex){
-	pthread_mutex_init(mutex, NULL);
+int osSemaphoreCreate(osSemaphore* mutex){
+	if (pthread_mutex_init(mutex, NULL) == 0) {
+		return CSP_SEMAPHORE_OK;
+	} else {
+		return CSP_SEMAPHORE_ERROR;
+	}
 }
 
-void osSemaphoreTake(osSemaphore *mutex, uint32_t timeout){
+int osSemaphoreTake(osSemaphore *mutex, uint32_t timeout){
 	int ret;
 	struct timespec ts;
 	uint32_t sec, nsec;
@@ -15,7 +19,7 @@ void osSemaphoreTake(osSemaphore *mutex, uint32_t timeout){
 		ret = pthread_mutex_lock(mutex);
 	} else {
 		if (clock_gettime(CLOCK_REALTIME, &ts))
-			return;
+			return CSP_SEMAPHORE_ERROR;
 
 		sec = timeout / 1000;
 		nsec = (timeout - 1000 * sec) * 1000000;
@@ -31,15 +35,15 @@ void osSemaphoreTake(osSemaphore *mutex, uint32_t timeout){
 	}
 
 	if (ret != 0)
-		return;
+		return CSP_SEMAPHORE_ERROR;
 
-	return;
+	return CSP_SEMAPHORE_OK;
 }
 
-void osSemaphoreGiven(osSemaphore *mutex){
+int osSemaphoreGiven(osSemaphore *mutex){
 	if (pthread_mutex_unlock(mutex) == 0) {
-		return;
+		return CSP_SEMAPHORE_OK;
 	} else {
-		return;
+		return CSP_SEMAPHORE_ERROR;
 	}
 }

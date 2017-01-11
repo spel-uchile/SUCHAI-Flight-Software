@@ -55,13 +55,15 @@ pthread_queue_t * pthread_queue_create(int length, size_t item_size) {
 }
 	
 
-int pthread_queue_send(pthread_queue_t * queue, void * value, int timeout) {
+int pthread_queue_send(pthread_queue_t * queue, void * value, uint32_t timeout) {
 	
 	int ret;
 
 	/* Calculate timeout */
 	struct timespec ts;
-	
+	if (clock_gettime(CLOCK_REALTIME, &ts))
+		return PTHREAD_QUEUE_ERROR;
+
 	uint32_t sec = timeout / 1000;
 	uint32_t nsec = (timeout - 1000 * sec) * 1000000;
 
@@ -95,12 +97,14 @@ int pthread_queue_send(pthread_queue_t * queue, void * value, int timeout) {
 	
 }
 
-int pthread_queue_receive(pthread_queue_t * queue, void * buf, int timeout) {
+int pthread_queue_receive(pthread_queue_t * queue, void * buf, uint32_t timeout) {
 
 	int ret;
 	
 	/* Calculate timeout */
 	struct timespec ts;
+    if (clock_gettime(CLOCK_REALTIME, &ts))
+        return PTHREAD_QUEUE_ERROR;
 	
 	uint32_t sec = timeout / 1000;
 	uint32_t nsec = (timeout - 1000 * sec) * 1000000;
