@@ -93,8 +93,8 @@ static void on_reset(void);
 int main(void)
 {
     /* Initializing shared Queues */
-    dispatcherQueue = osQueueCreate(25,sizeof(cmd_t));
-    executerCmdQueue = osQueueCreate(1,sizeof(cmd_t));
+    dispatcherQueue = osQueueCreate(25,sizeof(cmd_t *));
+    executerCmdQueue = osQueueCreate(1,sizeof(cmd_t *));
     executerStatQueue = osQueueCreate(1,sizeof(int));
 
     /* Initializing shared Semaphore */
@@ -155,6 +155,6 @@ void on_reset(void)
 {
     /* FIXME: Check inits */
 //    repo_onResetCmdRepo(); //Command repository initialization
-    cmd_init(); //Command repository initialization
+    cmd_repo_init(); //Command repository initialization
     dat_onResetCubesatVar(); //Update status repository
 }

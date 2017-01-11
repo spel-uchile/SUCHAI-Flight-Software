@@ -21,27 +21,19 @@
 #include "repoCommand.h"
 
 # define CMD_MAX_LEN 100
-cmd_t cmd_list[CMD_MAX_LEN];
+
+/* Global variables */
+cmd_list_t cmd_list[CMD_MAX_LEN];
 int cmd_index = 0;
 
-/**
- * Registers a command in the system
- *
- * @param name Str. Name of the comand, max CMD_NAME_LEN characters
- * @param function Pointer to command function
- * @param params Str. to define command parameters
- * @return None
- */
-void cmd_add(char* name, cmdFunction function, int nparam)
+void cmd_add(char* name, cmdFunction function, int nparams)
 {
-    if (cmd_index < CMD_MAX_LEN){
+    if (cmd_index < CMD_MAX_LEN)
+    {
         // Create new command
         size_t l_name = strlen(name);
-        cmd_t cmd_new;
-        cmd_new.id = cmd_index;
-        cmd_new.nparam = nparam;
-        cmd_new.params = NULL;
-        cmd_new.function = (cmdFunction)malloc(sizeof(cmdFunction));
+        cmd_list_t cmd_new;
+        cmd_new.nparams = nparams;
         cmd_new.function = function;
         cmd_new.name = (char *)malloc(sizeof(char)*(l_name+1));
         strncpy(cmd_new.name, name, l_name+1);
@@ -52,79 +44,78 @@ void cmd_add(char* name, cmdFunction function, int nparam)
     }
 }
 
-/**
- * Get command by name
- *
- * @param name Str. Command name
- * @return cmd_t Command structure. Null if command does not exists.
- */
-cmd_t cmd_get_str(char *name)
+cmd_t * cmd_get_str(char *name)
 {
-    cmd_t cmd_new;
+    cmd_t *cmd_new = NULL;
 
     //Find inside command buffer
     int i, ok;
     for(i=0; i<CMD_MAX_LEN; i++)
     {
-        ok = strncmp(name, cmd_list[i].name, CMD_MAX_LEN);
+        ok = strcmp(name, cmd_list[i].name);
         if(ok == 0)
         {
-            cmd_new = cmd_list[i];
-            return cmd_new;
+            // Create the command by index
+            cmd_new = cmd_get_idx(i);
+            break;
         }
     }
 
     return cmd_new;
 }
 
-/**
- * Get command by index or id
- *
- * @param idx Int command index or Id.
- * @return cmd_t Command structure. Null if command does not exists.
- */
-cmd_t cmd_get_idx(int idx)
+cmd_t * cmd_get_idx(int idx)
 {
-    cmd_t cmd_new;
+    cmd_t *cmd_new = NULL;
 
     if (idx < CMD_MAX_LEN)
     {
-        cmd_new = cmd_list[idx];
+        // Get found command
+        cmd_list_t cmd_found = cmd_list[idx];
+
+        // Creates a new command
+        cmd_new = (cmd_t *)malloc(sizeof(cmd_t));
+
+        // Fill parameters
+        cmd_new->id = idx;
+        cmd_new->nparams = cmd_found.nparams;
+        cmd_new->function = cmd_found.function;
+        cmd_new->params = NULL;
     }
 
     return cmd_new;
 }
 
-/**
- * Print the list registered commands
- */
-void cmd_print_all(void){
-
-    printf("Name\t; Index\t; Params\n");
-    int i;
-    for(i=0; i<cmd_index; i++)
-    {
-        printf("%s\t; %d\t; %d\n", cmd_list[i].name, cmd_list[i].id, cmd_list[i].nparam);
+void cmd_free(cmd_t *cmd)
+{
+    if(cmd != NULL) {
+        // Free the params if allocated
+        free(cmd->params);
+        // Free the structure itself
+        free(cmd);
     }
 }
 
-/**
- * Initializes the command buffer adding null_cmd
- *
- * @return 1
- */
-int cmd_init(void)
+void cmd_print_all(void)
+{
+
+    printf("Index\t; name\t; Params\n");
+    int i;
+    for(i=0; i<cmd_index; i++)
+    {
+        printf("%d\t; %s\t; %d\n", i, cmd_list[i].name, cmd_list[i].nparams);
+    }
+}
+
+int cmd_repo_init(void)
 {
     // Create a null command
     char *name = "null";
     size_t l_name = strlen(name);
-    cmd_t cnull;
-    cnull.id = cmd_index;
-    cnull.nparam = 0;
-    cnull.params = NULL;
-    cnull.function = (cmdFunction)malloc(sizeof(cmdFunction));
+    cmd_list_t cnull;
+    cnull.nparams = 0;
     cnull.function = cmd_null;
-    cnull.name = (char *)malloc(sizeof(char)*(l_name+1));
+    cnull.name = (char *)malloc(sizeof(char)*l_name+1);
     strncpy(cnull.name, "null", l_name+1);
 
     // Reset the command buffer
@@ -141,12 +132,6 @@ int cmd_init(void)
     return 1;
 }
 
-/**
- * Null command, just print to stdout
- *
- * @param param Not used
- * @return 1, allways successful
- */
 int cmd_null(int nparam, void *param)
 {
     printf("cmd_null was used with %d params at 0x%X\n", nparam, *(int *)param);

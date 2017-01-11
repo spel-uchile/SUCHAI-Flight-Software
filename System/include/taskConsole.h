@@ -13,6 +13,7 @@
 #ifndef T_COSOLE_H
 #define T_CONSOLE_H
 
+#include <ctype.h>
 
 #include "osQueue.h"
 #include "osDelay.h"
@@ -24,6 +25,6 @@
 void taskConsole(void *param);
 int console_init(void);
 int console_read(char *buffer, int len);
-int console_parse(char *buffer, cmd_t *new_cmd);
+cmd_t * console_parse(char *buffer);
 
 #endif //T_CONSOLE_H

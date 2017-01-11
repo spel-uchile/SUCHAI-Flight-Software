@@ -20,17 +20,13 @@
 
 #include "include/taskDispatcher.h"
 
-//extern osQueue dispatcherQueue; /* Commands queue */
-//extern osQueue executerCmdQueue; /* Executer commands queue */
-//extern osQueue executerStatQueue; /* Executer result queue */
-
 void taskDispatcher(void *param)
 {
 	printf(">>[Dispatcher] Started\n");
 
     int status; /* Status of cmd reading operation */
 
-    cmd_t new_cmd; /* The new cmd readed */
+    cmd_t *new_cmd = NULL; /* The new cmd read */
     int cmd_result;
 
     while(1)
@@ -41,9 +37,9 @@ void taskDispatcher(void *param)
         if(status == pdPASS)
         {
             /* Check if command is executable */
-            if(check_if_executable(&new_cmd))
+            if(check_if_executable(new_cmd))
             {
-				printf("[Dispatcher] Cmd: %X, Param: %p, Orig: %X\n", new_cmd.id, new_cmd.params, -1);
+				printf("[Dispatcher] Cmd: %X, Param: %p, Orig: %X\n", new_cmd->id, new_cmd->params, -1);
 
                 /* Send the command to executer Queue - BLOCKING */
                 osQueueSend(executerCmdQueue, &new_cmd, portMAX_DELAY);
