@@ -26,7 +26,7 @@
 #include "OS/include/osQueue.h"
 
 #if __linux__
-    #define portMAX_DELAY (uint16_t) 0xffff
+    #define portMAX_DELAY (uint32_t) 0xffffffff
 	#define pdPASS				     1
     #define configMINIMAL_STACK_SIZE 1
  	#define portBASE_TYPE	short
