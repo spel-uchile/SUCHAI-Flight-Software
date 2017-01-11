@@ -30,7 +30,7 @@ typedef int (*cmdFunction)( int, void * );
  */
 typedef struct cmd_type{
     int id;                     ///< Command id
-    int nparams;                 ///< Number of parameters
+    int nparams;                ///< Number of parameters
     void *params;               ///< List of parameters (use malloc)
     cmdFunction function;       ///< Command function
 } cmd_t;

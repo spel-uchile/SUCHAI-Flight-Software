@@ -117,6 +117,48 @@ int con_help(int nparam, void *param)
 }
 
 /**
+ * TEST AND EXAMPLE
+ *
+ * @param param void
+ * @return 1 - OK
+ */
+int con_print_4_int(int nparam, void *param)
+{
+//    VALIDATE_PARAMS(param);
+
+    int par1 = ((int *)param)[0];
+    int par2 = ((int *)param)[1];
+    int par3 = ((int *)param)[2];
+
+    printf("Mis parametros son: %d, %d, %d", par1, par2, par3);
+    return 1;
+}
+
+/**
+ * TEST AND EXAMPLE
+ *
+ * @param param void
+ * @return 1 - OK
+ *
+ * char *params;
+ * sprintf(params, cmd->fmt, value, string);
+ * con_print_str_float("%s %f", "hola 23.1");
+ * con_print_ints("%d %d %d", "1 2 3");
+ * con_print_sp("%d %f %s", "1 2.0 hola");
+ */
+int con_print_str_float(char *fmt, char *param)
+{
+    float num;
+    char *str;
+
+    if(!sscanf(param, fmt, &num, &str) == 2)
+        return 0;
+
+    printf("Mis parametros son: %f, %s", num, str);
+    return 1;
+}
+
+/**
  * Display a generic propmp
  * @param param void
  * @return 1 - OK

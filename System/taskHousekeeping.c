@@ -57,9 +57,22 @@ void taskHousekeeping(void *param)
         {
             printf("[Housekeeping] _10min_check\n");
             cmd_t *cmd_10m = cmd_get_str("test");
+
+            /* TODO: A better way to fill parameters */
+            /* Example
+             * cmd_fill_int(cmd_10m, 1, 2, 3, 4);
+             * cmd_fill_int(cmd_t *cmd, ...)
+             * {
+             *  cmd_10m->params = (int *)malloc(sizeof(int)*4);
+             *  cmd_10m->params = {1,2,3,4};
+             * }
+             */
+
+            /* TODO: Fills parameters correctly */
             cmd_10m->params = (char *)malloc(sizeof(char)*20);
             strcpy(cmd_10m->params, "BYE ");
             strcat(cmd_10m->params, task_name);
+
             osQueueSend(dispatcherQueue, &cmd_10m, portMAX_DELAY);
         }
 
