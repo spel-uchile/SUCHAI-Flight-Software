@@ -53,7 +53,7 @@ void taskTest(void *param)
             cmd_t *cmd_3s = cmd_get_str("cmd3");
 
             cmd_3s->params = (char *)malloc(sizeof(char)*25);
-            strcpy(cmd_3s->params, "SEC-CMD3 HOLA SEC-CMD3 13.078 456");
+            strcpy(cmd_3s->params, "SEC-CMD3 123.456 SEC-CMD3 13.078 456");
             osQueueSend(dispatcherQueue, &cmd_3s, portMAX_DELAY);
         }
     }
