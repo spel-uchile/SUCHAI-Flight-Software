@@ -59,7 +59,7 @@ int drp_update_dat_CubesatVar_hoursWithoutReset(int nparam, void *param)
     variable = dat_getCubesatVar(dat_obc_hoursAlive);
     dat_setCubesatVar(dat_obc_hoursAlive, variable + arg);
 
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -81,5 +81,5 @@ int drp_print_dat_CubesatVar(int nparam, void *param)
         printf("%d, %d\n", indxVar, var);
     }
 
-    return 1;
+    return CMD_OK;
 }

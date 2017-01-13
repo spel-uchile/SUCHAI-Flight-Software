@@ -36,7 +36,7 @@ void obc_onResetCmdOBC(void)
 //    obc_sysReq[(unsigned char)obc_id_get_rtos_memory]  = CMD_SYSREQ_MIN;
     
 //    cmd_add("reset", obc_reset, "");
-    cmd_add("get_mem", obc_get_rtos_memory, 0);
+//    cmd_add("get_mem", obc_get_rtos_memory, 0);
 }
 
 /**
@@ -45,14 +45,14 @@ void obc_onResetCmdOBC(void)
  * @param param Not used
  * @return 1, but function never returns
  */
-int obc_reset(int nparam, void* param)
+int obc_reset(char *fmt, char *params, int nparams)
 {
     printf("Resetting system NOW!!\n");
 
     OBC_SYS_RESET();
 
     /* Never get here */
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -61,7 +61,7 @@ int obc_reset(int nparam, void* param)
  * @param param Not used
  * @return Availible heap memory in bytes
  */
-int obc_get_rtos_memory(int nparam, void *param)
+int obc_get_rtos_memory(char *fmt, char *params, int nparams)
 {
     #if __linux__
         int mem_heap = 666;
@@ -71,5 +71,6 @@ int obc_get_rtos_memory(int nparam, void *param)
         printf("Free RTOS memory: %d\n", mem_heap);
     #endif
         
-    return mem_heap;
+    //return mem_heap;
+    return CMD_OK;
 }

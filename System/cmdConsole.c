@@ -37,9 +37,11 @@ void con_onResetCmdCON(void){
 //    con_sysReq[(unsigned char)con_id_error_invalid_arg]  = CMD_SYSREQ_MIN;
 //    conFunction[(unsigned char)con_id_error_count_arg] = con_error_count_arg;
 //    con_sysReq[(unsigned char)con_id_error_count_arg]  = CMD_SYSREQ_MIN;
-    
-    cmd_add("test", con_debug_msg, 1);
-    cmd_add("help", con_help, 0);
+
+    //void cmd_add(char* name, cmdFunction function, char* fparams)
+    cmd_add("test", con_debug_msg, "%s", 1);
+    //cmd_add("help", con_help, 0);
+
 }
 
 /**
@@ -47,10 +49,10 @@ void con_onResetCmdCON(void){
  * @param param void
  * @return 1 - OK
  */
-int con_error_count_arg(void *param)
+int con_error_count_arg(char *fmt, char *params, int nparams)
 {
     printf("[Console Error] Arguments quantity dismatch\r\n"); //Type con_help for available commands\r\n");
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -58,10 +60,10 @@ int con_error_count_arg(void *param)
  * @param param void
  * @return 1 - OK
  */
-int con_error_invalid_arg(void *param)
+int con_error_invalid_arg(char *fmt, char *params, int nparams)
 {
     printf("[Console Error] Arguments invalid\r\n"); //Type con_help for available commands\r\n");
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -69,10 +71,10 @@ int con_error_invalid_arg(void *param)
  * @param param void
  * @return 1 - OK
  */
-int  con_error_unknown_cmd(void *param)
+int  con_error_unknown_cmd(char *fmt, char *params, int nparams)
 {
     printf("[Console Error] Unknown command\r\n"); //Type con_help for available commands\r\n");
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -80,10 +82,10 @@ int  con_error_unknown_cmd(void *param)
  * @param param void
  * @return 1 - OK
  */
-int  con_error_cmd_toolong(void *param)
+int  con_error_cmd_toolong(char *fmt, char *params, int nparams)
 {
     printf("[Console Error] Command too long\r\n"); //Type con_help for available commands\r\n");
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -91,15 +93,17 @@ int  con_error_cmd_toolong(void *param)
  * @param param void message as char array
  * @return 1 - OK, 0 fail
  */
-int con_debug_msg(int nparam, void *param)
+int con_debug_msg(char *fmt, char *params, int nparams)
 {
-    char *msg = (char *)param;
-    if(msg)
+    //char *msg = (char *)param;
+    char *msg;
+
+    if(sscanf(params,fmt, msg) == nparams)
     {
         printf("[Debug Msg] %s\n", msg);
-        return 1;
+        return CMD_OK;
     }
-    return 0;
+    return CMD_FAIL;
 }
 
 /**
@@ -109,11 +113,11 @@ int con_debug_msg(int nparam, void *param)
  * @param param void
  * @return 1 - OK
  */
-int con_help(int nparam, void *param)
+int con_help(char *fmt, char *params, int nparams)
 {
     printf("List of commands:\n");
     cmd_print_all();
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -122,16 +126,16 @@ int con_help(int nparam, void *param)
  * @param param void
  * @return 1 - OK
  */
-int con_print_4_int(int nparam, void *param)
+int con_print_4_int(char *fmt, char *params, int nparams)
 {
 //    VALIDATE_PARAMS(param);
 
-    int par1 = ((int *)param)[0];
+    /*int par1 = ((int *)param)[0];
     int par2 = ((int *)param)[1];
     int par3 = ((int *)param)[2];
 
-    printf("Mis parametros son: %d, %d, %d", par1, par2, par3);
-    return 1;
+    printf("Mis parametros son: %d, %d, %d", par1, par2, par3);*/
+    return CMD_OK;
 }
 
 /**
@@ -146,16 +150,16 @@ int con_print_4_int(int nparam, void *param)
  * con_print_ints("%d %d %d", "1 2 3");
  * con_print_sp("%d %f %s", "1 2.0 hola");
  */
-int con_print_str_float(char *fmt, char *param)
+int con_print_str_float(char *fmt, char *params, int nparams)
 {
     float num;
     char *str;
 
-    if(!sscanf(param, fmt, &num, &str) == 2)
-        return 0;
+    if(!sscanf(params, fmt, &num, &str) == 2)
+        return CMD_FAIL;
 
     printf("Mis parametros son: %f, %s", num, str);
-    return 1;
+    return CMD_OK;
 }
 
 /**
@@ -163,8 +167,9 @@ int con_print_str_float(char *fmt, char *param)
  * @param param void
  * @return 1 - OK
  */
-int con_promt(void *param)
+int con_promt(char *fmt, char *params, int nparams)
 {
     printf(">>");
-    return 1;
+    return CMD_OK;
 }
+
