@@ -26,17 +26,20 @@
 cmd_list_t cmd_list[CMD_MAX_LEN];
 int cmd_index = 0;
 
-void cmd_add(char* name, cmdFunction function, int nparams)
+void cmd_add(char* name, cmdFunction function, char* fparams, int nparam)
 {
     if (cmd_index < CMD_MAX_LEN)
     {
         // Create new command
         size_t l_name = strlen(name);
+        size_t l_fparams = strlen(fparams);
         cmd_list_t cmd_new;
-        cmd_new.nparams = nparams;
+        cmd_new.fmt = (char *)malloc(sizeof(char)*(l_fparams+1));
+        strncpy(cmd_new.fmt, fparams, l_fparams+1);
         cmd_new.function = function;
         cmd_new.name = (char *)malloc(sizeof(char)*(l_name+1));
         strncpy(cmd_new.name, name, l_name+1);
+        cmd_new.nparams = nparam;
 
         // Copy to command buffer
         cmd_list[cmd_index] = cmd_new;
@@ -78,8 +81,9 @@ cmd_t * cmd_get_idx(int idx)
 
         // Fill parameters
         cmd_new->id = idx;
-        cmd_new->nparams = cmd_found.nparams;
+        cmd_new->fmt = cmd_found.fmt;
         cmd_new->function = cmd_found.function;
+        cmd_new->nparams = cmd_found.nparams;
         cmd_new->params = NULL;
     }
 
@@ -103,7 +107,7 @@ void cmd_print_all(void)
     int i;
     for(i=0; i<cmd_index; i++)
     {
-        printf("%d\t; %s\t; %d\n", i, cmd_list[i].name, cmd_list[i].nparams);
+        printf("%d\t; %s\t; %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
 }
 
@@ -111,9 +115,13 @@ int cmd_repo_init(void)
 {
     // Create a null command
     char *name = "null";
+    char *fparams = "null"; //line duplicate
     size_t l_name = strlen(name);
+    size_t l_fparams = strlen(fparams);
     cmd_list_t cnull;
     cnull.nparams = 0;
+    cnull.fmt = (char *)malloc(sizeof(char)*l_fparams+1);
+    strncpy(cnull.fmt, "null", l_fparams+1);
     cnull.function = cmd_null;
     cnull.name = (char *)malloc(sizeof(char)*l_name+1);
     strncpy(cnull.name, "null", l_name+1);
@@ -128,12 +136,15 @@ int cmd_repo_init(void)
     obc_onResetCmdOBC();
     drp_onResetCmdDRP();
     con_onResetCmdCON();
+    test_cmd_init();
 
     return 1;
 }
 
-int cmd_null(int nparam, void *param)
+
+
+int cmd_null(char *fparams, char *params, int nparam)
 {
-    printf("cmd_null was used with %d params at 0x%X\n", nparam, *(int *)param);
+    printf("cmd_null was used with params format %s params at %s\n", fparams, params);
     return 1;
 }

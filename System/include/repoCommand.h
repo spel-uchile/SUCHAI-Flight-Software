@@ -17,12 +17,20 @@
 #include "cmdOBC.h"
 #include "cmdDRP.h"
 #include "cmdConsole.h"
+#include "cmdTestCommand.h"
 
 /* Command definitions */
 /**
  *  Defines the prototype of a command
  */
-typedef int (*cmdFunction)( int, void * );
+typedef int (*cmdFunction)(char *fmt, char *params, int nparams);
+
+
+/**
+ * Define return the command
+ */
+#define CMD_OK 1
+#define CMD_FAIL 0
 
 /**
  * Structure to store a command sent to
@@ -31,7 +39,8 @@ typedef int (*cmdFunction)( int, void * );
 typedef struct cmd_type{
     int id;                     ///< Command id
     int nparams;                ///< Number of parameters
-    void *params;               ///< List of parameters (use malloc)
+    char *fmt;                  ///< Format of parameters
+    char *params;               ///< List of parameters (use malloc)
     cmdFunction function;       ///< Command function
 } cmd_t;
 
@@ -41,6 +50,7 @@ typedef struct cmd_type{
  */
 typedef struct cmd_list_type{
     int nparams;                ///< Number of parameters
+    char *fmt;                  ///< Format of parameters
     char *name;                 ///< Command name (use malloc)
     cmdFunction function;       ///< Command function
 } cmd_list_t;
@@ -49,12 +59,12 @@ typedef struct cmd_list_type{
 /**
  * Registers a command in the system
  *
- * @param name Str. Name of the comand, max CMD_NAME_LEN characters
  * @param function Pointer to command function
- * @param params Str. to define command parameters
+ * @param fparams Str. define format of parameters
+ * @param nparam
  * @return None
  */
-void cmd_add(char *name, cmdFunction function, int nparam);
+void cmd_add(char *name, cmdFunction function, char *fmt, int nparams);
 
 /**
  * Create a new command by name
@@ -97,6 +107,6 @@ int cmd_repo_init(void);
  * @param param Not used
  * @return 1, allways successful
  */
-int cmd_null(int nparam, void *param);
+int cmd_null(char *fmt, char *params, int nparams);
 
 #endif /* CMD_REPO_H */
