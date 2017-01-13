@@ -42,7 +42,7 @@ void taskExecuter(void *param)
             ClrWdt();
 
             /* Execute the command */
-            cmd_stat = run_cmd->function(run_cmd->nparams, run_cmd->params);
+            cmd_stat = run_cmd->function(run_cmd->fmt, run_cmd->params, run_cmd->nparams);
             cmd_free(run_cmd);
 
             /* Commands may take a long time, so reset the WDT */
