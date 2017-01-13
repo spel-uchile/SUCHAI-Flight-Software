@@ -4,16 +4,17 @@
  * @date 2016
  * @copyright GNU GPL v3
  *
- * This header have definitions related to command repository
+ * This header have tests related to command interface
  */
 
 #ifndef CMD_TEST_COMMAND_H
 #define CMD_TEST_COMMAND_H
 
-#include "SUCHAI_config.h"
-#include "repoCommand.h"
 #include <errno.h>
 #include <assert.h>
+
+#include "SUCHAI_config.h"
+#include "repoCommand.h"
 
 #define clean_errno() (errno == 0 ? "None" : strerror(errno))
 #define log_error(M, ...) fprintf(stderr, "[ERROR] (%s:%d: errno: %s) " M "\n", __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)

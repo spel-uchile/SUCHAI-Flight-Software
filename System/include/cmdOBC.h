@@ -16,29 +16,19 @@
 #include "repoCommand.h"
 
 #if __linux__
-	#define OBC_SYS_RESET() { printf("reset\n");}///< processor software reset
+    /* FIXME: Find an adequate implementation in unix */
+	#define OBC_SYS_RESET() { printf("reset\n");} ///< processor software reset
 #else
 	#define OBC_SYS_RESET() { __asm__ volatile("reset");}///< processor software reset
 #endif
 
 #define CMD_OBC 0x10 ///< OBC commands group identifier
 
-/**
- * List of availible commands
- */
-typedef enum{
-    obc_id_reset = 0x1000, ///< @cmd_first
-    obc_id_get_rtos_memory, ///< @cmd
 
-    obc_id_last_one    // Dummy element
-}OBC_CmdIndx;
-
-#define OBC_NCMD ((unsigned char)obc_id_last_one)
-
-void obc_onResetCmdOBC(void);
+void cmd_obc_init(void);
 
 int obc_reset(char *fmt, char *params, int nparams);
 int obc_get_rtos_memory(char *fmt, char *params, int nparams);
 
 
-#endif /* CMD_PCC_H */
+#endif /* CMD_OBC_H */

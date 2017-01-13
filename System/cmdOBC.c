@@ -20,21 +20,12 @@
  
 #include "cmdOBC.h"
 
-cmdFunction obc_Function[OBC_NCMD];
-int obc_sysReq[OBC_NCMD];
-
 /**
  * This function registers the list of command in the system, initializing the
  * functions array. This function must be called at every system start up.
  */
-void obc_onResetCmdOBC(void)
+void cmd_obc_init(void)
 {
-//    obc_Function[(unsigned char)obc_id_reset] = obc_reset;
-//    obc_sysReq[(unsigned char)obc_id_reset]  = CMD_SYSREQ_MIN;
-    
-//    obc_Function[(unsigned char)obc_id_get_rtos_memory] = obc_get_rtos_memory;
-//    obc_sysReq[(unsigned char)obc_id_get_rtos_memory]  = CMD_SYSREQ_MIN;
-    
 //    cmd_add("reset", obc_reset, "");
 //    cmd_add("get_mem", obc_get_rtos_memory, 0);
 }

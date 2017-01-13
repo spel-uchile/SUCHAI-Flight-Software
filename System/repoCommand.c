@@ -163,9 +163,9 @@ int cmd_repo_init(void)
     }
 
     // Init repos
-    obc_onResetCmdOBC();
-    drp_onResetCmdDRP();
-    con_onResetCmdCON();
+    cmd_obc_init();
+    cmd_repodata_init();
+    cmd_console_init();
     test_cmd_init();
 
     return 1;

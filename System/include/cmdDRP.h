@@ -17,28 +17,16 @@
 #ifndef CMD_DRP_H
 #define CMD_DRP_H
 
-#include "../../SUCHAI_config.h"
+#include "SUCHAI_config.h"
 
 #include "repoData.h"
 #include "repoCommand.h"
 
 #define CMD_DRP 0x50 ///< DRP commands group identifier
 
-/**
- * List of availible commands
- */
-typedef enum{
-    drp_id_update_dat_CubesatVar_hoursWithoutReset = 0x5000, ///< @cmd_first
-    drp_id_update_dat_CubesatVar_hoursAlive, ///< @cmd
-    drp_id_print_CubesatVar, ///< @cmd
+void cmd_repodata_init(void);
 
-    drp_id_last_one    // Dummy element
-}DRP_CmdIndx;
-
-#define DRP_NCMD ((unsigned char)drp_id_last_one)
-
-void drp_onResetCmdDRP(void);
-
+/* TODO: Move documentation to his header */
 int drp_update_dat_CubesatVar_hoursWithoutReset(int nparam, void *param);
 int drp_print_dat_CubesatVar(int nparam, void *param);
 

@@ -1,10 +1,10 @@
 /**
- * @file  cmdTestCommand.h
+ * @file  cmdTestCommand.c
  * @author Ignacio Ibañez A - ignacio.ibanez@usach.cl
  * @date 2016
  * @copyright GNU GPL v3
  *
- * This header have definitions related to command repository
+ * This file have tests related to commands interface
  */
 
 #include "cmdTestCommand.h"

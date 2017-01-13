@@ -19,25 +19,8 @@
 
 #include "cmdConsole.h"
 
-cmdFunction conFunction[CON_NCMD];
-int con_sysReq[CON_NCMD];
-
-void con_onResetCmdCON(void){
-//    conFunction[(unsigned char)con_id_help] = con_help;
-//    con_sysReq[(unsigned char)con_id_help]  = CMD_SYSREQ_MIN;
-//    conFunction[(unsigned char)con_id_promt] = con_promt;
-//    con_sysReq[(unsigned char)con_id_promt]  = CMD_SYSREQ_MIN;
-//    conFunction[(unsigned char)con_id_error_cmd_toolong] = con_error_cmd_toolong;
-//    con_sysReq[(unsigned char)con_id_error_cmd_toolong]  = CMD_SYSREQ_MIN;
-////    conFunction[(unsigned char)con_id_debug_msg] = con_debug_msg;
-////    con_sysReq[(unsigned char)con_id_debug_msg]  = CMD_SYSREQ_MIN;
-//    conFunction[(unsigned char)con_id_error_unknown_cmd] = con_error_unknown_cmd;
-//    con_sysReq[(unsigned char)con_id_error_unknown_cmd]  = CMD_SYSREQ_MIN;
-//    conFunction[(unsigned char)con_id_error_invalid_arg] = con_error_invalid_arg;
-//    con_sysReq[(unsigned char)con_id_error_invalid_arg]  = CMD_SYSREQ_MIN;
-//    conFunction[(unsigned char)con_id_error_count_arg] = con_error_count_arg;
-//    con_sysReq[(unsigned char)con_id_error_count_arg]  = CMD_SYSREQ_MIN;
-
+void cmd_console_init(void)
+{
     //void cmd_add(char* name, cmdFunction function, char* fparams)
     cmd_add("test", con_debug_msg, "%s", 1);
     //cmd_add("help", con_help, 0);
