@@ -20,7 +20,8 @@
 
 #include "repoCommand.h"
 
-# define CMD_MAX_LEN 100
+#define CMD_MAX_LEN 100
+#define CMD_MAX_STR_PARAMS 64
 
 /* Global variables */
 cmd_list_t cmd_list[CMD_MAX_LEN];
@@ -88,6 +89,35 @@ cmd_t * cmd_get_idx(int idx)
     }
 
     return cmd_new;
+}
+
+void cmd_add_params_str(cmd_t *cmd, char *params)
+{
+    size_t len_param = strlen(params);
+
+    // Check pointers
+    if(cmd != NULL && len_param)
+    {
+        cmd->params = (char *)malloc(sizeof(char)*(len_param+1));
+        strncpy(cmd->params, params, len_param+1);
+    }
+
+    return;
+}
+
+void cmd_add_params_var(cmd_t *cmd, ...)
+{
+    va_list args;
+    va_start(args, cmd->fmt);
+
+    //Parsing arguments to string
+    char str_params[CMD_MAX_STR_PARAMS];
+    vsprintf(str_params, cmd->fmt, args);
+
+    va_end(args);
+
+    //Fill parameters as string
+    cmd_add_params_str(cmd, str_params);
 }
 
 void cmd_free(cmd_t *cmd)

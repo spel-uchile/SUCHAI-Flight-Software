@@ -14,8 +14,6 @@ void taskTest(void *param)
     unsigned int _2sec_check = 2;//10*60;  //10[m] condition
     unsigned int _3sec_check = 3;//60*60;  //1[h] condition
 
-    char *task_name = param != NULL ? (char *)param : "HSK";
-
     portTick xLastWakeTime = osTaskGetTickCount();
 
     while(1)
@@ -29,9 +27,7 @@ void taskTest(void *param)
         {
             printf("[Test] _1sec_check\n");
             cmd_t *cmd_1s = cmd_get_str("cmd1");
-
-            cmd_1s->params = (char *)malloc(sizeof(char)*25);
-            strcpy(cmd_1s->params, "SEC-CMD1 12");
+            cmd_add_params_str(cmd_1s, "SEC-CMD1 12");
             osQueueSend(dispatcherQueue, &cmd_1s, portMAX_DELAY);
         }
 
@@ -40,9 +36,7 @@ void taskTest(void *param)
         {
             printf("[Test] _2sec_check\n");
             cmd_t *cmd_2s = cmd_get_str("cmd2");
-
-            cmd_2s->params = (char *)malloc(sizeof(char)*25);
-            strcpy(cmd_2s->params, "1.08 2.09 12 23");
+            cmd_add_params_var(cmd_2s, 1.08, 2.09, 12, 23);
             osQueueSend(dispatcherQueue, &cmd_2s, portMAX_DELAY);
         }
 
@@ -51,9 +45,7 @@ void taskTest(void *param)
         {
             printf("[Test] _3sec_check\n");
             cmd_t *cmd_3s = cmd_get_str("cmd3");
-
-            cmd_3s->params = (char *)malloc(sizeof(char)*25);
-            strcpy(cmd_3s->params, "SEC-CMD3 123.456 SEC-CMD3 13.078 456");
+            cmd_add_params_str(cmd_3s, "SEC-CMD3 123.456 SEC-CMD3 13.078 456");
             osQueueSend(dispatcherQueue, &cmd_3s, portMAX_DELAY);
         }
     }

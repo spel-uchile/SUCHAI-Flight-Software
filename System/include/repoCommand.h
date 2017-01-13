@@ -11,7 +11,7 @@
 #ifndef CMD_REPO_H
 #define CMD_REPO_H
 
-#include "cmdIncludes.h"
+#include <stdarg.h>
 
 /* Add files with commands */
 #include "cmdOBC.h"
@@ -60,9 +60,15 @@ typedef struct cmd_list_type{
  * Registers a command in the system
  *
  * @param function Pointer to command function
- * @param fparams Str. define format of parameters
- * @param nparam
+ * @param fparams Str. defines format of parameters, separated by spaces
+ * @param nparam Int. number of parameters, according to @fparams
  * @return None
+ * @example:
+ *
+ *      // Adds command foo with 2 params: integer and string
+ *      cmd_add("foo", foo, "%d %s", 2);
+ *      // Adds command bar with 3 params: integers and double
+ *      cmd_add("bar", bar, "&d %d %f", 3);
  */
 void cmd_add(char *name, cmdFunction function, char *fmt, int nparams);
 
@@ -83,6 +89,40 @@ cmd_t * cmd_get_str(char *name);
  * @return cmd_t Command structure. Null if command does not exists.
  */
 cmd_t * cmd_get_idx(int idx);
+
+/**
+ * Fills command parameters as string
+ * @param cmd cmd_t. Command to fill parameters
+ * @param params Str. String with parameters
+ * @example
+ *
+ *      //Fill two parameters to foo command
+ *      cmd_t *foo = cmd_get_str("foo"); // foo.fmt is '%d %s'
+ *      cmd_add_params(foo, "123 abc");
+ *      //Fill three parameters to bar command
+ *      cmd_t *bar = cmd_get_str("bar"); // bar.fmt is '%d %d %f'
+ *      cmd_add_params(bar, "1 2 3.4");
+ */
+void cmd_add_params_str(cmd_t *cmd, char *params);
+
+/**
+ * Fills command parameters by variables.
+ * Note variables are converted to string
+ * @param cmd cmd_t. Command to fill parameters
+ * @param ... List of variables to fill as parameters
+ * @example
+ *
+ *      //Fill two parameters to foo command
+ *      int a = 123; char *b = "abc";
+ *      cmd_t *foo = cmd_get_str("foo"); // foo.fmt is '%d %s'
+ *      cmd_add_params_fmt(foo, a, b);
+ *      //Fill three parameters to bar command
+ *      int c = 1; int d = 2; float e = 3.4;
+ *      cmd_t *bar = cmd_get_str("bar"); // bar.fmt is '%d %d %f'
+ *      cmd_add_params_fmt(bar, c, d, e);
+ */
+void cmd_add_params_var(cmd_t *cmd, ...);
+
 
 /**
  * Destroys a command and frees the allocated memory
