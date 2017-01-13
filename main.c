@@ -107,7 +107,8 @@ int main(void)
     osCreateTask(taskDispatcher,"dispatcher",2*configMINIMAL_STACK_SIZE,NULL,3, &thread_id[0]);
     osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &thread_id[1]);
 
-    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &thread_id[2]);
+//    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &thread_id[2]);
+    osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &thread_id[2]);
     osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &thread_id[3]);
 
     /* Configure Peripherals */
