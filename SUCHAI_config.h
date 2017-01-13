@@ -23,7 +23,6 @@
 #include <limits.h>
 #include <string.h>
 
-#include "System/include/cmdIncludes.h"
 #include "OS/include/osQueue.h"
 
 #if __linux__
