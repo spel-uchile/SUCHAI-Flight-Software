@@ -1,13 +1,13 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <stdio.h>
-#include <string.h>
+#include "SUCHAI_config.h"
+#include "globals.h"
 
-#include "../../SUCHAI_config.h"
+#include "osQueue.h"
+#include "osDelay.h"
 
-#include "../../OS/include/osDelay.h"
-#include "../../OS/include/osQueue.h"
+#include "repoCommand.h"
 
 void taskTest(void *param);
 
