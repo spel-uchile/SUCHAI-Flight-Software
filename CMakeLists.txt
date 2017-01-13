@@ -19,6 +19,8 @@ set(SOURCE_FILES
         System/taskExecuter.c
         System/taskHousekeeping.c
         System/taskConsole.c
+        System/cmdTestCommand.c
+        System/taskTest.c
         main.c)
 
 include_directories(
