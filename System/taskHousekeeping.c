@@ -34,7 +34,9 @@ void taskHousekeeping(void *param)
     unsigned int _10min_check = 2;//10*60;  //10[m] condition
     unsigned int _1hour_check = 3;//60*60;  //1[h] condition
 
-    char *task_name = param != NULL ? (char *)param : "HSK";
+    //char *task_name = param != NULL ? (char *)param : "HSK";
+    char *task_name = malloc(sizeof(char)*14);
+    strcpy(task_name, "Housekeeping");
 
     portTick xLastWakeTime = osTaskGetTickCount();
     
@@ -48,7 +50,13 @@ void taskHousekeeping(void *param)
         if((elapsed_sec % _10sec_check) == 0)
         {
             printf("[Housekeeping] _10sec_check\n");
-            cmd_t *cmd_10s = cmd_get_str("get_mem");
+            //cmd_t *cmd_10s = cmd_get_str("get_mem");
+            cmd_t *cmd_10s = cmd_get_str("test");
+
+            cmd_10s->params = (char *)malloc(sizeof(char)*25);
+            strcpy(cmd_10s->params, "SEC1-");
+            strcat(cmd_10s->params, task_name);
+
             osQueueSend(dispatcherQueue, &cmd_10s, portMAX_DELAY);
         }
 
@@ -69,8 +77,8 @@ void taskHousekeeping(void *param)
              */
 
             /* TODO: Fills parameters correctly */
-            cmd_10m->params = (char *)malloc(sizeof(char)*20);
-            strcpy(cmd_10m->params, "BYE ");
+            cmd_10m->params = (char *)malloc(sizeof(char)*25);
+            strcpy(cmd_10m->params, "SEC2-");
             strcat(cmd_10m->params, task_name);
 
             osQueueSend(dispatcherQueue, &cmd_10m, portMAX_DELAY);
