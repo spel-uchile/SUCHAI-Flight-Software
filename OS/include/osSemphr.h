@@ -1,10 +1,11 @@
 #ifndef _OS_SEMPHR_H_
 #define _OS_SEMPHR_H_
 
-#include "../../SUCHAI_config.h"
+#include "os.h"
 
 #if __linux__
 	#include <pthread.h>
+	#include <stdint.h>
 	typedef pthread_mutex_t osSemaphore;
 
 	#define CSP_SEMAPHORE_OK 	1
@@ -12,8 +13,9 @@
 	#define CSP_MUTEX_OK 		CSP_SEMAPHORE_OK
 	#define CSP_MUTEX_ERROR		CSP_SEMAPHORE_ERROR
 #else
-	#include "FreeRTOS.h"
-	#include "semphr.h"
+	#include "freertos/FreeRTOS.h"
+	#include "freertos/queue.h"
+	#include "freertos/semphr.h"
 	typedef xSemaphoreHandle osSemaphore;
 
 	#define CSP_SEMAPHORE_OK 	pdPASS

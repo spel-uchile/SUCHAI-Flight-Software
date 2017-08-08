@@ -1,5 +1,5 @@
 
-#include "../include/osQueue.h"
+#include <osQueue.h>
 
 osQueue osQueueCreate(int length, size_t item_size) {
 	return xQueueCreate(length, item_size);

@@ -11,16 +11,16 @@
 #ifndef _OS_THREAD_H_
 #define _OS_THREAD_H_
 
-#include "../../SUCHAI_config.h"
-
 #if __linux__
     #include <pthread.h>
+    #include <stdio.h>
     typedef pthread_t os_thread;
 #else
-    #include "../../FreeRTOSConfig.h"
-    typedef BaseType_t os_thread;
+    #include "freertos/FreeRTOSConfig.h"
+    #include "freertos/FreeRTOS.h"
+    #include "freertos/task.h"
+    typedef portBASE_TYPE os_thread;
 #endif
-
 
 void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority, os_thread* thread);
 

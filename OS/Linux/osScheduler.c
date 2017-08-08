@@ -8,13 +8,16 @@
  *
  */
 
-#include "../include/osScheduler.h"
+#include "osScheduler.h"
+
+const static char *tag = "osScheduler";
 
 /**
  * starts the scheduler of the system operating
  */
-void osScheduler(os_thread** thread_id, int n_thread){
-    printf(">>Starting Linux scheduler [->]\r\n");
+void osScheduler(os_thread** thread_id, int n_thread)
+{
+    LOGI(tag, "Linux scheduler: waiting threads")
 
     int i;
     for(i = 0; i < n_thread; i++){

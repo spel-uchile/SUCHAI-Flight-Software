@@ -1,48 +1,49 @@
 /**
  * @file  Linux/delay.c
- * @author Ignacio Ibañez Aliaga 
+ * @author Ignacio Ibañez Aliaga
+ * @author Carlos Gonzalez Cortes
  * @date 26-10-2016
  * @copyright GNU Public License.
  *
- * Creation of functions related with time for systems operating Linux.
+ * Functions related with time for systems operating Linux.
  * 
  */
 
-#include "../include/osDelay.h"
+#include "osDelay.h"
 
-void osDelay(long milliseconds){
-    //transform in microseconds
-    usleep(milliseconds*1000);
-}
-
-portTick osDefineTime(long delayms){
+portTick osDefineTime(uint32_t mseconds){
     //use time
-    return (portTick) delayms;
+    return (portTick)mseconds*1000;
 }
 
-portTick osTaskGetTickCount(){
+portTick osTaskGetTickCount(void){
     //calculate time
-    struct timeval time;
-    gettimeofday(&time,0);
+    struct timespec time;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &time);
     //return time in microseconds
-	return (int)(time.tv_sec*1000000 + time.tv_usec);
+    return (portTick)(time.tv_sec*1e+6 + time.tv_nsec*1e-3);
 }
 
-void osTaskDelayUntil(portTick* lastTime, portTick delay_ticks){
+void osDelay(uint32_t mseconds){
+    //transform to microseconds
+    usleep(mseconds*1000);
+}
 
-    //get time
-    struct timeval current;
-    gettimeofday(&current,0);
-
+void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds){
     //calculate time left
-    portTick u_current = current.tv_sec*1000000+current.tv_usec;
-    if((u_current-*lastTime)>=delay_ticks*1000){
+    portTick c_usec = osTaskGetTickCount();   // Current ticks
+    portTick d_usec = c_usec - *lastTime;     // Delta ticks
+    portTick s_usec = osDefineTime(mseconds); // Sleep ticks
+
+    // Return if more than desired milli seconds have passed
+    if(d_usec > s_usec){
         return;
     }
-    //micro delay
-	usleep(delay_ticks*1000-(u_current-*lastTime));
 
-    gettimeofday(&current,0);
-    *lastTime = current.tv_sec*1000000+current.tv_usec;
+    // Delay left ticks
+    uint32_t s_msec = (s_usec - d_usec)/1000;
+    osDelay(s_msec);
 
+    // Tag last delay ticks
+    *lastTime = osTaskGetTickCount();
 }

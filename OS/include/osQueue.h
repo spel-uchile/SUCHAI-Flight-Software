@@ -21,11 +21,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef _OS_QUEUE_H_
 #define _OS_QUEUE_H_
 
-#include "../../SUCHAI_config.h"
 #include <stdint.h>
 
 #if __linux__
 	#include "../include/pthread_queue.h"
+#else
+    #include "freertos/FreeRTOS.h"
+    #include "freertos/queue.h"
 #endif
 
 typedef void* osQueue;
