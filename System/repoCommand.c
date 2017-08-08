@@ -23,11 +23,13 @@
 #define CMD_MAX_LEN 100
 #define CMD_MAX_STR_PARAMS 64
 
+const static char *tag = "repoCmd";
+
 /* Global variables */
 cmd_list_t cmd_list[CMD_MAX_LEN];
 int cmd_index = 0;
 
-void cmd_add(char* name, cmdFunction function, char* fparams, int nparam)
+int cmd_add(char *name, cmdFunction function, char *fparams, int nparam)
 {
     if (cmd_index < CMD_MAX_LEN)
     {
@@ -45,6 +47,12 @@ void cmd_add(char* name, cmdFunction function, char* fparams, int nparam)
         // Copy to command buffer
         cmd_list[cmd_index] = cmd_new;
         cmd_index++;
+        return cmd_index;
+    }
+    else
+    {
+        LOGW(tag, "Unable to add cmd: %s. Buffer full (%d)", name, cmd_index);
+        return CMD_ERROR;
     }
 }
 
@@ -65,6 +73,10 @@ cmd_t * cmd_get_str(char *name)
         }
     }
 
+    if(cmd_new == NULL)
+    {
+        LOGW(tag, "Command not found: %s", name);
+    }
     return cmd_new;
 }
 
@@ -86,6 +98,10 @@ cmd_t * cmd_get_idx(int idx)
         cmd_new->function = cmd_found.function;
         cmd_new->nparams = cmd_found.nparams;
         cmd_new->params = NULL;
+    }
+    else
+    {
+        LOGW(tag, "Command index found: %d", idx);
     }
 
     return cmd_new;
@@ -133,48 +149,37 @@ void cmd_free(cmd_t *cmd)
 void cmd_print_all(void)
 {
 
-    printf("Index\t; name\t; Params\n");
+    LOGD(tag, "Command list");
+    printf("Index\t name\t Params\n");
     int i;
     for(i=0; i<cmd_index; i++)
     {
-        printf("%d\t; %s\t; %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
+        printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
 }
 
 int cmd_repo_init(void)
 {
-    // Create a null command
-    char *name = "null";
-    char *fparams = "null"; //line duplicate
-    size_t l_name = strlen(name);
-    size_t l_fparams = strlen(fparams);
-    cmd_list_t cnull;
-    cnull.nparams = 0;
-    cnull.fmt = (char *)malloc(sizeof(char)*l_fparams+1);
-    strncpy(cnull.fmt, "null", l_fparams+1);
-    cnull.function = cmd_null;
-    cnull.name = (char *)malloc(sizeof(char)*l_name+1);
-    strncpy(cnull.name, "null", l_name+1);
-
-    // Reset the command buffer
-    int i;
-    for(i=0; i < CMD_MAX_LEN; i++){
-        cmd_list[i] = cnull;
+    // Reset command buffer with cmd_null command
+    int n_cmd = 0;
+    do
+    {
+        n_cmd = cmd_add("null", cmd_null, "", 0);
     }
+    while(n_cmd < CMD_MAX_LEN);
+    cmd_index = 0;
 
     // Init repos
+    test_cmd_init();
     cmd_obc_init();
     cmd_repodata_init();
     cmd_console_init();
-    test_cmd_init();
 
-    return 1;
+    return CMD_OK;
 }
-
-
 
 int cmd_null(char *fparams, char *params, int nparam)
 {
-    printf("cmd_null was used with params format %s params at %s\n", fparams, params);
-    return 1;
+    LOGD(tag, "cmd_null was used with params format: %s and params string: %s", fparams, params);
+    return CMD_ERROR;
 }

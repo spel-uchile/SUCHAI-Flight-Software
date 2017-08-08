@@ -23,6 +23,8 @@
 #include <limits.h>
 #include <string.h>
 
+#include "utils.h"
+
 #include "OS/include/osQueue.h"
 
 #if __linux__
@@ -41,11 +43,11 @@
 
 /* General system configurations */
 
+/* System debug configurations */
+#define LOG_LEVEL     LOG_LVL_DEBUG 	///< Define debug levels
+
 /* Data repository configurations */
 #define SCH_STATUS_REPO_MODE    	0   ///< Status repository location. (0) Internal, (1) Single external.
 #define SCH_CHECK_IF_EXECUTABLE_SOC 0   ///< Check if a command is executable using energy level (SOC)
-
-/* System verbose configurations */
-#define SCH_GRL_VERBOSE     1   ///< Activates verbose debug mode
 
 #endif	/* SUCHAI_CONFIG_H */

@@ -13,6 +13,8 @@
 
 #include <stdarg.h>
 
+#include "utils.h"
+
 /* Add files with commands */
 #include "cmdOBC.h"
 #include "cmdDRP.h"
@@ -31,6 +33,7 @@ typedef int (*cmdFunction)(char *fmt, char *params, int nparams);
  */
 #define CMD_OK 1
 #define CMD_FAIL 0
+#define CMD_ERROR -1
 
 /**
  * Structure to store a command sent to
@@ -62,7 +65,8 @@ typedef struct cmd_list_type{
  * @param function Pointer to command function
  * @param fparams Str. defines format of parameters, separated by spaces
  * @param nparam Int. number of parameters, according to @fparams
- * @return None
+ * @return Int. Length of command list in case of success or CMD_ERROR (-1) if
+ * an error occurred.
  * @example:
  *
  *      // Adds command foo with 2 params: integer and string
@@ -70,7 +74,7 @@ typedef struct cmd_list_type{
  *      // Adds command bar with 3 params: integers and double
  *      cmd_add("bar", bar, "&d %d %f", 3);
  */
-void cmd_add(char *name, cmdFunction function, char *fmt, int nparams);
+int cmd_add(char *name, cmdFunction function, char *fmt, int nparams);
 
 /**
  * Create a new command by name

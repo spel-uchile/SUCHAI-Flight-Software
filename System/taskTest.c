@@ -1,53 +1,44 @@
 #include "include/taskTest.h"
 
-//extern os_queue xQueue1;
+#define TEST_FAILS 1
+
+const static char *tag = "taskTest";
 
 void taskTest(void *param)
 {
-    printf(">>[TASK TEST] Started\r\n");
+    LOGI(tag, "Started");
+    LOGI(tag, "---- Testing commands interface ----")
 
-    portTick delay_ms    = 1000;    //Task period in [ms]
-    portTick delay_ticks = osDefineTime(delay_ms); //Task period in ticks
+    LOGI(tag, "Test: test_str_int from string")
+    cmd_t *test_cmd = cmd_get_str("test_str_int");
+    cmd_add_params_str(test_cmd, "STR1 12");
+    osQueueSend(dispatcherQueue, &test_cmd, portMAX_DELAY);
+    osDelay(500);
 
-    unsigned int elapsed_sec = 0;       // Seconds count
-    unsigned int _1sec_check = 1;//10;     //10[s] condition
-    unsigned int _2sec_check = 2;//10*60;  //10[m] condition
-    unsigned int _3sec_check = 3;//60*60;  //1[h] condition
+    LOGI(tag, "Test: test_double_int from vars")
+    cmd_t *test_cmd2 = cmd_get_str("test_double_int");
+    cmd_add_params_var(test_cmd2, 1.08, 2.09, 12, 23);
+    osQueueSend(dispatcherQueue, &test_cmd2, portMAX_DELAY);
+    osDelay(500);
 
-    portTick xLastWakeTime = osTaskGetTickCount();
+    LOGI(tag, "Test: test_str_double_int from string")
+    cmd_t *test_cmd3= cmd_get_str("test_str_double_int");
+    cmd_add_params_str(test_cmd3, "STR1 12.456 STR2 13.078 456");
+    osQueueSend(dispatcherQueue, &test_cmd3, portMAX_DELAY);
+    osDelay(500);
 
-    while(1)
-    {
 
-        osTaskDelayUntil(&xLastWakeTime, delay_ticks); //Suspend task
-        elapsed_sec += delay_ms/1000; //Update seconds counts
+#if TEST_FAILS
+    LOGI(tag, "Test: test_str_int from string with bad parameters numbers")
+    cmd_t *test_cmd5 = cmd_get_str("test_str_int");
+    cmd_add_params_str(test_cmd5, "STR1 12 12");
+    osQueueSend(dispatcherQueue, &test_cmd5, portMAX_DELAY);
+    osDelay(500);
 
-        /* 1 seconds actions */
-        if((elapsed_sec % _1sec_check) == 0)
-        {
-            printf("[Test] _1sec_check\n");
-            cmd_t *cmd_1s = cmd_get_str("cmd1");
-            cmd_add_params_str(cmd_1s, "SEC-CMD1 12");
-            osQueueSend(dispatcherQueue, &cmd_1s, portMAX_DELAY);
-        }
-
-        /* 2 seconds actions */
-        if((elapsed_sec % _2sec_check) == 0)
-        {
-            printf("[Test] _2sec_check\n");
-            cmd_t *cmd_2s = cmd_get_str("cmd2");
-            cmd_add_params_var(cmd_2s, 1.08, 2.09, 12, 23);
-            osQueueSend(dispatcherQueue, &cmd_2s, portMAX_DELAY);
-        }
-
-        /* 3 seconds actions */
-        if((elapsed_sec % _3sec_check) == 0)
-        {
-            printf("[Test] _3sec_check\n");
-            cmd_t *cmd_3s = cmd_get_str("cmd3");
-            cmd_add_params_str(cmd_3s, "SEC-CMD3 123.456 SEC-CMD3 13.078 456");
-            osQueueSend(dispatcherQueue, &cmd_3s, portMAX_DELAY);
-        }
-    }
+    LOGI(tag, "Test: test_str_int from string with bad parameters type")
+    cmd_t * test_cmd4 = cmd_get_str("test_str_int");
+    cmd_add_params_str(test_cmd4, "STR1 a12");
+    osQueueSend(dispatcherQueue, &test_cmd4, portMAX_DELAY);
+#endif
 
 }

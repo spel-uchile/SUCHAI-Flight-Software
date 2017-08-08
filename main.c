@@ -22,6 +22,7 @@
 
 /* System includes */
 #include "SUCHAI_config.h"
+#include "utils.h"
 
 /* Task includes */
 #include "taskTest.h"
@@ -92,6 +93,11 @@ static void on_reset(void);
 
 int main(void)
 {
+    /* On reset */
+    on_reset();
+
+    pthread_mutex_init(&print_mutex, NULL);
+
     /* Initializing shared Queues */
     dispatcherQueue = osQueueCreate(25,sizeof(cmd_t *));
     executerCmdQueue = osQueueCreate(1,sizeof(cmd_t *));
@@ -99,6 +105,8 @@ int main(void)
 
     /* Initializing shared Semaphore */
     osSemaphoreCreate(&repoDataSem);
+
+    osDelay(1000);
 
     //os_thread dispatcher, executer, housekeeping, console;
     int n_thread = 4;
@@ -113,8 +121,6 @@ int main(void)
 
     /* Configure Peripherals */
 
-    /* On reset */
-    on_reset();
 
     /* Start the scheduler. Should never return */
     osScheduler(&thread_id, n_thread);
