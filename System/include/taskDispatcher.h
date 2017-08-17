@@ -15,7 +15,7 @@
 #ifndef T_DISPATCHER_H
 #define T_DISPATCHER_H
 
-#include "SUCHAI_config.h"
+#include "config.h"
 #include "globals.h"
 #include "repoCommand.h"
 #include "repoData.h"

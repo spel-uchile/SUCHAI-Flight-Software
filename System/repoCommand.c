@@ -20,9 +20,6 @@
 
 #include "repoCommand.h"
 
-#define CMD_MAX_LEN 100
-#define CMD_MAX_STR_PARAMS 64
-
 const static char *tag = "repoCmd";
 
 /* Global variables */

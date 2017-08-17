@@ -18,7 +18,7 @@
 #include "os.h"
 #include "osSemphr.h"
 
-#include "SUCHAI_config.h"
+#include "config.h"
 
 /**
  * @brief Log level

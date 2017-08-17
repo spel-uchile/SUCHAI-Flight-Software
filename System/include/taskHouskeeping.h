@@ -13,7 +13,7 @@
 #ifndef T_HOUSEKEEPING_H
 #define T_HOUSEKEEPING_H
 
-#include "SUCHAI_config.h"
+#include "config.h"
 
 #include "cmdRepository.h"
 

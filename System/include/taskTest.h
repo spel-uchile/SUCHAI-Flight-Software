@@ -1,7 +1,7 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include "SUCHAI_config.h"
+#include "config.h"
 #include "globals.h"
 
 #include "osQueue.h"

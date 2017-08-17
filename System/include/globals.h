@@ -5,10 +5,12 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <osQueue.h>
+#include "osQueue.h"
+#include "osSemphr.h"
 
-osQueue dispatcherQueue; /* Commands queue */
-osQueue executerCmdQueue; /* Executer commands queue */
-osQueue executerStatQueue; /* Executer result queue */
+osQueue dispatcherQueue;    /* Commands queue */
+osQueue executerCmdQueue;   /* Executer commands queue */
+osQueue executerStatQueue;  /* Executer result queue */
+osSemaphore repoDataSem;    /* Data repository mutex */
 
 #endif //GLOBALS_H

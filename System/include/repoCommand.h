@@ -23,17 +23,22 @@
 
 /* Command definitions */
 /**
- *  Defines the prototype of a command
- */
-typedef int (*cmdFunction)(char *fmt, char *params, int nparams);
-
-
-/**
  * Define return the command
  */
 #define CMD_OK 1
 #define CMD_FAIL 0
 #define CMD_ERROR -1
+
+/**
+ * Fixed buffers lengths
+ */
+#define CMD_MAX_LEN 100
+#define CMD_MAX_STR_PARAMS 64
+
+/**
+ *  Defines the prototype of a command
+ */
+typedef int (*cmdFunction)(char *fmt, char *params, int nparams);
 
 /**
  * Structure to store a command sent to

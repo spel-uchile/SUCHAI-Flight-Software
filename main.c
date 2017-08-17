@@ -22,7 +22,7 @@
 
 /* System includes */
 #include "utils.h"
-#include "SUCHAI_config.h"
+#include "config.h"
 
 /* Task includes */
 #include "taskTest.h"
@@ -84,10 +84,6 @@
     #pragma config GCP = OFF                // General Code Segment Code Protect (Code protection is disabled)
     #pragma config JTAGEN = OFF             // JTAG Port Enable (JTAG port is disabled)
 #endif
-
-/* Global variables */
-osSemaphore repoDataSem;
-//osQueue dispatcherQueue, executerCmdQueue, executerStatQueue; // Moved to globals.h
 
 static void on_reset(void);
 
@@ -158,7 +154,7 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
  */
 void on_reset(void)
 {
-    /* FIXME: Check inits */
+    /* TODO: Check inits */
     log_init();
     cmd_repo_init(); //Command repository initialization
     dat_onResetCubesatVar(); //Update status repository

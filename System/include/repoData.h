@@ -21,7 +21,7 @@
 
 #include "../../OS/include/osSemphr.h"
 
-#include "../../SUCHAI_config.h"
+#include "config.h"
 
 
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation

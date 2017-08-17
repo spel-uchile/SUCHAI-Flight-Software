@@ -15,7 +15,7 @@
 
 #include <stdlib.h>
 
-#include "SUCHAI_config.h"
+#include "config.h"
 #include "globals.h"
 
 #include "osQueue.h"
