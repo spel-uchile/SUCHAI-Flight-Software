@@ -11,10 +11,14 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdarg.h>
+#include <stdio.h>
+#include <time.h>
+
+#include "os.h"
+#include "osSemphr.h"
 
 #include "SUCHAI_config.h"
-#include <time.h>
-#include <pthread.h>
 
 /**
  * @brief Log level
@@ -31,20 +35,29 @@ typedef enum {
 
 // Define default log level
 #ifndef LOG_LEVEL
-#define LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
+    #define LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
 #endif
 
 #define LF   "\n"
 #define CRLF "\r\n"
 
-// Logging functions
-pthread_mutex_t print_mutex;
+osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 
-#define LOGE(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_ERROR)   {pthread_mutex_lock(&print_mutex); printf("[ERROR][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); pthread_mutex_unlock(&print_mutex);}
-#define LOGW(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_WARN)    {pthread_mutex_lock(&print_mutex); printf("[WARN ][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); pthread_mutex_unlock(&print_mutex);}
-#define LOGI(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_INFO)    {pthread_mutex_lock(&print_mutex); printf("[INFO ][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); pthread_mutex_unlock(&print_mutex);}
-#define LOGD(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_DEBUG)   {pthread_mutex_lock(&print_mutex); printf("[DEBUG][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); pthread_mutex_unlock(&print_mutex);}
-#define LOGV(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_VERBOSE) {pthread_mutex_lock(&print_mutex); printf("[VERB ][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); pthread_mutex_unlock(&print_mutex);}
+/**
+ * Init logging system, specifically shared mutex
+ * @return Int. CSP_SEMAPHORE_OK(1) or CSP_SEMAPHORE_ERROR(2)
+ */
+static inline int log_init(void)
+{
+    return osSemaphoreCreate(&log_mutex);
+}
+
+// Logging functions
+#define LOGE(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_ERROR)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); printf("[ERROR][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); osSemaphoreGiven(&log_mutex);}
+#define LOGW(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_WARN)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); printf("[WARN ][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); osSemaphoreGiven(&log_mutex);}
+#define LOGI(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_INFO)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); printf("[INFO ][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); osSemaphoreGiven(&log_mutex);}
+#define LOGD(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_DEBUG)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); printf("[DEBUG][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); osSemaphoreGiven(&log_mutex);}
+#define LOGV(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_VERBOSE) {osSemaphoreTake(&log_mutex, portMAX_DELAY); printf("[VERB ][%lu][%s] ", (unsigned long)time(NULL), tag); printf(msg, ##__VA_ARGS__); printf(LF); fflush(stdout); osSemaphoreGiven(&log_mutex);}
 
 // Assert functions
 #define clean_errno() (errno == 0 ? "None" : strerror(errno))

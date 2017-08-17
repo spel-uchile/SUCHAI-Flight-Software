@@ -28,7 +28,7 @@ int test_cmd_str_int(char *fmt, char *params, int nparams)
     errno = 0;
     assertf(sscanf(params,fmt, msg, &valor) == nparams, tag, "The format of parameters are: %s and parameters used are: %s",fmt, params);
     assertf(errno == 0, tag, "The format of parameters are: %s and parameters used are: %s",fmt, params);
-    LOGI(tag, "%s: %s_%i","con_str_int" ,msg,valor);
+    LOGI(tag, "%s: %s_%i","con_str_int", msg, valor);
     return CMD_OK;
 }
 
@@ -52,5 +52,4 @@ int test_cmd_str_double_int(char *fmt, char *params, int nparams)
     assertf( sscanf(params,fmt, v1, &v2, v3, &v4, &v5) == nparams, tag, "The format of parameters are: %s and parameters used are: %s",fmt, params);
     LOGI(tag, "%s: %s_%f_%s_%f_%i","str_double_int",v1,v2,v3,v4,v5);
     return CMD_OK;
-
 }

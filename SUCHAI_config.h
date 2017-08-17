@@ -23,23 +23,9 @@
 #include <limits.h>
 #include <string.h>
 
-#include "utils.h"
+//#include "utils.h"
 
 #include "OS/include/osQueue.h"
-
-#if __linux__
-    #define portMAX_DELAY (uint32_t) 0xffffffff
-	#define pdPASS				     1
-    #define configMINIMAL_STACK_SIZE 1
- 	#define portBASE_TYPE	short
- 	#define ClrWdt(){};
-#else
- 	#include "FreeRTOS.h"
-    #include "task.h"
- 	#include "queue.h"
- 	#include "semphr.h"
-    #include "timers.h"
-#endif
 
 /* General system configurations */
 

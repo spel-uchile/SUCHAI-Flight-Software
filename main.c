@@ -21,8 +21,8 @@
 #include <stdio.h>
 
 /* System includes */
-#include "SUCHAI_config.h"
 #include "utils.h"
+#include "SUCHAI_config.h"
 
 /* Task includes */
 #include "taskTest.h"
@@ -96,8 +96,6 @@ int main(void)
     /* On reset */
     on_reset();
 
-    pthread_mutex_init(&print_mutex, NULL);
-
     /* Initializing shared Queues */
     dispatcherQueue = osQueueCreate(25,sizeof(cmd_t *));
     executerCmdQueue = osQueueCreate(1,sizeof(cmd_t *));
@@ -161,7 +159,7 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
 void on_reset(void)
 {
     /* FIXME: Check inits */
-//    repo_onResetCmdRepo(); //Command repository initialization
+    log_init();
     cmd_repo_init(); //Command repository initialization
     dat_onResetCubesatVar(); //Update status repository
 }
