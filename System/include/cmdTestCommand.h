@@ -1,7 +1,8 @@
 /**
  * @file  cmdTestCommand.h
- * @author Ignacio Ibañez A - ignacio.ibanez@usach.cl
- * @date 2016
+ * @author Ignacio Ibanez A - ignacio.ibanez@usach.cl
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @date 2017
  * @copyright GNU GPL v3
  *
  * This header have tests related to command interface

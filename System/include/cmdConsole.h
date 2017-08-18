@@ -1,7 +1,7 @@
 /**
  * @file  cmdConsole.h
- * @author Carlos Gonzalez C
- * @author Tomas Opazo T
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @date 2017
  * @copyright GNU Public License.
  *

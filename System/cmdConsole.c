@@ -47,7 +47,9 @@ int con_debug_msg(char *fmt, char *params, int nparams)
 
 int con_help(char *fmt, char *params, int nparams)
 {
+    osSemaphoreTake(&log_mutex, portMAX_DELAY);
     printf("List of commands:\n");
     cmd_print_all();
+    osSemaphoreGiven(&log_mutex);
     return CMD_OK;
 }

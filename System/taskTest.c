@@ -1,6 +1,6 @@
 #include "include/taskTest.h"
 
-#define TEST_FAILS 1
+#define TEST_FAILS 0
 
 const static char *tag = "taskTest";
 
@@ -41,4 +41,15 @@ void taskTest(void *param)
     osQueueSend(dispatcherQueue, &test_cmd4, portMAX_DELAY);
 #endif
 
+    LOGI(tag, "---- Testing OBC commands ----");
+    LOGI(tag, "Test: get_mem");
+    test_cmd = cmd_get_str("get_mem");
+    cmd_add_params_str(test_cmd, "");
+    cmd_send(test_cmd);
+    osDelay(500);
+
+    LOGI(tag, "Test: reset");
+    test_cmd = cmd_get_str("reset");
+    cmd_add_params_str(test_cmd, "");
+    cmd_send(test_cmd);
 }

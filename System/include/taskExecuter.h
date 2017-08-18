@@ -1,11 +1,10 @@
 /**
  * @file  commandRepoitory.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2012
+ * @date 2017
  * @copyright GNU GPL v3
  *
- * @id 0x1106
  *
  * This task implements the executer module. Waits a message from dispatcher to
  * obtain the function and parameter to execute. When the function ends, send a
@@ -15,8 +14,12 @@
 #ifndef T_EXECUTER_H
 #define T_EXECUTER_H
 
+#include "globals.h"
 #include "config.h"
+#include "utils.h"
+
 #include "osQueue.h"
+
 #include "repoCommand.h"
 
 void taskExecuter(void *param);

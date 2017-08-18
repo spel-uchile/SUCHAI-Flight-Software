@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2013, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2013, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,11 @@
 
 #include "taskExecuter.h"
 
-extern osQueue executerCmdQueue; /* Comands queue*/
-extern osQueue executerStatQueue; /* Comands queue*/
+static const char *tag = "Executer";
 
 void taskExecuter(void *param)
 {
-    printf(">>[Executer] Started\n");
+    LOGI(tag, "Started");
 
     cmd_t *run_cmd = NULL;
     int cmd_stat, queue_stat;
@@ -37,7 +36,7 @@ void taskExecuter(void *param)
 
         if(queue_stat == pdPASS)
         {
-            printf("[Executer] Running a command...\n");
+            LOGI(tag, "Running a command...");
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();
 
@@ -48,11 +47,10 @@ void taskExecuter(void *param)
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();
             
-            printf("[Executer] Command result: %d\n", cmd_stat);
+            LOGI(tag, "Command result: %d", cmd_stat);
             
             /* Send the result to Dispatcher - BLOCKING */
             osQueueSend(executerStatQueue, &cmd_stat, portMAX_DELAY);
-
         }
     }
 }

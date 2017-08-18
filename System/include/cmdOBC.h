@@ -1,11 +1,11 @@
 /**
  * @file  cmdPPC.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2012
+ * @date 2017
  * @copyright GNU GPL v3
  *
- * This header have definitions of commands related to the on borad computer
+ * This header have definitions of commands related to the on board computer
  * (OBC) features.
  */
 
@@ -15,19 +15,31 @@
 #include "config.h"
 #include "repoCommand.h"
 
-#if __linux__
-    /* FIXME: Find an adequate implementation in unix */
-	#define OBC_SYS_RESET() { printf("reset\n");} ///< processor software reset
-#else
-	#define OBC_SYS_RESET() { __asm__ volatile("reset");}///< processor software reset
-#endif
-
-#define CMD_OBC 0x10 ///< OBC commands group identifier
-
-
+/**
+ * Register on board computer related (OBC) commands
+ */
 void cmd_obc_init(void);
 
+/**
+ * Reset the system
+ * @note: In POSIX just exit the application
+ *
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
 int obc_reset(char *fmt, char *params, int nparams);
+
+/**
+ * Debug system memory
+ * @note: In POSIX just cat /proc/<id>/status file
+ *
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
 int obc_get_rtos_memory(char *fmt, char *params, int nparams);
 
 

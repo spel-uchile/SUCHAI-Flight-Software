@@ -1,8 +1,8 @@
 /**
  * @file  cmdRepoitory.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2016
+ * @date 2017
  * @copyright GNU GPL v3
  *
  * This header have definitions related to command repository
@@ -20,6 +20,15 @@
 #include "cmdDRP.h"
 #include "cmdConsole.h"
 #include "cmdTestCommand.h"
+
+/* Macros */
+/**
+ * Send command to execution using dispatcherQueue (must be initialized). Blocks
+ * if the queue is full
+ *
+ * @param cmd *cmd_type, pointer to command
+ */
+#define cmd_send(cmd) osQueueSend(dispatcherQueue, &cmd, portMAX_DELAY);
 
 /* Command definitions */
 /**

@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2013, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2013, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,27 +20,22 @@
  
 #include "cmdOBC.h"
 
-/**
- * This function registers the list of command in the system, initializing the
- * functions array. This function must be called at every system start up.
- */
+
 void cmd_obc_init(void)
 {
-//    cmd_add("reset", obc_reset, "");
-//    cmd_add("get_mem", obc_get_rtos_memory, 0);
+    cmd_add("reset", obc_reset, "", 0);
+    cmd_add("get_mem", obc_get_rtos_memory, "", 0);
 }
 
-/**
- * Perform a microcontroller software reset
- * 
- * @param param Not used
- * @return 1, but function never returns
- */
 int obc_reset(char *fmt, char *params, int nparams)
 {
     printf("Resetting system NOW!!\n");
 
-    OBC_SYS_RESET();
+    #if __linux__
+        exit(0);
+    #else
+        __asm__ volatile("reset");
+    #endif
 
     /* Never get here */
     return CMD_OK;
@@ -55,13 +50,22 @@ int obc_reset(char *fmt, char *params, int nparams)
 int obc_get_rtos_memory(char *fmt, char *params, int nparams)
 {
     #if __linux__
-        int mem_heap = 666;
-        printf("Linux memory: %d\n", mem_heap);
+        int c;
+        FILE* file = fopen( "/proc/self/status", "r" );
+        if (file)
+        {
+            while ((c = getc(file)) != EOF)
+                putchar(c);
+            fclose(file);
+            return CMD_OK;
+        }
+        else
+        {
+            return CMD_FAIL;
+        }
     #else
         size_t mem_heap = xPortGetFreeHeapSize();
         printf("Free RTOS memory: %d\n", mem_heap);
+        return CMD_OK;
     #endif
-        
-    //return mem_heap;
-    return CMD_OK;
 }
