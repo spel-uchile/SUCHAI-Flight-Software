@@ -20,7 +20,7 @@
 
 #include "taskConsole.h"
 
-//extern xQueueHandle dispatcherQueue;
+//extern xQueueHandle dispatcher_queue;
 
 #define CON_BUFF_LEN 100
 
@@ -68,7 +68,7 @@ void taskConsole(void *param)
             #endif
 
             /* Queue NewCmd - Blocking */
-            osQueueSend(dispatcherQueue, &new_cmd, portMAX_DELAY);
+            osQueueSend(dispatcher_queue, &new_cmd, portMAX_DELAY);
         }
     }
 }

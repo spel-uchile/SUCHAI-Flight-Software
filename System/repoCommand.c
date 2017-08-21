@@ -164,12 +164,12 @@ int cmd_repo_init(void)
         n_cmd = cmd_add("null", cmd_null, "", 0);
     }
     while(n_cmd < CMD_MAX_LEN);
-    cmd_index = 0;
+    cmd_index = 0;  // Reset registered command counter
 
     // Init repos
     test_cmd_init();
     cmd_obc_init();
-    cmd_repodata_init();
+    cmd_drp_init();
     cmd_console_init();
 
     return CMD_OK;

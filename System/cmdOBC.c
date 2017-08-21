@@ -24,7 +24,7 @@
 void cmd_obc_init(void)
 {
     cmd_add("reset", obc_reset, "", 0);
-    cmd_add("get_mem", obc_get_rtos_memory, "", 0);
+    cmd_add("get_mem", obc_get_os_memory, "", 0);
 }
 
 int obc_reset(char *fmt, char *params, int nparams)
@@ -41,13 +41,7 @@ int obc_reset(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
-/**
- * Performs debug taks over current RTOS. Get rtos memory usage in bytes
- *
- * @param param Not used
- * @return Availible heap memory in bytes
- */
-int obc_get_rtos_memory(char *fmt, char *params, int nparams)
+int obc_get_os_memory(char *fmt, char *params, int nparams)
 {
     #if __linux__
         int c;

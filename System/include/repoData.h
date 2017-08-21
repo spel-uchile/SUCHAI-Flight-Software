@@ -1,13 +1,13 @@
 /**
  * @file  commandRepoitory.h
- * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2012
+ * @author Tomas Opazo T - tomas.opazo.t@gmail.com
+ * @date 2017
  * @copyright GNU GPL v3
  *
  * This header is an API to Status Repository and Data Repository:
  *  Status Repository:
- *      DAT_Cubesatvar
+ *      dat_system_var
  *
  *  Data Repository:
  *      DAT_FligthPlanBuff
@@ -19,9 +19,11 @@
 #ifndef DATA_REPO_H
 #define DATA_REPO_H
 
-#include "../../OS/include/osSemphr.h"
+#include "osSemphr.h"
 
+#include "globals.h"
 #include "config.h"
+#include "utils.h"
 
 
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
@@ -29,15 +31,15 @@
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
 
 /**
- * Cubesat's State Variables
+ * System level status variables
  */
-typedef enum{
+typedef enum dat_system{
     //OBC => (C&DH subsystem)
-    dat_obc_opMode=0,           ///< General operation mode
+    dat_obc_opmode=0,           ///< General operation mode
     dat_obc_lastResetSource,    ///< Last reset source
-    dat_obc_hoursAlive,         ///< Hours since first boot
-    dat_obc_hoursWithoutReset,  ///< Hours since last reset
-    dat_obc_resetCounter,       ///< Number of reset since first boot
+    dat_obc_hours_alive,         ///< Hours since first boot
+    dat_obc_hours_without_reset, ///< Hours since last reset
+    dat_obc_reset_counter,       ///< Number of reset since first boot
 
     //DEP => (C&DH subsystem)
     dat_dep_ant_deployed,       ///< Is antena deployed?
@@ -72,29 +74,41 @@ typedef enum{
 
     /* Add custom status variables here */
 
-    dat_cubesatVar_last_one     ///< Dummy element
-}DAT_CubesatVar;
+    dat_system_last_var         ///< Dummy element
+}dat_system_t;
 
+/**
+ * Initializes data repositories including buffers and mutexes
+ */
+void dat_repo_init(void);
 
-void dat_setCubesatVar(DAT_CubesatVar indxVar, int value);
-int dat_getCubesatVar(DAT_CubesatVar indxVar);
-void dat_onResetCubesatVar(void);
+/**
+ * Sets a status variable value
+ *
+ * @param index dat_system_t. Variable to set @sa dat_system_t
+ * @param value Int. Value to set
+ */
+void dat_set_system_var(dat_system_t index, int value);
+
+/**
+ * Returns a status variable's value
+ *
+ * @param index Variable to set @sa DAT_CubesatVar
+ * @return Variable value
+ */
+int dat_get_system_var(dat_system_t index);
 
 
 /* The following is an API to interface with the repoData cubesat fligthPlan */
-
-typedef enum _DAT_FligthPlanBuff{
-    dat_fpb_last_one
-}DAT_FligthPlanBuff;
-
+//typedef enum _DAT_FligthPlanBuff{
+//    dat_fpb_last_one
+//}DAT_FligthPlanBuff;
+//
 //DispCmd dat_getFlightPlan(unsigned int index);
 //int dat_setFlightPlan_cmd(unsigned int index, unsigned int cmdID);
 //int dat_setFlightPlan_param(unsigned int index, int param);
 //int dat_onResetFlightPlan(void);
 //void dat_erase_FlightPlanBuff(void);
-
-int drp_update_all_status_var(void* param);
-
 
 #endif // DATA_REPO_H
 

@@ -15,19 +15,16 @@ const static char *tag = "osScheduler";
 /**
  * starts the scheduler of the system operating
  */
-void osScheduler(os_thread** thread_id, int n_thread)
+void osScheduler(os_thread* threads_id, int n_threads)
 {
     LOGI(tag, "Linux scheduler: waiting threads")
 
     int i;
-    for(i = 0; i < n_thread; i++){
-        pthread_join(*thread_id[i], NULL);
+    for(i = 0; i < n_threads; i++){
+        pthread_join(threads_id[i], NULL);
     }
     
     /* FIXME: In case of error the application should be closed */
     /* FIXME: Catch term or exit or kill signal to do a clean exit */
-    /*for(i = 0; i < n_thread; i++){
-        free(*thread_id[i]);
-    }*/
     exit(0);
 }

@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2013, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2013, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,187 +18,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/repoData.h"
+#include "repoData.h"
 
-extern osSemaphore repoDataSem;  // Mutex for status repository
+static const char *tag = "repoData";
 
 #if SCH_STATUS_REPO_MODE == 0
-    int DAT_CUBESAT_VAR_BUFF[dat_cubesatVar_last_one];
+    int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
 #endif
 
-/**
- * Sets a status variable's value
- *
- * @param indxVar Variable to set @sa DAT_CubesatVar
- * @param value Value to set
- */
-void dat_setCubesatVar(DAT_CubesatVar indxVar, int value)
+
+void dat_repo_init(void)
 {
-    osSemaphoreTake(&repoDataSem, portMAX_DELAY);
-    #if SCH_STATUSCH_STATUS_REPO_MODE == 0
+    // Init repository mutex
+    if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
+    {
+        LOGE(tag, "Unable to create data repository mutex");
+    }
+
+    LOGD(tag, "Initializing data repositories buffers...")
+    /* TODO: Setup external memories */
+#if (SCH_SSCH_STATUS_REPO_MODE == 0)
+    {
         //Uses internal memory
-        DAT_CUBESAT_VAR_BUFF[indxVar] = value;
+        int index;
+        for(index=0; index<dat_system_last_var; index++)
+        {
+            dat_set_system_var((dat_system_t)index, INT_MAX);
+        }
+    }
+#endif
+
+    /* TODO: Initialize custom variables */
+    LOGD(tag, "Initializing system variables values...")
+    dat_set_system_var(dat_obc_hours_alive, 0);
+    dat_set_system_var(dat_obc_hours_without_reset, 0);
+    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);  //TODO: This is a non-volatile variable
+}
+
+void dat_set_system_var(dat_system_t index, int value)
+{
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    //Uses internal memory
+    #if SCH_STATUSCH_STATUS_REPO_MODE == 0
+        DAT_SYSTEM_VAR_BUFF[index] = value;
+    //Uses external memory
     #else
-        //Uses external memory
         #if __linux__
             printf("writeIntEEPROM1\n");
         #else
-            writeIntEEPROM1( (unsigned char)indxVar, value);
+            writeIntEEPROM1( (unsigned char)index, value);
         #endif
     #endif
-    osSemaphoreGiven(&repoDataSem);
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
 }
 
-/**
- * Returns a status variable's value
- *
- * @param indxVar Variable to set @sa DAT_CubesatVar
- * @return Variable value
- */
-int dat_getCubesatVar(DAT_CubesatVar indxVar)
+int dat_get_system_var(dat_system_t index)
 {
     int value = 0;
 
-    osSemaphoreTake(&repoDataSem, portMAX_DELAY);
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    //Use internal (volatile) memory
     #if SCH_STATUSCH_STATUS_REPO_MODE == 0
-        //Uses internal memory
-        value = DAT_CUBESAT_VAR_BUFF[indxVar];
+        value = DAT_SYSTEM_VAR_BUFF[index];
+    //Uses external (non-volatile) memory
     #else
-        //Uses external memory
         #if __linux__
             printf("readIntEEPROM1\n");
             value = 0;
         #else
-            value = readIntEEPROM1( (unsigned char)indxVar );
+            value = readIntEEPROM1( (unsigned char)index );
         #endif
     #endif
-    osSemaphoreGiven(&repoDataSem);
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
 
     return value;
 }
-
-/**
- * Initializes status repository
- */
-void dat_onResetCubesatVar(void)
-{
-    #if (SCH_SSCH_STATUS_REPO_MODE == 0)
-    {
-        //Uses interal memory
-        int i;
-        for(i=0; i<dat_cubesatVar_last_one; i++)
-        {
-            
-            dat_setCubesatVar(i,INT_MAX);
-        }
-    }
-    #endif
-
-    //Updates all dat_CubesatVar
-    drp_update_all_status_var(NULL);
-}
-
-/**
- * This command updates all status variables
- * TODO: register with cmdOBC
- * 
- * @param param Not used
- * @return 1, success. 0, fail
- */
-int drp_update_all_status_var(void* param)
-{
-    return 1;
-}
-
-///**
-// * Esta funcion retorna un comando desde el fligh plan. Lee desde la SD el
-// * i-esimo comando y su parametro.
-// * @param index Index-esimo dato del fligh plan */
-//DispCmd dat_getFlightPlan(unsigned int index){
-//    DispCmd NewCmd;
-//    NewCmd.cmdId = CMD_CMDNULL;
-//    NewCmd.idOrig = CMD_IDORIG_TFLIGHTPLAN;
-//    NewCmd.execCmd.param = 0;
-//
-//    if(index < SCH_FLIGHTPLAN_N_CMD)
-//    {
-//        int id, param;
-//         // La organizacion de los datos en la SD es
-//         // Primera mitad comandos, segunda mitad parametros
-//
-//        msd_getVar_256BlockExtMem(dat_FlightPlan_256Block, index, &id);
-//        msd_getVar_256BlockExtMem(dat_FlightPlan_256Block, 0xFFFF - index, &param);
-//
-//        NewCmd.cmdId = id;
-//        NewCmd.execCmd.param = 0;
-//    }
-//
-//    return NewCmd;
-//}
-//
-///**
-// * Esta funcion escribe un comando en un determinado indice el flight plan
-// * @param index Indice del f. plan que sera actualizado
-// * @param cmdId Comando que sera escrito
-// * @return 1, OK. 0, Fallo
-// */
-//int dat_setFlightPlan_cmd(unsigned int index, unsigned int cmdID){
-//    if(index < SCH_FLIGHTPLAN_N_CMD)
-//    {
-//        msd_setVar_256BlockExtMem( dat_FlightPlan_256Block, index, cmdID);
-//        return 1;
-//    }
-//    else
-//        return 0;
-//}
-///**
-// * Esta funcion escribe el parametro (asociado a un comando) de un determinado indice el flight plan
-// * @param index Indice del f. plan que sera actualizado
-// * @param param Parametro que sera escrito
-// * @return 1, OK. 0, Fallo
-// */
-//int dat_setFlightPlan_param(unsigned int index, int param){
-//    if(index < SCH_FLIGHTPLAN_N_CMD)
-//    {
-//        msd_setVar_256BlockExtMem( dat_FlightPlan_256Block, 0xFFFF-index, param);
-//        return 1;
-//    }
-//    else
-//        return 0;
-//}
-//
-///**
-// * Funcion con acciones a seguri sobre el Fligth Plan, luego de un Reset del PIC.
-// * @return 1 si OK, 0 si fallo
-// */
-//int dat_onResetFlightPlan(void){
-//    /* Do nothing onReset
-//    unsigned long i; int cmdid;
-//
-//    for(i=0; i < SCH_FLIGHTPLAN_N_CMD; i++){
-//        cmdid = CMD_CMDNULL;
-//        msd_setVar_256BlockExtMem( DAT_FLIGHT_PLAN_BUFF_256BLOCK, i, cmdid);
-//    }
-//    */
-//
-//    return 1;
-//}
-//
-///**
-// * Borra todo el Fligth Plan
-// */
-//void dat_erase_FlightPlanBuff(void){
-//    #if (SCH_repoData_VERBOSE>=1)
-//        char ret[10];
-//        con_printf("  dat_erase_FlightPlanBuff()..");
-//        con_printf("    starting at block=");
-//        sprintf (ret, "%d", (unsigned int)dat_FlightPlan_256Block);
-//        con_printf(ret); con_printf("\r\n");
-//    #endif
-//
-//    unsigned int i;
-//    for(i=0;i<256;i++){
-//        dat_memSD_BlockErase(dat_FlightPlan_256Block+i);
-//        ClrWdt();
-//    }
-//}

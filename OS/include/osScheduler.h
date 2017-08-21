@@ -23,6 +23,6 @@
     #include "osThread.h"
 #endif
 
-void osScheduler(os_thread** thread_id, int n_thread);
+void osScheduler(os_thread* threads_id, int n_threads);
 
 #endif

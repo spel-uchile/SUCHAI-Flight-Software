@@ -34,7 +34,7 @@ void taskDispatcher(void *param)
     while(1)
     {
         /* Read new_cmd from Queue - Blocking */
-        status = osQueueReceive(dispatcherQueue, &new_cmd, portMAX_DELAY);
+        status = osQueueReceive(dispatcher_queue, &new_cmd, portMAX_DELAY);
 
         if(status == pdPASS)
         {
@@ -44,10 +44,10 @@ void taskDispatcher(void *param)
 				LOGD(tag, "Cmd: %X, Param: %p, Orig: %X", new_cmd->id, &(new_cmd->params), -1);
 
                 /* Send the command to executer Queue - BLOCKING */
-                osQueueSend(executerCmdQueue, &new_cmd, portMAX_DELAY);
+                osQueueSend(executer_cmd_queue, &new_cmd, portMAX_DELAY);
 
                 /* Get the result from Executer Stat Queue - BLOCKING */
-                osQueueReceive(executerStatQueue, &cmd_result, portMAX_DELAY);
+                osQueueReceive(executer_stat_queue, &cmd_result, portMAX_DELAY);
             }
         }
     }
@@ -69,13 +69,13 @@ int check_if_executable(cmd_t *new_cmd)
 //    }
 //
 //    #if (SCH_CHECK_IF_EXECUTABLE_SOC == 0)
-//        dat_setCubesatVar(dat_eps_soc, CMD_SYSREQ_MAX);
+//        dat_set_system_var(dat_eps_soc, CMD_SYSREQ_MAX);
 //    #endif
 //
 //    // Compare sysReq with SOC
-//    if(dat_getCubesatVar(dat_eps_soc) < sysReq)
+//    if(dat_get_system_var(dat_eps_soc) < sysReq)
 //    {
-//        printf("[Dispatcher] Cmd: %X from %X sysReq %d refused because of SOC %d\n", cmdId, idOrig, sysReq, dat_getCubesatVar(dat_eps_soc));
+//        printf("[Dispatcher] Cmd: %X from %X sysReq %d refused because of SOC %d\n", cmdId, idOrig, sysReq, dat_get_system_var(dat_eps_soc));
 //        return 0;
 //    }
 

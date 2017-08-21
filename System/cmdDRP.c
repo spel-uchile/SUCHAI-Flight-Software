@@ -1,8 +1,8 @@
 /*                                 SUCHAI
- *                      NANOSATELLITE FLIGHT SOFTWARE
+ *                       NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2013, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2013, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,60 +18,96 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/cmdDRP.h"
+#include "cmdDRP.h"
+
+static const char *tag = "cmdDRP";
 
 /**
  * This function registers the list of command in the system, initializing the
  * functions array. This function must be called at every system start up.
  */
-void cmd_repodata_init(void)
+void cmd_drp_init(void)
 {
-//    cmd_add("update_hours", drp_update_dat_CubesatVar_hoursWithoutReset, "%d");
-//    cmd_add("print_vars", drp_print_dat_CubesatVar, "");
+    cmd_add("print_vars", drp_print_system_vars, "", 0);
+    cmd_add("update_sys_var", drp_update_sys_var_idx, "%d %d", 2);
+    cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
 }
 
-/**
- * Updates the following status variables:
- *  - hoursWithoutReset
- *  - hoursAlive
- *
- * The comands adds the value of param to current variable's value
- * 
- * @param param Hours to be added
- * @return 1, success. 0, fail.
- */
-int drp_update_dat_CubesatVar_hoursWithoutReset(int nparam, void *param)
+int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
-    int arg, variable;
+    LOGD(tag, "Displaying system variables list");
 
-    arg = *((int *)param);
-    variable = dat_getCubesatVar(dat_obc_hoursWithoutReset);
-    dat_setCubesatVar(dat_obc_hoursWithoutReset, variable + arg);
-
-    variable = dat_getCubesatVar(dat_obc_hoursAlive);
-    dat_setCubesatVar(dat_obc_hoursAlive, variable + arg);
-
-    return CMD_OK;
-}
-
-/**
- * Print all system's status variables.
- * 
- * @param param Not used
- * @return 1, success.
- */
-int drp_print_dat_CubesatVar(int nparam, void *param)
-{
-    printf("===================================\n");
-    printf("        Status repository\n");
-    printf("===================================\n");
-
-    DAT_CubesatVar indxVar;
-    for(indxVar=0; indxVar<dat_cubesatVar_last_one; indxVar++)
+    //Take log_mutex to take control of the console
+    int rc = osSemaphoreTake(&log_mutex, portMAX_DELAY);
+    if(rc == CSP_SEMAPHORE_OK)
     {
-        int var = dat_getCubesatVar(indxVar);
-        printf("%d, %d\n", indxVar, var);
+        printf("System variables repository\n");
+        printf("index\t value\n");
+
+        int var_index;
+        for (var_index = 0; var_index < dat_system_last_var; var_index++)
+        {
+            int var = dat_get_system_var((dat_system_t)var_index);
+            printf("%d\t %d\n", var_index, var);
+        }
+
+        //Exit critical zone
+        osSemaphoreGiven(&log_mutex);
+
+        return CMD_OK;
+    }
+    else
+    {
+        LOGE(tag, "Unable to acquire console mutex");
+        return CMD_FAIL;
+    }
+}
+
+int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
+{
+    int index, value;
+    if(sscanf(params, fmt, &index, &value) == nparams)
+    {
+        dat_system_t var_index = (dat_system_t)index;
+        if(var_index < dat_system_last_var)
+        {
+            dat_set_system_var(var_index, value);
+            return CMD_OK;
+        }
+        else
+        {
+            LOGW(tag, "drp_update_sys_idx used with invalid index: %d", var_index);
+            return CMD_FAIL;
+        }
+    }
+    else
+    {
+        LOGW(tag, "drp_update_sys_idx used with invalid params: %s", params);
+        return CMD_FAIL;
     }
 
-    return CMD_OK;
+}
+
+int drp_update_hours_alive(char *fmt, char *params, int nparams)
+{
+    int value;  // Value to add
+    int current;  // Current value to update
+
+    if(sscanf(params, fmt, &value) == nparams)
+    {
+        // Adds <value> to current hours alive
+        current = dat_get_system_var(dat_obc_hours_alive);
+        current += value;
+        dat_set_system_var(dat_obc_hours_alive, current);
+
+        // Adds <value> to current hours without reset
+        current = dat_get_system_var(dat_obc_hours_without_reset);
+        current += value;
+        dat_set_system_var(dat_obc_hours_without_reset, current);
+    }
+    else
+    {
+        LOGW(tag, "drp_update_hours_alive used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
 }

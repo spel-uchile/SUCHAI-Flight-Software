@@ -32,7 +32,7 @@ void taskExecuter(void *param)
     while(1)
     {
         /* Read the CMD that Dispatcher sent - BLOCKING */
-        queue_stat = osQueueReceive(executerCmdQueue, &run_cmd, portMAX_DELAY);
+        queue_stat = osQueueReceive(executer_cmd_queue, &run_cmd, portMAX_DELAY);
 
         if(queue_stat == pdPASS)
         {
@@ -50,7 +50,7 @@ void taskExecuter(void *param)
             LOGI(tag, "Command result: %d", cmd_stat);
             
             /* Send the result to Dispatcher - BLOCKING */
-            osQueueSend(executerStatQueue, &cmd_stat, portMAX_DELAY);
+            osQueueSend(executer_stat_queue, &cmd_stat, portMAX_DELAY);
         }
     }
 }

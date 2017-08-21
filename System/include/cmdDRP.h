@@ -1,8 +1,8 @@
 /**
  * @file  cmdPPC.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2012
+ * @date 2017
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related following data repositories:
@@ -22,12 +22,42 @@
 #include "repoData.h"
 #include "repoCommand.h"
 
-#define CMD_DRP 0x50 ///< DRP commands group identifier
 
-void cmd_repodata_init(void);
+/**
+ * Register data repository (DRP) commands in the system
+ */
+void cmd_drp_init(void);
 
-/* TODO: Move documentation to his header */
-int drp_update_dat_CubesatVar_hoursWithoutReset(int nparam, void *param);
-int drp_print_dat_CubesatVar(int nparam, void *param);
+/**
+ * Display system related variables. Variables are read from system variables
+ * data repository
+ *
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int drp_print_system_vars(char *fmt, char *params, int nparams);
 
-#endif /* CMD_PCC_H */
+/**
+ * Update a system status variable <value> by <index>
+ *
+ * @param fmt Str. Parameters format "%d %d"
+ * @param params Str. Parameters as string "<index> <value>"
+ * @param nparams Int. Number of parameters 2
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int drp_update_sys_var_idx(char *fmt, char *params, int nparams);
+
+/**
+ * Update current hours alive and hours without reset counters adding <value>
+ * hours.
+ *
+ * @param fmt Str. Parameters format "%d"
+ * @param params Str. Parameters as string "<value>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int drp_update_hours_alive(char *fmt, char *params, int nparams);
+
+#endif /* CMD_DRP_H */

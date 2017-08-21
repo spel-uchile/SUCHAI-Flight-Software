@@ -20,7 +20,7 @@
 
 #include "taskHousekeeping.h"
 
-//extern osQueue dispatcherQueue; /* Commands queue */
+//extern osQueue dispatcher_queue; /* Commands queue */
 
 void taskHousekeeping(void *param)
 {
@@ -57,7 +57,7 @@ void taskHousekeeping(void *param)
             strcpy(cmd_10s->params, "SEC1-");
             strcat(cmd_10s->params, task_name);
 
-            osQueueSend(dispatcherQueue, &cmd_10s, portMAX_DELAY);
+            osQueueSend(dispatcher_queue, &cmd_10s, portMAX_DELAY);
         }
 
         /* 10 minutes actions */
@@ -81,7 +81,7 @@ void taskHousekeeping(void *param)
             strcpy(cmd_10m->params, "SEC2-");
             strcat(cmd_10m->params, task_name);
 
-            osQueueSend(dispatcherQueue, &cmd_10m, portMAX_DELAY);
+            osQueueSend(dispatcher_queue, &cmd_10m, portMAX_DELAY);
         }
 
         /* 1 hours actions */
@@ -92,7 +92,7 @@ void taskHousekeeping(void *param)
             cmd_1h->params = (char *)malloc(sizeof(char)*20);
             strcpy(cmd_1h->params, "HELLO ");
             strcat(cmd_1h->params, task_name);
-            osQueueSend(dispatcherQueue, &cmd_1h, portMAX_DELAY);
+            osQueueSend(dispatcher_queue, &cmd_1h, portMAX_DELAY);
         }
     }
 }

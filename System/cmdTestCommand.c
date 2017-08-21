@@ -9,7 +9,7 @@
 
 #include "cmdTestCommand.h"
 
-const static char *tag = "cmdTest";
+static const char *tag = "cmdTest";
 
 void test_cmd_init(void)
 {

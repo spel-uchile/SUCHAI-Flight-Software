@@ -93,31 +93,26 @@ int main(void)
     on_reset();
 
     /* Initializing shared Queues */
-    dispatcherQueue = osQueueCreate(25,sizeof(cmd_t *));
-    executerCmdQueue = osQueueCreate(1,sizeof(cmd_t *));
-    executerStatQueue = osQueueCreate(1,sizeof(int));
-
-    /* Initializing shared Semaphore */
-    osSemaphoreCreate(&repoDataSem);
+    dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
+    executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
+    executer_stat_queue = osQueueCreate(1,sizeof(int));
 
     osDelay(1000);
 
-    //os_thread dispatcher, executer, housekeeping, console;
-    int n_thread = 4;
-    os_thread* thread_id = malloc(sizeof(os_thread)*n_thread);
-    /* Crating all task (the others are created inside taskDeployment) */
-    osCreateTask(taskDispatcher,"dispatcher",2*configMINIMAL_STACK_SIZE,NULL,3, &thread_id[0]);
-    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &thread_id[1]);
+    int n_threads = 4;
+    os_thread threads_id[n_threads];
 
-//    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &thread_id[2]);
-    osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &thread_id[2]);
-    osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &thread_id[3]);
+    /* Crating system task (the others are created inside taskDeployment) */
+    osCreateTask(taskDispatcher,"dispatcher",2*configMINIMAL_STACK_SIZE,NULL,3, &threads_id[0]);
+    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
 
-    /* Configure Peripherals */
-
+    /* Creating monitors tasks */
+//    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[2]);
+    osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &threads_id[2]);
+    osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
 
     /* Start the scheduler. Should never return */
-    osScheduler(&thread_id, n_thread);
+    osScheduler(threads_id, n_threads);
 
     return 0;
 }
@@ -154,8 +149,7 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
  */
 void on_reset(void)
 {
-    /* TODO: Check inits */
     log_init();
     cmd_repo_init(); //Command repository initialization
-    dat_onResetCubesatVar(); //Update status repository
+    dat_repo_init(); //Update status repository
 }

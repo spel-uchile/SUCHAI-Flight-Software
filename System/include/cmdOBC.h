@@ -40,7 +40,7 @@ int obc_reset(char *fmt, char *params, int nparams);
  * @param nparams Int. Number of parameters 0
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int obc_get_rtos_memory(char *fmt, char *params, int nparams);
+int obc_get_os_memory(char *fmt, char *params, int nparams);
 
 
 #endif /* CMD_OBC_H */
