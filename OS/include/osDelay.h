@@ -1,8 +1,8 @@
 /**
- * @file  delay.h
- * @author Ignacio Ibanez Aliaga
+ * @file  osDelay.h
  * @author Carlos Gonzalez Cortes
- * @date 26-10-2016
+ * @author Ignacio Ibanez Aliaga
+ * @date 2017
  * @copyright GNU Public License.
  *
  * Functions related to time for operating systems Linux and FreeRTOS

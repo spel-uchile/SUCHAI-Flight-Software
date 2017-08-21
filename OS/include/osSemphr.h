@@ -1,3 +1,11 @@
+/**
+ * @file  osSemphr.h
+ * @author Carlos Gonzalez Cortes
+ * @author Ignacio Ibanez Aliaga
+ * @date 2017
+ * @copyright GNU Public License.
+ */
+
 #ifndef _OS_SEMPHR_H_
 #define _OS_SEMPHR_H_
 

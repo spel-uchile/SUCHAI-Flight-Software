@@ -1,7 +1,8 @@
 /**
- * @file  thread.h
- * @author Ignacio Iba�ez Aliaga 
- * @date 26-10-2016
+ * @file  osThread.h
+ * @author Carlos Gonzalez Cortes
+ * @author Ignacio Ibanez Aliaga
+ * @date 2017
  * @copyright GNU Public License.
  *
  * 
