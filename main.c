@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-/* System includes */
+/* system includes */
 #include "utils.h"
 #include "config.h"
 
@@ -48,7 +48,7 @@
 #include <stdio.h>
 #include <PPS.h>
 
-    /* Drivers includes */
+    /* drivers includes */
 
     /* RTOS Includes */
     #include "FreeRTOSConfig.h"

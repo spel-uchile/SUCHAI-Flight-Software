@@ -23,13 +23,11 @@
 #include <limits.h>
 #include <string.h>
 
-//#include "utils.h"
-
-#include "OS/include/osQueue.h"
+#include "osQueue.h"
 
 /* General system configurations */
 
-/* System debug configurations */
+/* system debug configurations */
 #define LOG_LEVEL     LOG_LVL_DEBUG 	///< Define debug levels
 
 /* Data repository configurations */

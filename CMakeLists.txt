@@ -4,29 +4,29 @@ project(SUCHAI_Flight_Software)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
-        OS/Linux/osDelay.c
-        OS/Linux/osQueue.c
-        OS/Linux/osScheduler.c
-        OS/Linux/osSemphr.c
-        OS/Linux/osThread.c
-        OS/Linux/pthread_queue.c
-        System/cmdDRP.c
-        System/cmdOBC.c
-        System/cmdConsole.c
-        System/repoCommand.c
-        System/repoData.c
-        System/taskDispatcher.c
-        System/taskExecuter.c
-        System/taskHousekeeping.c
-        System/taskConsole.c
-        System/cmdTestCommand.c
-        System/taskTest.c
+        os/Linux/osDelay.c
+        os/Linux/osQueue.c
+        os/Linux/osScheduler.c
+        os/Linux/osSemphr.c
+        os/Linux/osThread.c
+        os/Linux/pthread_queue.c
+        system/cmdDRP.c
+        system/cmdOBC.c
+        system/cmdConsole.c
+        system/repoCommand.c
+        system/repoData.c
+        system/taskDispatcher.c
+        system/taskExecuter.c
+        system/taskHousekeeping.c
+        system/taskConsole.c
+        system/cmdTestCommand.c
+        system/taskTest.c
         main.c)
 
 include_directories(
         .
-        System/include/
-        OS/include)
+        system/include/
+        os/include)
 
 link_libraries(-lpthread)
 

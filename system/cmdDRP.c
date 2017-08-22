@@ -41,7 +41,7 @@ int drp_print_system_vars(char *fmt, char *params, int nparams)
     int rc = osSemaphoreTake(&log_mutex, portMAX_DELAY);
     if(rc == CSP_SEMAPHORE_OK)
     {
-        printf("System variables repository\n");
+        printf("system variables repository\n");
         printf("index\t value\n");
 
         int var_index;
