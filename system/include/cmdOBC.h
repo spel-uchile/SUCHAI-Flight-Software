@@ -12,6 +12,8 @@
 #ifndef CMD_OBC_H
 #define CMD_OBC_H
 
+#include <signal.h>
+
 #include "config.h"
 #include "repoCommand.h"
 
