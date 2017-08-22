@@ -1,17 +1,12 @@
 /**
  * @file  SUCHAI_config.h
- * @author Tomas Opazo T
  * @author Carlos Gonzalez C
- * @autor Ignacio Ibañez A
- * @date 04-01-2013
+ * @author Tomas Opazo T
+ * @autor Ignacio Ibanez A
+ * @date 2017
  * @copyright GNU Public License.
  *
- * El proposito de este header file es configurar las ditintas opciones de SUCHAI
- * en un solo archivo a traves de una serie de defines que son utilzadas por
- * el pre-procesador del compilador. Las configuraciones descritas aca, afectan
- * la forma en que funciona el sistema de vuelo del satelite SUCHAI, por ejemplo
- * activando o desactivando opciones de debug, hardware disponible y parametros
- * generales del sistema.
+ * This header contains system wide settings to customize different submodules
  */
 
 #ifndef SUCHAI_CONFIG_H
@@ -25,13 +20,14 @@
 
 #include "osQueue.h"
 
-/* General system configurations */
-
-/* system debug configurations */
+/* System debug configurations */
 #define LOG_LEVEL     LOG_LVL_DEBUG 	///< Define debug levels
 
+/* General system configurations */
+
+
 /* Data repository configurations */
-#define SCH_STATUS_REPO_MODE    	0   ///< Status repository location. (0) Internal, (1) Single external.
-#define SCH_CHECK_IF_EXECUTABLE_SOC 0   ///< Check if a command is executable using energy level (SOC)
+#define SCH_STATUS_REPO_MODE    	1   ///< Status repository location. (0) Internal, (1) Single external.
+#define SCH_STORAGE_FILE            "/tmp/suchai.db"
 
 #endif	/* SUCHAI_CONFIG_H */

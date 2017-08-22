@@ -21,9 +21,18 @@
 #include <stdio.h>
 #include <signal.h>
 
+/* OS includes */
+#include "osThread.h"
+#include "osScheduler.h"
+#include "osQueue.h"
+#include "osSemphr.h"
+
 /* system includes */
-#include "utils.h"
 #include "config.h"
+#include "globals.h"
+#include "utils.h"
+#include "repoData.h"
+#include "repoCommand.h"
 
 /* Task includes */
 #include "taskTest.h"
@@ -31,12 +40,6 @@
 #include "taskExecuter.h"
 #include "taskHousekeeping.h"
 #include "taskConsole.h"
-
-#include "osThread.h"
-#include "osScheduler.h"
-#include "osQueue.h"
-#include "osSemphr.h"
-#include "globals.h"
 
 /* FIXME: Fix includes in RTOS */
 #if !__linux__
@@ -165,7 +168,7 @@ void on_reset(void)
 
 void on_close(int signal)
 {
-//TODO:  dat_repo_close();
+    dat_repo_close();
     LOGI("Main", "Exit system!");
     exit(signal);
 }

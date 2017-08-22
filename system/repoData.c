@@ -29,6 +29,8 @@ static const char *tag = "repoData";
 
 void dat_repo_init(void)
 {
+    int rc;
+
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
     {
@@ -37,13 +39,29 @@ void dat_repo_init(void)
 
     LOGD(tag, "Initializing data repositories buffers...")
     /* TODO: Setup external memories */
-#if (SCH_SSCH_STATUS_REPO_MODE == 0)
+#if (SCH_STATUS_REPO_MODE == 0)
     {
-        //Uses internal memory
+        //Use internal memory
         int index;
         for(index=0; index<dat_system_last_var; index++)
         {
             dat_set_system_var((dat_system_t)index, INT_MAX);
+        }
+    }
+#else
+    {
+        //Init storage system
+        rc = storage_init(SCH_STORAGE_FILE);
+        assertf(rc==0, tag, "Unable to create non-volatile data repository");
+
+        //Init system repo
+        rc = storage_table_init(DAT_REPO_SYSTEM, 0);
+        assertf(rc==0, tag, "Unable to create system variables repository");
+
+        int index;
+        for(index=0; index<dat_system_last_var; index++)
+        {
+            storage_set_value_idx(index, INT_MAX, DAT_REPO_SYSTEM);
         }
     }
 #endif
@@ -55,21 +73,25 @@ void dat_repo_init(void)
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);  //TODO: This is a non-volatile variable
 }
 
+void dat_repo_close(void)
+{
+#if SCH_STATUS_REPO_MODE == 1
+    {
+        storage_close();
+    };
+}
+
 void dat_set_system_var(dat_system_t index, int value)
 {
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Uses internal memory
-    #if SCH_STATUSCH_STATUS_REPO_MODE == 0
+    #if SCH_STATUS_REPO_MODE == 0
         DAT_SYSTEM_VAR_BUFF[index] = value;
     //Uses external memory
     #else
-        #if __linux__
-            printf("writeIntEEPROM1\n");
-        #else
-            writeIntEEPROM1( (unsigned char)index, value);
-        #endif
+        storage_set_value_idx(index, value, DAT_REPO_SYSTEM);
     #endif
 
     //Exit critical zone
@@ -84,16 +106,11 @@ int dat_get_system_var(dat_system_t index)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Use internal (volatile) memory
-    #if SCH_STATUSCH_STATUS_REPO_MODE == 0
+    #if SCH_STATUS_REPO_MODE == 0
         value = DAT_SYSTEM_VAR_BUFF[index];
     //Uses external (non-volatile) memory
     #else
-        #if __linux__
-            printf("readIntEEPROM1\n");
-            value = 0;
-        #else
-            value = readIntEEPROM1( (unsigned char)index );
-        #endif
+        value = storage_get_value_idx(index, DAT_REPO_SYSTEM);
     #endif
 
     //Exit critical zone

@@ -21,14 +21,18 @@
 
 #include "osSemphr.h"
 
-#include "globals.h"
 #include "config.h"
+#include "globals.h"
 #include "utils.h"
+
+#include "data_storage.h"
 
 
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
+
+#define DAT_REPO_SYSTEM "dat_system"
 
 /**
  * System level status variables
@@ -81,6 +85,11 @@ typedef enum dat_system{
  * Initializes data repositories including buffers and mutexes
  */
 void dat_repo_init(void);
+
+/**
+ * Cleanup and close data repository resources
+ */
+void dat_repo_close(void);
 
 /**
  * Sets a status variable value
