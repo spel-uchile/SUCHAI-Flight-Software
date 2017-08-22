@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <signal.h>
 
 /* system includes */
 #include "utils.h"
@@ -86,6 +87,7 @@
 #endif
 
 static void on_reset(void);
+static void on_close(int signal);
 
 int main(void)
 {
@@ -149,7 +151,21 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
  */
 void on_reset(void)
 {
-    log_init();
+    /* Register CTR+C signal handler*/
+    struct sigaction act;
+    act.sa_handler = on_close;
+    sigaction(SIGINT, &act, NULL);
+    sigaction(SIGTERM, &act, NULL);
+
+    /* Init subsystems */
+    log_init();      // Logging system
     cmd_repo_init(); //Command repository initialization
     dat_repo_init(); //Update status repository
+}
+
+void on_close(int signal)
+{
+//TODO:  dat_repo_close();
+    LOGI("Main", "Exit system!");
+    exit(signal);
 }
