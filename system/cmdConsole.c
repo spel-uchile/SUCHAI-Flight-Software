@@ -39,7 +39,7 @@ int con_debug_msg(char *fmt, char *params, int nparams)
     char msg[CMD_MAX_STR_PARAMS];
     if(sscanf(params,fmt, msg) == nparams)
     {
-        LOGD(tag, "[Debug Msg] %s\n", msg);
+        printf("[Debug Msg] %s\n", msg);
         return CMD_OK;
     }
     return CMD_FAIL;
