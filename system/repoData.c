@@ -78,7 +78,8 @@ void dat_repo_close(void)
 #if SCH_STATUS_REPO_MODE == 1
     {
         storage_close();
-    };
+    }
+#endif
 }
 
 void dat_set_system_var(dat_system_t index, int value)
