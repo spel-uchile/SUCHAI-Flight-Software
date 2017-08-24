@@ -32,3 +32,13 @@
 *.dSYM/
 *.su
 /SUCHAI.X/dist/Sim/
+
+# Clion project files
+.idea
+
+# Cmake folders
+build
+cmake-build-debug/
+
+# Play Ground
+playground
