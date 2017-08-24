@@ -21,7 +21,8 @@
 #include "osQueue.h"
 
 /* System debug configurations */
-#define LOG_LEVEL     LOG_LVL_DEBUG 	///< Define debug levels
+#define LOG_LEVEL     LOG_LVL_INFO   	///< Define debug levels
+#define SCH_RUN_TESTS 0                 ///< Enable or disable tests
 
 /* General system configurations */
 
