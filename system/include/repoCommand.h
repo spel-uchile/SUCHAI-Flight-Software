@@ -109,6 +109,17 @@ cmd_t * cmd_get_str(char *name);
 cmd_t * cmd_get_idx(int idx);
 
 /**
+ * Find the name of a command by id. This function allocates memory for the
+ * string so the user must free the array.
+ *
+ * @param idx Int. Command index or id
+ * @param name *char. Pointer to char variable. The function allocates memory so
+ * make sure to free the array after use.
+ * @return Int. CMD_OK if the command was found, CMD_ERROR otherwise.
+ */
+char * cmd_get_name(int idx);
+
+/**
  * Fills command parameters as string
  * @param cmd cmd_t. Command to fill parameters
  * @param params Str. String with parameters

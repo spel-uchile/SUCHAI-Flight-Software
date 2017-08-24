@@ -27,6 +27,7 @@ void taskExecuter(void *param)
     LOGI(tag, "Started");
 
     cmd_t *run_cmd = NULL;
+
     int cmd_stat, queue_stat;
         
     while(1)
@@ -36,7 +37,10 @@ void taskExecuter(void *param)
 
         if(queue_stat == pdPASS)
         {
-            LOGI(tag, "Running a command...");
+            char *cmd_name = cmd_get_name(run_cmd->id);
+            LOGI(tag, "Running the command: %s...", cmd_name);
+            free(cmd_name);
+
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();
 
@@ -46,7 +50,6 @@ void taskExecuter(void *param)
 
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();
-            
             LOGI(tag, "Command result: %d", cmd_stat);
             
             /* Send the result to Dispatcher - BLOCKING */

@@ -104,6 +104,32 @@ cmd_t * cmd_get_idx(int idx)
     return cmd_new;
 }
 
+char * cmd_get_name(int idx)
+{
+    char *name = NULL;
+    if (idx < CMD_MAX_LEN)
+    {
+        // Get found command
+        cmd_list_t cmd_found = cmd_list[idx];
+        LOGI(tag, cmd_found.name);
+        name = (char *)malloc((strlen(cmd_found.name)+1)*sizeof(char));
+        if(name == NULL)
+        {
+            LOGW(tag, "Error allocating memory in cmd_get_name");
+        }
+        else
+        {
+            strcpy(name, cmd_found.name);
+        }
+    }
+    else
+    {
+        LOGW(tag, "Command index not found: %d", idx);
+    }
+
+    return name;
+}
+
 void cmd_add_params_str(cmd_t *cmd, char *params)
 {
     size_t len_param = strlen(params);
