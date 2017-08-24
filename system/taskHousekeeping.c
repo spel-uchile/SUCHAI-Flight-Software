@@ -20,19 +20,18 @@
 
 #include "taskHousekeeping.h"
 
-//extern osQueue dispatcher_queue; /* Commands queue */
+static const char *tag = "Housekeeping";
 
 void taskHousekeeping(void *param)
 {
-    printf(">>[Housekeeping] Started\r\n");
+    LOGD(tag, "Started");
     
-    portTick delay_ms    = 1000;    //Task period in [ms]
-    portTick delay_ticks = osDefineTime(delay_ms); //Task period in ticks
+    portTick delay_ms    = 1000;            //Task period in [ms]
 
-    unsigned int elapsed_sec = 0;       // Seconds count
+    unsigned int elapsed_sec = 0;           // Seconds counter
     unsigned int _10sec_check = 1;//10;     //10[s] condition
     unsigned int _10min_check = 2;//10*60;  //10[m] condition
-    unsigned int _1hour_check = 3;//60*60;  //1[h] condition
+    unsigned int _1hour_check = 3;//60*60;  //01[h] condition
 
     //char *task_name = param != NULL ? (char *)param : "HSK";
     char *task_name = malloc(sizeof(char)*14);
@@ -43,56 +42,35 @@ void taskHousekeeping(void *param)
     while(1)
     {
 
-        osTaskDelayUntil(&xLastWakeTime, delay_ticks); //Suspend task
+        osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
         elapsed_sec += delay_ms/1000; //Update seconds counts
 
         /* 10 seconds actions */
         if((elapsed_sec % _10sec_check) == 0)
         {
-            printf("[Housekeeping] _10sec_check\n");
+            LOGD(tag, "10 sec tasks");
             //cmd_t *cmd_10s = cmd_get_str("get_mem");
             cmd_t *cmd_10s = cmd_get_str("test");
-
-            cmd_10s->params = (char *)malloc(sizeof(char)*25);
-            strcpy(cmd_10s->params, "SEC1-");
-            strcat(cmd_10s->params, task_name);
-
-            osQueueSend(dispatcher_queue, &cmd_10s, portMAX_DELAY);
+            cmd_add_params_var(cmd_10s, "Task housekeeping running");
+            cmd_send(cmd_10s);
         }
 
         /* 10 minutes actions */
         if((elapsed_sec % _10min_check) == 0)
         {
-            printf("[Housekeeping] _10min_check\n");
-            cmd_t *cmd_10m = cmd_get_str("test");
-
-            /* TODO: A better way to fill parameters */
-            /* Example
-             * cmd_fill_int(cmd_10m, 1, 2, 3, 4);
-             * cmd_fill_int(cmd_t *cmd, ...)
-             * {
-             *  cmd_10m->params = (int *)malloc(sizeof(int)*4);
-             *  cmd_10m->params = {1,2,3,4};
-             * }
-             */
-
-            /* TODO: Fills parameters correctly */
-            cmd_10m->params = (char *)malloc(sizeof(char)*25);
-            strcpy(cmd_10m->params, "SEC2-");
-            strcat(cmd_10m->params, task_name);
-
-            osQueueSend(dispatcher_queue, &cmd_10m, portMAX_DELAY);
+            LOGD(tag, "10 min tasks");
+            cmd_t *cmd_10m = cmd_get_str("get_mem");
+            cmd_add_params_var(cmd_10m, 0);
+            cmd_send(cmd_10m);
         }
 
         /* 1 hours actions */
         if((elapsed_sec % _1hour_check) == 0)
         {
-            printf("[Housekeeping] _1hour_check\n");
-            cmd_t *cmd_1h = cmd_get_str("test");
-            cmd_1h->params = (char *)malloc(sizeof(char)*20);
-            strcpy(cmd_1h->params, "HELLO ");
-            strcat(cmd_1h->params, task_name);
-            osQueueSend(dispatcher_queue, &cmd_1h, portMAX_DELAY);
+            LOGD(tag, "1 hour check");
+            cmd_t *cmd_1h = cmd_get_str("update_hours_alive");
+            cmd_add_params_var(cmd_1h, 1); // Add 1hr
+            cmd_send(cmd_1h);
         }
     }
 }
