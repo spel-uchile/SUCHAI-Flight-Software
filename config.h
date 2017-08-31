@@ -21,14 +21,14 @@
 #include "osQueue.h"
 
 /* System debug configurations */
-#define LOG_LEVEL     LOG_LVL_INFO   	///< Define debug levels
+#define LOG_LEVEL     LOG_LVL_VERBOSE   	///< Define debug levels
 #define SCH_RUN_TESTS 0                 ///< Enable or disable tests
 
 /* General system configurations */
 
 
 /* Data repository configurations */
-#define SCH_STATUS_REPO_MODE    	1   ///< Status repository location. (0) Internal, (1) Single external.
+#define SCH_STATUS_REPO_MODE    	0   ///< Status repository location. (0) Internal, (1) Single external.
 #define SCH_STORAGE_FILE            "/tmp/suchai.db"
 
 #endif	/* SUCHAI_CONFIG_H */
