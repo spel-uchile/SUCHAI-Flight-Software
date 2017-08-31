@@ -20,12 +20,12 @@
 
 #include "taskConsole.h"
 
-//extern xQueueHandle dispatcher_queue;
-
 #define CON_BUFF_LEN 100
 
-const char console_baner[] =   
-"______________________________________________________________________________\n\
+static const char *tag = "Console";
+
+const char console_banner[] =
+"\n______________________________________________________________________________\n\
                      ___ _   _  ___ _  _   _   ___ \n\
                     / __| | | |/ __| || | /_\\ |_ _|\n\
                     \\__ \\ |_| | (__| __ |/ _ \\ | | \n\
@@ -37,24 +37,20 @@ ______________________________________________________________________________\n
 
 void taskConsole(void *param)
 {
-#if (SCH_GRL_VERBOSE)
-    printf(">>[Console] Started\r\n");
-#endif
+    LOGD(tag, "Started");
 
-    portTick Delayms = osDefineTime(250);
+    portTick delay_ms = 250;
     cmd_t *new_cmd =  NULL;
     char buffer[CON_BUFF_LEN];
 
     /* Initializing console */
     console_init();
 
-#if (SCH_GRL_VERBOSE>=1)
-    printf(console_baner);
-#endif
+    LOGI(tag, console_banner);
 
     while(1)
     {
-        osDelay(Delayms);
+        osDelay(delay_ms);
 
         /* Read console and parse commands (blocking) */
         console_read(buffer, CON_BUFF_LEN);
@@ -62,21 +58,27 @@ void taskConsole(void *param)
 
         if(new_cmd != NULL)
         {
-            #if (SCH_GRL_VERBOSE >=1)
-                /* Print the parsed command */
-                printf("[Console] Se genera comando: %d\n", new_cmd->id);
-            #endif
-
+#if LOG_LEVEL >= LOG_LVL_DEBUG
+            char *name = cmd_get_name(new_cmd->id);
+            LOGD(tag, "Command sent: %d (%s)", new_cmd->id, name);
+            free(name);
+#endif
             /* Queue NewCmd - Blocking */
-            osQueueSend(dispatcher_queue, &new_cmd, portMAX_DELAY);
+            cmd_send(new_cmd);
+        }
+        else
+        {
+            LOGW(tag, "Null command was read!");
         }
     }
 }
 
 int console_init(void)
 {
-    printf("[Console] Init...\n");
+    LOGD(tag, "Init...\n");
+//    osSemaphoreTake(&log_mutex, portMAX_DELAY);
     cmd_print_all();
+//    osSemaphoreGiven(&log_mutex);
     return 0;
 }
 
@@ -89,23 +91,28 @@ int console_read(char *buffer, int len)
 
 cmd_t * console_parse(char *buffer)
 {
+    cmd_t *new_cmd = NULL;
     char tmp_cmd[CON_BUFF_LEN];
     char tmp_arg[CON_BUFF_LEN];
+    int next;
     int n_args;
 
-    printf("[Console] Parsing: %s\n", buffer);
-    n_args = sscanf(buffer, "%s %s", tmp_cmd, tmp_arg);
-    printf("[Console] Parsed: %s, %s\n", tmp_cmd, tmp_arg);
+    LOGV(tag, "Parsing: %s", buffer);
+    n_args = sscanf(buffer, "%s %n", tmp_cmd, &next);
+    strncpy(tmp_arg, buffer+next, CON_BUFF_LEN);
+    LOGV(tag, "Parsed %d: %s, %s (%d))", n_args, tmp_cmd, tmp_arg, next);
 
-    if (n_args != 2) return 0;
-
-    cmd_t *new_cmd = cmd_get_str(tmp_cmd);
-
-    if(new_cmd == NULL) return 0;
-
-    /* TODO: Parse args according to command */
-    new_cmd->params = (char *)malloc(sizeof(char)*(strlen(tmp_arg)+1));
-    strcpy(new_cmd->params, tmp_arg);
+    if (n_args == 1)
+    {
+        new_cmd = cmd_get_str(tmp_cmd);
+        if(new_cmd)
+        {
+            if(next > 1)
+                cmd_add_params_str(new_cmd, tmp_arg);
+            else
+                cmd_add_params_str(new_cmd, "");
+        }
+    }
 
     return new_cmd;
 }

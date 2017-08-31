@@ -19,6 +19,8 @@
 #include "osDelay.h"
 
 #include "globals.h"
+#include "utils.h"
+
 #include "repoCommand.h"
 
 void taskConsole(void *param);
