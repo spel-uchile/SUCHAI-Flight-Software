@@ -37,10 +37,11 @@ void taskExecuter(void *param)
 
         if(queue_stat == pdPASS)
         {
+#if LOG_LEVEL >= LOG_LVL_INFO
             char *cmd_name = cmd_get_name(run_cmd->id);
             LOGI(tag, "Running the command: %s...", cmd_name);
             free(cmd_name);
-
+#endif
             /* Commands may take a long time, so reset the WDT */
             ClrWdt();
 
