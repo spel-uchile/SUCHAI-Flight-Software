@@ -42,8 +42,12 @@ int cmd_add(char *name, cmdFunction function, char *fparams, int nparam)
         cmd_new.nparams = nparam;
 
         // Copy to command buffer
-        cmd_list[cmd_index] = cmd_new;
-        cmd_index++;
+        osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
+        {
+            cmd_list[cmd_index] = cmd_new;
+            cmd_index++;
+        }
+        osSemaphoreGiven(&repo_cmd_sem);
         return cmd_index;
     }
     else
@@ -61,7 +65,10 @@ cmd_t * cmd_get_str(char *name)
     int i, ok;
     for(i=0; i<CMD_MAX_LEN; i++)
     {
+        osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
         ok = strcmp(name, cmd_list[i].name);
+        osSemaphoreGiven(&repo_cmd_sem);
+
         if(ok == 0)
         {
             // Create the command by index
@@ -84,7 +91,9 @@ cmd_t * cmd_get_idx(int idx)
     if (idx < CMD_MAX_LEN)
     {
         // Get found command
+        osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
         cmd_list_t cmd_found = cmd_list[idx];
+        osSemaphoreGiven(&repo_cmd_sem);
 
         // Creates a new command
         cmd_new = (cmd_t *)malloc(sizeof(cmd_t));
@@ -110,7 +119,10 @@ char * cmd_get_name(int idx)
     if (idx < CMD_MAX_LEN)
     {
         // Get found command
+        osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
         cmd_list_t cmd_found = cmd_list[idx];
+        osSemaphoreGiven(&repo_cmd_sem);
+
         LOGI(tag, cmd_found.name);
         name = (char *)malloc((strlen(cmd_found.name)+1)*sizeof(char));
         if(name == NULL)
@@ -173,16 +185,21 @@ void cmd_print_all(void)
 {
 
     LOGD(tag, "Command list");
+    osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
     printf("Index\t name\t Params\n");
     int i;
     for(i=0; i<cmd_index; i++)
     {
         printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
+    osSemaphoreGiven(&repo_cmd_sem);
 }
 
 int cmd_repo_init(void)
 {
+    // Init repository mutex
+    osSemaphoreCreate(&repo_cmd_sem);
+
     // Reset command buffer with cmd_null command
     int n_cmd = 0;
     do

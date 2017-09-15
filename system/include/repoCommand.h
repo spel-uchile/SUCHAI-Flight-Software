@@ -14,6 +14,7 @@
 #include <stdarg.h>
 
 #include "utils.h"
+#include "globals.h"
 
 /* Add files with commands */
 #include "cmdOBC.h"
