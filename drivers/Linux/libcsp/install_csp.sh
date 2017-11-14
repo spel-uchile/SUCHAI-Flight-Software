@@ -4,6 +4,6 @@ echo "Downloading libcsp"
 cd libcsp
 
 echo "Build libcsp"
-./waf configure --with-os=posix --enable-if-kiss --enable-if-zmqhub --install-csp --prefix=../ build install
+./waf configure --with-os=posix --enable-if-zmqhub --install-csp --prefix=../ build install
 
 cd -
