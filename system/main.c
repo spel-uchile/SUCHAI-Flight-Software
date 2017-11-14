@@ -18,28 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <signal.h>
-
-/* OS includes */
-#include "osThread.h"
-#include "osScheduler.h"
-#include "osQueue.h"
-#include "osSemphr.h"
-
-/* system includes */
-#include "config.h"
-#include "globals.h"
-#include "utils.h"
-#include "repoData.h"
-#include "repoCommand.h"
-
-/* Task includes */
-#include "taskTest.h"
-#include "taskDispatcher.h"
-#include "taskExecuter.h"
-#include "taskHousekeeping.h"
-#include "taskConsole.h"
+#include "main.h"
 
 static void on_reset(void);
 static void on_close(int signal);
@@ -108,6 +87,8 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
  */
 void on_reset(void)
 {
+    const char *tag = "main";
+    /* Register INT/TERM signals */
     struct sigaction act;
     act.sa_handler = on_close;
     sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
@@ -117,6 +98,36 @@ void on_reset(void)
     log_init();      // Logging system
     cmd_repo_init(); //Command repository initialization
     dat_repo_init(); //Update status repository
+
+    /* Init communications */
+    LOGI(tag, "Initialising CSP...");
+    /* Init buffer system with 10 packets of maximum 300 bytes each */
+	csp_buffer_init(5, 300);
+    /* Init CSP with address MY_ADDRESS */
+    csp_init(SCH_COMM_ADDRESS);
+    /* Start router task with 500 word stack, OS task priority 1 */
+    csp_route_start_task(500, 1);
+    /* Set ZMQ interface */
+    csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_OUT);
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
+
+
+#if LOG_LEVEL >= LOG_LVL_DEBUG
+    /* Debug output from CSP */
+    printf("Debug enabed\r\n");
+    csp_debug_toggle_level(1);
+    csp_debug_toggle_level(2);
+    csp_debug_toggle_level(3);
+    csp_debug_toggle_level(4);
+    csp_debug_toggle_level(5);
+    csp_debug_toggle_level(6);
+    LOGD(tag, "Conn table");
+    csp_conn_print_table();
+    LOGD(tag, "Route table");
+    csp_route_print_table();
+    LOGD(tag, "Interfaces");
+    csp_route_print_interfaces();
+#endif
 }
 
 /**

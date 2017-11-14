@@ -21,13 +21,18 @@
 #include "osQueue.h"
 
 /* System debug configurations */
-#define LOG_LEVEL     LOG_LVL_VERBOSE   	///< Define debug levels
+#define LOG_LEVEL     LOG_LVL_VERBOSE   ///< Define debug levels
 #define SCH_RUN_TESTS 0                 ///< Enable or disable tests
 
-/* General system configurations */
+/* General system settings */
 
 
-/* Data repository configurations */
+/* Communications system settings */
+#define SCH_COMM_ADDRESS            1                       ///< Node address
+#define SCH_COMM_ZMQ_OUT            "tcp://127.0.0.1:8001"  ///< Out socket URI
+#define SCH_COMM_ZMQ_IN             "tcp://127.0.0.1:8002"  ///< In socket URI
+
+/* Data repository settings */
 #define SCH_STATUS_REPO_MODE    	0   ///< Status repository location. (0) Internal, (1) Single external.
 #define SCH_STORAGE_FILE            "/tmp/suchai.db"
 
