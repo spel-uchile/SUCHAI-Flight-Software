@@ -25,11 +25,11 @@ http://code.google.com/p/c-pthread-queue/
 
 #include <pthread.h>
 /* CSP includes */
-#include "../include/pthread_queue.h"
+#include "pthread_queue.h"
 
-pthread_queue_t * pthread_queue_create(int length, size_t item_size) {
+os_pthread_queue_t * os_pthread_queue_create(int length, size_t item_size) {
 	
-	pthread_queue_t * q = malloc(sizeof(pthread_queue_t));
+	os_pthread_queue_t * q = malloc(sizeof(os_pthread_queue_t));
 	
 	if (q != NULL) {
 		q->buffer = malloc(length*item_size);
@@ -55,7 +55,8 @@ pthread_queue_t * pthread_queue_create(int length, size_t item_size) {
 }
 	
 
-int pthread_queue_send(pthread_queue_t * queue, void * value, uint32_t timeout) {
+int os_pthread_queue_send(os_pthread_queue_t *queue, void *value,
+                          uint32_t timeout) {
 	
 	int ret;
 
@@ -97,7 +98,8 @@ int pthread_queue_send(pthread_queue_t * queue, void * value, uint32_t timeout) 
 	
 }
 
-int pthread_queue_receive(pthread_queue_t * queue, void * buf, uint32_t timeout) {
+int os_pthread_queue_receive(os_pthread_queue_t *queue, void *buf,
+                             uint32_t timeout) {
 
 	int ret;
 	

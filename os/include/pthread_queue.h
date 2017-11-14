@@ -31,7 +31,7 @@ http://code.google.com/p/c-pthread-queue/
 #include <sys/time.h>
 #include <string.h>
 
-typedef struct pthread_queue_s {
+typedef struct os_thread_queue_s {
 	void * buffer;
 	int size;
 	int item_size;
@@ -41,16 +41,16 @@ typedef struct pthread_queue_s {
 	pthread_mutex_t mutex;
 	pthread_cond_t cond_full;
 	pthread_cond_t cond_empty;
-} pthread_queue_t;
+} os_pthread_queue_t;
 
 #define PTHREAD_QUEUE_ERROR 0
 #define PTHREAD_QUEUE_EMPTY 0
 #define PTHREAD_QUEUE_FULL 0
 #define PTHREAD_QUEUE_OK 1
 
-pthread_queue_t * pthread_queue_create(int length, size_t item_size);
-int pthread_queue_send(pthread_queue_t * queue, void * value, uint32_t timeout);
-int pthread_queue_receive(pthread_queue_t * queue, void * buf, uint32_t timeout);
+os_pthread_queue_t * os_pthread_queue_create(int length, size_t item_size);
+int os_pthread_queue_send(os_pthread_queue_t *queue, void *value, uint32_t timeout);
+int os_pthread_queue_receive(os_pthread_queue_t *queue, void *buf, uint32_t timeout);
 
 #endif 
 
