@@ -15,6 +15,8 @@
 
 #include <stdlib.h>
 
+#include "csp/csp.h"
+
 #include "config.h"
 #include "globals.h"
 

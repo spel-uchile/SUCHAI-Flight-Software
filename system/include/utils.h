@@ -40,8 +40,8 @@ typedef enum {
     #define LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
 #endif
 
-//#define LOGOUT stdout   ///<! Log to stdout
-#define LOGOUT stderr   ///<! Log to stderr
+#define LOGOUT stdout   ///<! Log to stdout
+//#define LOGOUT stderr   ///<! Log to stderr
 
 #define LF   "\n"
 #define CRLF "\r\n"
