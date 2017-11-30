@@ -21,14 +21,18 @@
 #include "osQueue.h"
 
 /* System debug configurations */
-#define LOG_LEVEL     LOG_LVL_VERBOSE   ///< Define debug levels
-#define SCH_RUN_TESTS 0                 ///< Enable or disable tests
+#define LOG_LEVEL       LOG_LVL_VERBOSE   ///< Define debug levels
+#define SCH_RUN_TESTS   0                 ///< Enable or disable tests
 
 /* General system settings */
-
+#define SCH_BUFF_MAX_LEN            (256) ///< General buffers max length (bytes)
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS            1                       ///< Node address
+#define SCH_COMM_ADDRESS            (1)                     ///< Node address
+#define SCH_TRX_PORT_TM             (10)                    ///< Telemetry port (in the ground station)
+#define SCH_TRX_PORT_TC             (10)                    ///< Telecommands post (in the flight software)
+#define SCH_TRX_PORT_DEBUG          (11)                    ///< Debug port (just print packets)
+#define SCH_TRX_PORT_CONSOLE        (12)                    ///< Console port (execute console commands)
 #define SCH_COMM_ZMQ_OUT            "tcp://127.0.0.1:8001"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN             "tcp://127.0.0.1:8002"  ///< In socket URI
 

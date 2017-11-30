@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2013, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2013, Tomas Opazo Toro, tomas.opazo.t@gmail.com 
+ *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ int main(void)
 
     osDelay(1000);
 
-    int n_threads = 4;
+    int n_threads = 6;
     os_thread threads_id[n_threads];
 
     /* Crating system task (the others are created inside taskDeployment) */
@@ -47,8 +47,9 @@ int main(void)
 #endif
 
     /* Creating monitors tasks */
-    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[2]);
     osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
+//    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
+    osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
 
     /* Start the scheduler. Should never return */
     osScheduler(threads_id, n_threads);
@@ -101,21 +102,21 @@ void on_reset(void)
 
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
-    /* Init buffer system with 10 packets of maximum 300 bytes each */
+    /* Init buffer system with 5 packets of maximum 300 bytes each */
 	csp_buffer_init(5, 300);
     /* Init CSP with address MY_ADDRESS */
     csp_init(SCH_COMM_ADDRESS);
     /* Start router task with 500 word stack, OS task priority 1 */
     csp_route_start_task(500, 1);
     /* Set ZMQ interface */
-    csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_OUT);
+    csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
 
 
 #if LOG_LEVEL >= LOG_LVL_DEBUG
     /* Debug output from CSP */
     printf("Debug enabed\r\n");
-    csp_debug_toggle_level(1);
+    csp_debug_set_level(1, 1);
     csp_debug_toggle_level(2);
     csp_debug_toggle_level(3);
     csp_debug_toggle_level(4);

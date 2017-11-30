@@ -29,5 +29,6 @@
 #include "taskExecuter.h"
 #include "taskHousekeeping.h"
 #include "taskConsole.h"
+#include "taskCommunications.h"
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_MAIN_H

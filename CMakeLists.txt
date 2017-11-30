@@ -19,10 +19,12 @@ set(SOURCE_FILES
         system/taskDispatcher.c
         system/taskExecuter.c
         system/taskHousekeeping.c
+        system/taskCommunications.c
         system/taskConsole.c
         system/cmdTestCommand.c
         system/taskTest.c
-        system/main.c)
+        system/main.c
+)
 
 include_directories(
         .
