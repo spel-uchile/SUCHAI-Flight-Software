@@ -53,27 +53,6 @@ void taskHousekeeping(void *param)
             cmd_t *cmd_10s = cmd_get_str("test");
             cmd_add_params_var(cmd_10s, "Task housekeeping running");
             cmd_send(cmd_10s);
-
-            char *message = "hello zmq with csp";
-            uint8_t me, other = 0;
-            uint8_t PORT = 10;
-            csp_socket_t *sock;
-            csp_conn_t *conn;
-            csp_packet_t *packet;
-
-            packet = csp_buffer_get(strlen(message));
-            if(packet)
-            {
-                strcpy((char *) packet->data, message);
-                packet->length = (uint16_t)strlen(message);
-
-                conn = csp_connect(CSP_PRIO_NORM, other, PORT, 1000, CSP_O_NONE);
-                LOGD(tag, "Sending: %s", message);
-                if (!conn || !csp_send(conn, packet, 1000))
-                    LOGW(tag, "Error sending message");
-
-                csp_close(conn);
-            }
         }
 
         /* 10 minutes actions */
@@ -82,7 +61,7 @@ void taskHousekeeping(void *param)
             LOGD(tag, "10 min tasks");
             cmd_t *cmd_10m = cmd_get_str("get_mem");
             cmd_add_params_var(cmd_10m, 0);
-//            cmd_send(cmd_10m);
+            cmd_send(cmd_10m);
         }
 
         /* 1 hours actions */
@@ -91,7 +70,7 @@ void taskHousekeeping(void *param)
             LOGD(tag, "1 hour check");
             cmd_t *cmd_1h = cmd_get_str("update_hours_alive");
             cmd_add_params_var(cmd_1h, 1); // Add 1hr
-//            cmd_send(cmd_1h);
+            cmd_send(cmd_1h);
         }
     }
 }

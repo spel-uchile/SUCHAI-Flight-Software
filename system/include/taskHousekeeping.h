@@ -1,5 +1,5 @@
 /**
- * @file  commandRepoitory.h
+ * @file  taskHousekeeping.h
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
  * @date 2012
@@ -7,7 +7,7 @@
  *
  * @id 0x1101
  *
- * This task implements a listener, that send commands at periodical times.
+ * This task implements a listener, that sends commands at periodical times.
  */
 
 #ifndef T_HOUSEKEEPING_H

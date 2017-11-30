@@ -1,5 +1,5 @@
 /**
- * @file  commandRepoitory.h
+ * @file  taskDispatcher.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @date 2017
