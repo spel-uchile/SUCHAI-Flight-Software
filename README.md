@@ -34,6 +34,7 @@ Currently it have been tested in the following OS/Architectures :
 
 * ArchLinux x86_64
 * Manjaro x86_64
+* Ubuntu 16.04 x86_64
 
 ### Linux Installation
 
@@ -62,7 +63,7 @@ the libcsp:
 
 ```bash
 cd drivers/Linux/libcsp
-sh install.sh
+sh install_csp.sh
 cd -
 ```
 
