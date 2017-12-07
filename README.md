@@ -1,18 +1,18 @@
 # Nanosatellite Flight Software
 
-The SUCHAI Flight software was originally developed to be used in the 
+SUCHAI Flight software was originally developed to be used in the 
 [SUCHAI](http://spel.ing.uchile.cl/suchai.html) nanosatellite (1U 
 [Cubesat](https://en.wikipedia.org/wiki/CubeSat)). SUCHAI was launch into orbit 
 in June 2017 and has been working properly for months.
 
 The main idea was to design a highly modular software architecture to help de
-development of educational CubeSats projects that are usually composed by
-large and heterogeneous teams.
+development of CubeSats projects that are composed by
+large and heterogeneous teams and that are built incrementally.
 
-The software architecture is based in the command processor design pattern. Developers
+The software architecture is based on the command processor design pattern. Developers
 can extend the functionalities adding new commands to the system (with low 
-impact in the whole software) or adding new clients that generate available
-commands depending on a custom control strategy. Commands and control modules 
+impact in the whole software) or adding new clients that can request any of the available
+commands depending on their custom control strategy. Commands and control modules 
 can be added or removed with zero impact in the software main functionalities.
 
 Visit http://spel.ing.uchile.cl to get latest news about SUCHAI project
@@ -28,9 +28,9 @@ More: http://tesis.uchile.cl/handle/2250/115307
 
 ## Installation Notes
 
-SUCHAI flight software is designed to run in multiple embedded architectures 
-using FreeRTOS. It is also ported to Linux for easy debugging. 
-Currently it have been tested in the following OS/Architectures :
+SUCHAI flight software was designed to run in multiple embedded architectures 
+using FreeRTOS. It was also ported to Linux to facilitate the development and debugging. 
+Currently, it has been tested in the following OS/Architectures :
 
 * ArchLinux x86_64
 * Manjaro x86_64
@@ -46,17 +46,17 @@ Linux installation requires the following libraries:
 * libcsp
 
 
-#### Compile and run
+#### Clone
 Clone this repository
 
 ```bash
 git clone https://github.com/spel-uchile/SUCHAI-Flight-Software
 cd SUCHAI-Flight-Software
 ```
-Go to folder, locate ```config.h``` file to customize parameters and 
+Go to the folder, locate ```config.h``` file to customize parameters and 
 functionalities.
 
-##### Installing LibCSP
+#### Installing LibCSP
 LibCSP (Cubesat Space Protocol) implements the CSP protocol stack. It works
 on Linux (with ZMQ) and FreeRTOS (I2C or CAN). Follow these step to install
 the libcsp:
@@ -69,8 +69,8 @@ cd -
 
 This will download and compile the latest libcsp version from GitHub.
 
-
-Build the Flight Software with cmake and run. In the root directory execute:
+#### Compile and run
+Build the flight software with cmake and run from command line. In the root directory execute:
 
 ```bash
 mkdir build
