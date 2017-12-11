@@ -48,7 +48,7 @@ int main(void)
 
     /* Creating monitors tasks */
     osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
-//    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
+    //osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
     osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
 
     /* Start the scheduler. Should never return */
