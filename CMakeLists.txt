@@ -33,7 +33,7 @@ include_directories(
         src/drivers/Linux/libcsp/include
 )
 
-link_directories(drivers/Linux/libcsp/lib)
+link_directories(src/drivers/Linux/libcsp/lib)
 
 link_libraries(-lpthread -lsqlite3 -lcsp -lzmq)
 
