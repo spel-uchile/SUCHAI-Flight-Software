@@ -5,7 +5,7 @@
  * @date 2017
  * @copyright GNU Public License.
  *
- * This header contains command related with serial console functions
+ * This header contains commands related with serial console functions
  */
 
 #ifndef CMD_CONSOLE_H
@@ -39,14 +39,5 @@ int con_debug_msg(char *fmt, char *params, int nparams);
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int con_help(char *fmt, char *params, int nparams);
-
-/**
- * Send ping to node
- * @param fmt Str. Parameters format "%d"
- * @param param Str. Parameters as string Ex: "10"
- * @param nparams Int. Number of parameters 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int con_ping(char *fmt, char *param, int nparams);
 
 #endif /* CMD_CONSOLE_H */
