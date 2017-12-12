@@ -13,6 +13,7 @@ set(SOURCE_FILES
         src/os/Linux/pthread_queue.c
         src/system/cmdDRP.c
         src/system/cmdOBC.c
+        src/system/cmdCOM.c
         src/system/cmdConsole.c
         src/system/repoCommand.c
         src/system/repoData.c

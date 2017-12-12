@@ -19,6 +19,7 @@
 /* Add files with commands */
 #include "cmdOBC.h"
 #include "cmdDRP.h"
+#include "cmdCOM.h"
 #include "cmdConsole.h"
 #include "cmdTestCommand.h"
 

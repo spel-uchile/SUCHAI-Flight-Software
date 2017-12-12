@@ -213,6 +213,7 @@ int cmd_repo_init(void)
     test_cmd_init();
     cmd_obc_init();
     cmd_drp_init();
+    cmd_com_init();
     cmd_console_init();
 
     return CMD_OK;
