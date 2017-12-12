@@ -32,7 +32,7 @@ int storage_init(const char *file);
  * @param drop Int. Set to 1 to drop the existing table before create one
  * @return 0 OK, -1 Error
  */
-int storage_table_init(char *table, int drop);
+int storage_table_strepo_init(char *table, int drop);
 
 /**
  * Get an INT (integer) value from table by index

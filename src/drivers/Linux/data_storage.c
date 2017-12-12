@@ -18,7 +18,7 @@ int storage_init(const char *file)
     }
 
     // Open database
-    if(sqlite3_open(file, &db))
+    if(sqlite3_open(file, &db)!= SQLITE_OK)
     {
         LOGE(tag, "Can't open database: %s", sqlite3_errmsg(db));
         return -1;
@@ -30,7 +30,7 @@ int storage_init(const char *file)
     }
 }
 
-int storage_table_init(char *table, int drop)
+int storage_table_strepo_init(char *table, int drop)
 {
     char *err_msg;
     char *sql;

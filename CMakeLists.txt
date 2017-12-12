@@ -24,7 +24,7 @@ set(SOURCE_FILES
         src/system/cmdTestCommand.c
         src/system/taskTest.c
         src/system/main.c
-)
+        src/system/taskFlightPlan.c src/system/include/taskFlightPlan.h)
 
 include_directories(
         src/system/include/
@@ -37,4 +37,4 @@ link_directories(src/drivers/Linux/libcsp/lib)
 
 link_libraries(-lpthread -lsqlite3 -lcsp -lzmq)
 
-add_executable(SUCHAI_Flight_Software ${SOURCE_FILES})
+add_executable(SUCHAI_Flight_Software ${SOURCE_FILES} src/system/taskFlightPlan.c src/system/include/taskFlightPlan.h)
