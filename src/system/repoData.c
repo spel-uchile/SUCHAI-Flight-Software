@@ -55,7 +55,7 @@ void dat_repo_init(void)
         assertf(rc==0, tag, "Unable to create non-volatile data repository");
 
         //Init system repo
-        rc = storage_table_strepo_init(DAT_REPO_SYSTEM, 0);
+        rc = storage_table_status_repo_init(DAT_REPO_SYSTEM, 0);
         assertf(rc==0, tag, "Unable to create system variables repository");
 
         int index;

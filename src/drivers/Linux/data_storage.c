@@ -18,7 +18,7 @@ int storage_init(const char *file)
     }
 
     // Open database
-    if(sqlite3_open(file, &db)!= SQLITE_OK)
+    if(sqlite3_open(file, &db) != SQLITE_OK)
     {
         LOGE(tag, "Can't open database: %s", sqlite3_errmsg(db));
         return -1;
@@ -30,7 +30,7 @@ int storage_init(const char *file)
     }
 }
 
-int storage_table_strepo_init(char *table, int drop)
+int storage_table_status_repo_init(char *table, int drop)
 {
     char *err_msg;
     char *sql;
@@ -39,7 +39,7 @@ int storage_table_strepo_init(char *table, int drop)
     /* Drop table if selected */
     if(drop)
     {
-        sql = sqlite3_mprintf("DROP TABLE IF NOT EXISTS %s", table);
+        sql = sqlite3_mprintf("DROP TABLE %s", table);
         rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK )
@@ -198,6 +198,8 @@ int storage_close(void)
         return -1;
     }
 }
+
+int
 
 static int dummy_callback(void *data, int argc, char **argv, char **names)
 {
