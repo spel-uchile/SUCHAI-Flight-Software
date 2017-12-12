@@ -26,7 +26,6 @@ void cmd_console_init(void)
 {
     cmd_add("test", con_debug_msg, "%s", 1);
     cmd_add("help", con_help, "", 0);
-    cmd_add("ping", con_ping, "%d", 1);
 }
 
 /**
