@@ -62,7 +62,7 @@ on Linux (with ZMQ) and FreeRTOS (I2C or CAN). Follow these step to install
 the libcsp:
 
 ```bash
-cd drivers/Linux/libcsp
+cd src/drivers/Linux/libcsp
 sh install_csp.sh
 cd -
 ```
