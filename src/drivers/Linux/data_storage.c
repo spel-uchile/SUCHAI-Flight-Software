@@ -149,7 +149,7 @@ int storage_get_value_idx(int index, char *table)
     if(rc == SQLITE_ROW)
         value = sqlite3_column_int(stmt, 0);
     else
-    LOGE(tag, "Some error encountered (rc=%d)", rc);
+        LOGE(tag, "Some error encountered (rc=%d)", rc);
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
@@ -204,6 +204,8 @@ int storage_set_value_idx(int index, int value, char *table)
     else
     {
         LOGV(tag, "Inserted %d to %d in %s", value, index, table);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
         return 0;
     }
 }
@@ -230,6 +232,8 @@ int storage_set_value_str(char *name, int value, char *table)
     else
     {
         LOGV(tag, "Inserted %d to %s in %s", value, name, table);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
         return 0;
     }
 }
