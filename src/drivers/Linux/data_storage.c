@@ -107,10 +107,10 @@ int storage_table_flight_plan_init(char* table, int drop)
     }
 
     sql = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS %s("
-                                  "time int PRIMARY KEY NOT NULL, "
-                                  "command text UNIQUE NOT NULL, "
-                                  "args text NOT NULL, "
-                                  "repeat int NOT NULL);",
+                                  "time int PRIMARY KEY , "
+                                  "command text UNIQUE , "
+                                  "args text , "
+                                  "repeat int );",
                           table);
 
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
@@ -232,6 +232,36 @@ int storage_repo_set_value_str(char *name, int value, char *table)
     else
     {
         LOGV(tag, "Inserted %d to %s in %s", value, name, table);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return 0;
+    }
+}
+
+int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table)
+{
+    char *err_msg;
+    char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (time, command, args, repeat) "
+                                        "VALUES ("
+                                        "%d, "
+                                        "%s, "
+                                        "%s, "
+                                        "%d);",
+                                table, timetodo, command, args, repeat);
+
+    /* Execute SQL statement */
+    int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+
+    if( rc != SQLITE_OK )
+    {
+        LOGE(tag, "SQL error: %s", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return -1;
+    }
+    else
+    {
+        LOGV(tag, "Inserted (%d, %s, %s, %d) in %s", timetodo, command, args, repeat, table);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
         return 0;

@@ -5,10 +5,11 @@
 #ifndef SCH_PERSISTENT_H
 #define SCH_PERSISTENT_H
 
+#include "utils.h"
 #include <stdio.h>
 #include <sqlite3.h>
 
-#include "utils.h"
+
 
 /**
  * Init data storage system.
@@ -92,6 +93,20 @@ int storage_repo_set_value_idx(int index, int value, char *table);
  * @return 0 OK, -1 Error
  */
 int storage_repo_set_value_str(char *name, int value, char *table);
+
+/**
+ * Set or update the row of certain time
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param time Int. Variable time
+ * @param command Str. Command to set
+ * @param args Str. command's arguments
+ * @param repeat Int. Value of time to run the command
+ * @param table Str. Table name
+ * @return 0 OK, -1 Error
+ */
+int storage_flight_plan_set(int time, char* command, char* args, int repeat, char* table);
 
 /**
  * Close the opened database
