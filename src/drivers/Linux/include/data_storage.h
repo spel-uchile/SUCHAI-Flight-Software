@@ -109,6 +109,17 @@ int storage_repo_set_value_str(char *name, int value, char *table);
 int storage_flight_plan_set(int time, char* command, char* args, int repeat, char* table);
 
 /**
+ * Reset the table in the opened database (@relatesalso storage_init) in the
+ * form (time, command, args, repeat).
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. Table name
+ * @return 0 OK, -1 Error
+ */
+int storage_flight_plan_reset (char* table);
+
+/**
  * Close the opened database
  *
  * @note: non-reentrant function, use mutex to sync access
