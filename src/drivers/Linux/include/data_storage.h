@@ -32,7 +32,7 @@ int storage_init(const char *file);
  * @param drop Int. Set to 1 to drop the existing table before create one
  * @return 0 OK, -1 Error
  */
-int storage_table_status_repo_init(char *table, int drop);
+int storage_table_repo_init(char *table, int drop);
 
 /**
  * Create new table in the opened database (@relatesalso storage_init) in the
@@ -56,7 +56,7 @@ int storage_table_flight_plan_init(char* table, int drop);
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_get_value_idx(int index, char *table);
+int storage_repo_get_value_idx(int index, char *table);
 
 /**
  * Get a INT (integer) value from table by name
@@ -67,7 +67,7 @@ int storage_get_value_idx(int index, char *table);
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_get_value_str(char *name, char *table);
+int storage_repo_get_value_str(char *name, char *table);
 
 /**
  * Set or update the value of a INT (integer) variable by index.
@@ -79,7 +79,7 @@ int storage_get_value_str(char *name, char *table);
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_set_value_idx(int index, int value, char *table);
+int storage_repo_set_value_idx(int index, int value, char *table);
 
 /**
  * Set or update the value of a INT (integer) variable by name.
@@ -91,7 +91,7 @@ int storage_set_value_idx(int index, int value, char *table);
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_set_value_str(char *name, int value, char *table);
+int storage_repo_set_value_str(char *name, int value, char *table);
 
 /**
  * Close the opened database

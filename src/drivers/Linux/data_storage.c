@@ -30,7 +30,7 @@ int storage_init(const char *file)
     }
 }
 
-int storage_table_status_repo_init(char *table, int drop)
+int storage_table_repo_init(char *table, int drop)
 {
     char *err_msg;
     char *sql;
@@ -130,7 +130,7 @@ int storage_table_flight_plan_init(char* table, int drop)
     }
 }
 
-int storage_get_value_idx(int index, char *table)
+int storage_repo_get_value_idx(int index, char *table)
 {
     sqlite3_stmt* stmt = NULL;
     char *sql = sqlite3_mprintf("SELECT value FROM %s WHERE idx=\"%d\";", table, index);
@@ -156,7 +156,7 @@ int storage_get_value_idx(int index, char *table)
     return value;
 }
 
-int storage_get_value_str(char *name, char *table)
+int storage_repo_get_value_str(char *name, char *table)
 {
     sqlite3_stmt* stmt = NULL;
     char *sql = sqlite3_mprintf("SELECT value FROM %s WHERE name=\"%s\";", table, name);
@@ -182,7 +182,7 @@ int storage_get_value_str(char *name, char *table)
     return value;
 }
 
-int storage_set_value_idx(int index, int value, char *table)
+int storage_repo_set_value_idx(int index, int value, char *table)
 {
     char *err_msg;
     char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (idx, name, value) "
@@ -210,7 +210,7 @@ int storage_set_value_idx(int index, int value, char *table)
     }
 }
 
-int storage_set_value_str(char *name, int value, char *table)
+int storage_repo_set_value_str(char *name, int value, char *table)
 {
     char *err_msg;
     char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (idx, name, value) "
