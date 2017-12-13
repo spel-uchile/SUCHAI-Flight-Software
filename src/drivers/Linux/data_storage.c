@@ -79,6 +79,57 @@ int storage_table_status_repo_init(char *table, int drop)
     }
 }
 
+int storage_table_flight_plan_init(char* table, int drop)
+{
+
+    char* err_msg;
+    char* sql;
+    int rc;
+
+    /* Drop table if selected */
+    if (drop)
+    {
+        sql = sqlite3_mprintf("DROP TABLE %s", table);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+        if (rc != SQLITE_OK )
+        {
+            LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", table, err_msg, sql);
+            sqlite3_free(err_msg);
+            sqlite3_free(sql);
+            return -1;
+        }
+        else
+        {
+            LOGD(tag, "Table %s drop successfully", table);
+            sqlite3_free(sql);
+        }
+    }
+
+    sql = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS %s("
+                                  "time int PRIMARY KEY NOT NULL, "
+                                  "command text UNIQUE NOT NULL, "
+                                  "args text NOT NULL, "
+                                  "repeat int NOT NULL);",
+                          table);
+
+    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+    if (rc != SQLITE_OK )
+    {
+        LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", table, err_msg, sql);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return -1;
+    }
+    else
+    {
+        LOGD(tag, "Table %s created successfully", table);
+        sqlite3_free(sql);
+        return 0;
+    }
+}
+
 int storage_get_value_idx(int index, char *table)
 {
     sqlite3_stmt* stmt = NULL;
@@ -86,7 +137,7 @@ int storage_get_value_idx(int index, char *table)
 
     // execute statement
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-    if(rc != 0)
+    if(rc != SQLITE_OK)
     {
         LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
         return -1;
@@ -199,7 +250,7 @@ int storage_close(void)
     }
 }
 
-int
+
 
 static int dummy_callback(void *data, int argc, char **argv, char **names)
 {

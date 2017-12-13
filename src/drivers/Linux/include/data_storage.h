@@ -35,6 +35,19 @@ int storage_init(const char *file);
 int storage_table_status_repo_init(char *table, int drop);
 
 /**
+ * Create new table in the opened database (@relatesalso storage_init) in the
+ * form (time, command, args, repeat). If the table exists do nothing. If drop is set to
+ * 1 then drop an existing table and then creates an empty one.
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. Table name
+ * @param drop Int. Set to 1 to drop the existing table before create one
+ * @return 0 OK, -1 Error
+ */
+int storage_table_flight_plan_init(char* table, int drop);
+
+/**
  * Get an INT (integer) value from table by index
  *
  * @note: non-reentrant function, use mutex to sync access
