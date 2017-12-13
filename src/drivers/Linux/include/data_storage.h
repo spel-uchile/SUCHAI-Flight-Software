@@ -99,14 +99,26 @@ int storage_repo_set_value_str(char *name, int value, char *table);
  *
  * @note: non-reentrant function, use mutex to sync access
  *
- * @param time Int. Variable time
+ * @param timetodo Int. time to do the action
  * @param command Str. Command to set
  * @param args Str. command's arguments
  * @param repeat Int. Value of time to run the command
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_set(int time, char* command, char* args, int repeat, char* table);
+int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table);
+
+/**
+ * Erase the row in the table in the opened database (@relatesalso storage_init) that
+ * have the same timetodo.
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param timetodo Int. time to do the action
+ * @param table Str. Table name
+ * @return 0 OK, -1 Error
+ */
+int storage_flight_plan_erase (int timetodo, char* table);
 
 /**
  * Reset the table in the opened database (@relatesalso storage_init) in the

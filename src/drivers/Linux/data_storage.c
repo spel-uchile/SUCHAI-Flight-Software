@@ -268,6 +268,11 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
     }
 }
 
+int storage_flight_plan_erase (int timetodo, char* table){
+
+    storage_flight_plan_set(timetodo, NULL, NULL, NULL, table);
+}
+
 
 
 int storage_flight_plan_reset (char* table)
