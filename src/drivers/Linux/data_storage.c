@@ -351,12 +351,12 @@ int storage_flight_plan_get_repeat(int timetodo, char* table)
 
 int storage_flight_plan_erase (int timetodo, char* table){
 
-    storage_flight_plan_set(timetodo, NULL, NULL, NULL, table);
+    return storage_flight_plan_set(timetodo, NULL, NULL, NULL, table);
 }
 
 int storage_flight_plan_reset (char* table)
 {
-    storage_table_flight_plan_init(table, 1);
+    return storage_table_flight_plan_init(table, 1);
 }
 
 int storage_close(void)
@@ -372,6 +372,14 @@ int storage_close(void)
     {
         LOGD(tag, "Attempting to close a NULL pointer database");
         return -1;
+    }
+}
+
+void storage_table_flight_plan_init_times(int timeinit, char* table)
+{
+    storage_flight_plan_reset(table);
+    for(int i=timeinit; i<(timeinit+86400);i+=10) {
+        storage_flight_plan_set(i, NULL, NULL, NULL, table);
     }
 }
 
