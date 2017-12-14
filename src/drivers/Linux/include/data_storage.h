@@ -109,6 +109,40 @@ int storage_repo_set_value_str(char *name, int value, char *table);
 int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table);
 
 /**
+ * Get a String that contains the command from table flight plan by timetodo
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param timetodo Int. the time of action
+ * @param table Str. Table name
+ * @return String, NULL Error
+ */
+const unsigned char* storage_flight_plan_get_command(int timetodo, char* table);
+
+/**
+ * Get a String that constains the command's arguments from table flight plan by timetodo
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param timetodo Int. the time of action
+ * @param table Str. Table name
+ * @return String, NULL Error
+ */
+const unsigned char* storage_flight_plan_get_args(int timetodo, char* table);
+
+/**
+ * Get a Integer that constains the times to execute the command from table flight plan by timetodo
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param timetodo Int. the time of action
+ * @param table Str. Table name
+ * @return Integer, NULL Error
+ */
+int storage_flight_plan_get_repeat(int timetodo, char* table);
+
+
+/**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
  * have the same timetodo.
  *

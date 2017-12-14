@@ -268,12 +268,91 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
     }
 }
 
+const unsigned char* storage_flight_plan_get_command(int timetodo, char* table)
+{
+    const unsigned char* command;
+    sqlite3_stmt* stmt = NULL;
+    char *sql = sqlite3_mprintf("SELECT command FROM %s WHERE time=\"%d\";", table, timetodo);
+
+    // execute statement
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if(rc != 0)
+    {
+        LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
+        return NULL;
+    }
+
+    // fetch only one row's status
+    rc = sqlite3_step(stmt);
+
+    if(rc == SQLITE_ROW)
+        command  = sqlite3_column_text(stmt, 0);
+    else
+        LOGE(tag, "Some error encountered (rc=%d)", rc);
+
+    sqlite3_finalize(stmt);
+    sqlite3_free(sql);
+    return command;
+}
+
+const unsigned char* storage_flight_plan_get_args(int timetodo, char* table)
+{
+    const unsigned char* args;
+    sqlite3_stmt* stmt = NULL;
+    char *sql = sqlite3_mprintf("SELECT args FROM %s WHERE time=\"%d\";", table, timetodo);
+
+    // execute statement
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if(rc != 0)
+    {
+        LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
+        return NULL;
+    }
+
+    // fetch only one row's status
+    rc = sqlite3_step(stmt);
+
+    if(rc == SQLITE_ROW)
+        args  = sqlite3_column_text(stmt, 0);
+    else
+    LOGE(tag, "Some error encountered (rc=%d)", rc);
+
+    sqlite3_finalize(stmt);
+    sqlite3_free(sql);
+    return args;
+}
+
+int storage_flight_plan_get_repeat(int timetodo, char* table)
+{
+    int repeat;
+    sqlite3_stmt* stmt = NULL;
+    char *sql = sqlite3_mprintf("SELECT repeat FROM %s WHERE time=\"%d\";", table, timetodo);
+
+    // execute statement
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if(rc != 0)
+    {
+        LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
+        return NULL;
+    }
+
+    // fetch only one row's status
+    rc = sqlite3_step(stmt);
+
+    if(rc == SQLITE_ROW)
+        repeat  = sqlite3_column_int(stmt, 0);
+    else
+    LOGE(tag, "Some error encountered (rc=%d)", rc);
+
+    sqlite3_finalize(stmt);
+    sqlite3_free(sql);
+    return repeat;
+}
+
 int storage_flight_plan_erase (int timetodo, char* table){
 
     storage_flight_plan_set(timetodo, NULL, NULL, NULL, table);
 }
-
-
 
 int storage_flight_plan_reset (char* table)
 {
@@ -295,8 +374,6 @@ int storage_close(void)
         return -1;
     }
 }
-
-
 
 static int dummy_callback(void *data, int argc, char **argv, char **names)
 {
