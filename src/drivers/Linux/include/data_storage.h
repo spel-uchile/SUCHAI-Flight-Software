@@ -108,6 +108,8 @@ int storage_repo_set_value_str(char *name, int value, char *table);
  */
 int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table);
 
+int storage_flight_plan_set_time(int timetodo, char* table);
+
 /**
  * Get a String that contains the command from table flight plan by timetodo
  *

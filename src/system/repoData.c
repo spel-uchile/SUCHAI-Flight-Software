@@ -55,13 +55,13 @@ void dat_repo_init(void)
         assertf(rc==0, tag, "Unable to create non-volatile data repository");
 
         //Init system repo
-        rc = storage_table_status_repo_init(DAT_REPO_SYSTEM, 0);
+        rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
         assertf(rc==0, tag, "Unable to create system variables repository");
 
         int index;
         for(index=0; index<dat_system_last_var; index++)
         {
-            storage_set_value_idx(index, INT_MAX, DAT_REPO_SYSTEM);
+            storage_repo_set_value_idx(index, INT_MAX, DAT_REPO_SYSTEM);
         }
     }
 #endif
@@ -92,7 +92,7 @@ void dat_set_system_var(dat_system_t index, int value)
         DAT_SYSTEM_VAR_BUFF[index] = value;
     //Uses external memory
     #else
-        storage_set_value_idx(index, value, DAT_REPO_SYSTEM);
+        storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
     #endif
 
     //Exit critical zone
@@ -111,7 +111,7 @@ int dat_get_system_var(dat_system_t index)
         value = DAT_SYSTEM_VAR_BUFF[index];
     //Uses external (non-volatile) memory
     #else
-        value = storage_get_value_idx(index, DAT_REPO_SYSTEM);
+        value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
     #endif
 
     //Exit critical zone

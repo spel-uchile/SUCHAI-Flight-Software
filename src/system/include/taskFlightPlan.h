@@ -11,3 +11,6 @@
 #include <utils.h>
 #include <stdlib.h>
 #include "osDelay.h"
+#include "repoCommand.h"
+
+void taskFlightPlan(void *param);

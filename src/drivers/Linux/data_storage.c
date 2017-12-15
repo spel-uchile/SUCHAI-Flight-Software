@@ -118,14 +118,14 @@ int storage_table_flight_plan_init(char* table, int drop)
     if (rc != SQLITE_OK )
     {
         LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", table, err_msg, sql);
-        sqlite3_free(err_msg);
-        sqlite3_free(sql);
+        //sqlite3_free(err_msg);
+        //sqlite3_free(sql);
         return -1;
     }
     else
     {
         LOGD(tag, "Table %s created successfully", table);
-        sqlite3_free(sql);
+        //sqlite3_free(sql);
         return 0;
     }
 }
@@ -241,12 +241,7 @@ int storage_repo_set_value_str(char *name, int value, char *table)
 int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table)
 {
     char *err_msg;
-    char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (time, command, args, repeat) "
-                                        "VALUES ("
-                                        "%d, "
-                                        "%s, "
-                                        "%s, "
-                                        "%d);",
+    char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (time, command, args, repeat)\n VALUES (%d, \"%s\", \"%s\", %d);",
                                 table, timetodo, command, args, repeat);
 
     /* Execute SQL statement */
@@ -262,6 +257,31 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
     else
     {
         LOGV(tag, "Inserted (%d, %s, %s, %d) in %s", timetodo, command, args, repeat, table);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return 0;
+    }
+}
+
+int storage_flight_plan_set_time(int timetodo, char* table)
+{
+    char *err_msg;
+    char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (time)\n VALUES (%d);",
+                                table, timetodo);
+
+    /* Execute SQL statement */
+    int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+
+    if( rc != SQLITE_OK )
+    {
+        LOGE(tag, "SQL error: %s", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return -1;
+    }
+    else
+    {
+        LOGV(tag, "Inserted (%d) in %s", timetodo, table);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
         return 0;
@@ -377,9 +397,10 @@ int storage_close(void)
 
 void storage_table_flight_plan_init_times(int timeinit, char* table)
 {
+
     storage_flight_plan_reset(table);
-    for(int i=timeinit; i<(timeinit+86400);i+=10) {
-        storage_flight_plan_set(i, NULL, NULL, NULL, table);
+    for(int i=timeinit; i<(timeinit+86400);i+=60) {
+        storage_flight_plan_set_time(i, table);
     }
 }
 

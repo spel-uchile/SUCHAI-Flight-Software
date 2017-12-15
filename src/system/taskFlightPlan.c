@@ -5,19 +5,16 @@
 #include "taskFlightPlan.h"
 
 static const char *tag = "FlightPlan";
-char* table = "flight-plan";
-int timeinit=0;   // ################################################################  Must change  ###################
+char* table = "flightPlan";
+int timeinit=60;   // ################################################################  Must change  ###################
 
-void taskFlighPlan (void *param){
+void taskFlightPlan(void *param){
 
     LOGD(tag, "Started");
 
-    portTick delay_ms = 10000;          //Task period in [ms]
+    portTick delay_ms = 30000;          //Task period in [ms]
 
     unsigned int elapsed_sec = 0;      // Seconds counter
-
-    char *task_name = malloc(sizeof(char)*14);
-    strcpy(task_name, "FlightPlan");
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
@@ -27,8 +24,8 @@ void taskFlighPlan (void *param){
     const unsigned char* args;
     int repeat;
 
-    while(1){
-
+    while(1)
+    {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
         elapsed_sec += delay_ms; //Update seconds counts
 
@@ -36,10 +33,15 @@ void taskFlighPlan (void *param){
         args = storage_flight_plan_get_args(elapsed_sec,table);
         repeat = storage_flight_plan_get_repeat(elapsed_sec,table);
 
+        if(command == NULL || args == NULL)
+            continue;
+
+        cmd_t *new_cmd = cmd_get_str((char *)command);
+        cmd_add_params_str(new_cmd, (char *)args);
+
         for(int i=0; i<repeat; i++)
         {
-            //ejecutar el commando     
+            cmd_send(new_cmd);
         }
-
     }
 }

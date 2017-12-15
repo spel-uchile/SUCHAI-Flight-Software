@@ -35,7 +35,7 @@ int main(void)
 
     osDelay(1000);
 
-    int n_threads = 6;
+    int n_threads = 7;
     os_thread threads_id[n_threads];
 
     /* Crating system task (the others are created inside taskDeployment) */
@@ -50,6 +50,8 @@ int main(void)
     osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
     //osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
     osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
+
+    osCreateTask(taskFlightPlan,"flightplan",2*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
 
     /* Start the scheduler. Should never return */
     osScheduler(threads_id, n_threads);

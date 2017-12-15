@@ -30,5 +30,7 @@
 #include "taskHousekeeping.h"
 #include "taskConsole.h"
 #include "taskCommunications.h"
+#include "taskFlightPlan.h"
+
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_MAIN_H
