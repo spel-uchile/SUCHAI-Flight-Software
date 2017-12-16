@@ -108,8 +108,6 @@ int storage_repo_set_value_str(char *name, int value, char *table);
  */
 int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table);
 
-int storage_flight_plan_set_time(int timetodo, char* table);
-
 /**
  * Get a String that contains the command from table flight plan by timetodo
  *
@@ -119,7 +117,7 @@ int storage_flight_plan_set_time(int timetodo, char* table);
  * @param table Str. Table name
  * @return String, NULL Error
  */
-const unsigned char* storage_flight_plan_get_command(int timetodo, char* table);
+char* storage_flight_plan_get_command(int timetodo, char* table);
 
 /**
  * Get a String that constains the command's arguments from table flight plan by timetodo
@@ -130,7 +128,7 @@ const unsigned char* storage_flight_plan_get_command(int timetodo, char* table);
  * @param table Str. Table name
  * @return String, NULL Error
  */
-const unsigned char* storage_flight_plan_get_args(int timetodo, char* table);
+char* storage_flight_plan_get_args(int timetodo, char* table);
 
 /**
  * Get a Integer that constains the times to execute the command from table flight plan by timetodo

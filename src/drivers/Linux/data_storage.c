@@ -263,13 +263,13 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
     }
 }
 
-int storage_flight_plan_set_time(int timetodo, char* table)
+/*int storage_flight_plan_set_time(int timetodo, char* table)
 {
     char *err_msg;
     char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (time)\n VALUES (%d);",
                                 table, timetodo);
 
-    /* Execute SQL statement */
+    // Execute SQL statement
     int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
     if( rc != SQLITE_OK )
@@ -281,18 +281,17 @@ int storage_flight_plan_set_time(int timetodo, char* table)
     }
     else
     {
-        LOGV(tag, "Inserted (%d) in %s", timetodo, table);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
         return 0;
     }
-}
+}*/
 
-const unsigned char* storage_flight_plan_get_command(int timetodo, char* table)
+char* storage_flight_plan_get_command(int timetodo, char* table)
 {
     const unsigned char* command;
     sqlite3_stmt* stmt = NULL;
-    char *sql = sqlite3_mprintf("SELECT command FROM %s WHERE time=\"%d\";", table, timetodo);
+    char *sql = sqlite3_mprintf("SELECT command FROM %s WHERE time = %d;", table, timetodo);
 
     // execute statement
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
@@ -304,22 +303,29 @@ const unsigned char* storage_flight_plan_get_command(int timetodo, char* table)
 
     // fetch only one row's status
     rc = sqlite3_step(stmt);
+    char *var = malloc(sizeof(char)*14);
 
-    if(rc == SQLITE_ROW)
-        command  = sqlite3_column_text(stmt, 0);
-    else
-        LOGE(tag, "Some error encountered (rc=%d)", rc);
+    if(rc == SQLITE_ROW) {
+        command = sqlite3_column_text(stmt, 0);
+        strcpy(var, (char*)command);
+    }
+    else if(rc == SQLITE_DONE) {
+
+        //LOGE(tag, "Some error encountered (rc=%d)", rc);
+        return NULL;
+    }
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
-    return command;
+    return var;
+
 }
 
-const unsigned char* storage_flight_plan_get_args(int timetodo, char* table)
+char* storage_flight_plan_get_args(int timetodo, char* table)
 {
     const unsigned char* args;
     sqlite3_stmt* stmt = NULL;
-    char *sql = sqlite3_mprintf("SELECT args FROM %s WHERE time=\"%d\";", table, timetodo);
+    char *sql = sqlite3_mprintf("SELECT args FROM %s WHERE time= %d;", table, timetodo);
 
     // execute statement
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
@@ -332,21 +338,28 @@ const unsigned char* storage_flight_plan_get_args(int timetodo, char* table)
     // fetch only one row's status
     rc = sqlite3_step(stmt);
 
-    if(rc == SQLITE_ROW)
-        args  = sqlite3_column_text(stmt, 0);
-    else
-    LOGE(tag, "Some error encountered (rc=%d)", rc);
+    char *var = malloc(sizeof(char)*14);
+
+    if(rc == SQLITE_ROW) {
+        args = sqlite3_column_text(stmt, 0);
+        strcpy(var, (char*)args);
+    }
+    else if(rc == SQLITE_DONE) {
+
+        //LOGE(tag, "Some error encountered (rc=%d)", rc);
+        return NULL;
+    }
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
-    return args;
+    return var;
 }
 
 int storage_flight_plan_get_repeat(int timetodo, char* table)
 {
-    int repeat;
+    int repeat=0;
     sqlite3_stmt* stmt = NULL;
-    char *sql = sqlite3_mprintf("SELECT repeat FROM %s WHERE time=\"%d\";", table, timetodo);
+    char *sql = sqlite3_mprintf("SELECT repeat FROM %s WHERE time = %d;", table, timetodo);
 
     // execute statement
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
@@ -361,9 +374,11 @@ int storage_flight_plan_get_repeat(int timetodo, char* table)
 
     if(rc == SQLITE_ROW)
         repeat  = sqlite3_column_int(stmt, 0);
-    else
-    LOGE(tag, "Some error encountered (rc=%d)", rc);
+    else if(rc == SQLITE_DONE) {
 
+        //LOGE(tag, "Some error encountered (rc=%d)", rc);
+        return NULL;
+    }
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
     return repeat;
@@ -395,14 +410,15 @@ int storage_close(void)
     }
 }
 
-void storage_table_flight_plan_init_times(int timeinit, char* table)
+/*void storage_table_flight_plan_init_times(int timeinit, char* table)
 {
 
     storage_flight_plan_reset(table);
     for(int i=timeinit; i<(timeinit+86400);i+=60) {
         storage_flight_plan_set_time(i, table);
     }
-}
+    LOGV(tag, "Initial flightPlan table created");
+}*/
 
 static int dummy_callback(void *data, int argc, char **argv, char **names)
 {

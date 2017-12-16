@@ -6,3 +6,10 @@
 #define SUCHAI_FLIGHT_SOFTWARE_CMDFLIGHTPLAN_C_H
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_CMDFLIGHTPLAN_C_H
+
+
+#include <repoCommand.h>
+#include "data_storage.h"
+
+void cmd_fp_init(void);
+int fp_set(char *fmt, char *params, int nparams);
