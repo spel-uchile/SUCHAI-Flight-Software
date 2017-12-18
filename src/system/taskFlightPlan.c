@@ -12,7 +12,7 @@ void taskFlightPlan(void *param){
 
     LOGD(tag, "Started");
 
-    portTick delay_ms = 1000;          //Task period in [ms]
+    portTick delay_ms = 2000;          //Task period in [ms]
 
     unsigned int elapsed_sec = 0;      // Seconds counter
 
@@ -25,8 +25,8 @@ void taskFlightPlan(void *param){
     int repeat;
 
     storage_flight_plan_set(4000,"ping","5",1,"flightPlan");
-    //storage_flight_plan_set(6000,"comando2","2 2",2,"flightPlan");
-    //storage_flight_plan_set(360,"comando3","4 2 hola",3,"flightPlan");
+    storage_flight_plan_set(6000,"get_mem","",1,"flightPlan");
+    storage_flight_plan_set(8000,"help","",1,"flightPlan");
     LOGD(tag, "insertions ready");
 
     while(1)

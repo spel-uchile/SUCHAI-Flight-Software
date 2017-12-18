@@ -89,7 +89,7 @@ int storage_table_flight_plan_init(char* table, int drop)
     /* Drop table if selected */
     if (drop)
     {
-        sql = sqlite3_mprintf("DROP TABLE %s", table);
+        sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s", table);
         rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK )
