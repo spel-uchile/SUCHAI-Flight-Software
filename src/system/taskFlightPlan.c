@@ -25,8 +25,8 @@ void taskFlightPlan(void *param){
     int repeat;
 
     storage_flight_plan_set(4000,"ping","5",1,"flightPlan");
-    //storage_flight_plan_set(6000,"get_mem","",1,"flightPlan");
-    //storage_flight_plan_set(8000,"help","",1,"flightPlan");
+    storage_flight_plan_set(6000,"get_mem","",1,"flightPlan");
+    storage_flight_plan_set(8000,"help","",1,"flightPlan");
     LOGD(tag, "insertions ready");
     storage_show_table(table);
     LOGD(tag, "showed table");

@@ -15,3 +15,4 @@ void cmd_fp_init(void);
 int fp_set(char *fmt, char *params, int nparams);
 int fp_delete(char* fmt, char* params, int nparams);
 int fp_show(char* fmt, char* params, int nparams);
+int fp_reset(char* fmt, char* params, int nparams);
