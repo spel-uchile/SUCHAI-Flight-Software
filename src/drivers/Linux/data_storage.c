@@ -108,7 +108,7 @@ int storage_table_flight_plan_init(char* table, int drop)
 
     sql = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS %s("
                                   "time int PRIMARY KEY , "
-                                  "command text UNIQUE , "
+                                  "command text, "
                                   "args text , "
                                   "repeat int );",
                           table);
@@ -385,6 +385,32 @@ int storage_flight_plan_erase (int timetodo, char* table)
 int storage_flight_plan_reset (char* table)
 {
     return storage_table_flight_plan_init(table, 1);
+}
+
+int storage_show_table (char* table) {
+    char **results;
+    char *err_msg;
+    int row;
+    int col;
+    char *sql = sqlite3_mprintf("SELECT * FROM %s", table);
+
+    // execute statement
+    sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
+
+    if(row==0 || col==0){
+        printf("Empty table !\n");
+        return 0;
+    }
+    else {
+        for (int i = 0; i < (col * row) + 4; i++) {
+            printf("%s", results[i]);
+            if ((i + 1) % col == 0 && i != 0)
+                printf("\n");
+            else
+                printf("\t");
+        }
+    }
+    return 0;
 }
 
 int storage_close(void)

@@ -165,15 +165,11 @@ int storage_flight_plan_erase (int timetodo, char* table);
  */
 int storage_flight_plan_reset (char* table);
 
-/**
- * Create the table in the opened database (@relatesalso storage_init) in the
- * form (time, command, args, repeat) and insert all the times with NULL atributes
- *
- * @note: non-reentrant function, use mutex to sync access
- *
- * @param table Str. Table name
- */
-void storage_table_flight_plan_init_times(int timeinit, char* table);
+
+
+
+int storage_show_table (char* table);
+
 
 /**
  * Close the opened database
