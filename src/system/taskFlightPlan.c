@@ -28,6 +28,8 @@ void taskFlightPlan(void *param){
     storage_flight_plan_set(6000,"get_mem","",1,"flightPlan");
     storage_flight_plan_set(8000,"help","",1,"flightPlan");
     LOGD(tag, "insertions ready");
+    storage_flight_plan_erase(4000,"flightPlan");
+    LOGD(tag, "Delet ready");
 
     while(1)
     {
