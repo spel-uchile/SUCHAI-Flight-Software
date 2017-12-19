@@ -32,6 +32,8 @@ void taskCommunications(void *param)
     /* Pointer to current connection, packet and socket */
     csp_conn_t *conn;
     csp_packet_t *packet;
+    csp_packet_t *response;
+
     csp_socket_t *sock = csp_socket(CSP_SO_NONE);
     if((rc = csp_bind(sock, CSP_ANY)) != CSP_ERR_NONE)
     {
@@ -43,6 +45,14 @@ void taskCommunications(void *param)
         LOGE(tag, "Error listening to socket (%d)", rc)
         return;
     }
+
+    response = csp_buffer_get(sizeof(csp_packet_t) + 3);
+    if( response == NULL ) {
+        LOGE(stderr, "Could not allocate memory for response packet!\n");
+        return;
+    }
+    memcpy(response->data, "OK", 3);
+    response->length = 4;
 
     while(1)
     {
@@ -60,18 +70,21 @@ void taskCommunications(void *param)
                     /* Process incoming TC */
                     com_receive_tc(packet);
                     csp_buffer_free(packet);
+                    csp_send(conn, response, 1000);
                     break;
 
                 case SCH_TRX_PORT_DEBUG:
                     /* Debug port, only to print strings */
                     LOGI(tag, (char *)(packet->data));
                     csp_buffer_free(packet);
+                    csp_send(conn, response, 1000);
                     break;
 
                 case SCH_TRX_PORT_CONSOLE:
                     /* Debug port, executes console commands */
                     com_receive_cmd(packet);
                     csp_buffer_free(packet);
+                    csp_send(conn, response, 1000);
                     break;
 
                 default:
@@ -98,13 +111,14 @@ static void com_receive_tc(csp_packet_t *packet)
     static cmd_t *new_cmd;
     char tmp_cmd[packet->length];
     char tmp_arg[packet->length];
-
-    char *buffer = (char *)(packet->data);
-    LOGI(tag, "New TC: %s", buffer);
+    char buffer[packet->length];
+    strncpy(buffer, (char *)(packet->data), (size_t)packet->length);
+    LOGI(tag, "New TC: %s (%d)", buffer, packet->length);
 
     n_args = sscanf(buffer, "%s %n", tmp_cmd, &next);
-    strncpy(tmp_arg, buffer+next, SCH_BUFF_MAX_LEN);
-    LOGV(tag, "Parsed %d: %s, %s (%d))", n_args, tmp_cmd, tmp_arg, next);
+    LOGV(tag, "Parsed %d: %s (%d))", n_args, tmp_cmd, next);
+    strncpy(tmp_arg, buffer+next, (size_t)(packet->length));
+    LOGV(tag, "Parsed args: %s", tmp_arg);
 
     if (n_args == 1)
     {

@@ -25,7 +25,7 @@ void cmd_com_init(void)
 {
     cmd_add("ping", com_ping, "%d", 1);
     cmd_add("send", com_send_dbg, "%d %s", 2);
-    cmd_add("send_cmd", com_send_cmd, "%d %s", 2);
+    cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
 }
 
 int com_ping(char *fmt, char *params, int nparams)
@@ -62,15 +62,21 @@ int com_send_dbg(char *fmt, char *params, int nparams)
 
 int com_send_cmd(char *fmt, char *params, int nparams)
 {
-    int node;
+    int node, next, n_args;
     char msg[CMD_MAX_STR_PARAMS];
 
-    if(sscanf(params, fmt, &node, msg) == nparams)
+    n_args = sscanf(params, "%d %n", &node, &next);
+
+    if(n_args == nparams && next > 1)
     {
+        strncpy(msg, params+next, (size_t)CMD_MAX_STR_PARAMS);
+        LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, msg, next);
+
         /* Sending message to node debug port */
         int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_TC, 1000,
                                  (void *)msg, strlen(msg),
                                  (void *)msg, strlen(msg));
+
         LOGV(tag, "Sending %s to %d. Bytes read %d\n", msg, node, rc);
 
         if(rc >= 0)

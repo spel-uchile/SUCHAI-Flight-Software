@@ -10,6 +10,10 @@
 #ifndef CMD_COM_H
 #define CMD_COM_H
 
+#include "stdlib.h"
+#include "string.h"
+#include "stdint.h"
+
 #include "csp/csp.h"
 
 #include "repoCommand.h"
