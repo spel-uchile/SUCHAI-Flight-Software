@@ -261,101 +261,33 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
     }
 }
 
-char* storage_flight_plan_get_command(int timetodo, char* table)
+int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, char* table)
 {
-    const unsigned char* command;
-    sqlite3_stmt* stmt = NULL;
-    char *sql = sqlite3_mprintf("SELECT command FROM %s WHERE time = %d;", table, timetodo);
+    char **results;
+    char *err_msg;
+    int row;
+    int col;
+    char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE time = %d",table, timetodo);
+
 
     // execute statement
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-    if(rc != 0)
+    sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
+
+    if(row==0 || col==0)
     {
-        LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
-        return NULL;
+        *command = NULL;
+        *args = NULL;
     }
-
-    // fetch only one row's status
-    rc = sqlite3_step(stmt);
-    char *var = malloc(sizeof(char)*14);
-
-    if(rc == SQLITE_ROW) {
-        command = sqlite3_column_text(stmt, 0);
-        strcpy(var, (char*)command);
-    }
-    else if(rc == SQLITE_DONE) {
-
-        //LOGE(tag, "Some error encountered (rc=%d)", rc);
-        return NULL;
-    }
-
-    sqlite3_finalize(stmt);
-    sqlite3_free(sql);
-    return var;
-
-}
-
-char* storage_flight_plan_get_args(int timetodo, char* table)
-{
-    const unsigned char* args;
-    sqlite3_stmt* stmt = NULL;
-    char *sql = sqlite3_mprintf("SELECT args FROM %s WHERE time= %d;", table, timetodo);
-
-    // execute statement
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-    if(rc != 0)
+    else
     {
-        LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
-        return NULL;
+        strcpy(*command, results[5]);
+        strcpy(*args,results[6]);
+        **repeat = atoi(results[7]);
+        sqlite3_free(sql);
+        return 0;
     }
 
-    // fetch only one row's status
-    rc = sqlite3_step(stmt);
-
-    char *var = malloc(sizeof(char)*14);
-
-    if(rc == SQLITE_ROW) {
-        args = sqlite3_column_text(stmt, 0);
-        strcpy(var, (char*)args);
-    }
-    else if(rc == SQLITE_DONE) {
-
-        //LOGE(tag, "Some error encountered (rc=%d)", rc);
-        return NULL;
-    }
-
-    sqlite3_finalize(stmt);
-    sqlite3_free(sql);
-    return var;
-}
-
-int storage_flight_plan_get_repeat(int timetodo, char* table)
-{
-    int repeat=0;
-    sqlite3_stmt* stmt = NULL;
-    char *sql = sqlite3_mprintf("SELECT repeat FROM %s WHERE time = %d;", table, timetodo);
-
-    // execute statement
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-    if(rc != 0)
-    {
-        LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
-        return NULL;
-    }
-
-    // fetch only one row's status
-    rc = sqlite3_step(stmt);
-
-    if(rc == SQLITE_ROW)
-        repeat  = sqlite3_column_int(stmt, 0);
-    else if(rc == SQLITE_DONE) {
-
-        //LOGE(tag, "Some error encountered (rc=%d)", rc);
-        return NULL;
-    }
-    sqlite3_finalize(stmt);
-    sqlite3_free(sql);
-    return repeat;
+    return -1;
 }
 
 int storage_flight_plan_erase (int timetodo, char* table)

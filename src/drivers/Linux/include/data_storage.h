@@ -10,7 +10,6 @@
 #include <sqlite3.h>
 
 
-
 /**
  * Init data storage system.
  * In this case we use SQLite, so this function open a database in file
@@ -95,7 +94,7 @@ int storage_repo_set_value_idx(int index, int value, char *table);
 int storage_repo_set_value_str(char *name, int value, char *table);
 
 /**
- * Set or update the row of certain time
+ * Set or update the row of a certain time
  *
  * @note: non-reentrant function, use mutex to sync access
  *
@@ -109,38 +108,18 @@ int storage_repo_set_value_str(char *name, int value, char *table);
 int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table);
 
 /**
- * Get a String that contains the command from table flight plan by timetodo
+ * Get the row of a certain time and set the values in the variables committed
  *
  * @note: non-reentrant function, use mutex to sync access
  *
- * @param timetodo Int. the time of action
+ * @param timetodo Int. time to do the action
+ * @param command Str. Command to get
+ * @param args Str. command's arguments
+ * @param repeat Int. Value of times to run the command
  * @param table Str. Table name
- * @return String, NULL Error
+ * @return 0 OK, -1 Error
  */
-char* storage_flight_plan_get_command(int timetodo, char* table);
-
-/**
- * Get a String that constains the command's arguments from table flight plan by timetodo
- *
- * @note: non-reentrant function, use mutex to sync access
- *
- * @param timetodo Int. the time of action
- * @param table Str. Table name
- * @return String, NULL Error
- */
-char* storage_flight_plan_get_args(int timetodo, char* table);
-
-/**
- * Get a Integer that constains the times to execute the command from table flight plan by timetodo
- *
- * @note: non-reentrant function, use mutex to sync access
- *
- * @param timetodo Int. the time of action
- * @param table Str. Table name
- * @return Integer, NULL Error
- */
-int storage_flight_plan_get_repeat(int timetodo, char* table);
-
+int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, char* table);
 
 /**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
@@ -152,6 +131,7 @@ int storage_flight_plan_get_repeat(int timetodo, char* table);
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
+
 int storage_flight_plan_erase (int timetodo, char* table);
 
 /**
@@ -165,11 +145,16 @@ int storage_flight_plan_erase (int timetodo, char* table);
  */
 int storage_flight_plan_reset (char* table);
 
-
-
-
+/**
+ * Show the table in the opened database (@relatesalso storage_init) in the
+ * form (time, command, args, repeat).
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. Table name
+ * @return 0 OK
+ */
 int storage_show_table (char* table);
-
 
 /**
  * Close the opened database
