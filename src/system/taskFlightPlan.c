@@ -20,7 +20,7 @@ void taskFlightPlan(void *param)
 
     storage_table_flight_plan_init(table,1);
 
-    storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan");
+    //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan");
     //storage_flight_plan_set(6000,"get_mem","",1,"flightPlan");
     //storage_flight_plan_set(8000,"help","",1,"flightPlan");
     //storage_flight_plan_set(15000,"reset","",1,"flightPlan");
@@ -40,10 +40,10 @@ void taskFlightPlan(void *param)
         int* repeat = malloc(sizeof(int));
 
         storage_flight_plan_get((int)elapsed_sec, &command, &args, &repeat, table);
-        LOGD(tag, "Tiempo: %d", (int)elapsed_sec);
-        LOGD(tag, "Comando: %s", command);
-        LOGD(tag, "Argumentos: %s", args);
-        LOGD(tag, "Repeticiones: %d", *repeat);
+        //LOGD(tag, "Tiempo: %d", (int)elapsed_sec);
+        //LOGD(tag, "Comando: %s", command);
+        //LOGD(tag, "Argumentos: %s", args);
+        //LOGD(tag, "Repeticiones: %d", *repeat);
 
         if(command == NULL)
             continue;
