@@ -1,5 +1,7 @@
 # Nanosatellite Flight Software
 
+[![Build Status](http://jenkins.spel.cl/buildStatus/icon?job=SUCHAI-Flight-Software)](http://jenkins.spel.cl/job/SUCHAI-Flight-Software/)
+
 SUCHAI Flight software was originally developed to be used in the 
 [SUCHAI](http://spel.ing.uchile.cl/suchai.html) nanosatellite (1U 
 [Cubesat](https://en.wikipedia.org/wiki/CubeSat)). SUCHAI was launch into orbit 
@@ -110,3 +112,6 @@ to submit questions, requirements and bugs.
 
 Follow the [SPEL team](https://twitter.com/SPEL_UCHILE) at Twitter to get latest 
 news about the SUCHAI project
+
+
+
