@@ -14,3 +14,4 @@
 #include "repoCommand.h"
 
 void taskFlightPlan(void *param);
+int date_to_unixtime(int day, int month, int year, int hour, int min, int sec);
