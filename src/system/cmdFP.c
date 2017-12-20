@@ -6,13 +6,14 @@
 
 static const char* tag = "cmdFlightPlan";
 
+
 /**
  * This function registers the list of command in the system, initializing the
  * functions array. This function must be called at every system start up.
  */
 void cmd_fp_init(void)
 {
-    cmd_add("fp_set_command", fp_set, "%d %d %d %d %d %d %s %s %d %s", 10);
+    cmd_add("fp_set_command", fp_set, "%d %d %d %d %d %d %s %s %d %s %d", 11);
     cmd_add("fp_delete_command", fp_delete, "%d %d %d %d %d %d %s", 7);
     cmd_add("fp_show", fp_show, "%s", 1);
     cmd_add("fp_reset", fp_reset,"%s", 1);
@@ -26,10 +27,10 @@ int fp_set(char *fmt, char *params, int nparams)
     int day, month, year, hour, min, sec;
     char command[CMD_MAX_STR_PARAMS];
     char args[CMD_MAX_STR_PARAMS];
-    int repeat;
+    int repeat,periodical;
     char table[CMD_MAX_STR_PARAMS];
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &repeat, &table) == nparams) {
+    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &repeat, &table, &periodical) == nparams) {
 
         str_time.tm_mday = day;
         str_time.tm_mon = month-1;
@@ -42,7 +43,7 @@ int fp_set(char *fmt, char *params, int nparams)
 
         printf("Tiempo cmd: %d", (int)unixtime);
 
-        int rc = storage_flight_plan_set((int)unixtime, command, args, repeat, table);
+        int rc = storage_flight_plan_set((int)unixtime, command, args, repeat, table, periodical);
 
         if (rc == 0)
             return CMD_OK;

@@ -105,7 +105,7 @@ int storage_repo_set_value_str(char *name, int value, char *table);
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table);
+int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table, int periodical);
 
 /**
  * Get the row of a certain time and set the values in the variables committed
@@ -119,8 +119,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, char* table);
-
+int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, char* table, int** periodical);
 /**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
  * have the same timetodo.
