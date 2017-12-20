@@ -65,7 +65,7 @@ void taskFlightPlan(void *param)
 
 int date_to_unixtime(int day, int month, int year, int hour, int min, int sec)
 {
-    struct tm str_time;
+    struct tm str_time; 
     time_t unixtime;
 
     str_time.tm_mday = day;
