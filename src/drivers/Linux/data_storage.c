@@ -335,11 +335,16 @@ int storage_show_table (char* table) {
     }
     else {
         for (int i = 0; i < (col * row) + 4; i++) {
-            printf("%s", results[i]);
-            if ((i + 1) % col == 0 && i != 0)
+
+            if (i%4 == 0 && i!=0)
+            {
+                time_t timef = atoi(results[i]);
+                printf("%s\t",ctime(&timef));
+                continue;
+            }
+            printf("%s\t", results[i]);
+            if ((i + 1) % col == 0)
                 printf("\n");
-            else
-                printf("\t");
         }
     }
     return 0;

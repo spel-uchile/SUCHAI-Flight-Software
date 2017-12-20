@@ -20,7 +20,8 @@ void taskFlightPlan(void *param)
 
     storage_table_flight_plan_init(table,1);
 
-    //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan");
+    storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan");
+    storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan");
     //storage_flight_plan_set(6000,"get_mem","",1,"flightPlan");
     //storage_flight_plan_set(8000,"help","",1,"flightPlan");
     //storage_flight_plan_set(15000,"reset","",1,"flightPlan");
@@ -33,7 +34,6 @@ void taskFlightPlan(void *param)
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
 
         elapsed_sec = time(NULL);
-
 
         char* command = malloc(sizeof(char)*50);
         char* args = malloc(sizeof(char)*50);
@@ -53,8 +53,11 @@ void taskFlightPlan(void *param)
 
         for(int i=0; i<*repeat; i++)
         {
+            LOGD(tag, "Comando: %s", command);
+            LOGD(tag, "Argumentos: %s", args);
+            LOGD(tag, "Repeticiones: %d", *repeat);
             cmd_send(new_cmd);
-            LOGD(tag, "Ha enviado comando");
+
         }
 
         free(command);
@@ -65,7 +68,7 @@ void taskFlightPlan(void *param)
 
 int date_to_unixtime(int day, int month, int year, int hour, int min, int sec)
 {
-    struct tm str_time; 
+    struct tm str_time;
     time_t unixtime;
 
     str_time.tm_mday = day;
