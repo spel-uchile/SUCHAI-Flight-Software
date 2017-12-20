@@ -107,6 +107,9 @@ void dat_set_system_var(dat_system_t index, int value);
  */
 int dat_get_system_var(dat_system_t index);
 
+int dat_get_fp(int elapsed_sec, char** command, char** args, int** repeat, char* table, int** periodical);
+
+
 
 /* The following is an API to interface with the repoData cubesat fligthPlan */
 //typedef enum _DAT_FligthPlanBuff{
@@ -118,6 +121,8 @@ int dat_get_system_var(dat_system_t index);
 //int dat_setFlightPlan_param(unsigned int index, int param);
 //int dat_onResetFlightPlan(void);
 //void dat_erase_FlightPlanBuff(void);
+
+
 
 #endif // DATA_REPO_H
 

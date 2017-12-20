@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "osDelay.h"
 #include "repoCommand.h"
+#include "repoData.h"
 
 void taskFlightPlan(void *param);
 int date_to_unixtime(int day, int month, int year, int hour, int min, int sec);

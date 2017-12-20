@@ -18,11 +18,11 @@ void taskFlightPlan(void *param)
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
-    storage_table_flight_plan_init(table,1);
+    storage_table_flight_plan_init(table,1);    //############################################################ alguien debe iniciar esto que no se taskFlightPlan  ######################
 
-    storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
-    storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan",0);
-    storage_flight_plan_set(date_to_unixtime(21,12,2017,19,55,0),"ping","5",1,"flightPlan",0);
+    //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
+    //storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan",0);
+    //storage_flight_plan_set(date_to_unixtime(21,12,2017,19,55,0),"ping","5",1,"flightPlan",0);
 
 
     LOGD(tag, "insertions ready");
@@ -40,7 +40,7 @@ void taskFlightPlan(void *param)
         int* repeat = malloc(sizeof(int));
         int* periodical = malloc(sizeof(int));
 
-        storage_flight_plan_get((int)elapsed_sec, &command, &args, &repeat, table, &periodical);
+        dat_get_fp((int)elapsed_sec, &command, &args, &repeat, table, &periodical);
 
         if(command == NULL)
             continue;

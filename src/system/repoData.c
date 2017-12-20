@@ -119,3 +119,13 @@ int dat_get_system_var(dat_system_t index)
 
     return value;
 }
+
+int dat_get_fp(int elapsed_sec, char** command, char** args, int** repeat, char* table, int** periodical)
+{
+    int rc = storage_flight_plan_get(elapsed_sec, command, args, repeat, table, periodical);
+
+    if (rc == 0)
+        return DAT_OBC_OPMODE_NORMAL;
+    else if (rc == -1)
+        return DAT_OBC_OPMODE_FAIL;
+}
