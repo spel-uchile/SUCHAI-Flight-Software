@@ -107,6 +107,16 @@ void dat_set_system_var(dat_system_t index, int value);
  */
 int dat_get_system_var(dat_system_t index);
 
+/**
+ * TODO: Docummentation required
+ * @param elapsed_sec
+ * @param command
+ * @param args
+ * @param repeat
+ * @param table
+ * @param periodical
+ * @return
+ */
 int dat_get_fp(int elapsed_sec, char** command, char** args, int** repeat, char* table, int** periodical);
 
 
