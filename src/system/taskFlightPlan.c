@@ -57,11 +57,11 @@ void taskFlightPlan(void *param)
         if(rc == -1)
             continue;
 
-        cmd_t *new_cmd = cmd_get_str(command);
-        cmd_add_params_str(new_cmd, args);
-
         for(int i=0; i< (*repeat); i++)
         {
+            cmd_t *new_cmd = cmd_get_str(command);
+            cmd_add_params_str(new_cmd, args);
+
             LOGD(tag, "Command: %s", command);
             LOGD(tag, "Arguments: %s", args);
             LOGD(tag, "Repetitions: %d", *repeat);
