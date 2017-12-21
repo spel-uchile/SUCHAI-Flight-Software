@@ -24,6 +24,8 @@
 static const char *tag = "repoData";
 char* table = "flightPlan";
 
+
+
 #if SCH_STATUS_REPO_MODE == 0
     int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
 #endif
@@ -31,9 +33,9 @@ char* table = "flightPlan";
 
 void dat_repo_init(void)
 {
-    storage_table_flight_plan_init(table,1);
-    int rc;
 
+    int rc;
+    storage_table_flight_plan_init(table,0);
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
     {

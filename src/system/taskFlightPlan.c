@@ -21,7 +21,7 @@
 #include "taskFlightPlan.h"
 
 static const char *tag = "FlightPlan";
-char* table = "flightPlan";
+char* table;
 
 void taskFlightPlan(void *param)
 {
@@ -33,16 +33,12 @@ void taskFlightPlan(void *param)
     portTick xLastWakeTime = osTaskGetTickCount();
 
     /* FIXME: Move this to data repository dat_repo_init */ //Fixed
-    //storage_table_flight_plan_init(table,1);
+    //  storage_table_flight_plan_init(table,1);
 
     //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
     //storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan",0);
     //storage_flight_plan_set(date_to_unixtime(21,12,2017,19,55,0),"ping","5",1,"flightPlan",0);
 
-
-    LOGD(tag, "insertions ready");
-    storage_show_table(table);
-    LOGD(tag, "showed table");
 
     while(1)
     {
