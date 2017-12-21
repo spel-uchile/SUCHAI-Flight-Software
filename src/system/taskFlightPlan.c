@@ -32,8 +32,8 @@ void taskFlightPlan(void *param)
     time_t elapsed_sec;   // Seconds counter
     portTick xLastWakeTime = osTaskGetTickCount();
 
-    /* FIXME: Move this to data repository dat_repo_init */
-    storage_table_flight_plan_init(table,1);    //############################################################ alguien debe iniciar esto que no se taskFlightPlan  ######################
+    /* FIXME: Move this to data repository dat_repo_init */ //Fixed
+    //storage_table_flight_plan_init(table,1);
 
     //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
     //storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan",0);
@@ -55,10 +55,10 @@ void taskFlightPlan(void *param)
         int* repeat = malloc(sizeof(int));
         int* periodical = malloc(sizeof(int));
 
-        dat_get_fp((int)elapsed_sec, &command, &args, &repeat, table, &periodical);
+        int rc = dat_get_fp((int)elapsed_sec, &command, &args, &repeat, table, &periodical);
 
-        /* FIXME: Memory leak detected */
-        if(command == NULL)
+        /* FIXME: Memory leak detected */  //Fixed
+        if(rc == -1)
             continue;
 
         cmd_t *new_cmd = cmd_get_str(command);

@@ -282,8 +282,7 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
 
     if(row==0 || col==0)
     {
-        *command = NULL;
-        *args = NULL;
+        return -1;
     }
     else
     {
@@ -300,8 +299,6 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
         sqlite3_free(sql);
         return 0;
     }
-
-    return -1;
 }
 
 int storage_flight_plan_erase(int timetodo, char* table)

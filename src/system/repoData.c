@@ -12,7 +12,8 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU General Public License for
+ * more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -21,6 +22,7 @@
 #include "repoData.h"
 
 static const char *tag = "repoData";
+char* table = "flightPlan";
 
 #if SCH_STATUS_REPO_MODE == 0
     int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
@@ -29,6 +31,7 @@ static const char *tag = "repoData";
 
 void dat_repo_init(void)
 {
+    storage_table_flight_plan_init(table,1);
     int rc;
 
     // Init repository mutex

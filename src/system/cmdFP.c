@@ -21,12 +21,6 @@
 
 static const char* tag = "cmdFlightPlan";
 
-
-/* TODO: Move this doc to the header */
-/**
- * This function registers the list of command in the system, initializing the
- * functions array. This function must be called at every system start up.
- */
 void cmd_fp_init(void)
 {
     cmd_add("fp_set_cmd", fp_set, "%d %d %d %d %d %d %s %s %d %s %d", 11);
@@ -62,7 +56,7 @@ int fp_set(char *fmt, char *params, int nparams)
 
         if (rc == 0)
             return CMD_OK;
-        else if (rc == -1)
+        else
             return CMD_FAIL;
     }
 }
@@ -90,10 +84,8 @@ int fp_delete(char* fmt, char* params, int nparams)
 
         if(rc==0)
             return CMD_OK;
-        else if(rc == -1)
-            return CMD_FAIL;
         else
-            return CMD_ERROR;
+            return CMD_FAIL;
     }
 }
 
@@ -107,10 +99,8 @@ int fp_show(char* fmt, char* params, int nparams)
 
         if(rc==0)
             return CMD_OK;
-        else if(rc == -1)
-            return CMD_FAIL;
         else
-            return CMD_ERROR;
+            return CMD_FAIL;
     }
 }
 
@@ -124,10 +114,8 @@ int fp_reset(char* fmt, char* params, int nparams)
 
         if(rc==0)
             return CMD_OK;
-        else if(rc == -1)
-            return CMD_FAIL;
         else
-            return CMD_ERROR;
+            return CMD_FAIL;
     }
 }
 
