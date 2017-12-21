@@ -1,11 +1,9 @@
 hooks
-execute
-
-"Tasks should not call RepoCmd"
+exportSVG
 
 	"The following code shows dependencies between "
 	| root p b allSystemModules allDrivers relevantModules lb |
-	root := '../SUCHAI-Flight-Software/'.
+	root := '../SUCHAI-Flight-Software'.
 	p := CPPProcessor new.
 	p processRootFolder: root asFileReference.
 	p resolveDependencies.
@@ -25,7 +23,7 @@ execute
 		
 		if: [ :f | 
 			('*/task*' match: f filename) and: [ f dependOn: '*/cmd*' ] ] borderColor: Color red.
-	b interaction highlightNeighbour:  #dependentModules color: Color orange .
+	b interaction highlightNeighbour:  #dependentModules color: Color orange.
 "	b shape box size: #loc."
 	b nodes: relevantModules.
 	
@@ -49,12 +47,10 @@ execute
 	lb setAsFixed.
 	lb view: b view.
 	lb addText: 'Dependencies between modules'.
-	lb addColor: Color green text: 'Tasks'.
+	lb addColor: Color green text: 'Task'.
 	lb addColor: Color red text: 'Repos'.
 	lb addColor: Color blue text: 'Commands'.
 	lb addColor: Color lightGray text: 'Drivers'.
 	lb build.
 	
-	b view.
-	
-	RTHTML5Exporter new export: b view
+	RTSVGExporter exportBuilderAsSVG: b view filename:'code.svg'."
