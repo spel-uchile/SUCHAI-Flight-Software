@@ -24,7 +24,9 @@ set(SOURCE_FILES
         src/system/cmdTestCommand.c
         src/system/taskTest.c
         src/system/main.c
-        src/system/taskFlightPlan.c src/system/include/taskFlightPlan.h src/system/cmdFP.c src/system/include/cmdFP.h)
+        src/system/taskFlightPlan.c
+        src/system/cmdFP.c
+)
 
 include_directories(
         src/system/include/

@@ -120,6 +120,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
  * @return 0 OK, -1 Error
  */
 int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, char* table, int** periodical);
+
 /**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
  * have the same timetodo.
@@ -130,8 +131,7 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-
-int storage_flight_plan_erase (int timetodo, char* table);
+int storage_flight_plan_erase(int timetodo, char* table);
 
 /**
  * Reset the table in the opened database (@relatesalso storage_init) in the
@@ -142,7 +142,7 @@ int storage_flight_plan_erase (int timetodo, char* table);
  * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_reset (char* table);
+int storage_flight_plan_reset(char* table);
 
 /**
  * Show the table in the opened database (@relatesalso storage_init) in the
@@ -153,7 +153,7 @@ int storage_flight_plan_reset (char* table);
  * @param table Str. Table name
  * @return 0 OK
  */
-int storage_show_table (char* table);
+int storage_show_table(char* table);
 
 /**
  * Close the opened database

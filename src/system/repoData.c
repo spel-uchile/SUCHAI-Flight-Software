@@ -124,8 +124,5 @@ int dat_get_fp(int elapsed_sec, char** command, char** args, int** repeat, char*
 {
     int rc = storage_flight_plan_get(elapsed_sec, command, args, repeat, table, periodical);
 
-    if (rc == 0)
-        return DAT_OBC_OPMODE_NORMAL;
-    else if (rc == -1)
-        return DAT_OBC_OPMODE_FAIL;
+    return rc;
 }

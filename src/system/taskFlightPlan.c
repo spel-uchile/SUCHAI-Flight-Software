@@ -1,6 +1,22 @@
-//
-// Created by grynn on 12-12-17.
-//
+/*                                 SUCHAI
+ *                      NANOSATELLITE FLIGHT SOFTWARE
+ *
+ *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "taskFlightPlan.h"
 
@@ -13,11 +29,10 @@ void taskFlightPlan(void *param)
     LOGD(tag, "Started");
 
     portTick delay_ms = 1000;          //Task period in [ms]
-
     time_t elapsed_sec;   // Seconds counter
-
     portTick xLastWakeTime = osTaskGetTickCount();
 
+    /* FIXME: Move this to data repository dat_repo_init */
     storage_table_flight_plan_init(table,1);    //############################################################ alguien debe iniciar esto que no se taskFlightPlan  ######################
 
     //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
@@ -42,20 +57,20 @@ void taskFlightPlan(void *param)
 
         dat_get_fp((int)elapsed_sec, &command, &args, &repeat, table, &periodical);
 
+        /* FIXME: Memory leak detected */
         if(command == NULL)
             continue;
 
         cmd_t *new_cmd = cmd_get_str(command);
         cmd_add_params_str(new_cmd, args);
 
-        for(int i=0; i<*repeat; i++)
+        for(int i=0; i< (*repeat); i++)
         {
-            LOGD(tag, "Comando: %s", command);
-            LOGD(tag, "Argumentos: %s", args);
-            LOGD(tag, "Repeticiones: %d", *repeat);
-            LOGD(tag, "Periodico: %d", *periodical);
+            LOGD(tag, "Command: %s", command);
+            LOGD(tag, "Arguments: %s", args);
+            LOGD(tag, "Repetitions: %d", *repeat);
+            LOGD(tag, "Periodical: %d", *periodical);
             cmd_send(new_cmd);
-
         }
 
         free(command);
@@ -80,5 +95,4 @@ int date_to_unixtime(int day, int month, int year, int hour, int min, int sec)
     unixtime = mktime(&str_time);
 
     return (int)unixtime;
-
 }

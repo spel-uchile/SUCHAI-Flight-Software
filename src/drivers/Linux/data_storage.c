@@ -197,7 +197,8 @@ int storage_repo_set_value_idx(int index, int value, char *table)
     /* Execute SQL statement */
     int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
-    if( rc != SQLITE_OK ) {
+    if( rc != SQLITE_OK )
+    {
         LOGE(tag, "SQL error: %s", err_msg);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
@@ -225,7 +226,8 @@ int storage_repo_set_value_str(char *name, int value, char *table)
     /* Execute SQL statement */
     int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
-    if( rc != SQLITE_OK ) {
+    if( rc != SQLITE_OK )
+    {
         LOGE(tag, "SQL error: %s", err_msg);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
@@ -250,13 +252,15 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
     /* Execute SQL statement */
     int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         LOGE(tag, "SQL error: %s", err_msg);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
         return -1;
     }
-    else {
+    else
+    {
         LOGV(tag, "Inserted (%d, %s, %s, %d, %d) in %s", timetodo, command, args, repeat, periodical, table);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
@@ -300,31 +304,32 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
     return -1;
 }
 
-int storage_flight_plan_erase (int timetodo, char* table)
+int storage_flight_plan_erase(int timetodo, char* table)
 {
 
     char *err_msg;
-    char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE time = %d",
-            table, timetodo);
+    char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE time = %d", table, timetodo);
 
     /* Execute SQL statement */
     int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         LOGE(tag, "SQL error: %s", err_msg);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
         return -1;
     }
-    else {
-        LOGV(tag, "Eliminated the command in time: %d, in %s", timetodo, table);
+    else
+    {
+        LOGV(tag, "Command in time %d, table %s was deleted", timetodo, table);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
         return 0;
     }
 }
 
-int storage_flight_plan_reset (char* table)
+int storage_flight_plan_reset(char* table)
 {
     return storage_table_flight_plan_init(table, 1);
 }
@@ -339,13 +344,16 @@ int storage_show_table (char* table) {
     // execute statement
     sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
 
-    if(row==0 || col==0){
-        printf("Empty table !\n");
+    if(row==0 || col==0)
+    {
+        LOGI(tag, "Flight plan table empy!\n");
         return 0;
     }
-    else {
-        for (int i = 0; i < (col * row) + 5; i++) {
-
+    else
+    {
+        LOGI(tag, "Flight plan table")
+        for (int i = 0; i < (col*row + 5); i++)
+        {
             if (i%col == 0 && i!=0)
             {
                 time_t timef = atoi(results[i]);
@@ -371,7 +379,7 @@ int storage_close(void)
     }
     else
     {
-        LOGD(tag, "Attempting to close a NULL pointer database");
+        LOGW(tag, "Attempting to close a NULL pointer database");
         return -1;
     }
 }
