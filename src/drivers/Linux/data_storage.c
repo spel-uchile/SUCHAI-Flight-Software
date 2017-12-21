@@ -120,14 +120,14 @@ int storage_table_flight_plan_init(char* table, int drop)
     if (rc != SQLITE_OK )
     {
         LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", table, err_msg, sql);
-        //sqlite3_free(err_msg);
-        //sqlite3_free(sql);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
         return -1;
     }
     else
     {
         LOGD(tag, "Table %s created successfully", table);
-        //sqlite3_free(sql);
+        sqlite3_free(sql);
         return 0;
     }
 }
