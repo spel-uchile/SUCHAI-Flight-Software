@@ -21,7 +21,6 @@
 #include "taskFlightPlan.h"
 
 static const char *tag = "FlightPlan";
-char* table;
 
 void taskFlightPlan(void *param)
 {
@@ -31,11 +30,6 @@ void taskFlightPlan(void *param)
     portTick delay_ms = 1000;          //Task period in [ms]
     time_t elapsed_sec;   // Seconds counter
     portTick xLastWakeTime = osTaskGetTickCount();
-
-    /* FIXME: Move this to data repository dat_repo_init */ //Fixed
-    //  storage_table_flight_plan_init(table,1);
-
-    //dat_init_fp();
 
     //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
     //storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan",0);
@@ -53,9 +47,8 @@ void taskFlightPlan(void *param)
         int* executions = malloc(sizeof(int));
         int* periodical = malloc(sizeof(int));
 
-        int rc = dat_get_fp((int)elapsed_sec, &command, &args, &executions, table, &periodical);
+        int rc = dat_get_fp((int)elapsed_sec, &command, &args, &executions, &periodical);
 
-        /* FIXME: Memory leak detected */  //Fixed
         if(rc == -1)
             continue;
 

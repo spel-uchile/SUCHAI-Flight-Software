@@ -23,10 +23,10 @@ static const char* tag = "cmdFlightPlan";
 
 void cmd_fp_init(void)
 {
-    cmd_add("fp_set_cmd", fp_set, "%d %d %d %d %d %d %s %s %d %s %d", 11);
-    cmd_add("fp_del_cmd", fp_delete, "%d %d %d %d %d %d %s", 7);
-    cmd_add("fp_show", fp_show, "%s", 1);
-    cmd_add("fp_reset", fp_reset,"%s", 1);
+    cmd_add("fp_set_cmd", fp_set, "%d %d %d %d %d %d %s %s %d %d", 10);
+    cmd_add("fp_del_cmd", fp_delete, "%d %d %d %d %d %d", 6);
+    cmd_add("fp_show", fp_show, "", 0);
+    cmd_add("fp_reset", fp_reset,"", 0);
 }
 
 int fp_set(char *fmt, char *params, int nparams)
@@ -37,9 +37,8 @@ int fp_set(char *fmt, char *params, int nparams)
     char command[CMD_MAX_STR_PARAMS];
     char args[CMD_MAX_STR_PARAMS];
     int executions,periodical;
-    char table[CMD_MAX_STR_PARAMS];
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &executions, &table, &periodical) == nparams)
+    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &executions, &periodical) == nparams)
     {
         str_time.tm_mday = day;
         str_time.tm_mon = month-1;
@@ -52,12 +51,17 @@ int fp_set(char *fmt, char *params, int nparams)
 
         printf("Tiempo cmd: %d", (int)unixtime);
 
-        int rc = storage_flight_plan_set((int)unixtime, command, args, executions, table, periodical);
+        int rc = storage_flight_plan_set((int)unixtime, command, args, executions, periodical);
 
         if (rc == 0)
             return CMD_OK;
         else
             return CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
+        return CMD_FAIL;
     }
 }
 
@@ -67,9 +71,8 @@ int fp_delete(char* fmt, char* params, int nparams)
     struct tm str_time;
     time_t unixtime;
     int day, month, year, hour, min, sec;
-    char table[CMD_MAX_STR_PARAMS];
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &table) == nparams)
+    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec) == nparams)
     {
         str_time.tm_mday = day;
         str_time.tm_mon = month-1;
@@ -80,42 +83,40 @@ int fp_delete(char* fmt, char* params, int nparams)
 
         unixtime = mktime(&str_time);
 
-        int rc = storage_flight_plan_erase((int)unixtime, table);
+        int rc = storage_flight_plan_erase((int)unixtime);
 
         if(rc==0)
             return CMD_OK;
         else
             return CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "fp_del_cmd used with invalid params: %s", params);
+        return CMD_FAIL;
     }
 }
 
 int fp_show(char* fmt, char* params, int nparams)
 {
-    char table[CMD_MAX_STR_PARAMS];
 
-    if(sscanf(params, fmt, &table) == nparams)
-    {
-        int rc= storage_show_table(table);
+    int rc= storage_show_table();
 
-        if(rc==0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
+    if(rc==0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
 }
 
 int fp_reset(char* fmt, char* params, int nparams)
 {
-    char table[CMD_MAX_STR_PARAMS];
 
-    if(sscanf(params, fmt, &table) == nparams)
-    {
-        int rc = storage_flight_plan_reset(table);
+    int rc = storage_flight_plan_reset();
 
-        if(rc==0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
+    if(rc==0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
+
 }
 

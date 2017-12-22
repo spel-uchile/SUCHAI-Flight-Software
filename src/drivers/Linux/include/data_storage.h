@@ -41,11 +41,10 @@ int storage_table_repo_init(char *table, int drop);
  *
  * @note: non-reentrant function, use mutex to sync access
  *
- * @param table Str. Table name
  * @param drop Int. Set to 1 to drop the existing table before create one
  * @return 0 OK, -1 Error
  */
-int storage_table_flight_plan_init(char* table, int drop);
+int storage_table_flight_plan_init(int drop);
 
 /**
  * Get an INT (integer) value from table by index
@@ -102,10 +101,9 @@ int storage_repo_set_value_str(char *name, int value, char *table);
  * @param command Str. Command to set
  * @param args Str. command's arguments
  * @param repeat Int. Value of time to run the command
- * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table, int periodical);
+int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, int periodical);
 
 /**
  * Get the row of a certain time and set the values in the variables committed
@@ -116,10 +114,9 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
  * @param command Str. Command to get
  * @param args Str. command's arguments
  * @param repeat Int. Value of times to run the command
- * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, char* table, int** periodical);
+int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, int** periodical);
 
 /**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
@@ -128,10 +125,9 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param timetodo Int. time to do the action
- * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_erase(int timetodo, char* table);
+int storage_flight_plan_erase(int timetodo);
 
 /**
  * Reset the table in the opened database (@relatesalso storage_init) in the
@@ -139,10 +135,9 @@ int storage_flight_plan_erase(int timetodo, char* table);
  *
  * @note: non-reentrant function, use mutex to sync access
  *
- * @param table Str. Table name
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_reset(char* table);
+int storage_flight_plan_reset(void);
 
 /**
  * Show the table in the opened database (@relatesalso storage_init) in the
@@ -150,10 +145,9 @@ int storage_flight_plan_reset(char* table);
  *
  * @note: non-reentrant function, use mutex to sync access
  *
- * @param table Str. Table name
  * @return 0 OK
  */
-int storage_show_table(char* table);
+int storage_show_table(void);
 
 /**
  * Close the opened database

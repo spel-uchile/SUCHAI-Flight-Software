@@ -70,7 +70,7 @@ void dat_repo_init(void)
         }
 
         //Init system flight plan table
-        rc=storage_table_flight_plan_init(table,1);
+        rc=storage_table_flight_plan_init(1);
         assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif
@@ -129,16 +129,10 @@ int dat_get_system_var(dat_system_t index)
     return value;
 }
 
-int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, char* table, int** periodical)
+int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical)
 {
-    int rc = storage_flight_plan_get(elapsed_sec, command, args, executions, table, periodical);
+    int rc = storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
 
     return rc;
 }
 
-int dat_init_fp(void)
-{
-    int rc = storage_table_flight_plan_init(table,1);
-
-    return rc;
-}
