@@ -70,7 +70,7 @@ void dat_repo_init(void)
         }
 
         //Init system flight plan table
-        rc=storage_table_flight_plan_init(1);
+        rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif

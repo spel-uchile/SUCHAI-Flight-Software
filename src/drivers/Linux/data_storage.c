@@ -6,7 +6,6 @@
 
 static const char *tag = "data_storage";
 static sqlite3 *db = NULL;
-static const int period = 30;
 char* fp_table = "flightPlan";
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
@@ -293,8 +292,8 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** exe
 
         storage_flight_plan_erase(timetodo);
 
-        if (atoi(results[9]) == 1)
-            storage_flight_plan_set(timetodo+period,results[6],results[7],**executions,**periodical);
+        if (atoi(results[9]) > 0)
+            storage_flight_plan_set(timetodo+**periodical,results[6],results[7],**executions,**periodical);
 
         sqlite3_free(sql);
         return 0;
