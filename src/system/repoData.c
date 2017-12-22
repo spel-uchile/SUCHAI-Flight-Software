@@ -35,7 +35,7 @@ void dat_repo_init(void)
 {
 
     int rc;
-    storage_table_flight_plan_init(table,0);
+
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
     {
@@ -68,6 +68,10 @@ void dat_repo_init(void)
         {
             storage_repo_set_value_idx(index, INT_MAX, DAT_REPO_SYSTEM);
         }
+
+        //Init system flight plan table
+        rc=storage_table_flight_plan_init(table,1);
+        assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif
 
@@ -125,9 +129,16 @@ int dat_get_system_var(dat_system_t index)
     return value;
 }
 
-int dat_get_fp(int elapsed_sec, char** command, char** args, int** repeat, char* table, int** periodical)
+int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, char* table, int** periodical)
 {
-    int rc = storage_flight_plan_get(elapsed_sec, command, args, repeat, table, periodical);
+    int rc = storage_flight_plan_get(elapsed_sec, command, args, executions, table, periodical);
+
+    return rc;
+}
+
+int dat_init_fp(void)
+{
+    int rc = storage_table_flight_plan_init(table,1);
 
     return rc;
 }

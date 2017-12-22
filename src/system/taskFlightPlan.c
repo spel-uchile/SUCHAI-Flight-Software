@@ -35,6 +35,8 @@ void taskFlightPlan(void *param)
     /* FIXME: Move this to data repository dat_repo_init */ //Fixed
     //  storage_table_flight_plan_init(table,1);
 
+    //dat_init_fp();
+
     //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
     //storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan",0);
     //storage_flight_plan_set(date_to_unixtime(21,12,2017,19,55,0),"ping","5",1,"flightPlan",0);
@@ -48,30 +50,30 @@ void taskFlightPlan(void *param)
 
         char* command = malloc(sizeof(char)*50);
         char* args = malloc(sizeof(char)*50);
-        int* repeat = malloc(sizeof(int));
+        int* executions = malloc(sizeof(int));
         int* periodical = malloc(sizeof(int));
 
-        int rc = dat_get_fp((int)elapsed_sec, &command, &args, &repeat, table, &periodical);
+        int rc = dat_get_fp((int)elapsed_sec, &command, &args, &executions, table, &periodical);
 
         /* FIXME: Memory leak detected */  //Fixed
         if(rc == -1)
             continue;
 
-        for(int i=0; i< (*repeat); i++)
+        for(int i=0; i< (*executions); i++)
         {
             cmd_t *new_cmd = cmd_get_str(command);
             cmd_add_params_str(new_cmd, args);
 
             LOGD(tag, "Command: %s", command);
             LOGD(tag, "Arguments: %s", args);
-            LOGD(tag, "Repetitions: %d", *repeat);
+            LOGD(tag, "Executions: %d", *executions);
             LOGD(tag, "Periodical: %d", *periodical);
             cmd_send(new_cmd);
         }
 
         free(command);
         free(args);
-        free(repeat);
+        free(executions);
         free(periodical);
     }
 }

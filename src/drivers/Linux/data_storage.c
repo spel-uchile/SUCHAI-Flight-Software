@@ -111,7 +111,7 @@ int storage_table_flight_plan_init(char* table, int drop)
                                   "time int PRIMARY KEY , "
                                   "command text, "
                                   "args text , "
-                                  "repeat int , "
+                                  "executions int , "
                                   "periodical int );",
                           table);
 
@@ -241,12 +241,12 @@ int storage_repo_set_value_str(char *name, int value, char *table)
     }
 }
 
-int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, char* table, int periodical)
+int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, char* table, int periodical)
 {
     char *err_msg;
     char *sql = sqlite3_mprintf(
-            "INSERT OR REPLACE INTO %s (time, command, args, repeat, periodical)\n VALUES (%d, \"%s\", \"%s\", %d, %d);",
-            table, timetodo, command, args, repeat, periodical);
+            "INSERT OR REPLACE INTO %s (time, command, args, executions, periodical)\n VALUES (%d, \"%s\", \"%s\", %d, %d);",
+            table, timetodo, command, args, executions, periodical);
 
     /* Execute SQL statement */
     int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
@@ -260,14 +260,14 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
     }
     else
     {
-        LOGV(tag, "Inserted (%d, %s, %s, %d, %d) in %s", timetodo, command, args, repeat, periodical, table);
+        LOGV(tag, "Inserted (%d, %s, %s, %d, %d) in %s", timetodo, command, args, executions, periodical, table);
         sqlite3_free(err_msg);
         sqlite3_free(sql);
         return 0;
     }
 }
 
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, char* table, int** periodical)
+int storage_flight_plan_get(int timetodo, char** command, char** args, int** executions, char* table, int** periodical)
 {
     char **results;
     char *err_msg;
@@ -287,13 +287,13 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
     {
         strcpy(*command, results[6]);
         strcpy(*args,results[7]);
-        **repeat = atoi(results[8]);
+        **executions = atoi(results[8]);
         **periodical = atoi(results[9]);
 
         storage_flight_plan_erase(timetodo,table);
 
         if (atoi(results[9]) == 1)
-            storage_flight_plan_set(timetodo+period,results[6],results[7],**repeat,table,**periodical);
+            storage_flight_plan_set(timetodo+period,results[6],results[7],**executions,table,**periodical);
 
         sqlite3_free(sql);
         return 0;

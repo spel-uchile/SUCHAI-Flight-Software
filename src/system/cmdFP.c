@@ -36,10 +36,10 @@ int fp_set(char *fmt, char *params, int nparams)
     int day, month, year, hour, min, sec;
     char command[CMD_MAX_STR_PARAMS];
     char args[CMD_MAX_STR_PARAMS];
-    int repeat,periodical;
+    int executions,periodical;
     char table[CMD_MAX_STR_PARAMS];
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &repeat, &table, &periodical) == nparams)
+    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &executions, &table, &periodical) == nparams)
     {
         str_time.tm_mday = day;
         str_time.tm_mon = month-1;
@@ -52,7 +52,7 @@ int fp_set(char *fmt, char *params, int nparams)
 
         printf("Tiempo cmd: %d", (int)unixtime);
 
-        int rc = storage_flight_plan_set((int)unixtime, command, args, repeat, table, periodical);
+        int rc = storage_flight_plan_set((int)unixtime, command, args, executions, table, periodical);
 
         if (rc == 0)
             return CMD_OK;
