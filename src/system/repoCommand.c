@@ -215,6 +215,7 @@ int cmd_repo_init(void)
     cmd_drp_init();
     cmd_com_init();
     cmd_console_init();
+    cmd_fp_init();
 
     return CMD_OK;
 }

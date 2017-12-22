@@ -22,6 +22,7 @@
 #include "cmdCOM.h"
 #include "cmdConsole.h"
 #include "cmdTestCommand.h"
+#include "cmdFP.h"
 
 /* Macros */
 /**

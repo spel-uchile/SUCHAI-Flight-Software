@@ -12,7 +12,8 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU General Public License for
+ * more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -21,6 +22,9 @@
 #include "repoData.h"
 
 static const char *tag = "repoData";
+char* table = "flightPlan";
+
+
 
 #if SCH_STATUS_REPO_MODE == 0
     int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
@@ -29,6 +33,7 @@ static const char *tag = "repoData";
 
 void dat_repo_init(void)
 {
+
     int rc;
 
     // Init repository mutex
@@ -55,14 +60,18 @@ void dat_repo_init(void)
         assertf(rc==0, tag, "Unable to create non-volatile data repository");
 
         //Init system repo
-        rc = storage_table_init(DAT_REPO_SYSTEM, 0);
+        rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
         assertf(rc==0, tag, "Unable to create system variables repository");
 
         int index;
         for(index=0; index<dat_system_last_var; index++)
         {
-            storage_set_value_idx(index, INT_MAX, DAT_REPO_SYSTEM);
+            storage_repo_set_value_idx(index, INT_MAX, DAT_REPO_SYSTEM);
         }
+
+        //Init system flight plan table
+        rc=storage_table_flight_plan_init(0);
+        assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif
 
@@ -92,7 +101,7 @@ void dat_set_system_var(dat_system_t index, int value)
         DAT_SYSTEM_VAR_BUFF[index] = value;
     //Uses external memory
     #else
-        storage_set_value_idx(index, value, DAT_REPO_SYSTEM);
+        storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
     #endif
 
     //Exit critical zone
@@ -111,7 +120,7 @@ int dat_get_system_var(dat_system_t index)
         value = DAT_SYSTEM_VAR_BUFF[index];
     //Uses external (non-volatile) memory
     #else
-        value = storage_get_value_idx(index, DAT_REPO_SYSTEM);
+        value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
     #endif
 
     //Exit critical zone
@@ -119,3 +128,11 @@ int dat_get_system_var(dat_system_t index)
 
     return value;
 }
+
+int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical)
+{
+    int rc = storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
+
+    return rc;
+}
+

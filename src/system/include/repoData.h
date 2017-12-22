@@ -107,6 +107,22 @@ void dat_set_system_var(dat_system_t index, int value);
  */
 int dat_get_system_var(dat_system_t index);
 
+/**
+ *
+ * Get the necesary parameters to send a command and set the values in
+ * the variables command, args, repeat and periodical
+ *
+ * @param elapsed_sec Int. time in unixtime
+ * @param command Save the command name
+ * @param args Save the command arguments
+ * @param repeat Save the times to execute the command
+ * @param table Str. the name of the table
+ * @param periodical Save the periodical value (1 is periodical, 0 is not periodical)
+ * @return 0 OK, -1 Error
+ */
+int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical);
+
+
 
 /* The following is an API to interface with the repoData cubesat fligthPlan */
 //typedef enum _DAT_FligthPlanBuff{
@@ -118,6 +134,8 @@ int dat_get_system_var(dat_system_t index);
 //int dat_setFlightPlan_param(unsigned int index, int param);
 //int dat_onResetFlightPlan(void);
 //void dat_erase_FlightPlanBuff(void);
+
+
 
 #endif // DATA_REPO_H
 

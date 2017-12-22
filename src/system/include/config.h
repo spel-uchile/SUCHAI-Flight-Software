@@ -37,7 +37,7 @@
 #define SCH_COMM_ZMQ_IN             "tcp://127.0.0.1:8002"  ///< In socket URI
 
 /* Data repository settings */
-#define SCH_STATUS_REPO_MODE    	0   ///< Status repository location. (0) Internal, (1) Single external.
+#define SCH_STATUS_REPO_MODE    	1   ///< Status repository location. (0) Internal, (1) Single external.
 #define SCH_STORAGE_FILE            "/tmp/suchai.db"
 
 #endif	/* SUCHAI_CONFIG_H */
