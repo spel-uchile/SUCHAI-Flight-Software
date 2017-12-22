@@ -13,6 +13,8 @@
 #ifndef T_COMMUNICATIONS_H
 #define T_COMMUNICATIONS_H
 
+#include "stdlib.h"
+
 #include "os.h"
 #include "csp/csp.h"
 

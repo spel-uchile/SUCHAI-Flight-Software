@@ -1,5 +1,7 @@
 # Nanosatellite Flight Software
 
+[![Build Status](http://jenkins.spel.cl/buildStatus/icon?job=SUCHAI-Flight-Software)](http://jenkins.spel.cl/job/SUCHAI-Flight-Software/)
+
 SUCHAI Flight software was originally developed to be used in the 
 [SUCHAI](http://spel.ing.uchile.cl/suchai.html) nanosatellite (1U 
 [Cubesat](https://en.wikipedia.org/wiki/CubeSat)). SUCHAI was launch into orbit 
@@ -80,6 +82,29 @@ make
 ./SUCHAI_Flight_Software
 ```
 
+#### Using ZMQ interface
+In Linux, LibCSP uses the ZMQ interface to communicate different nodes. To pass
+messages between zmq_hub interfaces, we required a ZMQ Forwarder Device (Proxy)
+running in background. To start the ZMQ Forwarder server:
+
+```bash
+cd sandbox
+python minzmqhub.py
+```
+
+It is possible to change the default ports (8001, 8002) and activate a monitor 
+socket (8003) that will print all messages to ```stout``` using:
+
+```bash
+cd sandbox
+python minzmqhub.py [-i IN_PORT] [-o OUT_PORT] [-m MON_PORT] [--mon]
+```
+
+Refs:
+- https://github.com/libcsp/libcsp/pull/64
+- https://github.com/libcsp/libcsp/issues/68
+- http://learning-0mq-with-pyzmq.readthedocs.io/en/latest/pyzmq/devices/forwarder.html
+
 ## Contact
 
 Use the [issue tracker](https://github.com/spel-uchile/SUCHAI-Flight-Software/issues) 
@@ -87,3 +112,6 @@ to submit questions, requirements and bugs.
 
 Follow the [SPEL team](https://twitter.com/SPEL_UCHILE) at Twitter to get latest 
 news about the SUCHAI project
+
+
+

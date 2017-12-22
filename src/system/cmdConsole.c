@@ -24,10 +24,8 @@ static const char *tag = "cmdConsole";
 
 void cmd_console_init(void)
 {
-    //void cmd_add(char* name, cmdFunction function, char* fparams)
     cmd_add("test", con_debug_msg, "%s", 1);
     cmd_add("help", con_help, "", 0);
-    cmd_add("ping", con_ping, "%d", 1);
 }
 
 /**
@@ -53,19 +51,4 @@ int con_help(char *fmt, char *params, int nparams)
     cmd_print_all();
 //    osSemaphoreGiven(&log_mutex);
     return CMD_OK;
-}
-
-int con_ping(char *fmt, char *params, int nparams)
-{
-    int node;
-    if(sscanf(params, fmt, &node) == nparams)
-    {
-        int rc = csp_ping((uint8_t)node, 3000, 10, CSP_O_NONE);
-        LOGI(tag, "Ping to %d took %d", node, rc);
-        if(rc > 0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    return CMD_FAIL;
 }
