@@ -33,8 +33,8 @@
 #define SCH_TRX_PORT_TC             (10)                    ///< Telecommands post (in the flight software)
 #define SCH_TRX_PORT_DEBUG          (11)                    ///< Debug port (just print packets)
 #define SCH_TRX_PORT_CONSOLE        (12)                    ///< Console port (execute console commands)
-#define SCH_COMM_ZMQ_OUT            "tcp://127.0.0.1:8001"  ///< Out socket URI
-#define SCH_COMM_ZMQ_IN             "tcp://127.0.0.1:8002"  ///< In socket URI
+#define SCH_COMM_ZMQ_OUT            "tcp://192.168.0.36:8001"  ///< Out socket URI
+#define SCH_COMM_ZMQ_IN             "tcp://192.168.0.36:8002"  ///< In socket URI
 
 /* Data repository settings */
 #define SCH_STATUS_REPO_MODE    	1   ///< Status repository location. (0) Internal, (1) Single external.
