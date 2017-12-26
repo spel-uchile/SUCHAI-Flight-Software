@@ -31,7 +31,7 @@ consulting the database.
 
 ## How to use it
 
-##### Add a command in flight plan
+### Add a command in flight plan
 
 - Command : fp_set_cmd
 
@@ -51,7 +51,7 @@ the next line `fp_set_cmd 26 12 2017 20 00 00 help null 1 0`.
 - Example : To set the command send (that has a integer and a string for arguments) at 7pm we 
 need to write the next line `fp_set_cmd 26 12 2017 19 00 00 send 10hola 1 0`.
 
-##### Delete a command in flight plan
+### Delete a command in flight plan
 
 - Command : fp_del_cmd 
 
@@ -64,7 +64,7 @@ need to write the next line `fp_set_cmd 26 12 2017 19 00 00 send 10hola 1 0`.
 - Example : To delete the command ping set in the section above we need to write the 
 next line `fp_del_cmd 27 12 2017 06 00 00`.
 
-##### Show the flight plan
+### Show the flight plan
 
 - Command : fp_show
 
@@ -73,7 +73,7 @@ next line `fp_del_cmd 27 12 2017 06 00 00`.
 - Function : Show the flight plan table, if the flight plan table is empty just show
 a message saying this.
 
-##### Reset the flight plan
+### Reset the flight plan
 
 - Command : fp_reset
 
