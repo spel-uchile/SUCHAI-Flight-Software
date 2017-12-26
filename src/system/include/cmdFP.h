@@ -27,7 +27,7 @@ void cmd_fp_init(void);
  * Set a command to be added in the flight plan
  *
  * @param fmt Str. Parameters format "%d %d %d %d %d %d %s %s %d %d"
- * @param params Str. Parameters as string "<day> <month> <year> <hour> <min> <sec> <command> <args> <repeat> <periodical>"
+ * @param params Str. Parameters as string "<day> <month> <year> <hour> <min> <sec> <command> <args> <executions> <periodical>"
  * @param nparams Int. Number of parameters 11
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
