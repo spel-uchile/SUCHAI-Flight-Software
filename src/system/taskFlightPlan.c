@@ -20,7 +20,7 @@
 
 #include "taskFlightPlan.h"
 
-static const char *tag = "FlightPlan";
+static const char *tag = "FlightPlan"; 
 
 void taskFlightPlan(void *param)
 {
