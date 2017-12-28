@@ -348,7 +348,8 @@ int storage_show_table (void) {
     else
     {
         LOGI(tag, "Flight plan table")
-        for (int i = 0; i < (col*row + 5); i++)
+        int i;
+        for (i = 0; i < (col*row + 5); i++)
         {
             if (i%col == 0 && i!=0)
             {

@@ -31,7 +31,7 @@ consulting the database.
 
 ## How to use it
 
-### Add a command in flight plan
+#### Add a command in flight plan
 
 - Command : fp_set_cmd
 
@@ -43,15 +43,15 @@ consulting the database.
 - For the next examples we assume that the time is 17:00 and the date is 26/12/2017
 
 - Example : To set the command ping (that has the number 10 for argument) everyday at 6am 
-we need to write the next line `fp_set_cmd 27 12 2017 06 00 00 ping 10 1 86400`.
+we need to write the next line `fp_set_cmd 27 12 2017 06 00 00 ping 10 1 86400`
 
 - Example : To set the command help (help has not arguments) at 8pm we need to write
-the next line `fp_set_cmd 26 12 2017 20 00 00 help null 1 0`.
+the next line `fp_set_cmd 26 12 2017 20 00 00 help null 1 0`
 
 - Example : To set the command send (that has a integer and a string for arguments) at 7pm we 
-need to write the next line `fp_set_cmd 26 12 2017 19 00 00 send 10hola 1 0`.
+need to write the next line `fp_set_cmd 26 12 2017 19 00 00 send 10hola 1 0`
 
-### Delete a command in flight plan
+#### Delete a command in flight plan
 
 - Command : fp_del_cmd 
 
@@ -62,18 +62,18 @@ need to write the next line `fp_set_cmd 26 12 2017 19 00 00 send 10hola 1 0`.
 - For the next examples we assume that the table has the commands set in the section above
 
 - Example : To delete the command ping set in the section above we need to write the 
-next line `fp_del_cmd 27 12 2017 06 00 00`.
+next line `fp_del_cmd 27 12 2017 06 00 00`
 
-### Show the flight plan
+#### Show the flight plan
 
 - Command : fp_show
 
 - Parameters : This command has not parameters
 
 - Function : Show the flight plan table, if the flight plan table is empty just show
-a message saying this.
+a message saying this
 
-### Reset the flight plan
+#### Reset the flight plan
 
 - Command : fp_reset
 

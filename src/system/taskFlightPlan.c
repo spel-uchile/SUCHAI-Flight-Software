@@ -52,7 +52,8 @@ void taskFlightPlan(void *param)
         if(rc == -1)
             continue;
 
-        for(int i=0; i< (*executions); i++)
+        int i;
+        for(i=0; i < (*executions); i++)
         {
             cmd_t *new_cmd = cmd_get_str(command);
             cmd_add_params_str(new_cmd, args);
