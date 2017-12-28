@@ -37,6 +37,7 @@ Currently, it has been tested in the following OS/Architectures :
 * ArchLinux x86_64
 * Manjaro x86_64
 * Ubuntu 16.04 x86_64
+* Debian Stretch RPi 3 (armv7l)
 
 ### Linux Installation
 
