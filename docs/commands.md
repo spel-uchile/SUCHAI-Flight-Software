@@ -88,9 +88,8 @@ in the system. We use the `cmd_add` function, available in `repoCommand.h`,
 inside an initialization function to register the command name, the function,
 the parameters format and the number of parameters:
 
-<<<<<<< HEAD
 ## Sending remote commands
-=======
+
 ```c
 int cmd_foo_init(void)
 {
@@ -141,7 +140,6 @@ cmd_add_params_var(new_cmd, 2);
 ```c
 cmd_send(new_cmd, 2);
 ```
->>>>>>> 7c081529258f4526a2d7a4da634335d74f13d294
 
 ### Technical notes
 1. `cmd_get_str` and `cmd_get_idx` use **malloc** inside to create the command.
