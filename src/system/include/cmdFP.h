@@ -12,7 +12,9 @@
 #ifndef CMD_FLIGHTPLAN_H
 #define CMD_FLIGHTPLAN_H
 
-#include "data_storage.h"
+#ifdef LINUX
+    #include "data_storage.h"
+#endif
 
 #include "repoCommand.h"
 

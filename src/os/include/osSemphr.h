@@ -9,9 +9,10 @@
 #ifndef _OS_SEMPHR_H_
 #define _OS_SEMPHR_H_
 
+#include "config.h"
 #include "os.h"
 
-#if __linux__
+#ifdef LINUX
 	#include <pthread.h>
 	#include <stdint.h>
 	typedef pthread_mutex_t osSemaphore;
@@ -21,9 +22,9 @@
 	#define CSP_MUTEX_OK 		CSP_SEMAPHORE_OK
 	#define CSP_MUTEX_ERROR		CSP_SEMAPHORE_ERROR
 #else
-	#include "freertos/FreeRTOS.h"
-	#include "freertos/queue.h"
-	#include "freertos/semphr.h"
+	#include "FreeRTOS.h"
+	#include "queue.h"
+	#include "semphr.h"
 	typedef xSemaphoreHandle osSemaphore;
 
 	#define CSP_SEMAPHORE_OK 	pdPASS

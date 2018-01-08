@@ -14,13 +14,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils.h"
+#include "config.h"
 
-#if __linux__
+#ifdef LINUX
     #include "osThread.h"
+    #include "utils.h"
 #else
-    #include "freertos/FreeRTOS.h"
-    #include "freertos/task.h"
+    #include "FreeRTOS.h"
+    #include "task.h"
     #include "osThread.h"
 #endif
 

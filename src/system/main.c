@@ -23,7 +23,11 @@
 static void on_reset(void);
 static void on_close(int signal);
 
+#ifdef ESP32
+void app_main()
+#else
 int main(void)
+#endif
 {
     /* On reset */
     on_reset();
@@ -48,25 +52,31 @@ int main(void)
 
     /* Creating monitors tasks */
     osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
-    //osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
-    osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
+    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
 
+#if SCH_COMM_ENABLE
+    osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
+#endif
+#if SCH_RUN_FP
     osCreateTask(taskFlightPlan,"flightplan",2*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
+#endif
 
     /* Start the scheduler. Should never return */
+    //osScheduler(threads_id, n_threads) don't need it for esp32 architecture
+#ifdef LINUX
     osScheduler(threads_id, n_threads);
-
-    return 0;
+#endif
+    //return 0;
 }
 
-#if !__linux__
+#ifndef LINUX
 /**
  * Task idle handle function. Performs operations inside the idle task
- * configUSE_IDLE_HOOK must be set to 1
+ * configUSE_IDLE_makHOOK must be set to 1
  */
 void vApplicationIdleHook(void)
 {
-    ClrWdt();
+    //ClrWdt();
 }
 
 /**
@@ -88,24 +98,27 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
 /**
  * Performs initialization actions
  */
-void on_reset(void)
-{
+void on_reset(void) {
     const char *tag = "main";
+
+#ifdef LINUX
     /* Register INT/TERM signals */
-    struct sigaction act;
-    act.sa_handler = on_close;
-    sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
-    sigaction(SIGTERM, &act, NULL);
+    //struct sigaction act;
+    //act.sa_handler = on_close;
+    //sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
+    //sigaction(SIGTERM, &act, NULL);
+#endif
 
     /* Init subsystems */
     log_init();      // Logging system
     cmd_repo_init(); //Command repository initialization
     dat_repo_init(); //Update status repository
 
+#ifdef LINUX
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
     /* Init buffer system with 5 packets of maximum 300 bytes each */
-	csp_buffer_init(5, 300);
+    csp_buffer_init(5, 300);
     /* Init CSP with address MY_ADDRESS */
     csp_init(SCH_COMM_ADDRESS);
     /* Start router task with 500 word stack, OS task priority 1 */
@@ -116,7 +129,9 @@ void on_reset(void)
 
 
 #if LOG_LEVEL >= LOG_LVL_DEBUG
-    /* Debug output from CSP */
+
+    /*Debug output from CSP */
+
     printf("Debug enabed\r\n");
     csp_debug_set_level(1, 1);
     csp_debug_toggle_level(2);
@@ -131,8 +146,8 @@ void on_reset(void)
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
 #endif
+#endif
 }
-
 /**
  * Performs a clean exit
  *

@@ -34,7 +34,7 @@ char* table = "flightPlan";
 void dat_repo_init(void)
 {
 
-    int rc;
+
 
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
@@ -56,6 +56,7 @@ void dat_repo_init(void)
 #else
     {
         //Init storage system
+        int rc;
         rc = storage_init(SCH_STORAGE_FILE);
         assertf(rc==0, tag, "Unable to create non-volatile data repository");
 
@@ -131,8 +132,14 @@ int dat_get_system_var(dat_system_t index)
 
 int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical)
 {
-    int rc = storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
 
-    return rc;
+    #if SCH_STATUS_REPO_MODE
+        int rc = storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
+
+        return rc;
+    #endif
+    return 1;
+
+
 }
 

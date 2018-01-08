@@ -104,6 +104,7 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
         current = dat_get_system_var(dat_obc_hours_without_reset);
         current += value;
         dat_set_system_var(dat_obc_hours_without_reset, current);
+        return CMD_OK;
     }
     else
     {

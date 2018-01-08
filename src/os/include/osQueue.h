@@ -10,12 +10,13 @@
 #define _OS_QUEUE_H_
 
 #include <stdint.h>
+#include "config.h"
 
-#if __linux__
+#ifdef LINUX
 	#include "pthread_queue.h"
 #else
-    #include "freertos/FreeRTOS.h"
-    #include "freertos/queue.h"
+    #include "FreeRTOS.h"
+    #include "queue.h"
 #endif
 
 typedef void* osQueue;

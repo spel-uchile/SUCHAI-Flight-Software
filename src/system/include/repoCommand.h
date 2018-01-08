@@ -19,10 +19,13 @@
 /* Add files with commands */
 #include "cmdOBC.h"
 #include "cmdDRP.h"
-#include "cmdCOM.h"
 #include "cmdConsole.h"
 #include "cmdTestCommand.h"
 #include "cmdFP.h"
+
+#if SCH_COMM_ENABLE
+    #include "cmdCOM.h"
+#endif
 
 /* Macros */
 /**

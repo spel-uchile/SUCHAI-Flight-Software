@@ -17,10 +17,9 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "config.h"
 #include "os.h"
 #include "osSemphr.h"
-
-#include "config.h"
 
 /**
  * @brief Log level

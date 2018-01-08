@@ -43,14 +43,14 @@ void taskExecuter(void *param)
             free(cmd_name);
 #endif
             /* Commands may take a long time, so reset the WDT */
-            ClrWdt();
+            //TODO ClrWdt();
 
             /* Execute the command */
             cmd_stat = run_cmd->function(run_cmd->fmt, run_cmd->params, run_cmd->nparams);
             cmd_free(run_cmd);
 
             /* Commands may take a long time, so reset the WDT */
-            ClrWdt();
+            //TODO ClrWdt();
             LOGI(tag, "Command result: %d", cmd_stat);
             
             /* Send the result to Dispatcher - BLOCKING */

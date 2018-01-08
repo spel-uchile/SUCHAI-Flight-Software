@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include "repoCommand.h"
+#include "os.h"
 
 /**
  * Register on board computer related (OBC) commands

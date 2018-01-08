@@ -25,8 +25,9 @@
 #include "globals.h"
 #include "utils.h"
 
-#include "data_storage.h"
-
+#if SCH_STATUS_REPO_MODE
+    #include "data_storage.h"
+#endif
 
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation

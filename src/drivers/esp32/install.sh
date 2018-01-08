@@ -1,8 +1,10 @@
 #!/bin/sh
 
 echo "Downloading toolchain..."
-wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-61-gab8375a-5.2.0.tar.gz
-tar -xzf xtensa-esp32-elf-linux64-1.22.0-61-gab8375a-5.2.0.tar.gz
+#wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-61-gab8375a-5.2.0.tar.gz
+wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-75-gbaf03c2-5.2.0.tar.gz
+#tar -xzf xtensa-esp32-elf-linux64-1.22.0-61-gab8375a-5.2.0.tar.gz
+tar -xzf xtensa-esp32-elf-linux64-1.22.0-75-gbaf03c2-5.2.0.tar.gz
 
 echo "Downloading ESP-IDF...."
 git clone --recursive https://github.com/espressif/esp-idf.git

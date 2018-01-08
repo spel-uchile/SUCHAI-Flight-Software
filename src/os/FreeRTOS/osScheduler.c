@@ -8,12 +8,12 @@
  * 
  */
 
-#include <osScheduler.h>
+#include "osScheduler.h"
 
 /**
  * starts the scheduler of the system operating
  */
-void osScheduler(os_thread** thread_id, int n_thread)
+void osScheduler(os_thread* thread_id, int n_thread)
 {
     printf(">>Starting FreeRTOS scheduler [->]\r\n");
     vTaskStartScheduler();

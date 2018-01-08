@@ -18,11 +18,15 @@
 #include <limits.h>
 #include <string.h>
 
-#include "osQueue.h"
+/* Arch settings */
+#define LINUX
+//#define FREERTOS
+//#define ESP32
+
 
 /* System debug configurations */
 #define LOG_LEVEL       LOG_LVL_VERBOSE   ///< Define debug levels
-#define SCH_RUN_TESTS   0                 ///< Enable or disable tests
+#define SCH_RUN_TESTS   0                 ///< Enable orfreertos disable tests
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN            (256) ///< General buffers max length (bytes)
@@ -35,6 +39,10 @@
 #define SCH_TRX_PORT_CONSOLE        (12)                    ///< Console port (execute console commands)
 #define SCH_COMM_ZMQ_OUT            "tcp://192.168.0.36:8001"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN             "tcp://192.168.0.36:8002"  ///< In socket URI
+#define SCH_COMM_ENABLE             1
+
+/*Flight Plan settings*/
+#define SCH_RUN_FP                  1
 
 /* Data repository settings */
 #define SCH_STATUS_REPO_MODE    	1   ///< Status repository location. (0) Internal, (1) Single external.

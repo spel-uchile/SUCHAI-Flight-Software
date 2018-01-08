@@ -15,7 +15,9 @@
 
 #include <stdlib.h>
 
-#include "csp/csp.h"
+#if SCH_COMM_ENABLE
+    #include "csp/csp.h"
+#endif
 
 #include "config.h"
 #include "globals.h"

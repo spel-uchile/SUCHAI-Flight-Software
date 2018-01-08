@@ -12,14 +12,16 @@
 #ifndef _OS_THREAD_H_
 #define _OS_THREAD_H_
 
-#if __linux__
+#include "config.h"
+
+#ifdef LINUX
     #include <pthread.h>
     #include <stdio.h>
     typedef pthread_t os_thread;
 #else
-    #include "freertos/FreeRTOSConfig.h"
-    #include "freertos/FreeRTOS.h"
-    #include "freertos/task.h"
+    #include "FreeRTOSConfig.h"
+    #include "FreeRTOS.h"
+    #include "task.h"
     typedef portBASE_TYPE os_thread;
 #endif
 

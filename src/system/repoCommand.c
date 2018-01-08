@@ -152,8 +152,6 @@ void cmd_add_params_str(cmd_t *cmd, char *params)
         cmd->params = (char *)malloc(sizeof(char)*(len_param+1));
         strncpy(cmd->params, params, len_param+1);
     }
-
-    return;
 }
 
 void cmd_add_params_var(cmd_t *cmd, ...)
@@ -210,12 +208,12 @@ int cmd_repo_init(void)
     cmd_index = 0;  // Reset registered command counter
 
     // Init repos
-    test_cmd_init();
+    //test_cmd_init();
     cmd_obc_init();
     cmd_drp_init();
-    cmd_com_init();
+    //cmd_com_init();
     cmd_console_init();
-    cmd_fp_init();
+    //cmd_fp_init();
 
     return CMD_OK;
 }

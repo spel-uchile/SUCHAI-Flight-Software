@@ -31,10 +31,10 @@ int obc_reset(char *fmt, char *params, int nparams)
 {
     printf("Resetting system NOW!!\n");
 
-    #if __linux__
+    #ifdef LINUX
         raise(SIGINT);
     #else
-        __asm__ volatile("reset");
+        //TODO __asm__ volatile("reset");
     #endif
 
     /* Never get here */
@@ -44,7 +44,7 @@ int obc_reset(char *fmt, char *params, int nparams)
 int obc_get_os_memory(char *fmt, char *params, int nparams)
 {
 
-    #if __linux__
+    #ifdef LINUX
         int c;
         FILE* file = fopen( "/proc/self/status", "r" );
         if (file)

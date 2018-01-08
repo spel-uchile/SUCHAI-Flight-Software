@@ -16,13 +16,13 @@
 #include "time.h"
 #include "stdint.h"
 
-#if __linux__
+#ifdef LINUX
     #include <unistd.h>
     #include <sys/time.h>
  	typedef  __useconds_t portTick; // Always useconds (uint32_t)
 #else
-	#include "freertos/FreeRTOS.h"
-	#include "freertos/task.h"
+	#include "FreeRTOS.h"
+	#include "task.h"
 	typedef portTickType portTick;  // Always ticks counts (int)
 #endif
 
