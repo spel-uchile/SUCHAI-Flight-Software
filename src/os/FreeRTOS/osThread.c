@@ -7,7 +7,7 @@
  * Creation of functions related with time for systems operating FreeRTOS.
  * 
  */
-#include <osThread.h>
+#include "osThread.h"
 
 /**
  * create a task in FreeRTOS
