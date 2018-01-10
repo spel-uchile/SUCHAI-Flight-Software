@@ -15,6 +15,14 @@ cd ..
 echo "Fixing FreeRTOS includes..."
 sed -i "s/COMPONENT_ADD_INCLUDEDIRS := include/COMPONENT_ADD_INCLUDEDIRS := include include\/freertos/g" esp-idf/components/freertos/component.mk
 
+
+echo "Moving files to corrects directions"
+mv component-main.mk ~/SUCHAI-Flight-Software/src/system/component.mk
+mv component-freertos.mk ~/SUCHAI-Flight-Software/src/os/FreeRTOS/component.mk
+mv Makefile ~/SUCHAI-Flight-Software/Makefile
+mv sdkconfig ~/SUCHAI-Flight-Software/sdkconfig
+
+
 echo "---------"
 echo "Finished"
 echo "Add the following lines to your bash.rc file"

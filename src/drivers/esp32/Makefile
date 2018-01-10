@@ -3,9 +3,8 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := wireless-sensor
-SRCDIRS:=system
-EXTRA_COMPONENT_DIRS:=$(shell pwd)/drivers/esp32/lis3dh $(shell pwd)/os
+PROJECT_NAME := suchai
+SRCDIRS:=$(shell pwd)/src/system
+EXTRA_COMPONENT_DIRS:=$(shell pwd)/src/os
 
 include $(IDF_PATH)/make/project.mk
-
