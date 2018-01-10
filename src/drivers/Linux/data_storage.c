@@ -5,6 +5,7 @@
 #include "data_storage.h"
 
 static const char *tag = "data_storage";
+
 static sqlite3 *db = NULL;
 char* fp_table = "flightPlan";
 

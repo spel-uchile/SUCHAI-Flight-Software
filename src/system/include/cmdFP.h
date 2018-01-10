@@ -12,13 +12,14 @@
 #ifndef CMD_FLIGHTPLAN_H
 #define CMD_FLIGHTPLAN_H
 
+#include "config.h"
+
 #ifdef LINUX
     #include "data_storage.h"
 #endif
 
 #include "repoCommand.h"
 
-/* TODO: Documentation required */  //Done
 /**
  * This function registers the list of command in the system, initializing the
  * functions array. This function must be called at every system start up.

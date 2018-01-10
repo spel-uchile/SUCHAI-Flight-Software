@@ -32,7 +32,7 @@
 #define SCH_BUFF_MAX_LEN            (256) ///< General buffers max length (bytes)
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS            (1)                     ///< Node address
+#define SCH_COMM_ADDRESS            (10)                     ///< Node address
 #define SCH_TRX_PORT_TM             (10)                    ///< Telemetry port (in the ground station)
 #define SCH_TRX_PORT_TC             (10)                    ///< Telecommands post (in the flight software)
 #define SCH_TRX_PORT_DEBUG          (11)                    ///< Debug port (just print packets)
@@ -45,7 +45,7 @@
 #define SCH_RUN_FP                  1
 
 /* Data repository settings */
-#define SCH_STATUS_REPO_MODE    	1   ///< Status repository location. (0) Internal, (1) Single external.
+#define SCH_STORAGE_MODE   	0   ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_FILE            "/tmp/suchai.db"
 
 #endif	/* SUCHAI_CONFIG_H */

@@ -29,11 +29,23 @@
     #include "data_storage.h"
 #endif
 
+#define FP_MAX_ENTRIES          100
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
 
 #define DAT_REPO_SYSTEM "dat_system"
+
+/**
+ * System level status variables
+ */
+typedef struct fp_entry {
+    int unixtime;               ///< time to execute in unixtime
+    char* cmd;                  ///< command to execute
+    char* args;                 ///< command arguments
+    int executions;             ///< times to be executed
+    int periodical;             ///< time to be executed again
+} fp_entry_t;
 
 /**
  * System level status variables
@@ -122,6 +134,24 @@ int dat_get_system_var(dat_system_t index);
  * @return 0 OK, -1 Error
  */
 int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical);
+
+
+
+
+int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical);
+
+
+
+
+int dat_del_fp(int timetodo);
+
+
+
+int dat_reset_fp(void);
+
+
+
+int dat_show_fp (void);
 
 
 

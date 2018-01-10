@@ -52,7 +52,7 @@ int main(void)
 
     /* Creating monitors tasks */
     osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
-    osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
+    //osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
 
 #if SCH_COMM_ENABLE
     osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
@@ -76,7 +76,7 @@ int main(void)
  */
 void vApplicationIdleHook(void)
 {
-    //ClrWdt();
+    ClrWdt();
 }
 
 /**
@@ -103,10 +103,10 @@ void on_reset(void) {
 
 #ifdef LINUX
     /* Register INT/TERM signals */
-    //struct sigaction act;
-    //act.sa_handler = on_close;
-    //sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
-    //sigaction(SIGTERM, &act, NULL);
+    struct sigaction act;
+    act.sa_handler = on_close;
+    sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
+    sigaction(SIGTERM, &act, NULL);
 #endif
 
     /* Init subsystems */

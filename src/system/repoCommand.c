@@ -211,9 +211,13 @@ int cmd_repo_init(void)
     //test_cmd_init();
     cmd_obc_init();
     cmd_drp_init();
-    //cmd_com_init();
+#if SCH_COMM_ENABLE
+    cmd_com_init();
+#endif
     cmd_console_init();
-    //cmd_fp_init();
+#if SCH_RUN_FP
+    cmd_fp_init();
+#endif
 
     return CMD_OK;
 }

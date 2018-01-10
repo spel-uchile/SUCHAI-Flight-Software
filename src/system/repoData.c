@@ -26,16 +26,14 @@ char* table = "flightPlan";
 
 
 
-#if SCH_STATUS_REPO_MODE == 0
+#if SCH_STORAGE_MODE == 0
     int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
+    fp_entry_t data_base [FP_MAX_ENTRIES];
 #endif
 
 
 void dat_repo_init(void)
 {
-
-
-
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
     {
@@ -44,13 +42,23 @@ void dat_repo_init(void)
 
     LOGD(tag, "Initializing data repositories buffers...")
     /* TODO: Setup external memories */
-#if (SCH_STATUS_REPO_MODE == 0)
+#if (SCH_STORAGE_MODE == 0)
     {
         //Use internal memory
         int index;
         for(index=0; index<dat_system_last_var; index++)
         {
             dat_set_system_var((dat_system_t)index, INT_MAX);
+        }
+        //Init internal flight plan table
+        int i;
+        for(i=0;i<FP_MAX_ENTRIES;i++)
+        {
+            data_base[i].unixtime = 0;
+            data_base[i].cmd = NULL;
+            data_base[i].args = NULL;
+            data_base[i].executions = 0;
+            data_base[i].periodical = 0;
         }
     }
 #else
@@ -85,7 +93,7 @@ void dat_repo_init(void)
 
 void dat_repo_close(void)
 {
-#if SCH_STATUS_REPO_MODE == 1
+#if SCH_STORAGE_MODE == 1
     {
         storage_close();
     }
@@ -98,7 +106,7 @@ void dat_set_system_var(dat_system_t index, int value)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Uses internal memory
-    #if SCH_STATUS_REPO_MODE == 0
+    #if SCH_STORAGE_MODE == 0
         DAT_SYSTEM_VAR_BUFF[index] = value;
     //Uses external memory
     #else
@@ -117,7 +125,7 @@ int dat_get_system_var(dat_system_t index)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Use internal (volatile) memory
-    #if SCH_STATUS_REPO_MODE == 0
+    #if SCH_STORAGE_MODE == 0
         value = DAT_SYSTEM_VAR_BUFF[index];
     //Uses external (non-volatile) memory
     #else
@@ -132,14 +140,126 @@ int dat_get_system_var(dat_system_t index)
 
 int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical)
 {
+#if SCH_STORAGE_MODE == 0
+    int i;
+    for(i = 0;i < FP_MAX_ENTRIES;i++)
+    {
+        if(elapsed_sec == data_base[i].unixtime)
+        {
+            strcpy(*command, data_base[i].cmd);
+            strcpy(*args,data_base[i].args);
+            **executions = data_base[i].executions;
+            **periodical = data_base[i].periodical;
 
-    #if SCH_STATUS_REPO_MODE
-        int rc = storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
+            if (data_base[i].periodical > 0)
+                dat_set_fp(elapsed_sec+**periodical,data_base[i].cmd,data_base[i].args,**executions,**periodical);
 
-        return rc;
-    #endif
+
+            dat_del_fp(elapsed_sec);
+
+            return 0;
+        }
+    }
     return 1;
-
-
+#else
+     return storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
+#endif
 }
+
+int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
+{
+#if SCH_STORAGE_MODE == 0
+    //TODO : agregar signal de segment para responder falla
+    int i;
+    for(i = 0;i < FP_MAX_ENTRIES;i++)
+    {
+        if(data_base[i].unixtime == 0)
+        {
+            data_base[i].unixtime = timetodo;
+            data_base[i].executions = executions;
+            data_base[i].periodical = periodical;
+
+            data_base[i].cmd = malloc(sizeof(char)*50);
+            data_base[i].args = malloc(sizeof(char)*50);
+
+            strcpy(data_base[i].cmd, command);
+            strcpy(data_base[i].args,args);
+
+            return 0;
+        }
+    }
+    return 1;
+#else
+    return storage_flight_plan_set(timetodo, command, args, executions, periodical);
+#endif
+}
+
+int dat_del_fp(int timetodo)
+{
+#if SCH_STORAGE_MODE ==0
+    int i;
+    for(i = 0;i < FP_MAX_ENTRIES;i++)
+    {
+        if(timetodo == data_base[i].unixtime)
+        {
+            data_base[i].unixtime = 0;
+            data_base[i].executions = 0;
+            data_base[i].periodical = 0;
+            free(data_base[i].args);
+            free(data_base[i].cmd);
+            return 0;
+        }
+    }
+#else
+    return storage_flight_plan_erase(timetodo);
+
+#endif
+}
+
+int dat_reset_fp(void)
+{
+#if SCH_STORAGE_MODE == 0
+    int i;
+    for(i=0;i<FP_MAX_ENTRIES;i++)
+    {
+        data_base[i].unixtime = 0;
+        data_base[i].cmd = NULL;
+        data_base[i].args = NULL;
+        data_base[i].executions = 0;
+        data_base[i].periodical = 0;
+    }
+    return 0;
+#else
+    return storage_table_flight_plan_init(1);
+#endif
+}
+
+int dat_show_fp (void)
+{
+#if SCH_STORAGE_MODE ==0
+    int cont = 0;
+    int i;
+    for(i = 0;i < FP_MAX_ENTRIES; i++)
+    {
+        if(data_base[i].unixtime!=0)
+        {
+            if(cont == 0)
+            {
+                printf("UnixTime\tCommand\tArguments\tExecutions\tPeriodical\n");
+                cont++;
+            }
+            printf("%d\t%s\t%s\t%d\t%d\n",data_base[i].unixtime,data_base[i].cmd,data_base[i].args,data_base[i].executions,data_base[i].periodical);
+        }
+    }
+    if(cont == 0)
+    {
+        LOGI(tag, "Flight plan table empty");
+    }
+
+    return 0;
+#else
+    return storage_show_table();
+#endif
+}
+
 

@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <signal.h>
-
+#include "config.h"
 
 /* OS includes */
 #include "osThread.h"
@@ -17,7 +17,6 @@
 #include "os.h"
 
 /* system includes */
-#include "config.h"
 #include "globals.h"
 #include "utils.h"
 #include "repoData.h"
@@ -37,7 +36,7 @@
 #if SCH_COMM_ENABLE
     #include "taskCommunications.h"
 #endif
-#if SCH_STATUS_REPO_MODE
+#if SCH_RUN_FP
     #include "taskFlightPlan.h"
 #endif
 

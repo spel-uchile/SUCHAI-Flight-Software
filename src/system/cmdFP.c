@@ -51,7 +51,7 @@ int fp_set(char *fmt, char *params, int nparams)
 
         printf("Tiempo cmd: %d", (int)unixtime);
 
-        int rc = storage_flight_plan_set((int)unixtime, command, args, executions, periodical);
+        int rc = dat_set_fp((int)unixtime, command, args, executions, periodical);
 
         if (rc == 0)
             return CMD_OK;
@@ -83,7 +83,7 @@ int fp_delete(char* fmt, char* params, int nparams)
 
         unixtime = mktime(&str_time);
 
-        int rc = storage_flight_plan_erase((int)unixtime);
+        int rc = dat_del_fp((int)unixtime);
 
         if(rc==0)
             return CMD_OK;
@@ -100,7 +100,7 @@ int fp_delete(char* fmt, char* params, int nparams)
 int fp_show(char* fmt, char* params, int nparams)
 {
 
-    int rc= storage_show_table();
+    int rc= dat_show_fp();
 
     if(rc==0)
         return CMD_OK;
@@ -111,7 +111,7 @@ int fp_show(char* fmt, char* params, int nparams)
 int fp_reset(char* fmt, char* params, int nparams)
 {
 
-    int rc = storage_flight_plan_reset();
+    int rc = dat_reset_fp();
 
     if(rc==0)
         return CMD_OK;
