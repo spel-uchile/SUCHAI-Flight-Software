@@ -1,0 +1,16 @@
+#ifndef CONF_USART_SERIAL_H
+#define CONF_USART_SERIAL_H
+
+// Use the UART on port J4
+#define UART_PORT           (&AVR32_USART1)
+#define UART_BAUDRATE       (115200)
+#define UART_CHAR_LENGTH    (8)
+#define UART_PARITY         (USART_NO_PARITY)
+#define UART_STOP_BIT       (USART_1_STOPBIT)
+
+#define UART_RX_PIN         AVR32_USART1_RXD_0_0_PIN
+#define UART_RX_FUNC        AVR32_USART1_RXD_0_0_FUNCTION
+#define UART_TX_PIN         AVR32_USART1_TXD_0_0_PIN
+#define UART_TX_FUNC        AVR32_USART1_TXD_0_0_FUNCTION
+
+#endif
