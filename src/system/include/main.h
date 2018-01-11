@@ -27,6 +27,11 @@
     #include <csp/interfaces/csp_if_zmqhub.h>
 #endif
 
+#ifdef AVR32
+    #include "asf.h"
+    #include "util.h"
+#endif
+
 /* Task includes */
 //#include "taskTest.h"
 #include "taskDispatcher.h"
@@ -36,7 +41,7 @@
 #if SCH_COMM_ENABLE
     #include "taskCommunications.h"
 #endif
-#if SCH_RUN_FP
+#if SCH_FP_ENABLED
     #include "taskFlightPlan.h"
 #endif
 
@@ -45,6 +50,5 @@
 #else
     int main(void);
 #endif
-
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_MAIN_H

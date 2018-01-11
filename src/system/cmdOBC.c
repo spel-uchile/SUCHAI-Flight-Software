@@ -59,7 +59,11 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
             return CMD_FAIL;
         }
     #else
-        size_t mem_heap = xPortGetFreeHeapSize();
+        #ifdef AVR32
+            size_t mem_heap = 0; //xPortGetFreeHeapSize();
+        #else
+            size_t mem_heap = xPortGetFreeHeapSize();
+        #endif
         printf("Free RTOS memory: %d\n", mem_heap);
         return CMD_OK;
     #endif

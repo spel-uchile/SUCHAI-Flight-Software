@@ -22,6 +22,7 @@
 
 static void on_reset(void);
 static void on_close(int signal);
+const char *tag = "main";
 
 #ifdef ESP32
 void app_main()
@@ -32,64 +33,75 @@ int main(void)
     /* On reset */
     on_reset();
 
+    LOGI(tag, "Creating tasks...");
+
     /* Initializing shared Queues */
-    dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
+    dispatcher_queue = osQueueCreate(3,sizeof(cmd_t *));
     executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
     executer_stat_queue = osQueueCreate(1,sizeof(int));
-
-    osDelay(1000);
 
     int n_threads = 7;
     os_thread threads_id[n_threads];
 
     /* Crating system task (the others are created inside taskDeployment) */
     osCreateTask(taskDispatcher,"dispatcher", 2*configMINIMAL_STACK_SIZE,NULL,3, &threads_id[0]);
-    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
+    osCreateTask(taskExecuter, "executer", 10*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
 
 #if SCH_RUN_TESTS
     osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &threads_id[2]);
 #endif
 
     /* Creating monitors tasks */
-    osCreateTask(taskConsole, "console", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
-    //osCreateTask(taskHousekeeping, "housekeeping", 2*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
+    osCreateTask(taskConsole, "console", 5*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
+    osCreateTask(taskHousekeeping, "housekeeping", 5*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
 
 #if SCH_COMM_ENABLE
     osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
 #endif
-#if SCH_RUN_FP
+#if SCH_FP_ENABLED
     osCreateTask(taskFlightPlan,"flightplan",2*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
 #endif
 
+#ifndef ESP32
     /* Start the scheduler. Should never return */
-    //osScheduler(threads_id, n_threads) don't need it for esp32 architecture
-#ifdef LINUX
     osScheduler(threads_id, n_threads);
+    return 0;
 #endif
-    //return 0;
+
 }
 
-#ifndef LINUX
+#ifdef FREERTOS
 /**
  * Task idle handle function. Performs operations inside the idle task
- * configUSE_IDLE_makHOOK must be set to 1
+ * configUSE_IDLE_HOOK must be set to 1
  */
 void vApplicationIdleHook(void)
 {
-    ClrWdt();
+    //Add hook code here
+}
+
+/**
+ * Task idle handle function. Performs operations inside the idle task
+ * configUSE_TICK_HOOK must be set to 1
+ */
+void vApplicationTickHook(void)
+{
+#ifdef AVR32
+    LED_Toggle(LED0);
+#endif
 }
 
 /**
  * Stack overflow handle function.
- * configCHECK_FOR_STACK_OVERFLOW must be set to 1 or 2
+ * configCHECK_FOR_STACK_OVERFLOW must be set to 1 or 2 and
  * 
  * @param pxTask Task handle
  * @param pcTaskName Task name
  */
 void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
 {
-    printf(">> Stak overflow! - TaskName: %s\n", (char *)pcTaskName);
-    
+    printf("[ERROR][-1][%s] Stak overflow!", (char *)pcTaskName);
+
     /* Stack overflow handle */
     while(1);
 }
@@ -98,15 +110,22 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
 /**
  * Performs initialization actions
  */
-void on_reset(void) {
-    const char *tag = "main";
-
+void on_reset(void)
+{
 #ifdef LINUX
     /* Register INT/TERM signals */
     struct sigaction act;
     act.sa_handler = on_close;
     sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
     sigaction(SIGTERM, &act, NULL);
+#endif
+
+#ifdef AVR32
+    serial_init();
+    LED_On(LED0);
+    LED_On(LED1);
+    LED_On(LED2);
+    LED_On(LED3);
 #endif
 
     /* Init subsystems */
@@ -127,27 +146,25 @@ void on_reset(void) {
     csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
 
-
-#if LOG_LEVEL >= LOG_LVL_DEBUG
-
-    /*Debug output from CSP */
-
-    printf("Debug enabed\r\n");
-    csp_debug_set_level(1, 1);
-    csp_debug_toggle_level(2);
-    csp_debug_toggle_level(3);
-    csp_debug_toggle_level(4);
-    csp_debug_toggle_level(5);
-    csp_debug_toggle_level(6);
-    LOGD(tag, "Conn table");
-    csp_conn_print_table();
-    LOGD(tag, "Route table");
-    csp_route_print_table();
-    LOGD(tag, "Interfaces");
-    csp_route_print_interfaces();
-#endif
+    #if LOG_LEVEL >= LOG_LVL_DEBUG<s
+        /*Debug output from CSP */
+        printf("Debug enabed\r\n");
+        csp_debug_set_level(1, 1);
+        csp_debug_toggle_level(2);
+        csp_debug_toggle_level(3);
+        csp_debug_toggle_level(4);
+        csp_debug_toggle_level(5);
+        csp_debug_toggle_level(6);
+        LOGD(tag, "Conn table");
+        csp_conn_print_table();
+        LOGD(tag, "Route table");
+        csp_route_print_table();
+        LOGD(tag, "Interfaces");
+        csp_route_print_interfaces();
+    #endif
 #endif
 }
+
 /**
  * Performs a clean exit
  *
@@ -157,6 +174,6 @@ void on_close(int signal)
 {
     dat_repo_close();
 
-    LOGI("Main", "Exit system!");
+    LOGI(tag, "Exit system!");
     exit(signal);
 }

@@ -14,12 +14,16 @@
 #define T_HOUSEKEEPING_H
 
 #include <stdlib.h>
+#include "config.h"
 
 #if SCH_COMM_ENABLE
     #include "csp/csp.h"
 #endif
+#ifdef AVR32
+    #include "asf.h"
+    #include "util.h"
+#endif
 
-#include "config.h"
 #include "globals.h"
 
 #include "osQueue.h"
