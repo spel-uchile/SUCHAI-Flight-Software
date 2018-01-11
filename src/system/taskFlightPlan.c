@@ -31,16 +31,12 @@ void taskFlightPlan(void *param)
     time_t elapsed_sec;   // Seconds counter
     portTick xLastWakeTime = osTaskGetTickCount();
 
-    //storage_flight_plan_set(date_to_unixtime(19,12,2017,22,52,0),"ping","5",1,"flightPlan",0);
-    //storage_flight_plan_set(date_to_unixtime(20,12,2017,23,52,0),"ping","5",1,"flightPlan",0);
-    //storage_flight_plan_set(date_to_unixtime(21,12,2017,19,55,0),"ping","5",1,"flightPlan",0);
-
-
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
 
         elapsed_sec = time(NULL);
+
 
         char* command = malloc(sizeof(char)*50);
         char* args = malloc(sizeof(char)*50);

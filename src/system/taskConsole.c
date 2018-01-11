@@ -53,7 +53,13 @@ void taskConsole(void *param)
         osDelay(delay_ms);
 
         /* Read console and parse commands (blocking) */
+        //TODO a fancy solution for this if
+#ifdef LINUX
         console_read(buffer, CON_BUFF_LEN);
+#else
+        if(fgets(buffer, CON_BUFF_LEN-1, stdin)==NULL)
+            continue;
+#endif
         new_cmd = console_parse(buffer);
 
         if(new_cmd != NULL)

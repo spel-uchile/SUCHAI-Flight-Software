@@ -58,25 +58,27 @@ int main(void)
     osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
 #endif
 #if SCH_RUN_FP
-    osCreateTask(taskFlightPlan,"flightplan",2*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
+    osCreateTask(taskFlightPlan,"flightplan",10*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
 #endif
 
     /* Start the scheduler. Should never return */
     //osScheduler(threads_id, n_threads) don't need it for esp32 architecture
+
 #ifdef LINUX
     osScheduler(threads_id, n_threads);
 #endif
     //return 0;
 }
 
-#ifndef LINUX
+#ifdef FREERTOS
 /**
  * Task idle handle function. Performs operations inside the idle task
  * configUSE_IDLE_makHOOK must be set to 1
  */
 void vApplicationIdleHook(void)
 {
-    ClrWdt();
+    //TODO clear watchdog
+    //ClrWdt();
 }
 
 /**

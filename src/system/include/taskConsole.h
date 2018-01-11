@@ -13,6 +13,8 @@
 #ifndef T_COSOLE_H
 #define T_CONSOLE_H
 
+#include "config.h"
+
 #include <ctype.h>
 
 #include "osQueue.h"
