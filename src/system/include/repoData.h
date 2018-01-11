@@ -2,6 +2,7 @@
  * @file  commandRepoitory.h
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
+ * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @date 2017
  * @copyright GNU GPL v3
  *
@@ -25,7 +26,7 @@
 #include "globals.h"
 #include "utils.h"
 
-#if SCH_STATUS_REPO_MODE
+#if SCH_STORAGE_MODE
     #include "data_storage.h"
 #endif
 

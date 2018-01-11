@@ -49,7 +49,7 @@ int fp_set(char *fmt, char *params, int nparams)
 
         unixtime = mktime(&str_time);
 
-        printf("Tiempo cmd: %d", (int)unixtime);
+        //printf("Tiempo cmd: %d", (int)unixtime);
 
         int rc = dat_set_fp((int)unixtime, command, args, executions, periodical);
 

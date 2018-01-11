@@ -3,6 +3,7 @@
  *
  *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -160,7 +161,7 @@ int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, i
             return 0;
         }
     }
-    return 1;
+    return -1;
 #else
      return storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
 #endif
@@ -210,9 +211,9 @@ int dat_del_fp(int timetodo)
             return 0;
         }
     }
+    return 1;
 #else
     return storage_flight_plan_erase(timetodo);
-
 #endif
 }
 

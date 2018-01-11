@@ -36,7 +36,7 @@ int main(void)
     LOGI(tag, "Creating tasks...");
 
     /* Initializing shared Queues */
-    dispatcher_queue = osQueueCreate(3,sizeof(cmd_t *));
+    dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
     executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
     executer_stat_queue = osQueueCreate(1,sizeof(int));
 
@@ -45,7 +45,7 @@ int main(void)
 
     /* Crating system task (the others are created inside taskDeployment) */
     osCreateTask(taskDispatcher,"dispatcher", 2*configMINIMAL_STACK_SIZE,NULL,3, &threads_id[0]);
-    osCreateTask(taskExecuter, "executer", 10*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
+    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
 
 #if SCH_RUN_TESTS
     osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &threads_id[2]);
@@ -93,8 +93,8 @@ void vApplicationTickHook(void)
 
 /**
  * Stack overflow handle function.
- * configCHECK_FOR_STACK_OVERFLOW must be set to 1 or 2 and
- * 
+ * configCHECK_FOR_STACK_OVERFLOW must be set to 1 or 2
+ *
  * @param pxTask Task handle
  * @param pcTaskName Task name
  */
