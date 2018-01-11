@@ -12,7 +12,7 @@ cd -
 echo "Fixing headers"
 # Fix SDRAM include
 sed -i "s/#define SDRAM_PART_HDR              \"mt48lc16m16a2tg7e\/mt48lc16m16a2tg7e.h\"/#define SDRAM_PART_HDR              \"mt48lc4m16a2tg7e.h\"/g" xdk-asf-3.33.0/avr32/boards/uc3_a3_xplained/uc3_a3_xplained.h
-
+sed -i "s/#define configTICK_TC_IRQ             ATPASTE2(AVR32_TC_IRQ, configTICK_TC_CHANNEL)/#define configTICK_TC_IRQ             ATPASTE2(AVR32_TC0_IRQ, configTICK_TC_CHANNEL)/g" xdk-asf-3.33.0/thirdparty/freertos/freertos-7.0.0/source/portable/gcc/avr32_uc3/portmacro.h
 
 echo "Coping custom ASF application..."
 cp -r suchai/ xdk-asf-3.33.0/avr32/applications/
