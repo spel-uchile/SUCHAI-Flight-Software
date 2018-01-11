@@ -34,6 +34,19 @@ TARGET = $(PROJ_NAME).elf
 # List of C source files.
 CSRCS = \
        $(PROJ_ROOT)/system/main.c                         \
+       $(PROJ_ROOT)/system/cmdConsole.c                   \
+       $(PROJ_ROOT)/system/cmdDRP.c                       \
+       $(PROJ_ROOT)/system/cmdFP.c                        \
+       $(PROJ_ROOT)/system/cmdOBC.c                       \
+       $(PROJ_ROOT)/system/cmdTestCommand.c               \
+       $(PROJ_ROOT)/system/repoCommand.c                  \
+       $(PROJ_ROOT)/system/repoData.c                     \
+       $(PROJ_ROOT)/system/taskConsole.c                  \
+       $(PROJ_ROOT)/system/taskDispatcher.c               \
+       $(PROJ_ROOT)/system/taskExecuter.c                 \
+       $(PROJ_ROOT)/system/taskFlightPlan.c               \
+       $(PROJ_ROOT)/system/taskHousekeeping.c             \
+       $(PROJ_ROOT)/system/taskTest.c                     \
        $(PROJ_ROOT)/util/hexdump.c                        \
        $(PROJ_ROOT)/util/memcheck.c                       \
        $(PROJ_ROOT)/util/init.c                           \
@@ -73,7 +86,7 @@ CSRCS = \
        thirdparty/freertos/freertos-7.0.0/source/timers.c       \
        thirdparty/freertos/freertos-7.0.0/source/portable/memmang/heap_3.c      \
        thirdparty/freertos/freertos-7.0.0/source/portable/gcc/avr32_uc3/read.c  \
-       thirdparty/freertos/freertos-7.0.0/source/portable/gcc/avr32_uc3/write.c \
+       thirdparty/freertos/freertos-7.0.0/source/portable/gcc/avr32_uc3/write.c
 
 # List of assembler source files.
 ASSRCS = \

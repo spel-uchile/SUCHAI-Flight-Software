@@ -50,7 +50,7 @@
 #define CONFIG_SYSCLK_PBA_DIV   0
 #define CONFIG_SYSCLK_PBB_DIV   0
 
-// PLL0 uses OSC0 (12 MHz * 11 / 2 = 66 MHz)
+// PLL0 uses OSC0 (12 MHz * 2 / 1 = 24 MHz)
 #define CONFIG_PLL0_SOURCE  PLL_SRC_OSC0
 #define CONFIG_PLL0_MUL     2
 #define CONFIG_PLL0_DIV     1
