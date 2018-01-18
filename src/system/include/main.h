@@ -45,6 +45,9 @@
 #if SCH_FP_ENABLED
     #include "taskFlightPlan.h"
 #endif
+#if SCH_RUN_TESTS
+    #include "taskTest.h"
+#endif
 
 #ifdef FREERTOS
     void app_main();

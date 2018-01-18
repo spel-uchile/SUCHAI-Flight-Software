@@ -11,7 +11,7 @@
 
 static const char *tag = "cmdTest";
 
-void test_cmd_init(void)
+void cmd_test_init(void)
 {
 
     cmd_add("test_str_int", test_cmd_str_int, "%s %i", 2);

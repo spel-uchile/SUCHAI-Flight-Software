@@ -40,4 +40,4 @@ link_directories(src/drivers/Linux/libcsp/lib)
 
 link_libraries(-lpthread -lsqlite3 -lcsp -lzmq)
 
-add_executable(SUCHAI_Flight_Software ${SOURCE_FILES} src/system/taskFlightPlan.c src/system/include/taskFlightPlan.h)
+add_executable(SUCHAI_Flight_Software ${SOURCE_FILES})
