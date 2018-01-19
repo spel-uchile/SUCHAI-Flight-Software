@@ -219,6 +219,9 @@ int cmd_repo_init(void)
 #if SCH_RUN_FP
     cmd_fp_init();
 #endif
+#if SCH_RUN_TESTS
+    cmd_test_init();
+#endif
 
     return CMD_OK;
 }

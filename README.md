@@ -1,6 +1,6 @@
 # Nanosatellite Flight Software
 
-[![Build Status](http://jenkins.spel.cl/buildStatus/icon?job=SUCHAI-Flight-Software)](http://jenkins.spel.cl/job/SUCHAI-Flight-Software/)
+[![Build Status](http://jenkins.spel.cl/buildStatus/icon?job=SUCHAI-Flight-Software-pipeline)](http://jenkins.spel.cl/job/SUCHAI-Flight-Software-pipeline/)
 [![GitHub tag](https://img.shields.io/github/tag/spel-uchile/SUCHAI-Flight-Software.svg)]()
 [![license](https://img.shields.io/github/license/spel-uchile/SUCHAI-Flight-Software.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -113,3 +113,4 @@ Refs:
 [![issue tracker](https://img.shields.io/github/issues/spel-uchile/SUCHAI-Flight-Software.svg)](https://github.com/spel-uchile/SUCHAI-Flight-Software/issues) Use the issue tracker to submit questions, requirements and bugs.
 
 [![SPEL Team](https://img.shields.io/twitter/follow/spel_uchile.svg?style=social&label=Follow)](https://twitter.com/SPEL_UCHILE) the SPEL team at Twitter to get latest news about the SUCHAI project
+

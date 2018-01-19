@@ -25,7 +25,7 @@
  * @param None
  * @return None
  */
-void test_cmd_init(void);
+void cmd_test_init(void);
 
 /**
  * Test commands with string and integers

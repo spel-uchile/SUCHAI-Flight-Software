@@ -20,11 +20,13 @@
 #include "cmdOBC.h"
 #include "cmdDRP.h"
 #include "cmdConsole.h"
-#include "cmdTestCommand.h"
 #include "cmdFP.h"
 
 #if SCH_COMM_ENABLE
     #include "cmdCOM.h"
+#endif
+#if SCH_RUN_TESTS
+    #include "cmdTestCommand.h"
 #endif
 
 /* Macros */
