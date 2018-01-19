@@ -184,4 +184,9 @@ int cmd_repo_init(void);
  */
 int cmd_null(char *fmt, char *params, int nparams);
 
+
+
+
+int cmd_print(cmd_t* cmd);
+
 #endif /* CMD_REPO_H */
