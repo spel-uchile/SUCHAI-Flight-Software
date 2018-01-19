@@ -43,16 +43,18 @@ void taskExecuter(void *param)
             free(cmd_name);
 #endif
             /* Commands may take a long time, so reset the WDT */
-            //TODO ClrWdt();
+            //ClrWdt();
 
             /* Execute the command */
+            // TODO: Check that we are dereferencing a valid function pointer
             cmd_stat = run_cmd->function(run_cmd->fmt, run_cmd->params, run_cmd->nparams);
             cmd_free(run_cmd);
+            run_cmd = NULL;
 
             /* Commands may take a long time, so reset the WDT */
-            //TODO ClrWdt();
+            //ClrWdt();
             LOGI(tag, "Command result: %d", cmd_stat);
-            
+
             /* Send the result to Dispatcher - BLOCKING */
             osQueueSend(executer_stat_queue, &cmd_stat, portMAX_DELAY);
         }

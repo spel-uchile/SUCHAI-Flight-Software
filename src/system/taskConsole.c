@@ -33,7 +33,7 @@ const char console_banner[] =
 ______________________________________________________________________________\n\n";
 
 
-//"\n\n====== WELCOME TO THE SUCHAI CONSOLE - PRESS ANY KEY TO START ======\n\r"
+//"\n\n====== WELCOME TO THE SUCHAI CONSOLE - PRESS ANY KEY TO START ======\n\r";
 
 void taskConsole(void *param)
 {
@@ -53,12 +53,12 @@ void taskConsole(void *param)
         osDelay(delay_ms);
 
         /* Read console and parse commands (blocking) */
-        //TODO a fancy solution for this if
-#ifdef LINUX
-        console_read(buffer, CON_BUFF_LEN);
-#else
+
+#ifdef ESP32
         if(fgets(buffer, CON_BUFF_LEN-1, stdin)==NULL)
             continue;
+#else
+        console_read(buffer, CON_BUFF_LEN);
 #endif
         new_cmd = console_parse(buffer);
 

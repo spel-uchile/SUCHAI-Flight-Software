@@ -19,12 +19,12 @@
 #include <string.h>
 
 /* Select one operating system */
-#define LINUX                               ///< Use Linux
+#define LINUX                           ///< Use Linux
 //#define FREERTOS                          ///< Use FreeRTOS (select arch below)
 /* Select the correct architecture */
 #ifdef FREERTOS
-//    #define ESP32                         ///< Uncomment to run in ESP32
-//    #define AVR32                         ///< Uncomment to run in AVR32
+//  #define ESP32                         ///< Uncomment to run in ESP32
+    #define AVR32                         ///< Uncomment to run in AVR32
 #endif
 
 /* System debug configurations */
@@ -33,8 +33,9 @@
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN            (256)   ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE             1       ///< TaskCommunications enabled
-#define SCH_FP_ENABLED              1       ///< TaskFlightPlan enabled
+#define SCH_COMM_ENABLE             0       ///< TaskCommunications enabled
+#define SCH_FP_ENABLED              0       ///< TaskFlightPlan enabled
+#define SCH_HK_ENABLED              0       ///< TaskHousekeeping enabled
 
 
 /* Communications system settings */
