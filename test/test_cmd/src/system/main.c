@@ -30,6 +30,7 @@ void app_main()
 int main(void)
 #endif
 {
+
     /* On reset */
     on_reset();
 
@@ -40,23 +41,15 @@ int main(void)
     executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
     executer_stat_queue = osQueueCreate(1,sizeof(int));
 
-    int n_threads = 7;
+    int n_threads = 3;
     os_thread threads_id[n_threads];
 
     /* Crating system task (the others are created inside taskDeployment) */
     osCreateTask(taskDispatcher,"dispatcher", 2*configMINIMAL_STACK_SIZE,NULL,3, &threads_id[0]);
     osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
 
-    /* Creating monitors tasks */
-    osCreateTask(taskConsole, "console", 5*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[2]);
-    osCreateTask(taskHousekeeping, "housekeeping", 5*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
+    osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &threads_id[2]);
 
-#if SCH_COMM_ENABLE
-    osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
-#endif
-#if SCH_FP_ENABLED
-    osCreateTask(taskFlightPlan,"flightplan",2*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
-#endif
 
 #ifndef ESP32
     /* Start the scheduler. Should never return */
@@ -142,8 +135,8 @@ void on_reset(void)
     csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
 
-    #if LOG_LEVEL >= LOG_LVL_DEBUG<s
-        /*Debug output from CSP */
+#if LOG_LEVEL >= LOG_LVL_DEBUG<s
+    /*Debug output from CSP */
         printf("Debug enabed\r\n");
         csp_debug_set_level(1, 1);
         csp_debug_toggle_level(2);
@@ -157,7 +150,7 @@ void on_reset(void)
         csp_route_print_table();
         LOGD(tag, "Interfaces");
         csp_route_print_interfaces();
-    #endif
+#endif
 #endif
 }
 

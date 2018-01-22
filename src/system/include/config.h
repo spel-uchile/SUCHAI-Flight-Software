@@ -29,12 +29,12 @@
 
 /* System debug configurations */
 #define LOG_LEVEL       LOG_LVL_VERBOSE     ///< Define debug levels
-#define SCH_RUN_TESTS   0                   ///< Enable or disable tests
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN            (256)   ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE             1       ///< TaskCommunications enabled
-#define SCH_FP_ENABLED              1       ///< TaskFlightPlan enabled
+#define SCH_COMM_ENABLE             0       ///< TaskCommunications enabled
+#define SCH_FP_ENABLED              0       ///< TaskFlightPlan enabled
+#define SCH_TEST_ENABLED            0       ///< Set to run tests
 
 
 /* Communications system settings */

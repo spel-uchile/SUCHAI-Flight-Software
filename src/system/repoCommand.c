@@ -208,7 +208,9 @@ int cmd_repo_init(void)
     cmd_index = 0;  // Reset registered command counter
 
     // Init repos
-    //test_cmd_init();
+#if SCH_TEST_ENABLED
+    cmd_test_init();
+#endif
     cmd_obc_init();
     cmd_drp_init();
 #if SCH_COMM_ENABLE
@@ -217,9 +219,6 @@ int cmd_repo_init(void)
     cmd_console_init();
 #if SCH_RUN_FP
     cmd_fp_init();
-#endif
-#if SCH_RUN_TESTS
-    cmd_test_init();
 #endif
 
     return CMD_OK;

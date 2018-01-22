@@ -34,7 +34,9 @@
 #endif
 
 /* Task includes */
-//#include "taskTest.h"
+#if SCH_TEST_ENABLED
+    #include "taskTest.h"
+#endif
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
 #include "taskHousekeeping.h"
@@ -44,9 +46,6 @@
 #endif
 #if SCH_FP_ENABLED
     #include "taskFlightPlan.h"
-#endif
-#if SCH_RUN_TESTS
-    #include "taskTest.h"
 #endif
 
 #ifdef FREERTOS

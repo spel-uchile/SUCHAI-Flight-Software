@@ -38,7 +38,6 @@ CSRCS = \
        $(PROJ_ROOT)/system/cmdDRP.c                       \
        $(PROJ_ROOT)/system/cmdFP.c                        \
        $(PROJ_ROOT)/system/cmdOBC.c                       \
-       $(PROJ_ROOT)/system/cmdTestCommand.c               \
        $(PROJ_ROOT)/system/repoCommand.c                  \
        $(PROJ_ROOT)/system/repoData.c                     \
        $(PROJ_ROOT)/system/taskConsole.c                  \
@@ -46,7 +45,6 @@ CSRCS = \
        $(PROJ_ROOT)/system/taskExecuter.c                 \
        $(PROJ_ROOT)/system/taskFlightPlan.c               \
        $(PROJ_ROOT)/system/taskHousekeeping.c             \
-       $(PROJ_ROOT)/system/taskTest.c                     \
        $(PROJ_ROOT)/util/hexdump.c                        \
        $(PROJ_ROOT)/util/memcheck.c                       \
        $(PROJ_ROOT)/util/init.c                           \
