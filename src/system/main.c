@@ -49,7 +49,7 @@ int main(void)
     osCreateTask(taskExecuter, "executer", 15*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
 
 #if SCH_RUN_TESTS
-    osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &threads_id[2]);
+    osCreateTask(taskTest, "test", 5*configMINIMAL_STACK_SIZE, "TEST1", 2, &threads_id[2]);
 #endif
 
     /* Creating monitors tasks */

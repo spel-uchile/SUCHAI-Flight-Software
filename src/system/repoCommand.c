@@ -185,13 +185,16 @@ void cmd_print_all(void)
 
     LOGD(tag, "Command list");
     osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
+    osSemaphoreTake(&log_mutex, portMAX_DELAY);
     printf("Index\t name\t Params\n");
     int i;
     for(i=0; i<cmd_index; i++)
     {
         printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
+    osSemaphoreGiven(&log_mutex);
     osSemaphoreGiven(&repo_cmd_sem);
+
 }
 
 int cmd_repo_init(void)
