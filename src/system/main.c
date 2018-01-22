@@ -44,18 +44,22 @@ int main(void)
     os_thread threads_id[n_threads];
 
     /* Crating system task (the others are created inside taskDeployment) */
-    osCreateTask(taskDispatcher,"dispatcher", 2*configMINIMAL_STACK_SIZE,NULL,3, &threads_id[0]);
-    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
+    osCreateTask(taskDispatcher,"dispatcher", 10*256, NULL, 3, &threads_id[0]);
+    osCreateTask(taskExecuter, "executer", 15*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
 
     /* Creating monitors tasks */
-    osCreateTask(taskConsole, "console", 5*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[2]);
-    osCreateTask(taskHousekeeping, "housekeeping", 5*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
+    osCreateTask(taskConsole, "console", 15*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
+
+#if SCH_HK_ENABLED
+    osCreateTask(taskHousekeeping, "housekeeping", 6*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
+#endif
 
 #if SCH_COMM_ENABLE
     osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
 #endif
+
 #if SCH_FP_ENABLED
-    osCreateTask(taskFlightPlan,"flightplan",2*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
+    osCreateTask(taskFlightPlan,"flightplan",15*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
 #endif
 
 #ifndef ESP32

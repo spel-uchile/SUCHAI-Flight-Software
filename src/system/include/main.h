@@ -39,8 +39,11 @@
 #endif
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
-#include "taskHousekeeping.h"
 #include "taskConsole.h"
+
+#if SCH_HK_ENABLED
+    #include "taskHousekeeping.h"
+#endif
 #if SCH_COMM_ENABLE
     #include "taskCommunications.h"
 #endif

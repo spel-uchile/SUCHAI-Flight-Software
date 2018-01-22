@@ -172,7 +172,8 @@ void cmd_add_params_var(cmd_t *cmd, ...)
 void cmd_free(cmd_t *cmd)
 {
     if(cmd != NULL) {
-        // Free the params if allocated
+        // Free the params if allocated, we don't need free cmd->fmt because
+        // it has not been copied with malloc (see cmd_get_idx)
         free(cmd->params);
         // Free the structure itself
         free(cmd);
@@ -217,7 +218,7 @@ int cmd_repo_init(void)
     cmd_com_init();
 #endif
     cmd_console_init();
-#if SCH_RUN_FP
+#if SCH_FP_ENABLED
     cmd_fp_init();
 #endif
 
@@ -228,4 +229,11 @@ int cmd_null(char *fparams, char *params, int nparam)
 {
     LOGD(tag, "cmd_null was used with params format: %s and params string: %s", fparams, params);
     return CMD_ERROR;
+}
+
+int cmd_print(cmd_t* cmd)
+{
+    LOGV(tag, "Command Name:%s\n",cmd_get_name(cmd->id));
+    LOGV(tag, "\tid: %d\n\tnparams: %d\n\tfmt: %s\n\tparams: %s\n\tfunction: %p\n", cmd->id, cmd->nparams, cmd->fmt, cmd->params, cmd->function);
+    return 0;
 }

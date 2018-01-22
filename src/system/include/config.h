@@ -23,8 +23,8 @@
 //#define FREERTOS                          ///< Use FreeRTOS (select arch below)
 /* Select the correct architecture */
 #ifdef FREERTOS
-//    #define ESP32                         ///< Uncomment to run in ESP32
-//    #define AVR32                         ///< Uncomment to run in AVR32
+//  #define ESP32                         ///< Uncomment to run in ESP32
+    #define AVR32                         ///< Uncomment to run in AVR32
 #endif
 
 /* System debug configurations */
@@ -34,6 +34,7 @@
 #define SCH_BUFF_MAX_LEN            (256)   ///< General buffers max length (bytes)
 #define SCH_COMM_ENABLE             0       ///< TaskCommunications enabled
 #define SCH_FP_ENABLED              0       ///< TaskFlightPlan enabled
+#define SCH_HK_ENABLED              0       ///< TaskHousekeeping enabled
 #define SCH_TEST_ENABLED            0       ///< Set to run tests
 
 

@@ -39,12 +39,12 @@ void taskDispatcher(void *param)
         if(status == pdPASS)
         {
             /* Check if command is executable */
-            if(check_if_executable(new_cmd))
+            if (check_if_executable(new_cmd))
             {
-				LOGD(tag, "Cmd: %X, Param: %p, Orig: %X", new_cmd->id, &(new_cmd->params), -1);
 
                 /* Send the command to executer Queue - BLOCKING */
                 osQueueSend(executer_cmd_queue, &new_cmd, portMAX_DELAY);
+                LOGD(tag, "Cmd: %X, Param: %p, Orig: %X", new_cmd->id, &(new_cmd->params), -1);
 
                 /* Get the result from Executer Stat Queue - BLOCKING */
                 osQueueReceive(executer_stat_queue, &cmd_result, portMAX_DELAY);
@@ -78,6 +78,5 @@ int check_if_executable(cmd_t *new_cmd)
 //        printf("[Dispatcher] Cmd: %X from %X sysReq %d refused because of SOC %d\n", cmdId, idOrig, sysReq, dat_get_system_var(dat_eps_soc));
 //        return 0;
 //    }
-
     return 1;
 }
