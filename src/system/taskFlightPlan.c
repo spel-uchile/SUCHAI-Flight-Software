@@ -27,16 +27,33 @@ void taskFlightPlan(void *param)
 
     LOGD(tag, "Started");
 
+//funciona
+
     portTick delay_ms = 1000;          //Task period in [ms]
-    time_t elapsed_sec;   // Seconds counter
     portTick xLastWakeTime = osTaskGetTickCount();
+#ifdef AVR32
+    unsigned long test_unix_t = 1516629600;
+    volatile avr32_rtc_t *rtc;
+    rtc_init(&rtc,RTC_OSC_32KHZ,RTC_PSEL_32KHZ_1HZ);
+    //rtc_set_top_value(&rtc, 0);
+    rtc_enable_interrupt(&rtc);
+    //rtc_set_value(&rtc,test_unix_t);
+    rtc_enable(&rtc);
+    unsigned long elapsed_sec;
+#else
+    time_t elapsed_sec;   // Seconds counter
+#endif
 
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
 
+#ifdef AVR32
+        unsigned long elapsed_sec = rtc_get_value(&rtc);
+        printf("%lu\n", test_unix_t+elapsed_sec/1000);
+#else
         elapsed_sec = time(NULL);
-
+#endif
 
         char* command = malloc(sizeof(char)*50);
         char* args = malloc(sizeof(char)*50);

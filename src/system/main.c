@@ -53,7 +53,7 @@ int main(void)
 #endif
 
     /* Creating monitors tasks */
-    osCreateTask(taskConsole, "console", 5*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
+    osCreateTask(taskConsole, "console", 15*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
 
 #if SCH_HK_ENABLED
     osCreateTask(taskHousekeeping, "housekeeping", 6*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
@@ -64,7 +64,7 @@ int main(void)
 #endif
 
 #if SCH_FP_ENABLED
-    osCreateTask(taskFlightPlan,"flightplan",2*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
+    osCreateTask(taskFlightPlan,"flightplan",15*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
 #endif
 
 #ifndef ESP32

@@ -216,7 +216,7 @@ int cmd_repo_init(void)
     cmd_com_init();
 #endif
     cmd_console_init();
-#if SCH_RUN_FP
+#if SCH_FP_ENABLED
     cmd_fp_init();
 #endif
 #if SCH_RUN_TESTS
