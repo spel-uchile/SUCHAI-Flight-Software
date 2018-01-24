@@ -24,9 +24,6 @@ static void on_reset(void);
 static void on_close(int signal);
 const char *tag = "main";
 #ifdef AVR32
-volatile avr32_rtc_t *rtc;
-#endif
-
 __attribute__((__interrupt__)) void rtc_irq(void)
 {
     //Checking the interrupt execution
@@ -39,6 +36,7 @@ __attribute__((__interrupt__)) void rtc_irq(void)
     // specify that an interrupt has been raised
     //print_sec = 1;
 }
+#endif
 
 #ifdef ESP32
 void app_main()
