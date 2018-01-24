@@ -40,7 +40,6 @@ __attribute__((__interrupt__)) void rtc_irq(void)
     //print_sec = 1;
 }
 
-
 #ifdef ESP32
 void app_main()
 #else
