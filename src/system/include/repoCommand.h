@@ -25,7 +25,9 @@
 #if SCH_COMM_ENABLE
     #include "cmdCOM.h"
 #endif
-#if SCH_RUN_TESTS
+
+#include "cmdTestCommand.h"
+#if SCH_TEST_ENABLED
     #include "cmdTestCommand.h"
 #endif
 
