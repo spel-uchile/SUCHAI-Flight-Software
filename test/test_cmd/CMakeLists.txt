@@ -28,6 +28,7 @@ include_directories(
         ../../src/os/include
         ../../src/drivers/Linux/include
         ../../src/drivers/Linux/libcsp/include
+        src/system/include
 )
 
 link_directories(../../src/drivers/Linux/libcsp/lib)
