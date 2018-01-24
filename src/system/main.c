@@ -23,6 +23,23 @@
 static void on_reset(void);
 static void on_close(int signal);
 const char *tag = "main";
+#ifdef AVR32
+volatile avr32_rtc_t *rtc;
+#endif
+
+__attribute__((__interrupt__)) void rtc_irq(void)
+{
+    //Checking the interrupt execution
+    LED_Toggle(LED2);
+    // Increment the minutes counter
+    dat_update_time();
+    // clear the interrupt flag
+    rtc_clear_interrupt(&AVR32_RTC);
+
+    // specify that an interrupt has been raised
+    //print_sec = 1;
+}
+
 
 #ifdef ESP32
 void app_main()
@@ -45,26 +62,26 @@ int main(void)
     os_thread threads_id[n_threads];
 
     /* Crating system task (the others are created inside taskDeployment) */
-    osCreateTask(taskDispatcher,"dispatcher", 10*256, NULL, 3, &threads_id[0]);
-    osCreateTask(taskExecuter, "executer", 15*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
+    osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[0]);
+    osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[1]);
 
 #if SCH_RUN_TESTS
-    osCreateTask(taskTest, "test", 2*configMINIMAL_STACK_SIZE, "TEST1", 2, &threads_id[2]);
+    osCreateTask(taskTest, "test", 15*256, "TEST1", 2, &threads_id[2]);
 #endif
 
     /* Creating monitors tasks */
-    osCreateTask(taskConsole, "console", 15*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[3]);
+    osCreateTask(taskConsole, "console", 15*256, NULL, 2, &threads_id[3]);
 
 #if SCH_HK_ENABLED
-    osCreateTask(taskHousekeeping, "housekeeping", 6*configMINIMAL_STACK_SIZE, NULL, 2, &threads_id[4]);
+    osCreateTask(taskHousekeeping, "housekeeping", 15*256, NULL, 2, &threads_id[4]);
 #endif
 
 #if SCH_COMM_ENABLE
-    osCreateTask(taskCommunications, "comm", 2*configMINIMAL_STACK_SIZE, NULL,2, &threads_id[5]);
+    osCreateTask(taskCommunications, "comm", 15*256, NULL,2, &threads_id[5]);
 #endif
 
 #if SCH_FP_ENABLED
-    osCreateTask(taskFlightPlan,"flightplan",15*configMINIMAL_STACK_SIZE,NULL,2,&threads_id[6]);
+    osCreateTask(taskFlightPlan,"flightplan",15*256,NULL,2,&threads_id[6]);
 #endif
 
 #ifndef ESP32
@@ -126,11 +143,37 @@ void on_reset(void)
 #endif
 
 #ifdef AVR32
+    /* LED's init */
     serial_init();
     LED_On(LED0);
     LED_On(LED1);
     LED_On(LED2);
     LED_On(LED3);
+
+    /* Interrupts init */
+    // Disable all interrupts. */
+    Disable_global_interrupt();
+
+    // The INTC driver has to be used only for GNU GCC for AVR32.
+
+    // Initialize interrupt vectors.
+    INTC_init_interrupts();
+
+    // Register the RTC interrupt handler to the interrupt controller.
+    INTC_register_interrupt(&rtc_irq, AVR32_RTC_IRQ, AVR32_INTC_INT0);
+
+
+    /* RTC init */
+    rtc_init(&AVR32_RTC, RTC_OSC_32KHZ, RTC_PSEL_32KHZ_1HZ);
+    // Set top value to 0 to generate an interrupt every seconds */
+    rtc_set_top_value(&AVR32_RTC, 0);
+    // Enable the interrupts
+    rtc_enable_interrupt(&AVR32_RTC);
+    // Enable the RTC
+    rtc_enable(&AVR32_RTC);
+
+    // Enable global interrupts
+    Enable_global_interrupt();
 #endif
 
     /* Init subsystems */
@@ -182,3 +225,5 @@ void on_close(int signal)
     LOGI(tag, "Exit system!");
     exit(signal);
 }
+
+

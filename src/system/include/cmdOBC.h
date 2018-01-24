@@ -45,5 +45,26 @@ int obc_reset(char *fmt, char *params, int nparams);
  */
 int obc_get_os_memory(char *fmt, char *params, int nparams);
 
+/**
+ * Set the system time only if is not running Linux
+ *
+ * @param fmt Str. Parameters format "%d"
+ * @param params Str. Parameters as string "<time to set>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_set_time(char* fmt, char* params,int nparams);
+
+/**
+ * Show the system time in the format given. Param equal 0 is ISO format,
+ * param equal 1 is UNIX TIME format
+ *
+ * @param fmt Str. Parameters format "%d"
+ * @param params Str. Parameters as string "<format>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_show_time(char* fmt, char* params,int nparams);
+
 
 #endif /* CMD_OBC_H */

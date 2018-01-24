@@ -34,8 +34,8 @@
 
 void taskFlightPlan(void *param);
 
-/* TODO: Documentation required */
 /**
+ *Transform a date to unix time
  *
  * @param day
  * @param month
@@ -43,7 +43,7 @@ void taskFlightPlan(void *param);
  * @param hour
  * @param min
  * @param sec
- * @return
+ * @return the UNIX TIME of the date
  */
 int date_to_unixtime(int day, int month, int year, int hour, int min, int sec);
 

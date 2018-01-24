@@ -24,6 +24,9 @@
 
 static const char *tag = "repoData";
 char* table = "flightPlan";
+#ifdef AVR32
+time_t sec = 0;
+#endif
 
 
 
@@ -246,10 +249,11 @@ int dat_show_fp (void)
         {
             if(cont == 0)
             {
-                printf("UnixTime\tCommand\tArguments\tExecutions\tPeriodical\n");
+                printf("When\tCommand\tArguments\tExecutions\tPeriodical\n");
                 cont++;
             }
-            printf("%d\t%s\t%s\t%d\t%d\n",data_base[i].unixtime,data_base[i].cmd,data_base[i].args,data_base[i].executions,data_base[i].periodical);
+            time_t time_to_show = data_base[i].unixtime;
+            printf("%s\t%s\t%s\t%d\t%d\n",ctime(&time_to_show),data_base[i].cmd,data_base[i].args,data_base[i].executions,data_base[i].periodical);
         }
     }
     if(cont == 0)
@@ -260,6 +264,72 @@ int dat_show_fp (void)
     return 0;
 #else
     return storage_show_table();
+#endif
+}
+
+time_t dat_get_time(void)
+{
+#ifdef AVR32
+    return sec;
+#else
+    return time(NULL);
+#endif
+}
+
+int dat_update_time(void)
+{
+#ifdef AVR32
+    sec++;
+    return 0;
+#else
+    return 0;
+#endif
+}
+
+int dat_set_time(int new_time)
+{
+#ifdef AVR32
+    sec = (time_t)new_time;
+    return 0;
+#else
+    return 0;
+#endif
+}
+
+int dat_show_time(int format)
+{
+#ifdef AVR32
+    time_t time_to_show = dat_get_time();
+    if(format == 0)
+    {
+        printf("%s\n",ctime(&time_to_show));
+        return 0;
+    }
+    else if(format == 1)
+    {
+        printf("%d\n", (int)time_to_show);
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+#else
+    time_t time_to_show = time(NULL);
+    if(format == 0)
+    {
+        printf("%s\n",ctime(&time_to_show));
+        return 0;
+    }
+    else if(format == 1)
+    {
+        printf("%d\n", (int)time_to_show);
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 #endif
 }
 

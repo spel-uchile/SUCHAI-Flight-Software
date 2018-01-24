@@ -5,9 +5,22 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_MAIN_H
 #define SUCHAI_FLIGHT_SOFTWARE_MAIN_H
 
+#include "config.h"
 #include <stdio.h>
 #include <signal.h>
-#include "config.h"
+
+#ifdef AVR32
+    #include "asf.h"
+    #include "util.h"
+    #include <time.h>
+    #include <avr32/io.h>
+    #include "intc.h"
+    #include "board.h"
+    #include "compiler.h"
+    #include "rtc.h"
+    #include "usart.h"
+    #include "pm.h"
+#endif
 
 
 /* OS includes */
@@ -26,11 +39,6 @@
 #ifdef LINUX
     #include <csp/csp.h>
     #include <csp/interfaces/csp_if_zmqhub.h>
-#endif
-
-#ifdef AVR32
-    #include "asf.h"
-    #include "util.h"
 #endif
 
 /* Task includes */
@@ -57,5 +65,14 @@
 #else
     int main(void);
 #endif
+
+
+/**
+ *
+ * Makes an interruption to update the system time
+ *
+ * @return interruption
+ */
+__attribute__((__interrupt__)) void rtc_irq(void);
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_MAIN_H
