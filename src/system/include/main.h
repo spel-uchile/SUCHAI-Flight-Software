@@ -20,6 +20,14 @@
     #include "rtc.h"
     #include "usart.h"
     #include "pm.h"
+
+/**
+ *
+ * Makes an interruption to update the system time
+ *
+ * @return interruption
+ */
+__attribute__((__interrupt__)) void rtc_irq(void);
 #endif
 
 
@@ -64,14 +72,5 @@
 #else
     int main(void);
 #endif
-
-
-/**
- *
- * Makes an interruption to update the system time
- *
- * @return interruption
- */
-__attribute__((__interrupt__)) void rtc_irq(void);
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_MAIN_H
