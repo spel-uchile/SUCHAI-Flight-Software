@@ -2,7 +2,8 @@
  * @file  SUCHAI_config.h
  * @author Carlos Gonzalez C
  * @author Tomas Opazo T
- * @autor Ignacio Ibanez A
+ * @author Ignacio Ibanez A
+ * @author Matias Ramirez M
  * @date 2017
  * @copyright GNU Public License.
  *

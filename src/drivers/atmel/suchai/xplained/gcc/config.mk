@@ -67,6 +67,7 @@ CSRCS = \
        avr32/drivers/pm/power_clocks_lib.c                \
        avr32/drivers/usbb/usbb_device.c                   \
        avr32/drivers/spi/spi.c                            \
+       avr32/drivers/rtc/rtc.c                            \
        avr32/drivers/pdca/pdca.c                          \
        common/utils/stdio/read.c                          \
        common/utils/stdio/write.c                         \
@@ -111,6 +112,7 @@ INC_PATH = \
        avr32/drivers/pm                                   \
        avr32/drivers/usbb                                 \
        avr32/drivers/spi                                  \
+       avr32/drivers/rtc                                  \
        avr32/drivers/pdca                                 \
        avr32/utils                                        \
        avr32/utils/preprocessor                           \
@@ -135,7 +137,7 @@ INC_PATH = \
        thirdparty/freertos/freertos-7.0.0/source/portable/gcc/avr32_uc3/
 
 # Additional search paths for libraries.
-LIB_PATH =  
+LIB_PATH =
 
 # List of libraries to use during linking.
 LIBS =
@@ -145,20 +147,20 @@ LINKER_SCRIPT = $(PROJ_ROOT)/$(BOARD_NAME)/gcc/link_uc3a3256.lds
 
 # Additional options for debugging. By default the common Makefile.in will
 # add -g3.
-DBGFLAGS = 
+DBGFLAGS =
 
 # Application optimization used during compilation and linking:
 # -O0, -O1, -O2, -O3 or -Os
 OPTIMIZATION = -Os
 
 # Extra flags to use when archiving.
-ARFLAGS = 
+ARFLAGS =
 
 # Extra flags to use when assembling.
-ASFLAGS = 
+ASFLAGS =
 
 # Extra flags to use when compiling.
-CFLAGS = 
+CFLAGS =
 
 # Extra flags to use when preprocessing.
 #
@@ -177,5 +179,5 @@ LDFLAGS = \
        -nostartfiles -Wl,-e,_trampoline -nostartfiles
 
 # Pre- and post-build commands
-PREBUILD_CMD = 
-POSTBUILD_CMD = 
+PREBUILD_CMD =
+POSTBUILD_CMD =
