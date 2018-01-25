@@ -74,7 +74,7 @@ void taskConsole(void *param)
         }
         else
         {
-            LOGW(tag, "Null command was read!");
+            LOGW(tag, "Null command or Null arguments was read!");
         }
     }
 }
@@ -107,6 +107,14 @@ cmd_t * console_parse(char *buffer)
     n_args = sscanf(buffer, "%s %n", tmp_cmd, &next);
     strncpy(tmp_arg, buffer+next, CON_BUFF_LEN);
     LOGV(tag, "Parsed %d: %s, %s (%d))", n_args, tmp_cmd, tmp_arg, next);
+
+    char* format = cmd_get_fmt(tmp_cmd);
+
+    if(strcmp(format,"")!=0 && strcmp(tmp_arg,"")==0)
+    {
+        free(format);
+        return new_cmd;
+    }
 
     if (n_args == 1)
     {
