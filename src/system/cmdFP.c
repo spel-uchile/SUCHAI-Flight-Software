@@ -117,6 +117,5 @@ int fp_reset(char* fmt, char* params, int nparams)
         return CMD_OK;
     else
         return CMD_FAIL;
-
 }
 
