@@ -188,9 +188,23 @@ int cmd_repo_init(void);
  */
 int cmd_null(char *fmt, char *params, int nparams);
 
-
-
-
+/**
+ *
+ *Print each value of the structure
+ *
+ * @param cmd cmd_t. The command that will be printed
+ * @return 0 OK, 1 Error
+ */
 int cmd_print(cmd_t* cmd);
+
+/**
+ * Find the format of a command by name. This function allocates memory for the
+ * string so the user must free the array.
+ *
+ * @param name *char. Pointer to char variable. The function allocates memory so
+ * make sure to free the array after use.
+ * @return char* with the command's format
+ */
+char* cmd_get_fmt(char* name);
 
 #endif /* CMD_REPO_H */

@@ -240,3 +240,22 @@ int cmd_print(cmd_t* cmd)
     LOGV(tag, "\tid: %d\n\tnparams: %d\n\tfmt: %s\n\tparams: %s\n\tfunction: %p\n", cmd->id, cmd->nparams, cmd->fmt, cmd->params, cmd->function);
     return 0;
 }
+
+char* cmd_get_fmt(char* name)
+{
+    char* format = malloc(sizeof(char)*30);
+    int i, ok;
+    for(i=0; i<CMD_MAX_LEN; i++)
+    {
+        osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
+        ok = strcmp(name, cmd_list[i].name);
+        osSemaphoreGiven(&repo_cmd_sem);
+
+        if(ok == 0)
+        {
+            strcpy(format,cmd_list[i].fmt);
+            break;
+        }
+    }
+    return format;
+}
