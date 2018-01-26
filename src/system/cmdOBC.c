@@ -3,6 +3,7 @@
  *
  *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
  *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +21,15 @@
  
 #include "cmdOBC.h"
 
+static const char* tag = "cmdOBC";
+
 
 void cmd_obc_init(void)
 {
     cmd_add("reset", obc_reset, "", 0);
     cmd_add("get_mem", obc_get_os_memory, "", 0);
+    cmd_add("set_time", obc_set_time,"%d",1);
+    cmd_add("show_time", obc_show_time,"%d",1);
 }
 
 int obc_reset(char *fmt, char *params, int nparams)
@@ -64,7 +69,43 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
         #else
             size_t mem_heap = xPortGetFreeHeapSize();
         #endif
-        printf("Free RTOS memory: %d\n", mem_heap);
+        printf("Free RTOS memory: %d\n", (int)mem_heap);
         return CMD_OK;
     #endif
+}
+
+int obc_set_time(char* fmt, char* params,int nparams)
+{
+    int time_to_set;
+    if(sscanf(params, fmt, &time_to_set) == nparams){
+        int rc = dat_set_time(time_to_set);
+        if (rc == 0)
+            return CMD_OK;
+        else
+            return CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "set_time used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
+}
+
+
+int obc_show_time(char* fmt, char* params,int nparams)
+{
+    int format;
+    if(sscanf(params, fmt, &format) == nparams)
+    {
+        int rc = dat_show_time(format);
+        if (rc == 0)
+            return CMD_OK;
+        else
+            return  CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "show_time used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
 }

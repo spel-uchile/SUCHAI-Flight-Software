@@ -14,14 +14,28 @@
 
 #include <utils.h>
 #include <stdlib.h>
+#include "config.h"
 #include "osDelay.h"
 #include "repoCommand.h"
 #include "repoData.h"
 
+#ifdef AVR32
+    #include <avr32/io.h>
+    #if __GNUC__
+    #  include "intc.h"
+    #endif
+    #include "board.h"
+    #include "compiler.h"
+    #include "rtc.h"
+    #include "usart.h"
+    #include "pm.h"
+    #include <time.h>
+#endif
+
 void taskFlightPlan(void *param);
 
-/* TODO: Documentation required */
 /**
+ *Transform a date to unix time
  *
  * @param day
  * @param month
@@ -29,7 +43,7 @@ void taskFlightPlan(void *param);
  * @param hour
  * @param min
  * @param sec
- * @return
+ * @return the UNIX TIME of the date
  */
 int date_to_unixtime(int day, int month, int year, int hour, int min, int sec);
 

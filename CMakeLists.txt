@@ -22,8 +22,6 @@ set(SOURCE_FILES
         src/system/taskHousekeeping.c
         src/system/taskCommunications.c
         src/system/taskConsole.c
-        src/system/cmdTestCommand.c
-        src/system/taskTest.c
         src/system/main.c
         src/system/taskFlightPlan.c
         src/system/cmdFP.c

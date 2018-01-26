@@ -28,14 +28,20 @@ void taskFlightPlan(void *param)
     LOGD(tag, "Started");
 
     portTick delay_ms = 1000;          //Task period in [ms]
-    time_t elapsed_sec;   // Seconds counter
     portTick xLastWakeTime = osTaskGetTickCount();
+
+    time_t elapsed_sec;   // Seconds counter
 
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
 
+#ifdef AVR32
+        elapsed_sec = dat_get_time();
+#else
         elapsed_sec = time(NULL);
+#endif
+        //printf("%d\n", (int)elapsed_sec);
 
 
         char* command = malloc(sizeof(char)*50);

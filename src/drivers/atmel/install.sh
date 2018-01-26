@@ -23,6 +23,9 @@ ln -s -f ../../../../../../system
 ln -s -f ../../../../../../os
 cd -
 
+echo "Moving the FreeRTOS configuration...."
+cp FreeRTOSConfig.h xdk-asf-3.33.0/thirdparty/freertos/freertos-7.0.0/module_config/FreeRTOSConfig.h
+
 echo "---------"
 echo "Finished. Compile and program with:"
 echo "sh build.sh"
