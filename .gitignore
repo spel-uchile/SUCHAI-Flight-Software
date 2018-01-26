@@ -42,3 +42,6 @@ cmake-build-debug/
 
 # Play Ground
 playground
+
+# Libcsp
+src/drivers/Linux/libcsp/libcsp
