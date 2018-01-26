@@ -110,6 +110,10 @@ cmd_t * console_parse(char *buffer)
 
     char* format = cmd_get_fmt(tmp_cmd);
 
+    //char* fix_format = fix_fmt(format);
+    //LOGD(tag, "Format: %s, fixed format: %s", format, fix_format);
+
+
     if(strcmp(format,"")!=0 && strcmp(tmp_arg,"")==0)
     {
         free(format);

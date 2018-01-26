@@ -54,14 +54,15 @@ void taskFlightPlan(void *param)
         if(rc == -1)
             continue;
 
+        char* fixed_args = fix_fmt(args);
         int i;
         for(i=0; i < (*executions); i++)
         {
             cmd_t *new_cmd = cmd_get_str(command);
-            cmd_add_params_str(new_cmd, args);
+            cmd_add_params_str(new_cmd, fixed_args);
 
             LOGD(tag, "Command: %s", command);
-            LOGD(tag, "Arguments: %s", args);
+            LOGD(tag, "Arguments: %s", fixed_args);
             LOGD(tag, "Executions: %d", *executions);
             LOGD(tag, "Periodical: %d", *periodical);
             cmd_send(new_cmd);
@@ -69,6 +70,7 @@ void taskFlightPlan(void *param)
 
         free(command);
         free(args);
+        free(fixed_args);
         free(executions);
         free(periodical);
     }

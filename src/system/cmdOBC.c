@@ -23,13 +23,13 @@
 
 static const char* tag = "cmdOBC";
 
-
 void cmd_obc_init(void)
 {
     cmd_add("reset", obc_reset, "", 0);
     cmd_add("get_mem", obc_get_os_memory, "", 0);
     cmd_add("set_time", obc_set_time,"%d",1);
     cmd_add("show_time", obc_show_time,"%d",1);
+    cmd_add("test_fp", test_fp, "%d %s %d", 3);
 }
 
 int obc_reset(char *fmt, char *params, int nparams)
@@ -91,7 +91,6 @@ int obc_set_time(char* fmt, char* params,int nparams)
     }
 }
 
-
 int obc_show_time(char* fmt, char* params,int nparams)
 {
     int format;
@@ -106,6 +105,22 @@ int obc_show_time(char* fmt, char* params,int nparams)
     else
     {
         LOGW(tag, "show_time used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
+}
+
+int test_fp(char* fmt, char* params,int nparams)
+{
+    int num1, num2;
+    char str[CMD_MAX_STR_PARAMS];
+    if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
+    {
+        printf("Los parametros leidos son: %d ; %s ; %d \n",num1, str ,num2);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGW(tag, "test_fp used with invalid params: %s", params);
         return CMD_FAIL;
     }
 }

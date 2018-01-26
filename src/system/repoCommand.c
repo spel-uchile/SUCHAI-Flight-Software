@@ -256,3 +256,26 @@ char* cmd_get_fmt(char* name)
     }
     return format;
 }
+
+char* fix_fmt(char* fmt)
+{
+    char* new_fmt = malloc(sizeof(char)*30);
+    char* aux = new_fmt;
+    while(*fmt != 0)
+    {
+        if(*fmt ==',')
+        {
+            *aux = ' ';
+        }
+        else
+        {
+            *aux = *fmt;
+        }
+        fmt++;
+        aux++;
+    }
+    aux++;
+    *aux = 0;
+    return new_fmt;
+
+}

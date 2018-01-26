@@ -332,5 +332,3 @@ int dat_show_time(int format)
     }
 #endif
 }
-
-
