@@ -4,7 +4,7 @@
 #include "cmdFP.h"
 
 /* The suite initialization function.
- * Opens the temporary file used by the tests.
+ * Resets the flight plan
  * Returns zero on success, non-zero otherwise.
  */
 int init_suite1(void)
@@ -14,7 +14,6 @@ int init_suite1(void)
 }
 
 /* The suite cleanup function.
- * Closes the temporary file used by the tests.
  * Returns zero on success, non-zero otherwise.
  */
 int clean_suite1(void)
@@ -36,8 +35,8 @@ void testFPSET(void)
 //Test of fp_delete
 void testFPDELETE(void)
 {
-    char * fmt = "%d %d %d %d %d %d";
-    char * params = "26 01 2018 12 35 00";
+    char* fmt = "%d %d %d %d %d %d";
+    char* params = "26 01 2018 12 35 00";
     int nparams = 6;
     int result;
     result = fp_delete(fmt, params, nparams);
@@ -64,9 +63,8 @@ int main()
     }
 
     /* add the tests to the suite */
-    /* NOTE - ORDER IS IMPORTANT - MUST TEST fread() AFTER fprintf() */
-    if (NULL == CU_add_test(pSuite, "test of fpset()", testFPSET) ||
-            NULL == CU_add_test(pSuite, "test of fpdelete()", testFPDELETE)){
+    if (NULL == CU_add_test(pSuite, "test of fpset()", testFPSET)
+           || NULL == CU_add_test(pSuite, "test of fpdelete()", testFPDELETE)){
         CU_cleanup_registry();
         return CU_get_error();
     }
