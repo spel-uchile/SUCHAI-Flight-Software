@@ -66,5 +66,15 @@ int obc_set_time(char* fmt, char* params,int nparams);
  */
 int obc_show_time(char* fmt, char* params,int nparams);
 
+/**
+ *
+ * Function to test the console lecture on flight plan
+ *
+ * @param fmt Str. Parameters format "%d %s %d"
+ * @param params Str. Parameters as string "<int> <string> <int>"
+ * @param nparams Int. Number of parameters 3
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int test_fp(char* fmt, char* params,int nparams);
 
 #endif /* CMD_OBC_H */

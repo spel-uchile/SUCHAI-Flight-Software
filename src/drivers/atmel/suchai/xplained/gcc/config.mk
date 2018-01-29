@@ -38,6 +38,7 @@ CSRCS = \
        $(PROJ_ROOT)/system/cmdDRP.c                       \
        $(PROJ_ROOT)/system/cmdFP.c                        \
        $(PROJ_ROOT)/system/cmdOBC.c                       \
+       $(PROJ_ROOT)/system/cmdCOM.c                       \
        $(PROJ_ROOT)/system/repoCommand.c                  \
        $(PROJ_ROOT)/system/repoData.c                     \
        $(PROJ_ROOT)/system/taskConsole.c                  \
@@ -45,6 +46,7 @@ CSRCS = \
        $(PROJ_ROOT)/system/taskExecuter.c                 \
        $(PROJ_ROOT)/system/taskFlightPlan.c               \
        $(PROJ_ROOT)/system/taskHousekeeping.c             \
+       $(PROJ_ROOT)/system/taskCommunications.c           \
        $(PROJ_ROOT)/util/hexdump.c                        \
        $(PROJ_ROOT)/util/memcheck.c                       \
        $(PROJ_ROOT)/util/init.c                           \
@@ -54,6 +56,32 @@ CSRCS = \
        $(PROJ_ROOT)/os/FreeRTOS/osScheduler.c             \
        $(PROJ_ROOT)/os/FreeRTOS/osSemphr.c                \
        $(PROJ_ROOT)/os/FreeRTOS/osThread.c                \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_io.c            \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_services.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_service_handler.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_bridge.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_buffer.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_conn.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_crc32.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_debug.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_dedup.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_endian.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_iflist.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_port.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_promisc.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_qfifo.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_route.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/csp_sfp.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/transport/csp_rdp.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/transport/csp_udp.c          \
+       $(PROJ_ROOT)/libcsp/libcsp/src/rtable/csp_rtable_static.c        \
+       $(PROJ_ROOT)/libcsp/libcsp/src/interfaces/csp_if_i2c.c           \
+       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_malloc.c        \
+       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_queue.c         \
+       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_semaphore.c     \
+       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_system.c        \
+       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_thread.c        \
+       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_time.c          \
        avr32/boards/uc3_a3_xplained/init.c                \
        avr32/boards/uc3_a3_xplained/led.c                 \
        avr32/drivers/flashc/flashc.c                      \
@@ -98,6 +126,14 @@ INC_PATH = \
        $(PROJ_ROOT)/util                                  \
        $(PROJ_ROOT)/system/include                        \
        $(PROJ_ROOT)/os/include                            \
+       $(PROJ_ROOT)/libcsp/include                        \
+       $(PROJ_ROOT)/libcsp/libcsp/include                 \
+       $(PROJ_ROOT)/libcsp/libcsp/include/csp              \
+       $(PROJ_ROOT)/libcsp/libcsp/include/csp/interfaces   \
+       $(PROJ_ROOT)/libcsp/libcsp/include/arch            \
+       $(PROJ_ROOT)/libcsp/libcsp/include/drivers         \
+       $(PROJ_ROOT)/libcsp/libcsp/src                     \
+       $(PROJ_ROOT)/libcsp/libcsp/src/transport           \
        $(PROJ_ROOT)/$(BOARD_NAME)                         \
        $(PROJ_ROOT)/$(BOARD_NAME)/gcc                     \
        avr32/boards                                       \

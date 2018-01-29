@@ -217,5 +217,3 @@ void on_close(int signal)
     LOGI(tag, "Exit system!");
     exit(signal);
 }
-
-

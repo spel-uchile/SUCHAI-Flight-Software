@@ -185,13 +185,16 @@ void cmd_print_all(void)
 
     LOGD(tag, "Command list");
     osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
+    osSemaphoreTake(&log_mutex, portMAX_DELAY);
     printf("Index\t name\t Params\n");
     int i;
     for(i=0; i<cmd_index; i++)
     {
         printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
+    osSemaphoreGiven(&log_mutex);
     osSemaphoreGiven(&repo_cmd_sem);
+
 }
 
 int cmd_repo_init(void)
@@ -255,4 +258,27 @@ char* cmd_get_fmt(char* name)
         }
     }
     return format;
+}
+
+char* fix_fmt(char* fmt)
+{
+    char* new_fmt = malloc(sizeof(char)*30);
+    char* aux = new_fmt;
+    while(*fmt != 0)
+    {
+        if(*fmt ==',')
+        {
+            *aux = ' ';
+        }
+        else
+        {
+            *aux = *fmt;
+        }
+        fmt++;
+        aux++;
+    }
+    aux++;
+    *aux = 0;
+    return new_fmt;
+
 }
