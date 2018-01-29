@@ -21,6 +21,8 @@ echo "Linking source code to ASF application..."
 cd xdk-asf-3.33.0/avr32/applications/suchai/
 ln -s -f ../../../../../../system
 ln -s -f ../../../../../../os
+echo "Linking libcsp..."
+ln -s -f ../../../../../../drivers/atmel/libcsp
 cd -
 
 echo "Moving the FreeRTOS configuration...."
