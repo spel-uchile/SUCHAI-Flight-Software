@@ -166,6 +166,9 @@ void on_reset(void)
 
     // Enable global interrupts
     Enable_global_interrupt();
+
+
+
 #endif
 
     /* Init subsystems */
@@ -173,7 +176,26 @@ void on_reset(void)
     cmd_repo_init(); //Command repository initialization
     dat_repo_init(); //Update status repository
 
+#ifdef AVR32
+
+    /* Init communications */
+    LOGI(tag, "Initialising CSP...");
+    /* Init buffer system with 5 packets of maximum 300 bytes each */
+    csp_buffer_init(5, 300);
+    /* Init CSP with address MY_ADDRESS */
+    csp_init(SCH_COMM_ADDRESS);
+    /* Start router task with 500 word stack, OS task priority 1 */
+    csp_route_start_task(500, 1);
+
+    LOGD(tag, "Route table");
+    csp_route_print_table();
+    LOGD(tag, "Interfaces");
+    csp_route_print_interfaces();
+
+#endif
+
 #ifdef LINUX
+
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
     /* Init buffer system with 5 packets of maximum 300 bytes each */

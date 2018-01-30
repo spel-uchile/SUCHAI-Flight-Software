@@ -76,6 +76,7 @@ CSRCS = \
        $(PROJ_ROOT)/libcsp/libcsp/src/transport/csp_udp.c          \
        $(PROJ_ROOT)/libcsp/libcsp/src/rtable/csp_rtable_static.c        \
        $(PROJ_ROOT)/libcsp/libcsp/src/interfaces/csp_if_i2c.c           \
+       $(PROJ_ROOT)/libcsp/libcsp/src/interfaces/csp_if_lo.c           \
        $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_malloc.c        \
        $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_queue.c         \
        $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_semaphore.c     \

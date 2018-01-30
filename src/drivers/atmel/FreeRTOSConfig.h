@@ -66,8 +66,8 @@
  *----------------------------------------------------------*/
 
 #define configUSE_PREEMPTION      1
-#define configUSE_IDLE_HOOK       0
-#define configUSE_TICK_HOOK       0
+#define configUSE_IDLE_HOOK       1
+#define configUSE_TICK_HOOK       1
 #define configCPU_CLOCK_HZ        ( 24000000 ) /* Hz clk gen */
 #define configPBA_CLOCK_HZ        ( 24000000 )
 #define configTICK_RATE_HZ        ( ( portTickType ) 1000 )
