@@ -63,8 +63,8 @@ int main()
     }
 
     /* add the tests to the suite */
-    if (NULL == CU_add_test(pSuite, "test of fpset()", testFPSET)
-           || NULL == CU_add_test(pSuite, "test of fpdelete()", testFPDELETE)){
+    if ((NULL == CU_add_test(pSuite, "test of fpset()", testFPSET))
+           || (NULL == CU_add_test(pSuite, "test of fpdelete()", testFPDELETE))){
         CU_cleanup_registry();
         return CU_get_error();
     }
@@ -72,7 +72,18 @@ int main()
     /* Run all tests using the CUnit Basic interface */
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
+
+    int failed;
+    failed = CU_get_number_of_tests_failed();
+
     CU_cleanup_registry();
+
+    /*if one or more tests have failed, the execution needs to be ended with exit code 1*/
+    if (failed != 0) {
+        exit(1);
+    }
+
     return CU_get_error();
 }
+
 
