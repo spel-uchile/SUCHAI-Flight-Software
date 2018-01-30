@@ -26,7 +26,6 @@
     #include "cmdCOM.h"
 #endif
 
-#include "../../../test/test_cmd/src/system/include/cmdTestCommand.h"
 #if SCH_TEST_ENABLED
     #include "cmdTestCommand.h"
 #endif
