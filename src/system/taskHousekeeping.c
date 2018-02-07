@@ -29,9 +29,9 @@ void taskHousekeeping(void *param)
     portTick delay_ms    = 1000;            //Task period in [ms]
 
     unsigned int elapsed_sec = 0;           // Seconds counter
-    unsigned int _10sec_check = 1;//10;     //10[s] condition
-    unsigned int _10min_check = 2;//10*60;  //10[m] condition
-    unsigned int _1hour_check = 3;//60*60;  //01[h] condition
+    unsigned int _10sec_check = 10;     //10[s] condition
+    unsigned int _10min_check = 10*60;  //10[m] condition
+    unsigned int _1hour_check = 60*60;  //01[h] condition
 
     //char *task_name = param != NULL ? (char *)param : "HSK";
     char *task_name = malloc(sizeof(char)*14);
@@ -44,6 +44,11 @@ void taskHousekeeping(void *param)
 
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
         elapsed_sec += delay_ms/1000; //Update seconds counts
+
+        #ifdef NANOMIND
+            led_toggle(LED_CPUOK);
+            led_toggle(LED_A);
+        #endif
 
         /* 10 seconds actions */
         if((elapsed_sec % _10sec_check) == 0)

@@ -66,6 +66,8 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
     #else
         #ifdef AVR32
             size_t mem_heap = 0; //xPortGetFreeHeapSize();
+        #elif defined(NANOMIND)
+            size_t mem_heap = 0;
         #else
             size_t mem_heap = xPortGetFreeHeapSize();
         #endif

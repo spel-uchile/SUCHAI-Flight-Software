@@ -85,6 +85,7 @@ int main(void)
 }
 
 #ifdef FREERTOS
+#ifndef NANOMIND
 /**
  * Task idle handle function. Performs operations inside the idle task
  * configUSE_IDLE_HOOK must be set to 1
@@ -93,6 +94,7 @@ void vApplicationIdleHook(void)
 {
     //Add hook code here
 }
+
 
 /**
  * Task idle handle function. Performs operations inside the idle task
@@ -119,6 +121,7 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
     /* Stack overflow handle */
     while(1);
 }
+#endif
 #endif
 
 /**
@@ -167,17 +170,6 @@ void on_reset(void)
     // Enable global interrupts
     Enable_global_interrupt();
 
-
-
-#endif
-
-    /* Init subsystems */
-    log_init();      // Logging system
-    cmd_repo_init(); //Command repository initialization
-    dat_repo_init(); //Update status repository
-
-#ifdef AVR32
-
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
     /* Init buffer system with 5 packets of maximum 300 bytes each */
@@ -194,8 +186,57 @@ void on_reset(void)
 
 #endif
 
-#ifdef LINUX
+#ifdef NANOMIND
+    /* Reset watchdog */
+    wdt_disable();
+    wdt_clear();
+    wdt_opt_t wdtopt = { .us_timeout_period = 5000000 };
+    wdt_enable(&wdtopt);
 
+    /* Initialize interrupt handling.
+     * This function call is needed, when using libasf startup.S file */
+    INTC_init_interrupts();
+
+    /* Init CLK */
+    sysclk_init();
+
+    /* Init pwr channels */
+    pwr_switch_init();
+
+    /* At this point we only power the interstages.
+     * MLX and finesunsensors are powered on in init task */
+    pwr_switch_disable(PWR_GSSB);
+    pwr_switch_disable(PWR_GSSB2);
+
+    /* Init SDRAM, do this before malloc is called */
+    sdramc_init(sysclk_get_cpu_hz());
+
+
+    /* Init USART for debugging */
+    static const gpio_map_t USART_GPIO_MAP = {
+            {USART_RXD_PIN, USART_RXD_FUNCTION},
+            {USART_TXD_PIN, USART_TXD_FUNCTION},
+    };
+    gpio_enable_module(USART_GPIO_MAP,
+                       sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
+    usart_init(USART_CONSOLE, sysclk_get_peripheral_bus_hz(USART), 500000);
+    usart_stdio_id = USART_CONSOLE;
+
+    /* Init LED */
+    led_init();
+    led_on(LED_CPUOK);
+
+    /* RTC + 32kHz OSC */
+    /* Setup RTC */
+    uint8_t cmd[] = {FM33_WRPC, 0x18, 0x3D};
+    fm33256b_write(cmd, 3);
+    /* RTC */
+    fm33256b_clock_resume();
+    /* 32kHz Crystal setup */
+    osc_enable(OSC_ID_OSC32);
+#endif
+
+#ifdef LINUX
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
     /* Init buffer system with 5 packets of maximum 300 bytes each */
@@ -225,6 +266,11 @@ void on_reset(void)
         csp_route_print_interfaces();
     #endif
 #endif
+
+    /* Init subsystems */
+    log_init();      // Logging system
+    cmd_repo_init(); //Command repository initialization
+    dat_repo_init(); //Update status repository
 }
 
 /**

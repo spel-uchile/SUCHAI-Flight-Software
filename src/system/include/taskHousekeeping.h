@@ -23,6 +23,9 @@
     #include "asf.h"
     #include "util.h"
 #endif
+#ifdef NANOMIND
+    #include <led.h>
+#endif
 
 #include "globals.h"
 

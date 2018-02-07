@@ -21,13 +21,27 @@
     #include "usart.h"
     #include "pm.h"
 
-/**
- *
- * Makes an interruption to update the system time
- *
- * @return interruption
- */
+/* Makes an interruption to update the system time */
 __attribute__((__interrupt__)) void rtc_irq(void);
+#endif
+
+#ifdef NANOMIND
+    #include <conf_a3200.h>
+
+    #include <sysclk.h>
+    #include <wdt.h>
+    #include <gpio.h>
+    #include <sdramc.h>
+    #include <reset_cause.h>
+
+    #include <dev/usart.h>
+    #include <dev/i2c.h>
+    #include <dev/cpu.h>
+
+    #include <fm33256b.h>
+
+    #include <led.h>
+    #include <pwr_switch.h>
 #endif
 
 
@@ -67,7 +81,7 @@ __attribute__((__interrupt__)) void rtc_irq(void);
     #include "taskFlightPlan.h"
 #endif
 
-#ifdef FREERTOS
+#ifdef ESP32
     void app_main();
 #else
     int main(void);

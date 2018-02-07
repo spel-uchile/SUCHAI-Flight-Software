@@ -2,8 +2,7 @@
  * @file  SUCHAI_config.h
  * @author Carlos Gonzalez C
  * @author Tomas Opazo T
- * @author Ignacio Ibanez A
- * @author Matias Ramirez M
+ * @autor Ignacio Ibanez A
  * @date 2017
  * @copyright GNU Public License.
  *
@@ -20,22 +19,23 @@
 #include <string.h>
 
 /* Select one operating system */
-#define LINUX                               ///< Use Linux
-//#define FREERTOS                          ///< Use FreeRTOS (select arch below)
+// #define LINUX                               ///< Use Linux
+#define FREERTOS                          ///< Use FreeRTOS (select arch below)
 /* Select the correct architecture */
 #ifdef FREERTOS
-//  #define ESP32                         ///< Uncomment to run in ESP32
-    #define AVR32                         ///< Uncomment to run in AVR32
+//    #define ESP32                         ///< Uncomment to run in ESP32
+//    #define AVR32                         ///< Uncomment to run in AVR32
+    #define NANOMIND                      ///< Uncomment to run in Nanomind A3200
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL       LOG_LVL_VERBOSE     ///< Define debug levels
+#define LOG_LEVEL       LOG_LVL_INFO     ///< Define debug levels
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN            (256)   ///< General buffers max length (bytes)
 #define SCH_COMM_ENABLE             0       ///< TaskCommunications enabled
 #define SCH_FP_ENABLED              0       ///< TaskFlightPlan enabled
-#define SCH_HK_ENABLED              0       ///< TaskHousekeeping enabled
+#define SCH_HK_ENABLED              1       ///< TaskHousekeeping enabled
 #define SCH_TEST_ENABLED            0       ///< Set to run tests
 
 
