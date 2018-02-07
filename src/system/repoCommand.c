@@ -123,7 +123,7 @@ char * cmd_get_name(int idx)
         cmd_list_t cmd_found = cmd_list[idx];
         osSemaphoreGiven(&repo_cmd_sem);
 
-        LOGI(tag, cmd_found.name);
+        LOGD(tag, cmd_found.name);
         name = (char *)malloc((strlen(cmd_found.name)+1)*sizeof(char));
         if(name == NULL)
         {
