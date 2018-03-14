@@ -14,6 +14,7 @@
 #define T_HOUSEKEEPING_H
 
 #include <stdlib.h>
+#include <stdint.h>
 #include "config.h"
 
 #if SCH_COMM_ENABLE
@@ -24,7 +25,8 @@
     #include "util.h"
 #endif
 #ifdef NANOMIND
-    #include <led.h>
+    #include "led.h"
+    #include "wdt.h"
 #endif
 
 #include "globals.h"

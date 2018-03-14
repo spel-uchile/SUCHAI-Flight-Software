@@ -33,10 +33,6 @@ void taskHousekeeping(void *param)
     unsigned int _10min_check = 10*60;  //10[m] condition
     unsigned int _1hour_check = 60*60;  //01[h] condition
 
-    //char *task_name = param != NULL ? (char *)param : "HSK";
-    char *task_name = malloc(sizeof(char)*14);
-    strcpy(task_name, "Housekeeping");
-
     portTick xLastWakeTime = osTaskGetTickCount();
     
     while(1)
@@ -46,8 +42,10 @@ void taskHousekeeping(void *param)
         elapsed_sec += delay_ms/1000; //Update seconds counts
 
         #ifdef NANOMIND
+        //TODO: This should be a command
             led_toggle(LED_CPUOK);
             led_toggle(LED_A);
+            wdt_clear();
         #endif
 
         /* 10 seconds actions */
