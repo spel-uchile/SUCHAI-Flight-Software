@@ -15,12 +15,12 @@
  */
 void osScheduler(os_thread* thread_id, int n_thread)
 {
-    printf(">>Starting FreeRTOS scheduler [->]\r\n");
+    printf("[INFO] Starting FreeRTOS scheduler...\n");
     vTaskStartScheduler();
 
     /* FIXME: Should the system restart? */
-//    while(1)
-//    {
-//    	printf("\n>>FreeRTOS [FAIL]\n");
-//    }
+    while(1)
+    {
+    	printf("[ERROR] FreeRTOS scheduler stopped!\n");
+    }
 }
