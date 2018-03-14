@@ -48,30 +48,43 @@ int main(void)
     /* On reset */
     on_reset();
 
-    LOGI(tag, "Creating tasks...");
-
     /* Initializing shared Queues */
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
-    executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
+    if(dispatcher_queue == 0)
+        LOGE(tag, "Error creating dispatcher queue");
     executer_stat_queue = osQueueCreate(1,sizeof(int));
+    if(executer_stat_queue == 0)
+        LOGE(tag, "Error creating executer stat queue");
+    executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
+    if(executer_cmd_queue == 0)
+        LOGE(tag, "Error creating executer cmd queue");
 
     int n_threads = 7;
     os_thread threads_id[n_threads];
 
-    /* Crating system task (the others are created inside taskDeployment) */
-    osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[0]);
-    osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[1]);
-    /* Creating monitors tasks */
-    osCreateTask(taskConsole, "console", 15*256, NULL, 2, &threads_id[3]);
+    LOGI(tag, "Creating tasks...");
 
-#if SCH_HK_ENABLED
-    osCreateTask(taskHousekeeping, "housekeeping", 15*256, NULL, 2, &threads_id[4]);
+#ifdef NANOMIND
+    /* Start init task at highest priority */
+    //TODO: Refactor and add TaskInit
+    void init_task(void * param);
+    osCreateTask(init_task, "init", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
 #endif
 
+    /* Crating system task (the others are created inside taskDeployment) */
+    // FIXME: This memory values seems not work on nanomind (tested 5 and 10)
+    osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[0]);
+    osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[1]);
+
+    /* Creating clients tasks */
+    osCreateTask(taskConsole, "console", 15*256, NULL, 2, &threads_id[3]);
+#if SCH_HK_ENABLED
+    // FIXME: This memory values seems not work on nanomind (tested with 10)
+    osCreateTask(taskHousekeeping, "housekeeping", 15*256, NULL, 2, &threads_id[4]);
+#endif
 #if SCH_COMM_ENABLE
     osCreateTask(taskCommunications, "comm", 15*256, NULL,2, &threads_id[5]);
 #endif
-
 #if SCH_FP_ENABLED
     osCreateTask(taskFlightPlan,"flightplan",15*256,NULL,2,&threads_id[6]);
 #endif
@@ -183,7 +196,6 @@ void on_reset(void)
     csp_route_print_table();
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
-
 #endif
 
 #ifdef NANOMIND
@@ -225,15 +237,6 @@ void on_reset(void)
     /* Init LED */
     led_init();
     led_on(LED_CPUOK);
-
-    /* RTC + 32kHz OSC */
-    /* Setup RTC */
-    uint8_t cmd[] = {FM33_WRPC, 0x18, 0x3D};
-    fm33256b_write(cmd, 3);
-    /* RTC */
-    fm33256b_clock_resume();
-    /* 32kHz Crystal setup */
-    osc_enable(OSC_ID_OSC32);
 #endif
 
 #ifdef LINUX
