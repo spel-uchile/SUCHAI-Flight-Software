@@ -183,6 +183,12 @@ void on_reset(void)
     // Enable global interrupts
     Enable_global_interrupt();
 
+    /* Init subsystems */
+//    log_init();      // Logging system
+//    cmd_repo_init(); //Command repository initialization
+//    dat_repo_init(); //Update status repository
+
+#ifdef SCH_COMM_ENABLE
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
     /* Init buffer system with 5 packets of maximum 300 bytes each */
@@ -196,6 +202,8 @@ void on_reset(void)
     csp_route_print_table();
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
+#endif
+
 #endif
 
 #ifdef NANOMIND
