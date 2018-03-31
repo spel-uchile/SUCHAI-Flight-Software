@@ -181,3 +181,58 @@ void ssc_start(void)
     ssc->cr = AVR32_SSC_CR_RXEN_MASK;
     ssc->ier = AVR32_SSC_IDR_RXRDY_MASK;
 }
+
+__attribute__((__interrupt__)) void rtc_irq(void)
+{
+    //Checking the interrupt execution
+    LED_Toggle(LED2);
+    // Increment the minutes counter
+    dat_update_time();
+    // clear the interrupt flag
+    rtc_clear_interrupt(&AVR32_RTC);
+
+    // specify that an interrupt has been raised
+    //print_sec = 1;
+}
+
+void on_close(int signal)
+{
+    dat_repo_close();
+
+    LOGI(tag, "Exit system!");
+    exit(signal);
+}
+
+void on_reset(void)
+{
+    /* LED's init */
+    serial_init();
+    LED_On(LED0);
+    LED_On(LED1);
+    LED_On(LED2);
+    LED_On(LED3);
+
+    /* Interrupts init */
+    // Disable all interrupts. */
+    Disable_global_interrupt();
+
+    // The INTC driver has to be used only for GNU GCC for AVR32.
+
+    // Initialize interrupt vectors.
+    INTC_init_interrupts();
+
+    // Register the RTC interrupt handler to the interrupt controller.
+    INTC_register_interrupt(&rtc_irq, AVR32_RTC_IRQ, AVR32_INTC_INT0);
+
+    /* RTC init */
+    rtc_init(&AVR32_RTC, RTC_OSC_32KHZ, RTC_PSEL_32KHZ_1HZ);
+    // Set top value to 0 to generate an interrupt every seconds */
+    rtc_set_top_value(&AVR32_RTC, 0);
+    // Enable the interrupts
+    rtc_enable_interrupt(&AVR32_RTC);
+    // Enable the RTC
+    rtc_enable(&AVR32_RTC);
+
+    // Enable global interrupts
+    Enable_global_interrupt();
+}

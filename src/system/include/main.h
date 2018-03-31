@@ -5,6 +5,7 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_MAIN_H
 #define SUCHAI_FLIGHT_SOFTWARE_MAIN_H
 
+
 #include "config.h"
 #include <stdio.h>
 #include <signal.h>
@@ -20,6 +21,7 @@
     #include "rtc.h"
     #include "usart.h"
     #include "pm.h"
+
 
 /* Makes an interruption to update the system time */
 __attribute__((__interrupt__)) void rtc_irq(void);
@@ -57,6 +59,7 @@ __attribute__((__interrupt__)) void rtc_irq(void);
 #include "utils.h"
 #include "repoData.h"
 #include "repoCommand.h"
+#include "init.h"
 
 #ifdef LINUX
     #include <csp/csp.h>

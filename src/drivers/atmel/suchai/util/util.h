@@ -11,4 +11,8 @@ void ssc_start(void);
 uint32_t memcheck(void);
 void hexdump(char *desc, void *addr, int len);
 
+__attribute__((__interrupt__)) void rtc_irq(void);
+void on_close(int signal);
+void on_reset(void);
+
 #endif
