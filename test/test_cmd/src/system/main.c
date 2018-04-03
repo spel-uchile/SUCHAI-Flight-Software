@@ -20,8 +20,6 @@
 
 #include "main.h"
 
-static void on_reset(void);
-static void on_close(int signal);
 const char *tag = "main";
 
 #ifdef ESP32
