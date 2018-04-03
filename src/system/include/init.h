@@ -31,8 +31,6 @@
     #include "usart.h"
     #include "pm.h"
 
-/* Makes an interruption to update the system time */
-__attribute__((__interrupt__)) void rtc_irq(void);
 #endif
 
 

@@ -24,7 +24,7 @@
 /* Select the correct architecture */
 #ifdef FREERTOS
 //    #define ESP32                         ///< Uncomment to run in ESP32
-      #define AVR32                         ///< Uncomment to run in AVR32
+    #define AVR32                         ///< Uncomment to run in AVR32
 //    #define NANOMIND                      ///< Uncomment to run in Nanomind A3200
 #endif
 
