@@ -4,6 +4,8 @@
 #include "conf_usart_serial.h"
 #include "conf_spi_master.h"
 
+static const char *tag = "Initializer";
+
 void serial_init(void)
 {
 	// This is a fairly stereotypical "ASF pattern" for enabling a peripheral.
