@@ -1,7 +1,27 @@
 #ifndef __UTIL_H
 #define __UTIL_H
 
+/* system includes */
+#include "repoData.h"
+#include "repoCommand.h"
+
 #include <stdint.h>
+#include <stdint.h>
+#include "utils.h"
+#include <stdio.h>
+#include <signal.h>
+#include "asf.h"
+#include "util.h"
+#include <time.h>
+#include <avr32/io.h>
+#include "intc.h"
+#include "board.h"
+#include "compiler.h"
+#include "rtc.h"
+#include "usart.h"
+#include "pm.h"
+
+
 
 void serial_init(void);
 void spi_init(void);

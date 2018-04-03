@@ -19,8 +19,8 @@
 #include <string.h>
 
 /* Select one operating system */
-#define LINUX                               ///< Use Linux
-//#define FREERTOS                          ///< Use FreeRTOS (select arch below)
+//#define LINUX                               ///< Use Linux
+#define FREERTOS                          ///< Use FreeRTOS (select arch below)
 /* Select the correct architecture */
 #ifdef FREERTOS
 //    #define ESP32                         ///< Uncomment to run in ESP32
