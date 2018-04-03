@@ -99,10 +99,13 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
 /**
  * Performs initialization actions
  */
+
+/*
+
 void on_reset(void)
 {
 #ifdef LINUX
-    /* Register INT/TERM signals */
+    // Register INT/TERM signals
     struct sigaction act;
     act.sa_handler = on_close;
     sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
@@ -117,26 +120,26 @@ void on_reset(void)
     LED_On(LED3);
 #endif
 
-    /* Init subsystems */
+    // Init subsystems
     log_init();      // Logging system
     cmd_repo_init(); //Command repository initialization
     dat_repo_init(); //Update status repository
 
 #ifdef LINUX
-    /* Init communications */
+    // Init communications
     LOGI(tag, "Initialising CSP...");
-    /* Init buffer system with 5 packets of maximum 300 bytes each */
+    // Init buffer system with 5 packets of maximum 300 bytes each
     csp_buffer_init(5, 300);
-    /* Init CSP with address MY_ADDRESS */
+    // Init CSP with address MY_ADDRESS
     csp_init(SCH_COMM_ADDRESS);
-    /* Start router task with 500 word stack, OS task priority 1 */
+    // Start router task with 500 word stack, OS task priority 1
     csp_route_start_task(500, 1);
-    /* Set ZMQ interface */
+    // Set ZMQ interface
     csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
 
 #if LOG_LEVEL >= LOG_LVL_DEBUG<s
-    /*Debug output from CSP */
+    /*Debug output from CSP
         printf("Debug enabed\r\n");
         csp_debug_set_level(1, 1);
         csp_debug_toggle_level(2);
@@ -153,16 +156,18 @@ void on_reset(void)
 #endif
 #endif
 }
+ */
 
 /**
  * Performs a clean exit
  *
  * @param signal Int. Signal number
  */
-void on_close(int signal)
+/*void on_close(int signal)
 {
     dat_repo_close();
 
     LOGI(tag, "Exit system!");
     exit(signal);
 }
+*/
