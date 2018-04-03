@@ -6,4 +6,5 @@
 # in the build directory. This behaviour is entirely configurable,
 # please read the ESP-IDF documents if you need to do this.
 #
-COMPONENT_OBJS := main.o globals.o utils.o taskHousekeeping.o taskExecuter.o taskDispatcher.o taskConsole.o cmdConsole.o cmdDRP.o cmdOBC.o repoCommand.o repoData.o
+COMPONENT_OBJS := main.o globals.o utils.o taskHousekeeping.o taskExecuter.o taskDispatcher.o taskConsole.o taskFlightPlan.o cmdFP.o cmdConsole.o cmdDRP.o cmdOBC.o repoCommand.o repoData.o init.o
+
