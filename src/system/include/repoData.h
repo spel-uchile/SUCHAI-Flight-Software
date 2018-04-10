@@ -3,7 +3,7 @@
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
- * @date 2017
+ * @date 2018
  * @copyright GNU GPL v3
  *
  * This header is an API to Status Repository and Data Repository:
@@ -58,6 +58,7 @@ typedef enum dat_system{
     dat_obc_hours_alive,         ///< Hours since first boot
     dat_obc_hours_without_reset, ///< Hours since last reset
     dat_obc_reset_counter,       ///< Number of reset since first boot
+    dat_gnd_wdt,                ///< GND watchdog timer counter
 
     //DEP => (C&DH subsystem)
     dat_dep_ant_deployed,       ///< Is antena deployed?

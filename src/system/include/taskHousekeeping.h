@@ -2,7 +2,7 @@
  * @file  taskHousekeeping.h
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2012
+ * @date 2018
  * @copyright GNU GPL v3
  *
  * @id 0x1101

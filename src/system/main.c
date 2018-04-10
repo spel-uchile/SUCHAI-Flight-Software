@@ -1,9 +1,9 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ int main(void)
     int n_threads = 7;
     os_thread threads_id[n_threads];
 
-
     LOGI(tag, "Creating tasks...");
 
 #ifdef NANOMIND
@@ -58,11 +57,13 @@ int main(void)
 
     /* Crating system task (the others are created inside taskDeployment) */
     // FIXME: This memory values seems not work on nanomind (tested 5 and 10)
-    osCreateTask(taskDispatcher,"dispatcher", 15*256, (void *)threads_id, 3, &threads_id[0]);
+    osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[0]);
     osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[1]);
     osCreateTask(taskInit, "Init", 15*256, &threads_id, 4, &threads_id[2]);
+
     /* Creating clients tasks */
     /*
+    osCreateTask(taskWatchdog, "WDT", 4*256, NULL, 2, &threads_id[2]);
     osCreateTask(taskConsole, "console", 15*256, NULL, 2, &threads_id[3]);
 #if SCH_HK_ENABLED
     // FIXME: This memory values seems not work on nanomind (tested with 10)

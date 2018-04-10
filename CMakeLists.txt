@@ -15,6 +15,7 @@ set(SOURCE_FILES
         src/system/cmdDRP.c
         src/system/cmdOBC.c
         src/system/cmdCOM.c
+        src/system/cmdFP.c
         src/system/cmdConsole.c
         src/system/repoCommand.c
         src/system/repoData.c
@@ -23,10 +24,12 @@ set(SOURCE_FILES
         src/system/taskHousekeeping.c
         src/system/taskCommunications.c
         src/system/taskConsole.c
-        src/system/main.c
         src/system/taskFlightPlan.c
         src/system/cmdFP.c
-        src/system/taskInit.c)
+        src/system/taskInit.c
+        src/system/taskWatchdog.c
+        src/system/main.c
+)
 
 include_directories(
         src/system/include/

@@ -67,8 +67,10 @@
 #if SCH_TEST_ENABLED
     #include "taskTest.h"
 #endif
+
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
+#include "taskWatchdog.h"
 #include "taskConsole.h"
 #include "taskInit.h"
 

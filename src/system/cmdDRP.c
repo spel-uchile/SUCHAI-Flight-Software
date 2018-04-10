@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                       NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ void cmd_drp_init(void)
     cmd_add("print_vars", drp_print_system_vars, "", 0);
     cmd_add("update_sys_var", drp_update_sys_var_idx, "%d %d", 2);
     cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
+    cmd_add("clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
 }
 
 int drp_print_system_vars(char *fmt, char *params, int nparams)
@@ -111,4 +112,10 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
         LOGW(tag, "drp_update_hours_alive used with invalid params: %s", params);
         return CMD_FAIL;
     }
+}
+
+int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
+{
+    dat_set_system_var(dat_gnd_wdt, 0);
+    return CMD_OK;
 }
