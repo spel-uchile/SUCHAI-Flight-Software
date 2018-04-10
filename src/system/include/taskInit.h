@@ -6,16 +6,11 @@
 #define SUCHAI_FLIGHT_SOFTWARE_TASKINIT_H
 
 #include "utils.h"
-#include "osThread.h"
 #include "config.h"
-
+#include "init.h"
+#include "osThread.h"
 
 /* Task includes */
-#if SCH_TEST_ENABLED
-#include "taskTest.h"
-#endif
-#include "taskDispatcher.h"
-#include "taskExecuter.h"
 #include "taskConsole.h"
 
 #if SCH_HK_ENABLED

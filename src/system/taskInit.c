@@ -22,24 +22,61 @@ static const char *tag = "taskInit";
 
 void taskInit(void *param)
 {
-    os_thread threads_id = (os_thread)param;
+#ifdef NANOMIND
+    LOGI(tag, "Setting pheripherals...");
 
+    /* SPI device drivers */
+    LOGV(tag, "\tSetting SPI devices...");
+    init_spi();
+    lm70_init();
+    fm33256b_init();
+    osDelay(100);
+    adc_channels_init();
+    osDelay(100);
+
+    /* Init I2C */
+    LOGV(tag, "\tSetting I2C driver...");
+    twi_init();
+
+    /* Latest reset source */
+    LOGV(tag, "\tLast reset source:");
+    int reset_source = reset_cause_get_causes();
+    print_rst_cause(reset_source);
+    dat_set_system_var(dat_obc_lastResetSource, reset_source);
+
+    /* RTC + 32kHz OSC */
+    LOGV(tag, "\tSetting RTC...");
+    init_rtc();
+
+    /* Init spansion chip */
+    LOGV(tag, "\tSetting FL512...");
+    init_spn_fl512();
+
+    /* Init gyro */
+    LOGV(tag, "\tSetting SPI gyros...");
+    mpu3300_init(MPU3300_BW_5, MPU3300_FSR_225);
+
+    /* Init magnetometer */
+    LOGV(tag, "\tSetting SPI magnetometer...");
+    hmc5843_init();
+#endif
+
+    LOGD(tag, "Creating client tasks ...");
     unsigned short task_memory = 15*256;
-
-    LOGD(tag, "Initializing Tasks ...");
+    os_thread thread_id[4];
 
     /* Creating clients tasks */
-    osCreateTask(taskConsole, "console", task_memory, NULL, 2, &threads_id[3]);
+    osCreateTask(taskConsole, "console", task_memory, NULL, 2, &(thread_id[0]));
+
 #if SCH_HK_ENABLED
-    // FIXME: This memory values seems not work on nanomind (tested with 10)
-    osCreateTask(taskHousekeeping, "housekeeping", task_memory, NULL, 2, &threads_id[4]);
+    osCreateTask(taskHousekeeping, "housekeeping", task_memory, NULL, 2, &(thread_id[1]));
 #endif
 #if SCH_COMM_ENABLE
-    osCreateTask(taskCommunications, "comm", task_memory, NULL,2, &threads_id[5]);
+    osCreateTask(taskCommunications, "comm", task_memory, NULL, 2, &(thread_id[2]));
 #endif
 #if SCH_FP_ENABLED
-    osCreateTask(taskFlightPlan,"flightplan", task_memory,NULL,2,&threads_id[6]);
+    osCreateTask(taskFlightPlan,"flightplan", task_memory,NULL, 2, &(thread_id[3]));
 #endif
 
-    //TODO: Task has to kill himself
+    osTaskDelete(NULL);
 }
