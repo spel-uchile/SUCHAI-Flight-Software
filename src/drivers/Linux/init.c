@@ -31,18 +31,11 @@ void on_close(int signal)
 
 void on_reset(void)
 {
-#ifdef LINUX
     /* Register INT/TERM signals */
     struct sigaction act;
     act.sa_handler = on_close;
     sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
     sigaction(SIGTERM, &act, NULL);
-#endif
-
-    /* Init subsystems */
-    log_init();      // Logging system
-    cmd_repo_init(); // Command repository initialization
-    dat_repo_init(); // Update status repository
 
 #if SCH_COMM_ENABLE
     /* Init communications */

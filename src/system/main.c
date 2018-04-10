@@ -32,6 +32,11 @@ int main(void)
     /* On reset */
     on_reset();
 
+    /* Init software subsystems */
+    log_init();      // Logging system
+    cmd_repo_init(); // Command repository initialization
+    dat_repo_init(); // Update status repository
+
     /* Initializing shared Queues */
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
     if(dispatcher_queue == 0)
@@ -43,39 +48,17 @@ int main(void)
     if(executer_cmd_queue == 0)
         LOGE(tag, "Error creating executer cmd queue");
 
-    int n_threads = 7;
+    int n_threads = 4;
     os_thread threads_id[n_threads];
 
-    LOGI(tag, "Creating tasks...");
-
-#ifdef NANOMIND
-    /* Start init task at highest priority */
-    //TODO: Refactor and add TaskInit
-    void init_task(void * param);
-    osCreateTask(init_task, "init", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
-#endif
-
-    /* Crating system task (the others are created inside taskDeployment) */
+    LOGI(tag, "Creating basic tasks...");
+    /* Crating system task (the others are created inside taskInit) */
     // FIXME: This memory values seems not work on nanomind (tested 5 and 10)
-    osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[0]);
-    osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[1]);
-    osCreateTask(taskInit, "Init", 15*256, &threads_id, 4, &threads_id[2]);
+    osCreateTask(taskWatchdog, "watchdog", 4*256, NULL, 2, &threads_id[0]);
+    osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[1]);
+    osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[2]);
+    osCreateTask(taskInit, "init", 15*256, NULL, 4, &threads_id[3]);
 
-    /* Creating clients tasks */
-    /*
-    osCreateTask(taskWatchdog, "WDT", 4*256, NULL, 2, &threads_id[2]);
-    osCreateTask(taskConsole, "console", 15*256, NULL, 2, &threads_id[3]);
-#if SCH_HK_ENABLED
-    // FIXME: This memory values seems not work on nanomind (tested with 10)
-    osCreateTask(taskHousekeeping, "housekeeping", 15*256, NULL, 2, &threads_id[4]);
-#endif
-#if SCH_COMM_ENABLE
-    osCreateTask(taskCommunications, "comm", 15*256, NULL,2, &threads_id[5]);
-#endif
-#if SCH_FP_ENABLED
-    osCreateTask(taskFlightPlan,"flightplan",15*256,NULL,2,&threads_id[6]);
-#endif
-*/
 #ifndef ESP32
     /* Start the scheduler. Should never return */
     osScheduler(threads_id, n_threads);
@@ -116,7 +99,7 @@ void vApplicationTickHook(void)
  */
 void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
 {
-    printf("[ERROR][-1][%s] Stak overflow!", (char *)pcTaskName);
+    printf("[ERROR][-1][%s] Stack overflow!", (char *)pcTaskName);
 
     /* Stack overflow handle */
     while(1);

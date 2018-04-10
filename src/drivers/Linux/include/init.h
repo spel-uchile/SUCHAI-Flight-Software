@@ -14,24 +14,9 @@
 #include "repoData.h"
 #include "repoCommand.h"
 
-#ifdef LINUX
-    #include <csp/csp.h>
-    #include <csp/interfaces/csp_if_zmqhub.h>
-#endif
+#include <csp/csp.h>
+#include <csp/interfaces/csp_if_zmqhub.h>
 
-#ifdef AVR32
-    #include "asf.h"
-    #include "util.h"
-    #include <time.h>
-    #include <avr32/io.h>
-    #include "intc.h"
-    #include "board.h"
-    #include "compiler.h"
-    #include "rtc.h"
-    #include "usart.h"
-    #include "pm.h"
-
-#endif
 
 
 /**
