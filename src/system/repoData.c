@@ -1,9 +1,9 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2017, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,12 +48,13 @@ void dat_repo_init(void)
     /* TODO: Setup external memories */
 #if (SCH_STORAGE_MODE == 0)
     {
-        //Use internal memory
+        // Reset variables (we do not have persistent storage here)
         int index;
         for(index=0; index<dat_system_last_var; index++)
         {
             dat_set_system_var((dat_system_t)index, INT_MAX);
         }
+
         //Init internal flight plan table
         int i;
         for(i=0;i<FP_MAX_ENTRIES;i++)
@@ -76,12 +77,6 @@ void dat_repo_init(void)
         rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
         assertf(rc==0, tag, "Unable to create system variables repository");
 
-        int index;
-        for(index=0; index<dat_system_last_var; index++)
-        {
-            storage_repo_set_value_idx(index, INT_MAX, DAT_REPO_SYSTEM);
-        }
-
         //Init system flight plan table
         rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
@@ -93,6 +88,7 @@ void dat_repo_init(void)
     dat_set_system_var(dat_obc_hours_alive, 0);
     dat_set_system_var(dat_obc_hours_without_reset, 0);
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);  //TODO: This is a non-volatile variable
+    dat_set_system_var(dat_gnd_wdt, 0);  // Reset the gnd wdt on boot
 }
 
 void dat_repo_close(void)
