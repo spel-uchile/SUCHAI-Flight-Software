@@ -26,5 +26,6 @@
 #endif
 
 void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority, os_thread* thread);
+void osTaskDelete(void *task_handle);
 
-#endif
+#endif // _OS_THREAD_H_

@@ -32,3 +32,6 @@ void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size,
     if(pthread_setschedparam(*thread, SCHED_FIFO, &_priority) != 0)
         printf("[Warning] (%s) Failed to assign task priority, try as root\n", name);
 }
+
+void osTaskDelete(void *task_handle){};
+

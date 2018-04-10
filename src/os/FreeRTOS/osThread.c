@@ -16,3 +16,8 @@ void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size,
 {
     xTaskCreate((*functionTask), name, size, parameters, priority, NULL);
 }
+
+void osTaskDelete(void *task_handle)
+{
+    vTaskDelete(task_handle);
+}
