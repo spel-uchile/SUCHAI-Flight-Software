@@ -46,6 +46,7 @@ int main(void)
     int n_threads = 7;
     os_thread threads_id[n_threads];
 
+
     LOGI(tag, "Creating tasks...");
 
 #ifdef NANOMIND
@@ -57,10 +58,11 @@ int main(void)
 
     /* Crating system task (the others are created inside taskDeployment) */
     // FIXME: This memory values seems not work on nanomind (tested 5 and 10)
-    osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[0]);
+    osCreateTask(taskDispatcher,"dispatcher", 15*256, (void *)threads_id, 3, &threads_id[0]);
     osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[1]);
-
+    osCreateTask(taskInit, "Init", 15*256, &threads_id, 4, &threads_id[2]);
     /* Creating clients tasks */
+    /*
     osCreateTask(taskConsole, "console", 15*256, NULL, 2, &threads_id[3]);
 #if SCH_HK_ENABLED
     // FIXME: This memory values seems not work on nanomind (tested with 10)
@@ -72,7 +74,7 @@ int main(void)
 #if SCH_FP_ENABLED
     osCreateTask(taskFlightPlan,"flightplan",15*256,NULL,2,&threads_id[6]);
 #endif
-
+*/
 #ifndef ESP32
     /* Start the scheduler. Should never return */
     osScheduler(threads_id, n_threads);

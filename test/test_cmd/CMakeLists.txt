@@ -19,7 +19,7 @@ set(SOURCE_FILES
         ../../src/system/repoData.c
         ../../src/system/taskDispatcher.c
         ../../src/system/taskExecuter.c
-        ../../src/system/init.c
+        ../../src/drivers/Linux/init.c
         src/system/taskTest.c
         src/system/main.c
         )

@@ -70,6 +70,7 @@
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
 #include "taskConsole.h"
+#include "taskInit.h"
 
 #if SCH_HK_ENABLED
     #include "taskHousekeeping.h"

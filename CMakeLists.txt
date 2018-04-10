@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
         src/drivers/Linux/data_storage.c
-        src/system/init.c
+        src/drivers/Linux/init.c
         src/os/Linux/osDelay.c
         src/os/Linux/osQueue.c
         src/os/Linux/osScheduler.c
@@ -25,7 +25,8 @@ set(SOURCE_FILES
         src/system/taskConsole.c
         src/system/main.c
         src/system/taskFlightPlan.c
-        src/system/cmdFP.c)
+        src/system/cmdFP.c
+        src/system/taskInit.c)
 
 include_directories(
         src/system/include/
