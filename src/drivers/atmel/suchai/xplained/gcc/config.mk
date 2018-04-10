@@ -41,6 +41,7 @@ CSRCS = \
        $(PROJ_ROOT)/system/cmdCOM.c                       \
        $(PROJ_ROOT)/system/repoCommand.c                  \
        $(PROJ_ROOT)/system/repoData.c                     \
+       $(PROJ_ROOT)/system/taskWatchdog.c                  \
        $(PROJ_ROOT)/system/taskConsole.c                  \
        $(PROJ_ROOT)/system/taskDispatcher.c               \
        $(PROJ_ROOT)/system/taskExecuter.c                 \
@@ -98,6 +99,7 @@ CSRCS = \
        avr32/drivers/spi/spi.c                            \
        avr32/drivers/rtc/rtc.c                            \
        avr32/drivers/pdca/pdca.c                          \
+       avr32/drivers/wdt/wdt.c                            \
        common/utils/stdio/read.c                          \
        common/utils/stdio/write.c                         \
        common/utils/stdio/stdio_usb/stdio_usb.c           \
@@ -151,6 +153,8 @@ INC_PATH = \
        avr32/drivers/spi                                  \
        avr32/drivers/rtc                                  \
        avr32/drivers/pdca                                 \
+       avr32/drivers/wdt                                  \
+       avr32/drivers/cpu                                  \
        avr32/utils                                        \
        avr32/utils/preprocessor                           \
        common/boards                                      \

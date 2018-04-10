@@ -12,8 +12,10 @@
 #ifndef CMD_OBC_H
 #define CMD_OBC_H
 
-#include <signal.h>
+#include "config.h"
+
 #ifdef LINUX
+    #include <signal.h>
 #endif
 
 #ifdef AVR32
@@ -23,6 +25,7 @@
 #endif
 
 #ifdef NANOMIND
+    #include "compiler.h"
     #include "led.h"
     #include "wdt.h"
     #include "dev/cpu.h"
@@ -33,7 +36,6 @@
     #include "driver/gpio.h"
 #endif
 
-#include "config.h"
 #include "repoCommand.h"
 #include "os.h"
 
