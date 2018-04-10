@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2013, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2013, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,12 +41,10 @@ void taskHousekeeping(void *param)
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
         elapsed_sec += delay_ms/1000; //Update seconds counts
 
-        #ifdef NANOMIND
-        //TODO: This should be a command
-            led_toggle(LED_CPUOK);
-            led_toggle(LED_A);
-            wdt_clear();
-        #endif
+        // Debug command
+        cmd_t *cmd_dbg = cmd_get_str("debug_obc");
+        cmd_add_params_var(cmd_dbg, 0);
+        cmd_send(cmd_dbg);
 
         /* 10 seconds actions */
         if((elapsed_sec % _10sec_check) == 0)

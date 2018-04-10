@@ -67,8 +67,10 @@ __attribute__((__interrupt__)) void rtc_irq(void);
 #if SCH_TEST_ENABLED
     #include "taskTest.h"
 #endif
+
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
+#include "taskWatchdog.h"
 #include "taskConsole.h"
 
 #if SCH_HK_ENABLED
