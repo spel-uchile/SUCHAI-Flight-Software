@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "util.h"
+#include "init.h"
 
 // Hacked from Atmel's sdram example
 

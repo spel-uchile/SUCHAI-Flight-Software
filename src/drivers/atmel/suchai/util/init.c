@@ -1,6 +1,6 @@
 #include <asf.h>
 
-#include "util.h"
+#include "init.h"
 #include "conf_usart_serial.h"
 #include "conf_spi_master.h"
 

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <sdramc.h>
 
-#include "util.h"
+#include "init.h"
 
 // Thanks to http://stackoverflow.com/a/7776146
 

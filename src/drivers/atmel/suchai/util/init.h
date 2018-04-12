@@ -1,5 +1,5 @@
-#ifndef __UTIL_H
-#define __UTIL_H
+#ifndef __INIT_H
+#define __INIT_H
 
 /* system includes */
 #include "repoData.h"
@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <signal.h>
 #include "asf.h"
-#include "util.h"
 #include <time.h>
 #include <avr32/io.h>
 #include "intc.h"
@@ -35,4 +34,4 @@ __attribute__((__interrupt__)) void rtc_irq(void);
 void on_close(int signal);
 void on_reset(void);
 
-#endif
+#endif //__INIT_H

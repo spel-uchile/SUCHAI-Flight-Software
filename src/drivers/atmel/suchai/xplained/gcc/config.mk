@@ -41,7 +41,8 @@ CSRCS = \
        $(PROJ_ROOT)/system/cmdCOM.c                       \
        $(PROJ_ROOT)/system/repoCommand.c                  \
        $(PROJ_ROOT)/system/repoData.c                     \
-       $(PROJ_ROOT)/system/taskWatchdog.c                  \
+       $(PROJ_ROOT)/system/taskWatchdog.c                 \
+       $(PROJ_ROOT)/system/taskInit.c	                  \
        $(PROJ_ROOT)/system/taskConsole.c                  \
        $(PROJ_ROOT)/system/taskDispatcher.c               \
        $(PROJ_ROOT)/system/taskExecuter.c                 \

@@ -12,7 +12,6 @@
 
 #ifdef AVR32
     #include "asf.h"
-    #include "util.h"
     #include <time.h>
     #include <avr32/io.h>
     #include "intc.h"

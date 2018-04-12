@@ -59,7 +59,7 @@ int obc_debug(char *fmt, char *params, int nparams)
             gpio_set_level(BLINK_GPIO, level);
         #endif
         #ifdef LINUX
-            LOGD(tag, "OBC Debug (%d)", dbg_type);
+            LOGV(tag, "OBC Debug (%d)", dbg_type);
         #endif
         return CMD_OK;
     }

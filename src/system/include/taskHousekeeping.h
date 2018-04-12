@@ -22,7 +22,7 @@
 #endif
 #ifdef AVR32
     #include "asf.h"
-    #include "util.h"
+    #include "init.h"
 #endif
 #ifdef NANOMIND
     #include "led.h"
