@@ -166,6 +166,5 @@ void on_reset(void)
     /* Init LED */
     led_init();
     led_on(LED_CPUOK);
-
-    printf("PRE_INIT\n");
+    led_on(LED_A);
 }

@@ -62,6 +62,7 @@ void taskInit(void *param)
 #endif
 
     LOGD(tag, "Creating client tasks ...");
+    // FIXME: This memory values seems not work on nanomind (tested 5)
     unsigned short task_memory = 15*256;
     os_thread thread_id[4];
 
