@@ -46,6 +46,12 @@ void taskHousekeeping(void *param)
         cmd_add_params_var(cmd_dbg, 0);
         cmd_send(cmd_dbg);
 
+        if((elapsed_sec % 2) == 0)
+        {
+            cmd_t *cmd_2s = cmd_get_str("sample_obc_sensors");
+            cmd_send(cmd_2s);
+        }
+
         /* 10 seconds actions */
         if((elapsed_sec % _10sec_check) == 0)
         {

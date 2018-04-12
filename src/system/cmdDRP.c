@@ -32,6 +32,7 @@ void cmd_drp_init(void)
     cmd_add("update_sys_var", drp_update_sys_var_idx, "%d %d", 2);
     cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
     cmd_add("clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
+    cmd_add("sample_obc_sensors", drp_sample_obc_sensors, "", 0);
 }
 
 int drp_print_system_vars(char *fmt, char *params, int nparams)
@@ -117,5 +118,36 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
 int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
 {
     dat_set_system_var(dat_gnd_wdt, 0);
+    return CMD_OK;
+}
+
+int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
+{
+#ifdef NANOMIND
+    int16_t sensor1, sensor2;
+    float gyro_temp;
+
+    mpu3300_gyro_t gyro_reading;
+    hmc5843_data_t hmc_reading;
+
+    /* Read board temperature sensors */
+    sensor1 = lm70_read_temp(1);
+    sensor2 = lm70_read_temp(2);
+
+    /* Read gyroscope temperature and rate */
+    mpu3300_read_temp(&gyro_temp);
+    mpu3300_read_gyro(&gyro_reading);
+
+    /* Read magnetometer */
+    hmc5843_read_single(&hmc_reading);
+
+    /* Print readings */
+#if LOG_LEVEL >= LOG_LVL_INFO
+    printf("\r\nTemp1: %.1f, Temp2 %.1f, Gyro temp: %.2f\r\n", sensor1/10., sensor2/10., gyro_temp);
+    printf("Gyro x, y, z: %f, %f, %f\r\n", gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z);
+    printf("Mag x, y, z: %f, %f, %f\r\n\r\n",hmc_reading.x, hmc_reading.y, hmc_reading.z);
+#endif
+#endif
+
     return CMD_OK;
 }
