@@ -9,7 +9,7 @@ parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
 
 args = parser.parse_args()
 
-with open('/home/tamara/SUCHAI-Flight-Software/src/system/include/config_template.h', 'r') as config:
+with open('config_template.h', 'r') as config:
     config = config.read()
 
 config = config.replace("{{OS}}", args.os)
