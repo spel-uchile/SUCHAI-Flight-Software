@@ -31,10 +31,10 @@
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN            (256)   ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE             1       ///< TaskCommunications enabled
-#define SCH_FP_ENABLED              1       ///< TaskFlightPlan enabled
-#define SCH_HK_ENABLED              1       ///< TaskHousekeeping enabled
-#define SCH_TEST_ENABLED            0       ///< Set to run tests
+#define SCH_COMM_ENABLE             {{SCH_COMM}}       ///< TaskCommunications enabled (0 | 1)
+#define SCH_FP_ENABLED              {{SCH_FP}};       ///< TaskFlightPlan enabled (0 | 1)
+#define SCH_HK_ENABLED              {{SCH_HK}};       ///< TaskHousekeeping enabled (0 | 1)
+#define SCH_TEST_ENABLED            {{SCH_TEST}};       ///< Set to run tests (0 | 1)
 #define SCH_MAX_WDT_TIMER           10      ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER       (3600*48)  ///< Seconds to reset the OBC if the ground watchdog was not clear
 
@@ -48,7 +48,7 @@
 #define SCH_COMM_ZMQ_IN             "tcp://192.168.0.36:8002"  ///< In socket URI
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE   	1   ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_MODE   	{{SCH_ST_MODE}}   ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_FILE    "/tmp/suchai.db"
 
 #endif	/* SUCHAI_CONFIG_H */
