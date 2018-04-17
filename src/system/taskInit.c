@@ -69,6 +69,7 @@ void taskInit(void *param)
     osCreateTask(taskHousekeeping, "housekeeping", task_memory, NULL, 2, &(thread_id[1]));
 #endif
 #if SCH_COMM_ENABLE
+    init_communications();
     osCreateTask(taskCommunications, "comm", task_memory, NULL, 2, &(thread_id[2]));
 #endif
 #if SCH_FP_ENABLED
@@ -76,4 +77,20 @@ void taskInit(void *param)
 #endif
 
     osTaskDelete(NULL);
+}
+
+void init_communications(void){
+    /* Init communications */
+    LOGI(tag, "Initialising CSP...");
+    /* Init buffer system with 5 packets of maximum 300 bytes each */
+    csp_buffer_init(5, 300);
+    /* Init CSP with address MY_ADDRESS */
+    csp_init(SCH_COMM_ADDRESS);
+    /* Start router task with 500 word stack, OS task priority 1 */
+    csp_route_start_task(500, 1);
+
+    LOGD(tag, "Route table");
+    csp_route_print_table();
+    LOGD(tag, "Interfaces");
+    csp_route_print_interfaces();
 }
