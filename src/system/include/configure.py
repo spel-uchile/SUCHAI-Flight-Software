@@ -10,7 +10,7 @@ parser.add_argument('--sch_comm', type=int, default=1)
 parser.add_argument('--sch_fp', type=int, default=1)
 parser.add_argument('--sch_hk', type=int, default=1)
 parser.add_argument('--sch_test', type=int, default=0)
-parser.add_argument('--sch_st_mode', type, default=1)
+parser.add_argument('--sch_st_mode', type=int, default=1)
 
 args = parser.parse_args()
 
