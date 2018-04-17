@@ -154,6 +154,9 @@ void on_reset(void)
 #endif
 
     /* Init USART for debugging */
+    setvbuf(stdin, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
     static const gpio_map_t USART_GPIO_MAP = {
             {USART_RXD_PIN, USART_RXD_FUNCTION},
             {USART_TXD_PIN, USART_TXD_FUNCTION},
@@ -162,6 +165,11 @@ void on_reset(void)
                        sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
     usart_init(USART_CONSOLE, sysclk_get_peripheral_bus_hz(USART), 500000);
     usart_stdio_id = USART_CONSOLE;
+
+//    LOGV(tag, "\tSetting SPI devices...");
+    init_spi();
+    lm70_init();
+    fm33256b_init();
 
     /* Init LED */
     led_init();

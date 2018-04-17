@@ -26,10 +26,6 @@ void taskInit(void *param)
     LOGI(tag, "Setting pheripherals...");
 
     /* SPI device drivers */
-    LOGV(tag, "\tSetting SPI devices...");
-    init_spi();
-    lm70_init();
-    fm33256b_init();
     osDelay(100);
     adc_channels_init();
     osDelay(100);

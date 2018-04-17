@@ -53,7 +53,7 @@ int main(void)
 
     LOGI(tag, "Creating basic tasks...");
     /* Crating system task (the others are created inside taskInit) */
-    // FIXME: This memory values seems not work on nanomind (tested 2,5,10,5)
+    // FIXME: This memory values seems not work on nanomind (tested 5,5,10,5)
     osCreateTask(taskWatchdog, "watchdog", 4*256, NULL, 2, &threads_id[0]);
     osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[1]);
     osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[2]);
