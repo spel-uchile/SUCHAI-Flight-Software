@@ -14,20 +14,6 @@
 #include "repoData.h"
 #include "repoCommand.h"
 
-#ifdef AVR32
-    #include "asf.h"
-    #include "util.h"
-    #include <time.h>
-    #include <avr32/io.h>
-    #include "intc.h"
-    #include "board.h"
-    #include "compiler.h"
-    #include "rtc.h"
-    #include "usart.h"
-    #include "pm.h"
-
-#endif
-
 
 /**
  * Performs a clean exit
