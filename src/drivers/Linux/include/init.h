@@ -31,5 +31,8 @@ void on_close(int signal);
  */
 void on_reset(void);
 
+void init_communications(void);
+
+
 #endif //SUCHAI_FLIGHT_SOFTWARE_INITI_H
 

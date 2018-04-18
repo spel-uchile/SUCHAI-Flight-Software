@@ -24,6 +24,5 @@
 #endif
 
 void taskInit(void *param);
-void init_communications();
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_TASKINIT_H
