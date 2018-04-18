@@ -32,7 +32,7 @@
 #endif
 
 #ifdef ESP32
-    #define BLINK_GPIO CONFIG_BLINK_GPIO  // Set in menuconfig
+    #define BLINK_GPIO 5
     #include "driver/gpio.h"
 #endif
 

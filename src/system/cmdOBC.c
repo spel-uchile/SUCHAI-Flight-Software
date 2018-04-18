@@ -54,7 +54,7 @@ int obc_debug(char *fmt, char *params, int nparams)
                 led_toggle((led_names_t)dbg_type);
         #endif
         #ifdef ESP32
-            statinc int level = 0;
+            static int level = 0;
             level = ~level;
             gpio_set_level(BLINK_GPIO, level);
         #endif
