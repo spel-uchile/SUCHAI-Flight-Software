@@ -84,7 +84,7 @@ int obc_reset(char *fmt, char *params, int nparams)
     printf("Resetting system NOW!!\n");
 
     #ifdef LINUX
-        raise(SIGINT);
+        exit(0);
     #endif
     #ifdef AVR32
         reset_do_soft_reset();
