@@ -5,19 +5,13 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
         ../../src/drivers/Linux/data_storage.c
-        ../../src/os/Linux/osDelay.c
-        ../../src/os/Linux/osQueue.c
-        ../../src/os/Linux/osScheduler.c
         ../../src/os/Linux/osSemphr.c
-        ../../src/os/Linux/osThread.c
-        ../../src/os/Linux/pthread_queue.c
+        ../../src/system/repoData.c
+        ../../src/system/repoCommand.c
         ../../src/system/cmdOBC.c
         ../../src/system/cmdDRP.c
         ../../src/system/cmdFP.c
         ../../src/system/cmdConsole.c
-        ../test_cmd/src/system/cmdTestCommand.c
-        ../../src/system/repoCommand.c
-        ../../src/system/repoData.c
         src/system/main.c
         )
 

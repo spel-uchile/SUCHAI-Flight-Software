@@ -14,12 +14,12 @@ set(SOURCE_FILES
         ../../src/system/cmdOBC.c
         ../../src/system/cmdDRP.c
         ../../src/system/cmdConsole.c
-        src/system/cmdTestCommand.c
         ../../src/system/repoCommand.c
         ../../src/system/repoData.c
         ../../src/system/taskDispatcher.c
         ../../src/system/taskExecuter.c
         ../../src/drivers/Linux/init.c
+        src/system/cmdTestCommand.c
         src/system/taskTest.c
         src/system/main.c
         )
