@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "include/init.h"
+#include "init.h"
 
 static const char *tag = "Initializer";
 
@@ -35,26 +35,4 @@ void on_reset(void)
     log_init();      // Logging system
     cmd_repo_init(); // Command repository initialization
     dat_repo_init(); // Update status repository
-
-#if SCH_COMM_ENABLE
-    /* Init communications */
-    LOGI(tag, "Initialising CSP...");
-    /* Init buffer system with 5 packets of maximum 300 bytes each */
-    csp_buffer_init(5, 300);
-    /* Init CSP with address MY_ADDRESS */
-    csp_init(SCH_COMM_ADDRESS);
-    /* Start router task with 500 word stack, OS task priority 1 */
-    csp_route_start_task(500, 1);
-
-    /* Set ZMQ interface */
-    #ifdef LINUX
-        csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
-        csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
-    #endif
-
-    LOGD(tag, "Route table");
-    csp_route_print_table();
-    LOGD(tag, "Interfaces");
-    csp_route_print_interfaces();
-#endif
 }

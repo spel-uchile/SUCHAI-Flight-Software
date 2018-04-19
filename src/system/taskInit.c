@@ -26,10 +26,6 @@ void taskInit(void *param)
     LOGI(tag, "Setting pheripherals...");
 
     /* SPI device drivers */
-    LOGV(tag, "\tSetting SPI devices...");
-    init_spi();
-    lm70_init();
-    fm33256b_init();
     osDelay(100);
     adc_channels_init();
     osDelay(100);
@@ -88,7 +84,9 @@ void taskInit(void *param)
     osTaskDelete(NULL);
 }
 
-void init_communications(void){
+void init_communications(void)
+{
+#if SCH_COMM_ENABLE
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
     /* Init buffer system with 5 packets of maximum 300 bytes each */
@@ -102,4 +100,5 @@ void init_communications(void){
     csp_route_print_table();
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
+#endif
 }
