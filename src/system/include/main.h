@@ -20,6 +20,7 @@
     #include "rtc.h"
     #include "usart.h"
     #include "pm.h"
+    #include "twim.h"
 
 #endif
 

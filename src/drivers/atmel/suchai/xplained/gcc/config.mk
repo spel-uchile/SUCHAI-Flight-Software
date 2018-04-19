@@ -85,6 +85,7 @@ CSRCS = \
        $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_system.c        \
        $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_thread.c        \
        $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_time.c          \
+       $(PROJ_ROOT)/gomspace/drivers/avr32/i2c.c          \
        avr32/boards/uc3_a3_xplained/init.c                \
        avr32/boards/uc3_a3_xplained/led.c                 \
        avr32/drivers/flashc/flashc.c                      \
@@ -98,6 +99,7 @@ CSRCS = \
        avr32/drivers/pm/power_clocks_lib.c                \
        avr32/drivers/usbb/usbb_device.c                   \
        avr32/drivers/spi/spi.c                            \
+       avr32/drivers/twim/twim.c                            \
        avr32/drivers/rtc/rtc.c                            \
        avr32/drivers/pdca/pdca.c                          \
        avr32/drivers/wdt/wdt.c                            \
@@ -138,8 +140,10 @@ INC_PATH = \
        $(PROJ_ROOT)/libcsp/libcsp/include/drivers         \
        $(PROJ_ROOT)/libcsp/libcsp/src                     \
        $(PROJ_ROOT)/libcsp/libcsp/src/transport           \
+       $(PROJ_ROOT)/libutil/include/                      \
        $(PROJ_ROOT)/$(BOARD_NAME)                         \
        $(PROJ_ROOT)/$(BOARD_NAME)/gcc                     \
+       $(PROJ_ROOT)/gomspace/drivers/include               \
        avr32/boards                                       \
        avr32/boards/uc3_a3_xplained                       \
        avr32/drivers/cpu/cycle_counter                    \
@@ -152,6 +156,7 @@ INC_PATH = \
        avr32/drivers/pm                                   \
        avr32/drivers/usbb                                 \
        avr32/drivers/spi                                  \
+       avr32/drivers/twim                                  \
        avr32/drivers/rtc                                  \
        avr32/drivers/pdca                                 \
        avr32/drivers/wdt                                  \

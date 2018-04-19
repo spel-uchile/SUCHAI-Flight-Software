@@ -16,6 +16,9 @@ sed -i "s/#define configTICK_TC_IRQ             ATPASTE2(AVR32_TC_IRQ, configTIC
 
 echo "Coping custom ASF application..."
 cp -r suchai/ xdk-asf-3.33.0/avr32/applications/
+cp -f twim.c xdk-asf-3.33.0/avr32/drivers/twim/
+cp -f twim.h xdk-asf-3.33.0/avr32/drivers/twim/
+
 
 echo "Linking source code to ASF application..."
 cd xdk-asf-3.33.0/avr32/applications/suchai/
@@ -23,6 +26,12 @@ ln -s -f ../../../../../../system
 ln -s -f ../../../../../../os
 echo "Linking libcsp..."
 ln -s -f ../../../../../../drivers/atmel/libcsp
+echo "Linking gomspace libutil..."
+ln -s -f ../../../../../../drivers/atmel/libutil
+echo "Linking gomspace drivers..."
+ln -s -f ../../../../../../drivers/atmel/gomspace
+
+
 cd -
 
 echo "Moving the FreeRTOS configuration...."

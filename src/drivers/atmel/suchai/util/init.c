@@ -3,6 +3,7 @@
 #include "init.h"
 #include "conf_usart_serial.h"
 #include "conf_spi_master.h"
+#include "sysclk.h"
 
 static const char *tag = "Initializer";
 
@@ -195,6 +196,20 @@ __attribute__((__interrupt__)) void rtc_irq(void)
 
     // specify that an interrupt has been raised
     //print_sec = 1;
+}
+
+void twi_init(void) {
+    sysclk_init();
+    /* GPIO map setup */
+    const gpio_map_t TWIM_GPIO_MAP = {
+            {AVR32_TWIMS0_TWCK_0_0_PIN, AVR32_TWIMS0_TWCK_0_0_FUNCTION},
+            {AVR32_TWIMS0_TWD_0_0_PIN, AVR32_TWIMS0_TWD_0_0_FUNCTION}
+    };
+    gpio_enable_module(TWIM_GPIO_MAP,
+                       sizeof(TWIM_GPIO_MAP) / sizeof(TWIM_GPIO_MAP[0]));
+
+    /* Init twi master controller 2 with addr 5 and 100 kHz clock */
+    i2c_init_master(0, 5, 100);
 }
 
 void on_close(int signal)

@@ -37,6 +37,7 @@ int main(void)
     cmd_repo_init(); // Command repository initialization
     dat_repo_init(); // Update status repository
 
+
     /* Initializing shared Queues */
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
     if(dispatcher_queue == 0)
@@ -54,7 +55,7 @@ int main(void)
     LOGI(tag, "Creating basic tasks...");
     /* Crating system task (the others are created inside taskInit) */
     // FIXME: This memory values seems not work on nanomind (tested 2,5,10,5)
-    osCreateTask(taskWatchdog, "watchdog", 4*256, NULL, 2, &threads_id[0]);
+//    osCreateTask(taskWatchdog, "watchdog", 4*256, NULL, 2, &threads_id[0]);
     osCreateTask(taskDispatcher,"dispatcher", 15*256, NULL, 3, &threads_id[1]);
     osCreateTask(taskExecuter, "executer", 15*256, NULL, 4, &threads_id[2]);
     osCreateTask(taskInit, "init", 15*256, NULL, 4, &threads_id[3]);
