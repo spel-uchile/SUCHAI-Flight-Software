@@ -9,6 +9,7 @@
  */
 int init_suite1(void)
 {
+    dat_repo_init();
     fp_reset("", "", 1);
     return 0;
 }

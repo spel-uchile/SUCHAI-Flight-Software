@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
         ../../src/drivers/Linux/data_storage.c
+        ../../src/drivers/Linux/init.c
         ../../src/os/Linux/osDelay.c
         ../../src/os/Linux/osQueue.c
         ../../src/os/Linux/osScheduler.c
@@ -15,7 +16,6 @@ set(SOURCE_FILES
         ../../src/system/cmdDRP.c
         ../../src/system/cmdFP.c
         ../../src/system/cmdConsole.c
-        src/system/cmdTestCommand.c
         ../../src/system/repoCommand.c
         ../../src/system/repoData.c
         ../../src/system/taskDispatcher.c
