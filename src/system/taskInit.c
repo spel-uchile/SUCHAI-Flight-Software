@@ -69,7 +69,8 @@ void taskInit(void *param)
     osCreateTask(taskHousekeeping, "housekeeping", task_memory, NULL, 2, &(thread_id[1]));
 #endif
 #if SCH_COMM_ENABLE
-    init_communications();
+    //FIXME: Init_communications is found in init.c and taskInit.c
+    //init_communications();
     osCreateTask(taskCommunications, "comm", task_memory, NULL, 2, &(thread_id[2]));
 #endif
 #if SCH_FP_ENABLED
