@@ -67,12 +67,16 @@ int obc_debug(char *fmt, char *params, int nparams);
 int obc_reset_wdt(char *fmt, char *params, int nparams);
 
 /**
- * Reset the system
- * @note: In POSIX just exit the application
+ * Reset (reboot) the system.
  *
- * @param fmt Str. Parameters format ""
- * @param params Str. Parameters as string ""
- * @param nparams Int. Number of parameters 0
+ * @warning: In GNU/Linux if the params is the string "reboot" then "sudo reboot"
+ * is executed to reboot the system, if params is null or any other value then
+ * just exit the application
+ *
+ * @param fmt Str. Parameters format: "%s"
+ * @param params Str. Parameters as string: "" or "reboot" in Linux to actually
+ *                    reboot the system.
+ * @param nparams Int. Number of parameters 0 or 1
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int obc_reset(char *fmt, char *params, int nparams);
@@ -108,6 +112,18 @@ int obc_set_time(char* fmt, char* params,int nparams);
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int obc_show_time(char* fmt, char* params,int nparams);
+
+/**
+ * Execute a shell command by calling system(). No check are performed over the
+ * params, so use this command carefully. @see man system
+ * @warning only available in GNU/Linux systems
+ *
+ * @param fmt str. Parameters format: "%s"
+ * @param params  str. Parameters, the system command to execute: eg: "echo hello world"
+ * @param nparams int. Number of parameters: 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_system(char* fmt, char* params, int nparams);
 
 /**
  *

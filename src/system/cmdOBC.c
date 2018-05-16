@@ -32,6 +32,7 @@ void cmd_obc_init(void)
     cmd_add("show_time", obc_show_time,"%d",1);
     cmd_add("test_fp", test_fp, "%d %s %d", 3);
     cmd_add("reset_wdt", obc_reset_wdt, "", 0);
+    cmd_add("system", obc_system, "%s", 1);
 }
 
 int obc_debug(char *fmt, char *params, int nparams)
@@ -84,7 +85,10 @@ int obc_reset(char *fmt, char *params, int nparams)
     printf("Resetting system NOW!!\n");
 
     #ifdef LINUX
-        exit(0);
+        if(params != NULL && strcmp(params, "reboot")==0)
+            system("sudo reboot");
+        else
+            exit(0);
     #endif
     #ifdef AVR32
         reset_do_soft_reset();
@@ -160,6 +164,34 @@ int obc_show_time(char* fmt, char* params,int nparams)
         LOGW(tag, "show_time used with invalid params: %s", params);
         return CMD_FAIL;
     }
+}
+
+int obc_system(char* fmt, char* params, int nparams)
+{
+#ifdef LINUX
+    if(params != NULL)
+    {
+        int rc = system(params);
+        if(rc < 0)
+        {
+            LOGE(tag, "Call to system failed! (%d)", rc)
+            return CMD_FAIL;
+        }
+        else
+        {
+            LOGV(tag, "Call to system returned (%d)", rc);
+            return CMD_OK;
+        }
+    }
+    else
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
+#else
+    LOGW(tag, "Command not suported!");
+    return CMD_FAIL;
+#endif
 }
 
 // #FIXME: This function do not belong here (carlgonz)
