@@ -2,6 +2,8 @@
 #include <string.h>
 #include "CUnit/Basic.h"
 #include "cmdFP.h"
+#include "cmdOBC.h"
+#include "repoCommand.h"
 
 /* The suite initialization function.
  * Resets the flight plan
@@ -20,6 +22,78 @@ int init_suite1(void)
 int clean_suite1(void)
 {
     return 0;
+}
+
+/* The suite initialization function.
+ * Initializes
+ */
+int init_suite2(void)
+{
+    cmd_repo_init();
+    return 0;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite2(void)
+{
+    return 0;
+}
+
+
+// Test of parse cmd from string
+void testParseCommands(void)
+{
+    cmd_t *cmd;
+    char *name;
+
+    // Case 1: command without parameters; command do not req. parameters.
+    cmd = cmd_parse_from_str("get_mem");
+    CU_ASSERT_PTR_NOT_NULL(cmd);
+    name = cmd_get_name(cmd->id);
+    CU_ASSERT_STRING_EQUAL("get_mem", name)
+    CU_ASSERT_PTR_NULL(cmd->params);
+    free(cmd); free(name);
+
+    // Case 2: command with parameters; command do not req. parameters.
+    cmd = cmd_parse_from_str("get_mem foo");
+    CU_ASSERT_PTR_NOT_NULL(cmd);
+    name = cmd_get_name(cmd->id);
+    CU_ASSERT_STRING_EQUAL("get_mem", name)
+    CU_ASSERT_STRING_EQUAL("foo", cmd->params);
+    free(cmd); free(name);
+
+    // Case 3: command with parameters; command require parameters.
+    cmd = cmd_parse_from_str("debug_obc 1");
+    CU_ASSERT_PTR_NOT_NULL(cmd);
+    name = cmd_get_name(cmd->id);
+    CU_ASSERT_STRING_EQUAL("debug_obc", name)
+    CU_ASSERT_STRING_EQUAL("1", cmd->params);
+    free(cmd); free(name);
+
+    // Case 4: command without parameters; command require parameters.
+    cmd = cmd_parse_from_str("debug_obc");
+    CU_ASSERT_PTR_NOT_NULL(cmd);
+    name = cmd_get_name(cmd->id);
+    CU_ASSERT_STRING_EQUAL("debug_obc", name)
+    CU_ASSERT_PTR_NULL(cmd->params);
+    free(cmd); free(name);
+
+    // Case 5: not valid command
+    cmd = cmd_parse_from_str("invalid_command");
+    CU_ASSERT_PTR_NULL(cmd);
+    free(cmd);
+
+    // Case 6: empty command
+    cmd = cmd_parse_from_str("\0");
+    CU_ASSERT_PTR_NULL(cmd);
+    free(cmd);
+
+    // Case 7: \n or \cr command
+    cmd = cmd_parse_from_str("\r\n");
+    CU_ASSERT_PTR_NULL(cmd);
+    free(cmd);
 }
 
 // Test of fp_set.
@@ -56,8 +130,10 @@ int main()
     if (CUE_SUCCESS != CU_initialize_registry())
         return CU_get_error();
 
-    /* add a suite to the registry */
-    pSuite = CU_add_suite("Suite_1", init_suite1, clean_suite1);
+    /*
+     * SUITE 1: Flight Plan unit tests
+     */
+    pSuite = CU_add_suite("Suite Flight Plan", init_suite1, clean_suite1);
     if (NULL == pSuite) {
         CU_cleanup_registry();
         return CU_get_error();
@@ -66,6 +142,21 @@ int main()
     /* add the tests to the suite */
     if ((NULL == CU_add_test(pSuite, "test of fpset()", testFPSET))
            || (NULL == CU_add_test(pSuite, "test of fpdelete()", testFPDELETE))){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /*
+     * SUITE 2: Repo command unit tests
+     */
+    pSuite = CU_add_suite("Suite repo command", init_suite2, clean_suite2);
+    if (NULL == pSuite) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /* add the tests to the suite */
+    if ((NULL == CU_add_test(pSuite, "test of cmd_parse_from_str()", testParseCommands))){
         CU_cleanup_registry();
         return CU_get_error();
     }

@@ -47,6 +47,7 @@ Currently, it has been tested in the following OS/Architectures :
 
 #### Library Requirements
 Linux installation requires the following libraries:
+* cmake
 * pthread 
 * sqlite3
 * zmq

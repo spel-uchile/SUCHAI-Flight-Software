@@ -49,6 +49,7 @@
 #define CMD_ERROR -1
 
 /**
+ * TODO: Make this settings globals
  * Fixed buffers lengths
  */
 #define CMD_MAX_LEN 100
@@ -131,6 +132,8 @@ char * cmd_get_name(int idx);
 
 /**
  * Fills command parameters as string
+ * @note does not check the parameters format or if the command requires param.
+ *
  * @param cmd cmd_t. Command to fill parameters
  * @param params Str. String with parameters
  * @example
@@ -145,8 +148,9 @@ char * cmd_get_name(int idx);
 void cmd_add_params_str(cmd_t *cmd, char *params);
 
 /**
- * Fills command parameters by variables.
- * Note variables are converted to string
+ * Fills command parameters by variables using the registered parameters format.
+ * @note variables are converted to string
+ *
  * @param cmd cmd_t. Command to fill parameters
  * @param ... List of variables to fill as parameters
  * @example
@@ -162,6 +166,20 @@ void cmd_add_params_str(cmd_t *cmd, char *params);
  */
 void cmd_add_params_var(cmd_t *cmd, ...);
 
+/**
+ * Returns a new command with parameters form a string with the format:
+ * <command> [parameters]. The [parameters] field is optional. Returns NULL if
+ * the command is not found or in case of errors.
+ *
+ * @param buff str. A null terminated string with the format <command> [parameters]
+ * @return cmd_t. A new command (uses malloc) or NULL in case of errors.
+ *
+ * @example
+ *      char *str_cmd = "obc_debug 1";
+ *      cmd_t *cmd = cmd_parse_from_str(str_cmd);
+ *      assert(cmd != NULL);
+ */
+cmd_t *cmd_parse_from_str(char *buff);
 
 /**
  * Destroys a command and frees the allocated memory

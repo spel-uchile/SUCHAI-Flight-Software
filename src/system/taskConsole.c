@@ -41,7 +41,7 @@ void taskConsole(void *param)
 
     portTick delay_ms = 250;
     cmd_t *new_cmd =  NULL;
-    char buffer[CON_BUFF_LEN];
+    char buffer[SCH_BUFF_MAX_LEN];
 
     /* Initializing console */
     console_init();
@@ -52,15 +52,12 @@ void taskConsole(void *param)
     {
         osDelay(delay_ms);
 
-        /* Read console and parse commands (blocking) */
-
-#ifdef ESP32
-        if(fgets(buffer, CON_BUFF_LEN-1, stdin)==NULL)
+        /* Read console and parse commands (blocking, except in ESP32) */
+        memset(buffer, '\0', SCH_BUFF_MAX_LEN);
+        if(console_read(buffer, SCH_BUFF_MAX_LEN) != 0)
             continue;
-#else
-        console_read(buffer, CON_BUFF_LEN);
-#endif
-        new_cmd = console_parse(buffer);
+
+        new_cmd = cmd_parse_from_str(buffer);
 
         if(new_cmd != NULL)
         {
@@ -74,7 +71,7 @@ void taskConsole(void *param)
         }
         else
         {
-            LOGW(tag, "Null command or Null arguments was read!");
+            LOGW(tag, "An invalid command was read!");
         }
     }
 }
@@ -82,55 +79,13 @@ void taskConsole(void *param)
 int console_init(void)
 {
     LOGD(tag, "Init...\n");
-//    osSemaphoreTake(&log_mutex, portMAX_DELAY);
     cmd_print_all();
-//    osSemaphoreGiven(&log_mutex);
     return 0;
 }
 
 int console_read(char *buffer, int len)
 {
     /* FIXME: Move to drivers to support different systems */
-    fgets(buffer, len-1, stdin);
-    return 0;
-}
-
-cmd_t * console_parse(char *buffer)
-{
-    cmd_t *new_cmd = NULL;
-    char tmp_cmd[CON_BUFF_LEN];
-    char tmp_arg[CON_BUFF_LEN];
-    int next;
-    int n_args;
-
-    LOGV(tag, "Parsing: %s", buffer);
-    n_args = sscanf(buffer, "%s %n", tmp_cmd, &next);
-    strncpy(tmp_arg, buffer+next, CON_BUFF_LEN);
-    LOGV(tag, "Parsed %d: %s, %s (%d))", n_args, tmp_cmd, tmp_arg, next);
-
-    char* format = cmd_get_fmt(tmp_cmd);
-
-    //char* fix_format = fix_fmt(format);
-    //LOGD(tag, "Format: %s, fixed format: %s", format, fix_format);
-
-
-    if(strcmp(format,"")!=0 && strcmp(tmp_arg,"")==0)
-    {
-        free(format);
-        return new_cmd;
-    }
-
-    if (n_args == 1)
-    {
-        new_cmd = cmd_get_str(tmp_cmd);
-        if(new_cmd)
-        {
-            if(next > 1)
-                cmd_add_params_str(new_cmd, tmp_arg);
-            else
-                cmd_add_params_str(new_cmd, "");
-        }
-    }
-
-    return new_cmd;
+    char *s = fgets(buffer, len, stdin);
+    return (s != NULL) ? 0 : -1;
 }

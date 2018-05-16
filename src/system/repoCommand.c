@@ -123,8 +123,8 @@ char * cmd_get_name(int idx)
         cmd_list_t cmd_found = cmd_list[idx];
         osSemaphoreGiven(&repo_cmd_sem);
 
-        LOGD(tag, cmd_found.name);
-        name = (char *)malloc((strlen(cmd_found.name)+1)*sizeof(char));
+        LOGV(tag, "Cmd name found: %s", cmd_found.name);
+        name = (char *)malloc(strlen(cmd_found.name)+1);
         if(name == NULL)
         {
             LOGW(tag, "Error allocating memory in cmd_get_name");
@@ -169,9 +169,65 @@ void cmd_add_params_var(cmd_t *cmd, ...)
     cmd_add_params_str(cmd, str_params);
 }
 
+cmd_t *cmd_parse_from_str(char *buff)
+{
+    cmd_t *new_cmd = NULL;
+    size_t len = strlen(buff);
+    int ok = 0;
+
+    // Do not use sscanf in empty string
+    if(len > 0)
+    {
+        int next;
+        char tmp_cmd[len + 1];
+        memset(tmp_cmd, '\0', (size_t)len+1);
+
+        // Scan a command and parameter string: <command> [parameters]
+        LOGV(tag, "New TC: %s (%d)", buff, (int)len);
+        ok = sscanf(buff, "%s %n", tmp_cmd, &next);
+        LOGV(tag, "Parsed cmd: %s (a: %d, n: %d)", tmp_cmd, ok, next);
+
+        // Check that at least one str was found (the command name)
+        if (ok > 0)
+        {
+            new_cmd = cmd_get_str(tmp_cmd);
+
+            // Check if the command exist
+            if (new_cmd != NULL)
+            {
+                // Check if a parameter was found too (optional)
+                if (next < len)
+                {
+                    memset(tmp_cmd, '\0', (size_t)len+1);
+                    strncpy(tmp_cmd, buff + next, (size_t) (len - next));
+                    LOGV(tag, "Parsed args: %s", tmp_cmd);
+                    cmd_add_params_str(new_cmd, tmp_cmd);
+                }
+                else
+                {
+                    cmd_add_params_str(new_cmd, "");
+                }
+            }
+            else
+            {
+                ok = 0;
+            }
+        }
+    }
+
+    if(ok <= 0)
+    {
+        LOGE(tag, "Error parsing command!");
+    }
+
+    // Return the command filled with parameters or a NULL pointer
+    return new_cmd;
+}
+
 void cmd_free(cmd_t *cmd)
 {
-    if(cmd != NULL) {
+    if(cmd != NULL)
+    {
         // Free the params if allocated, we don't need free cmd->fmt because
         // it has not been copied with malloc (see cmd_get_idx)
         free(cmd->params);
@@ -185,6 +241,8 @@ void cmd_print_all(void)
 
     LOGD(tag, "Command list");
     osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
+
+    //Make sure no LOG functions are used in this zone
     osSemaphoreTake(&log_mutex, portMAX_DELAY);
     printf("Index\t name\t Params\n");
     int i;
@@ -193,6 +251,8 @@ void cmd_print_all(void)
         printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
     osSemaphoreGiven(&log_mutex);
+    //End log_mutex, can use LOG functions
+
     osSemaphoreGiven(&repo_cmd_sem);
 
 }
