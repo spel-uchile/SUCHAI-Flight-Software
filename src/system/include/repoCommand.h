@@ -131,6 +131,22 @@ cmd_t * cmd_get_idx(int idx);
 char * cmd_get_name(int idx);
 
 /**
+ * Fills command parameters as raw data using memcpy.@len bytes will be copied
+ * from @params to @cmd->params.
+ *
+ * @note make sure that @params contains at least @len bytes.
+ *
+ * @param cmd cmd_t *. Command to fill parameters
+ * @param params void *. Pointer to the data buffer
+ * @param len int. Lenght of the data buffer.
+ * @example:
+ *      char *data = {0,1,2,3,4,5};
+ *      cmd_t *foo = cmd_get_str("foo");
+ *      cmd_add_params_raw(foo, data, 6);
+ */
+void cmd_add_params_raw(cmd_t *cmd, void *params, int len);
+
+/**
  * Fills command parameters as string
  * @note does not check the parameters format or if the command requires param.
  *

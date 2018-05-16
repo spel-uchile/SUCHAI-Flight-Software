@@ -142,6 +142,16 @@ char * cmd_get_name(int idx)
     return name;
 }
 
+void cmd_add_params_raw(cmd_t *cmd, void *params, int len)
+{
+    // Check pointers
+    if(cmd != NULL && params != NULL)
+    {
+        cmd->params = (char *)malloc((size_t)len);
+        memcpy(cmd->params, params, (size_t)len);
+    }
+}
+
 void cmd_add_params_str(cmd_t *cmd, char *params)
 {
     size_t len_param = strlen(params);
