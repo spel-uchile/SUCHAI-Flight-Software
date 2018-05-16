@@ -52,49 +52,37 @@ typedef struct fp_entry {
  * System level status variables
  */
 typedef enum dat_system{
-    //OBC => (C&DH subsystem)
-    dat_obc_opmode=0,           ///< General operation mode
-    dat_obc_lastResetSource,    ///< Last reset source
-    dat_obc_hours_alive,         ///< Hours since first boot
-    dat_obc_hours_without_reset, ///< Hours since last reset
-    dat_obc_reset_counter,       ///< Number of reset since first boot
-    dat_gnd_wdt,                ///< GND watchdog timer counter
+    /// OBC: on borad computer related variables.
+    dat_obc_opmode = 0,        ///< General operation mode
+    dat_obc_last_reset,        ///< Last reset source
+    dat_obc_hrs_alive,         ///< Hours since first boot
+    dat_obc_hrs_wo_reset,      ///< Hours since last reset
+    dat_obc_reset_counter,     ///< Number of reset since first boot
+    dat_obc_sw_wdt,            ///< Software watchdog timer counter
 
-    //DEP => (C&DH subsystem)
-    dat_dep_ant_deployed,       ///< Is antena deployed?
+    /// DEP: deployment related variables.
+    dat_dep_ant_deployed,      ///< Was the antenna deployed?
+    dat_dep_date_time,         ///< Deployment unix time
 
-    //RTC => (C&DH subsystem)
-    dat_rtc_year,               ///< System current date and clock
-    dat_rtc_month,              ///< System current date and clock
-    dat_rtc_week_day,           ///< System current date and clock
-    dat_rtc_day_number,         ///< System current date and clock
-    dat_rtc_hours,              ///< System current date and clock
-    dat_rtc_minutes,            ///< System current date and clock
-    dat_rtc_seconds,            ///< System current date and clock
+    /// RTC: related variables
+    dat_rtc_date_time,         /// RTC current unix time
 
-    //EPS => (Energy subsystem)
-    dat_eps_status,             ///< Energy system general status
-    dat_eps_soc,                ///< Current availible energy level
+    /// COM: communications system variables.
+    dat_com_opmode,            ///< TRX Operation mode
+    dat_com_count_tm,          ///< number of TM sent
+    dat_com_count_tc,          ///< number of received TC
+    dat_com_last_tc,           ///< Unix time of the last received tc
 
-    //TRX => (Communication subsystem)
-    dat_trx_opmode,             ///< TRX Operation mode
-    dat_trx_beacon_pwr,         ///< TRX Beacon power level
-    dat_trx_telemetry_pwr,      ///< TRX Telemetry Power
-    dat_trx_count_tm,           ///< number of sended TM
-    dat_trx_count_tc,           ///< number of received TC
-    dat_trx_lastcmd_day,        ///< day of the last received tc (since 1/1/00)
+    /// FPL: flight plant related variables
+    dat_fpl_last,              ///< Last executed flight plan (unix time)
+    dat_fpl_queue,             ///< Flight plan queue length
 
-    // Cmd buffer control
-    dat_trx_newTcFrame,         ///< Exist any unprocessed TC?
-    dat_trx_newCmdBuff,         ///< Exist unprocessed CMD in the internal buffer?
+    /// Add custom status variables here
+    //dat_custom              ///< Variable description
 
-    //FLIGHT PLAN
-    dat_fpl_index,              ///< Flight plan entry to be edited
-
-    /* Add custom status variables here */
-
-    dat_system_last_var         ///< Dummy element
-}dat_system_t;
+    /// LAST ELEMENT: DO NOT EDIT
+            dat_system_last_var       ///< Dummy element, the number of status variables
+} dat_system_t;
 
 /**
  * Initializes data repositories including buffers and mutexes
@@ -209,24 +197,4 @@ int dat_set_time(int new_time);
  */
 int dat_show_time(int format);
 
-
-
-
-
-
-
-/* The following is an API to interface with the repoData cubesat fligthPlan */
-//typedef enum _DAT_FligthPlanBuff{
-//    dat_fpb_last_one
-//}DAT_FligthPlanBuff;
-//
-//DispCmd dat_getFlightPlan(unsigned int index);
-//int dat_setFlightPlan_cmd(unsigned int index, unsigned int cmdID);
-//int dat_setFlightPlan_param(unsigned int index, int param);
-//int dat_onResetFlightPlan(void);
-//void dat_erase_FlightPlanBuff(void);
-
-
-
 #endif // DATA_REPO_H
-

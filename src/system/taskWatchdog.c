@@ -29,7 +29,7 @@ void taskWatchdog(void *param)
     unsigned int max_obc_wdt = SCH_MAX_WDT_TIMER;     // Seconds to send "reset_wdt" command
     unsigned int max_gnd_wdt = SCH_MAX_GND_WDT_TIMER; // Seconds to send "reset" command
     unsigned int elapsed_obc_timer = 0; // OBC timer counter
-    unsigned int elapsed_gnd_timer = 0; // GND timer counter
+    unsigned int elapsed_sw_timer = 0; // Software timer counter
     portTick xLastWakeTime = osTaskGetTickCount();
     
     while(1)
@@ -37,10 +37,10 @@ void taskWatchdog(void *param)
         // Sleep task to count seconds
         osTaskDelayUntil(&xLastWakeTime, delay_ms);
         elapsed_obc_timer++; // Increase timer to reset the obc wdt
-        elapsed_gnd_timer = (unsigned  int)dat_get_system_var(dat_gnd_wdt) + 1; //Increase GND timer counter. Should be cleared by a gnd command
-        dat_set_system_var(dat_gnd_wdt, elapsed_gnd_timer); // Save increased GND timer
+        elapsed_sw_timer = (unsigned  int)dat_get_system_var(dat_obc_sw_wdt) + 1; //Increase software timer counter. Should be cleared by a gnd command
+        dat_set_system_var(dat_obc_sw_wdt, elapsed_sw_timer); // Save increased software timer
 
-        LOGV(tag, "GND_WDT (%d)", elapsed_gnd_timer);
+        LOGV(tag, "GND_WDT (%d)", elapsed_sw_timer);
 
         // Periodically reset the OBC watchdog
         if(elapsed_obc_timer > max_obc_wdt)
@@ -51,9 +51,9 @@ void taskWatchdog(void *param)
         }
 
         // If nobody clears elapsed_gnd_timer, then reset the OBC
-        if(elapsed_gnd_timer > max_gnd_wdt)
+        if(elapsed_sw_timer > max_gnd_wdt)
         {
-            LOGW(tag, "GND watchdog overflow")
+            LOGW(tag, "Software watchdog overflow")
             cmd_t *rst_obc = cmd_get_str("reset");
             cmd_send(rst_obc);
         }

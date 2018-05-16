@@ -98,14 +98,14 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &value) == nparams)
     {
         // Adds <value> to current hours alive
-        current = dat_get_system_var(dat_obc_hours_alive);
+        current = dat_get_system_var(dat_obc_hrs_alive);
         current += value;
-        dat_set_system_var(dat_obc_hours_alive, current);
+        dat_set_system_var(dat_obc_hrs_alive, current);
 
         // Adds <value> to current hours without reset
-        current = dat_get_system_var(dat_obc_hours_without_reset);
+        current = dat_get_system_var(dat_obc_hrs_wo_reset);
         current += value;
-        dat_set_system_var(dat_obc_hours_without_reset, current);
+        dat_set_system_var(dat_obc_hrs_wo_reset, current);
         return CMD_OK;
     }
     else
@@ -117,7 +117,7 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
 
 int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
 {
-    dat_set_system_var(dat_gnd_wdt, 0);
+    dat_set_system_var(dat_obc_sw_wdt, 0);
     return CMD_OK;
 }
 
