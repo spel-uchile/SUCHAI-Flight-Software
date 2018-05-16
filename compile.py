@@ -2,11 +2,14 @@
 import argparse
 import os
 
+import src.system.include.configure as configure
+
 def get_parameters():
     """
     Parse script arguments
     """
     parser = argparse.ArgumentParser(prog='compile.py')
+    # config.h template parameters
     parser.add_argument('os', type=str, default="LINUX")
     parser.add_argument('--arch', type=str, default="ESP32")
     parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
@@ -14,7 +17,11 @@ def get_parameters():
     parser.add_argument('--sch_fp', type=str, default="1")
     parser.add_argument('--sch_hk', type=str, default="1")
     parser.add_argument('--sch_test', type=str, default="0")
+    parser.add_argument('--sch_node', type=str, default="1")
+    parser.add_argument('--sch_zmq_out', type=str, default="tcp://127.0.0.1:8001")
+    parser.add_argument('--sch_zmq_in', type=str, default="tcp://127.0.0.1:8002")
     parser.add_argument('--sch_st_mode', type=str, default="1")
+    # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
 
     return parser.parse_args()
@@ -25,12 +32,9 @@ if __name__ == "__main__":
 
     # Generate config file
     cwd_root = os.getcwd()
-    os.chdir('src/system/include')
-    os.system('python configure.py ' + args.os + " --arch " + args.arch +
-              " --log_lvl " + args.log_lvl + " --sch_comm " + args.sch_comm +
-              " --sch_fp " + args.sch_fp + " --sch_hk " + args.sch_hk +
-              " --sch_test " + args.sch_test + " --sch_st_mode " + args.sch_st_mode)
-    os.chdir(cwd_root)
+    configure.make_config(args,
+                          'src/system/include/config_template.h',
+                          'src/system/include/config.h')
 
     # Build
     if args.os == "LINUX":

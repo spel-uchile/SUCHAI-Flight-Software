@@ -73,14 +73,14 @@ void taskCommunications(void *param)
                     csp_send(conn, response, 1000);
                     break;
 
-                case SCH_TRX_PORT_DEBUG:
-                    /* Debug port, only to print strings */
-                    LOGI(tag, (char *)(packet->data));
+                case SCH_TRX_PORT_RPT:
+                    /* Digital repeater port, resend the received packet */
+                    LOGD(tag, "Resending: %s", (char *)(packet->data));
+                    csp_send(conn, packet, 1000);
                     csp_buffer_free(packet);
-                    csp_send(conn, response, 1000);
                     break;
 
-                case SCH_TRX_PORT_CONSOLE:
+                case SCH_TRX_PORT_CMD:
                     /* Debug port, executes console commands */
                     com_receive_cmd(packet);
                     csp_buffer_free(packet);
@@ -102,54 +102,36 @@ void taskCommunications(void *param)
 /**
  * Parse TC frames and generates corresponding commands
  *
- * @param packet TC Buffer
+ * @param packet A csp buffer containing a null terminated string with the
+ *               format <command> [parameters]
  */
 static void com_receive_tc(csp_packet_t *packet)
 {
-    int next;
-    int n_args;
-    static cmd_t *new_cmd;
-    char tmp_cmd[packet->length];
-    char tmp_arg[packet->length];
-    char buffer[packet->length];
-    strncpy(buffer, (char *)(packet->data), (size_t)packet->length);
-    LOGI(tag, "New TC: %s (%d)", buffer, packet->length);
+    /* TODO: this function should receive several (cmd,args) pairs */
+    /* TODO: check com_receive_cmd implementation */
 
-    n_args = sscanf(buffer, "%s %n", tmp_cmd, &next);
-    LOGV(tag, "Parsed %d: %s (%d))", n_args, tmp_cmd, next);
-    strncpy(tmp_arg, buffer+next, (size_t)(packet->length));
-    LOGV(tag, "Parsed args: %s", tmp_arg);
+    // Make sure the buffer is a null terminated string
+    packet->data[packet->length] = '\0';
+    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
 
-    if (n_args == 1)
-    {
-        new_cmd = cmd_get_str(tmp_cmd);
-        if(new_cmd)
-        {
-            if(next > 1)
-            {
-                cmd_add_params_str(new_cmd, tmp_arg);
-            }
-            else
-            {
-                cmd_add_params_str(new_cmd, "");
-            }
-
-            cmd_send(new_cmd);
-        }
-    }
-    else
-    {
-        LOGE(tag, "Invalid number of arguments (%d)", n_args)
-    }
+    // Send command to execution if not null
+    if(new_cmd != NULL)
+        cmd_send(new_cmd);
 }
 
 /**
- * Parse tc frame as console commands
- * @note NOT IMPLEMENTED YET
- * @param packet TC Buffer
+ * Parse tc frame as console commands and execute the commands
+ *
+ * @param packet A csp buffer containing a null terminated string with the
+ *               format <command> [parameters]
  */
 static void com_receive_cmd(csp_packet_t *packet)
 {
-    /* FIXME: Not implemented */
-    LOGW(tag, "com_receive_cmd NOT implemented! (%s)", (char *)(packet->data))
+    // Make sure the buffer is a null terminated string
+    packet->data[packet->length] = '\0';
+    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
+
+    // Send command to execution if not null
+    if(new_cmd != NULL)
+        cmd_send(new_cmd);
 }

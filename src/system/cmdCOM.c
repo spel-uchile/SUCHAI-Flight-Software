@@ -49,7 +49,7 @@ int com_send_dbg(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &node, msg) == nparams)
     {
         /* Sending message to node debug port */
-        int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_DEBUG, 1000,
+        int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_RPT, 1000,
                                  (void *)msg, strlen(msg),
                                  (void *)msg, strlen(msg));
         LOGV(tag, "Sending %s to %d. Bytes read %d\n", msg, node, rc);
