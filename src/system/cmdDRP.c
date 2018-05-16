@@ -39,30 +39,17 @@ int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
 
-    //Take log_mutex to take control of the console
-    int rc = osSemaphoreTake(&log_mutex, portMAX_DELAY);
-    if(rc == CSP_SEMAPHORE_OK)
+    printf("system variables repository\n");
+    printf("index\t value\n");
+
+    int var_index;
+    for (var_index = 0; var_index < dat_system_last_var; var_index++)
     {
-        printf("system variables repository\n");
-        printf("index\t value\n");
-
-        int var_index;
-        for (var_index = 0; var_index < dat_system_last_var; var_index++)
-        {
-            int var = dat_get_system_var((dat_system_t)var_index);
-            printf("%d\t %d\n", var_index, var);
-        }
-
-        //Exit critical zone
-        osSemaphoreGiven(&log_mutex);
-
-        return CMD_OK;
+        int var = dat_get_system_var((dat_system_t)var_index);
+        printf("%d\t %d\n", var_index, var);
     }
-    else
-    {
-        LOGE(tag, "Unable to acquire console mutex");
-        return CMD_FAIL;
-    }
+
+    return CMD_OK;
 }
 
 int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
