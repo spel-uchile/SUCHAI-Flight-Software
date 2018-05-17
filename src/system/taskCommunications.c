@@ -32,7 +32,8 @@ void taskCommunications(void *param)
     /* Pointer to current connection, packet and socket */
     csp_conn_t *conn;
     csp_packet_t *packet;
-    csp_packet_t *response;
+    csp_packet_t *rep_ok_tmp;
+    csp_packet_t *rep_ok;
 
     csp_socket_t *sock = csp_socket(CSP_SO_NONE);
     if((rc = csp_bind(sock, CSP_ANY)) != CSP_ERR_NONE)
@@ -46,13 +47,9 @@ void taskCommunications(void *param)
         return;
     }
 
-    response = csp_buffer_get(sizeof(csp_packet_t) + 3);
-    if( response == NULL ) {
-        LOGE(stderr, "Could not allocate memory for response packet!\n");
-        return;
-    }
-    memcpy(response->data, "OK", 3);
-    response->length = 4;
+    rep_ok_tmp = csp_buffer_get(1);
+    memset(rep_ok_tmp->data, 200, 1);
+    rep_ok_tmp->length = 1;
 
     while(1)
     {
@@ -70,21 +67,49 @@ void taskCommunications(void *param)
                     /* Process incoming TC */
                     com_receive_tc(packet);
                     csp_buffer_free(packet);
-                    csp_send(conn, response, 1000);
+                    // Create a response packet and send
+//                    rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    rep_ok = csp_buffer_get(1);
+                    rep_ok->data[0] = 200;
+                    rep_ok->length = 1;
+                    csp_send(conn, rep_ok, 1000);
                     break;
 
-                case SCH_TRX_PORT_RPT:
-                    /* Digital repeater port, resend the received packet */
-                    LOGD(tag, "Resending: %s", (char *)(packet->data));
-                    csp_send(conn, packet, 1000);
+                case SCH_TRX_PORT_TM:
+                    /* TODO: Process incoming TM */
                     csp_buffer_free(packet);
+                    // Create a response packet and send
+                    rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    csp_send(conn, rep_ok, 1000);
+
+                case SCH_TRX_PORT_RPT:
+                    // Digital repeater port, resend the received packet
+                    if(csp_conn_dst(conn) == SCH_COMM_ADDRESS)
+                    {
+                        rc = csp_sendto(CSP_PRIO_NORM, CSP_BROADCAST_ADDR,
+                                        SCH_TRX_PORT_RPT, SCH_TRX_PORT_RPT,
+                                        CSP_O_NONE, packet, 1000);
+                        if (rc != 0)
+                            csp_buffer_free(packet); // Free the packet in case of errors
+                    }
+                    // If i am receiving a broadcast packet just print
+                    else
+                    {
+                        LOGI(tag, "RPT: %s", (char *)(packet->data));
+                        csp_buffer_free(packet);
+                    }
                     break;
 
                 case SCH_TRX_PORT_CMD:
-                    /* Debug port, executes console commands */
+                    /* Command port, executes console commands */
                     com_receive_cmd(packet);
                     csp_buffer_free(packet);
-                    csp_send(conn, response, 1000);
+                    // Create a response packet and send
+                    //rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    rep_ok = csp_buffer_get(1);
+                    rep_ok->data[0] = 200;
+                    rep_ok->length = 1;
+                    csp_send(conn, rep_ok, 1000);
                     break;
 
                 default:

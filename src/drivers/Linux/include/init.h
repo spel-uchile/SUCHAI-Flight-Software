@@ -5,8 +5,8 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_INITI_H
 #define SUCHAI_FLIGHT_SOFTWARE_INITI_H
 
-#include "utils.h"
 #include "config.h"
+#include "utils.h"
 #include <stdio.h>
 #include <signal.h>
 
