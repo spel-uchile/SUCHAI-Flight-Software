@@ -1,10 +1,15 @@
 /**
- * @file  SUCHAI_config.h
+ * @file  config.h
+ *
  * @author Carlos Gonzalez C
+ * @author Camilo Rojas M
  * @author Tomas Opazo T
- * @autor Ignacio Ibanez A
- * @date 2017
- * @copyright GNU Public License.
+ * @author Tamara Gutierrez R
+ * @author Matias Ramirez M
+ * @author Ignacio Ibanez A
+ *
+ * @date 2018
+ * @copyright GNU GPL v3
  *
  * This header contains system wide settings to customize different submodules
  */
@@ -26,7 +31,7 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               LOG_LVL_INFO        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define LOG_LEVEL               LOG_LVL_DEBUG        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)

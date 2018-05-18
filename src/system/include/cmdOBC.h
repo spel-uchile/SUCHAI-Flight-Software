@@ -1,5 +1,5 @@
 /**
- * @file  cmdPPC.h
+ * @file  cmdOBC.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @date 2018

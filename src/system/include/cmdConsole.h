@@ -2,7 +2,7 @@
  * @file  cmdConsole.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2017
+ * @date 2018
  * @copyright GNU Public License.
  *
  * This header contains commands related with serial console functions
@@ -25,9 +25,9 @@ void cmd_console_init(void);
 /**
  * Display a debug message
  *
- * @param fparams Str. Parameters format "%s"
+ * @param fmt Str. Parameters format "%s"
  * @param params Str. Parameters as string "test"
- * @param nparam Int. Number of parameters 1
+ * @param nparams Int. Number of parameters 1
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int con_debug_msg(char *fmt, char *params, int nparams);
@@ -35,9 +35,9 @@ int con_debug_msg(char *fmt, char *params, int nparams);
 /**
  * Show the list of available commands, id and parameters format
  *
- * @param fparams Str. Parameters format ""
+ * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
- * @param nparam Int. Number of parameters 0
+ * @param nparams Int. Number of parameters 0
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int con_help(char *fmt, char *params, int nparams);

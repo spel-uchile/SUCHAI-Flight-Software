@@ -2,9 +2,8 @@
  * @file  taskDispatcher.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2017
+ * @date 2018
  * @copyright GNU GPL v3
- *
  *
  * This task implements the dispatcher. Reads commands from queue, determines
  * if the commands is executable, asks to command repository the function to

@@ -5,7 +5,7 @@
  * @date 2018
  * @copyright GNU GPL v3
  *
- * This task implements a listener that works as a serial console.
+ * This task implements a client that works as a serial console.
  */
 
 #ifndef T_COSOLE_H

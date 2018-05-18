@@ -1,7 +1,7 @@
 /**
  * @file  cmdCOM.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2017
+ * @date 2018
  * @copyright GNU Public License.
  *
  * This header contains commands related with the communication system
@@ -17,6 +17,14 @@
 #include "csp/csp.h"
 
 #include "repoCommand.h"
+
+/**
+ * Parameter to com_send_data. Stores the destination node and binary data.
+ */
+typedef struct com_data{
+    uint8_t node;                       ///< destination node
+    uint8_t data[SCH_BUFF_MAX_LEN];     ///< data buffer
+}com_data_t;
 
 /**
  * Registers communications commands in the system
@@ -55,14 +63,6 @@ int com_send_rpt(char *fmt, char *param, int nparams);
 int com_send_cmd(char *fmt, char *param, int nparams);
 
 /**
- * Parameter to com_send_data. Stores the destination node and binary data.
- */
-typedef struct com_data{
-    uint8_t node;                       ///< destination node
-    uint8_t data[SCH_BUFF_MAX_LEN];     ///< data buffer
-}com_data_t;
-
-/**
  * Sends telemetry data using CSP. Data is received in @params as binary, packed
  * in a @com_data_t structure that contains the destination node and the data.
  * Its expect the confirmation code: 200. See the usage example.
@@ -70,10 +70,10 @@ typedef struct com_data{
  * @param fmt Str. Parameters format: "" (not used)
  * @param params com_data_t *. Pointer to a com_data_t structure.
  * @param nparams int. Number of parameters: 1
- * @return @return CMD_OK if executed correctly (data was sent and confirmed)
+ * @return CMD_OK if executed correctly (data was sent and confirmed)
  * or CMD_FAIL in case of errors.
  *
- * @example
+ * @code
  *      // Create the data buffer
  *      com_data_t data;
  *      data.node = 10;                       // Set the destination node
@@ -86,6 +86,7 @@ typedef struct com_data{
  *      cmd_t *send_cmd = cmd_get_str("send_data");         // Get the command
  *      cmd_add_params_raw(send_cmd, &data, sizeof(data));  // Add params as binary data
  *      cmd_send(send_cmd);
+ * @endcode
  */
 int com_send_data(char *fmt, char *params, int nparams);
 

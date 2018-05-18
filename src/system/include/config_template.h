@@ -1,10 +1,15 @@
 /**
- * @file  SUCHAI_config.h
+ * @file  config.h
+ *
  * @author Carlos Gonzalez C
+ * @author Camilo Rojas M
  * @author Tomas Opazo T
- * @autor Ignacio Ibanez A
- * @date 2017
- * @copyright GNU Public License.
+ * @author Tamara Gutierrez R
+ * @author Matias Ramirez M
+ * @author Ignacio Ibanez A
+ *
+ * @date 2018
+ * @copyright GNU GPL v3
  *
  * This header contains system wide settings to customize different submodules
  */
@@ -43,11 +48,11 @@
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
 #define SCH_TRX_PORT_CMD        (12)               ///< Commads port (execute console commands)
-#define SCH_COMM_ZMQ_OUT        "{{SCH_ZMQ_OUT}}"    ///< Out socket URI
-#define SCH_COMM_ZMQ_IN         "{{SCH_ZMQ_IN}}"     ///< In socket URI
+#define SCH_COMM_ZMQ_OUT        "{{SCH_ZMQ_OUT}}"  ///< Out socket URI
+#define SCH_COMM_ZMQ_IN         "{{SCH_ZMQ_IN}}"   ///< In socket URI
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        {{SCH_STORAGE}}    ///< Status repository location. (0) RAM, (1) Single external.
-#define SCH_STORAGE_FILE        "/tmp/suchai.db"
+#define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
 #endif	/* SUCHAI_CONFIG_H */

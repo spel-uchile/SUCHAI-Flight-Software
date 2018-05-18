@@ -1,6 +1,18 @@
-//
-// Created by carlos on 19-10-17.
-//
+/**
+ * @file  main.h
+ *
+ * @author Carlos Gonzalez C
+ * @author Camilo Rojas M
+ * @author Tomas Opazo T
+ * @author Tamara Gutierrez R
+ * @author Matias Ramirez M
+ * @author Ignacio Ibanez A
+ *
+ * @date 2018
+ * @copyright GNU GPL v3
+ *
+ * This header contains the main's includes
+ */
 
 #ifndef SUCHAI_FLIGHT_SOFTWARE_MAIN_H
 #define SUCHAI_FLIGHT_SOFTWARE_MAIN_H

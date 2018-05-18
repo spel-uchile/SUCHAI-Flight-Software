@@ -1,10 +1,9 @@
 /**
- * @file  commandRepoitory.h
+ * @file  taskExecuter.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2017
+ * @date 2018
  * @copyright GNU GPL v3
- *
  *
  * This task implements the executer module. Waits a message from dispatcher to
  * obtain the function and parameter to execute. When the function ends, send a

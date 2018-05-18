@@ -5,8 +5,6 @@
  * @date 2018
  * @copyright GNU GPL v3
  *
- * @id 0x1101
- *
  * This task implements a listener, that sends commands at periodical times.
  */
 

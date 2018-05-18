@@ -1,16 +1,11 @@
 /**
- * @file  cmdPPC.h
+ * @file  cmdDRP.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @date 2018
  * @copyright GNU GPL v3
  *
- * This header have definitions of commands related following data repositories:
- *  *dat_CubesatVar     -> dat_
- *
- * Commands are named with the following convention:
- *  * Update variables  -> drp_update_
- *  * Show variables    -> drp_print_
+ * This header have definitions of commands related with data repositories
  *
  */
 
