@@ -43,7 +43,7 @@ void taskFlightPlan(void *param)
 #endif
         //printf("%d\n", (int)elapsed_sec);
 
-
+        //FIXME: memory leak detected
         char* command = malloc(sizeof(char)*50);
         char* args = malloc(sizeof(char)*50);
         int* executions = malloc(sizeof(int));

@@ -108,6 +108,7 @@ int storage_table_flight_plan_init(int drop)
         }
     }
 
+    //FIXME: memory leak detected
     sql = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS %s("
                                   "time int PRIMARY KEY , "
                                   "command text, "
@@ -274,10 +275,13 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** exe
     char *err_msg;
     int row;
     int col;
+
+    //FIXME: memory leak detected
     char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
 
 
     // execute statement
+    //FIXME: memory leak detected
     sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
 
     if(row==0 || col==0)
