@@ -271,14 +271,6 @@ int cmd_repo_init(void)
 {
     // Init repository mutex
     osSemaphoreCreate(&repo_cmd_sem);
-
-    // Reset command buffer with cmd_null command
-    int n_cmd = 0;
-    do
-    {
-        n_cmd = cmd_add("null", cmd_null, "", 0);
-    }
-    while(n_cmd < CMD_MAX_LEN);
     cmd_index = 0;  // Reset registered command counter
 
     // Init repos
@@ -295,7 +287,30 @@ int cmd_repo_init(void)
     cmd_fp_init();
 #endif
 
+    int n_cmd;
+    int last_cmd_index = cmd_index;
+
+    // Fill command buffer with cmd_null command
+    do
+    {
+        n_cmd = cmd_add("null", cmd_null, "", 0);
+    }
+    while(n_cmd < CMD_MAX_LEN);
+
+    // Restore the number of not null commands
+    cmd_index = last_cmd_index;
+
     return CMD_OK;
+}
+
+void cmd_repo_close(void)
+{
+    int i;
+    for(i=0; i<CMD_MAX_LEN; i++)
+    {
+        free(cmd_list[i].name);
+        free(cmd_list[i].fmt);
+    }
 }
 
 int cmd_null(char *fparams, char *params, int nparam)

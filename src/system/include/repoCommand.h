@@ -215,6 +215,11 @@ void cmd_print_all(void);
 int cmd_repo_init(void);
 
 /**
+ * Cleans the repo buffer. Frees allocated memories
+ */
+void cmd_repo_close(void);
+
+/**
  * Null command, just print to stdout
  *
  * @param param Not used
