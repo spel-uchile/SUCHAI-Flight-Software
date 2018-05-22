@@ -67,7 +67,10 @@
 #include "utils.h"
 #include "repoData.h"
 #include "repoCommand.h"
+
+#ifndef AVR32
 #include "init.h"
+#endif
 
 #ifdef LINUX
     #include <csp/csp.h>
