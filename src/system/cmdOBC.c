@@ -30,7 +30,6 @@ void cmd_obc_init(void)
     cmd_add("get_mem", obc_get_os_memory, "", 0);
     cmd_add("set_time", obc_set_time,"%d",1);
     cmd_add("show_time", obc_show_time,"%d",1);
-    cmd_add("test_fp", test_fp, "%d %s %d", 3);
     cmd_add("reset_wdt", obc_reset_wdt, "", 0);
     cmd_add("system", obc_system, "%s", 1);
 }
@@ -192,21 +191,4 @@ int obc_system(char* fmt, char* params, int nparams)
     LOGW(tag, "Command not suported!");
     return CMD_FAIL;
 #endif
-}
-
-// #FIXME: This function do not belong here (carlgonz)
-int test_fp(char* fmt, char* params,int nparams)
-{
-    int num1, num2;
-    char str[CMD_MAX_STR_PARAMS];
-    if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
-    {
-        printf("Los parametros leidos son: %d ; %s ; %d \n",num1, str ,num2);
-        return CMD_OK;
-    }
-    else
-    {
-        LOGW(tag, "test_fp used with invalid params: %s", params);
-        return CMD_FAIL;
-    }
 }

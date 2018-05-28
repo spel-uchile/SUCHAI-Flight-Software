@@ -347,7 +347,7 @@ char* cmd_get_fmt(char* name)
 
 char* fix_fmt(char* fmt)
 {
-    char* new_fmt = malloc(sizeof(char)*30);
+    char* new_fmt = malloc(sizeof(char)*CMD_MAX_STR_PARAMS);
     char* aux = new_fmt;
     while(*fmt != 0)
     {

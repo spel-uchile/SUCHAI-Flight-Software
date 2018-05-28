@@ -13,10 +13,14 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdint.h"
-
-#include "csp/csp.h"
+#include "config.h"
 
 #include "repoCommand.h"
+
+#ifndef AVR32
+#include "csp/csp.h"
+#endif
+
 
 /**
  * Parameter to com_send_data. Stores the destination node and binary data.
