@@ -26,7 +26,7 @@ void cmd_com_init(void)
     cmd_add("ping", com_ping, "%d", 1);
     cmd_add("send_rpt", com_send_rpt, "%d %s", 2);
     cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
-    cmd_add("send_data", com_send_data, "", 1);
+    cmd_add("send_data", com_send_data, "%p", 1);
 }
 
 int com_ping(char *fmt, char *params, int nparams)
@@ -119,6 +119,12 @@ int com_send_cmd(char *fmt, char *params, int nparams)
 
 int com_send_data(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
     uint8_t rep[1];
     com_data_t *data_to_send = (com_data_t *)params;
 
