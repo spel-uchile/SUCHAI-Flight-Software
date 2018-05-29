@@ -60,13 +60,22 @@ def console(port="8001", ip="localhost", origin=10):
         try:
             global prompt
             prompt = _prompt.format(node, port)
-            cmd = input(prompt).split(" ", 1)
-            if len(cmd) > 1:
-                node = int(cmd[0])
-                port = int(cmd[1])
-                data = cmd[2]
+            cmd = input(prompt).split(" ")
+            # case 1: <node> <port> <cmd> <arg1> ... <argn>
+            # case 2: <cmd> <arg1> ... <argn>
+            # case 3: <cmd>
+            if len(cmd) > 2:
+                try:
+                    #case 1
+                    node = int(cmd[0])
+                    port = int(cmd[1])
+                    data = " ".join(cmd[2:])
+                except:
+                    # case 2
+                    data = " ".join(cmd)
             else:
-                data = cmd[0]
+                # case 2 or 3
+                data = " ".join(cmd)
 
             if len(data) > 0:
                 # Get CSP header and data
