@@ -21,13 +21,24 @@
 #include "csp/csp.h"
 #endif
 
+#define COM_FRAME_MAX_LEN (SCH_BUFF_MAX_LEN - 2 * sizeof(uint16_t))
+
+typedef struct com_frame{
+    uint16_t frame;
+    uint16_t type;
+    union{
+        uint8_t data8[COM_FRAME_MAX_LEN];
+        uint16_t data16[COM_FRAME_MAX_LEN/2];
+        uint32_t data32[COM_FRAME_MAX_LEN/4];
+    }data;
+}com_frame_t;
 
 /**
  * Parameter to com_send_data. Stores the destination node and binary data.
  */
 typedef struct com_data{
     uint8_t node;                       ///< destination node
-    uint8_t data[SCH_BUFF_MAX_LEN];     ///< data buffer
+    com_frame_t frame;
 }com_data_t;
 
 /**

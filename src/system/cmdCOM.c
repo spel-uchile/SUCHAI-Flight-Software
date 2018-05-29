@@ -130,7 +130,8 @@ int com_send_data(char *fmt, char *params, int nparams)
 
     // Send the data buffer to node and wait 1 seg. for the confirmation
     int rc = csp_transaction(CSP_PRIO_NORM, data_to_send->node, SCH_TRX_PORT_TM,
-                             1000, data_to_send->data, sizeof(data_to_send)-1, rep, 1);
+                             1000, (uint8_t *)&data_to_send->frame,
+                             sizeof(data_to_send->frame), rep, 1);
 
     if(rc > 0 && rep[0] == 200)
     {
