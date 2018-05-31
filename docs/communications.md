@@ -6,7 +6,7 @@ software nodes and the zmq node.
 
 1. Go to sandbox and execute the zmq node.
         
-        python3 minzmqnode.py --mon
+        python3 zmqnode.py --mon
     
     1.1 This will start the zmq node in the local host and ports 8001 and 8002
     

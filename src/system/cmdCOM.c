@@ -26,7 +26,7 @@ void cmd_com_init(void)
     cmd_add("ping", com_ping, "%d", 1);
     cmd_add("send_rpt", com_send_rpt, "%d %s", 2);
     cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
-    cmd_add("send_data", com_send_data, "", 1);
+    cmd_add("send_data", com_send_data, "%p", 1);
 }
 
 int com_ping(char *fmt, char *params, int nparams)
@@ -119,12 +119,19 @@ int com_send_cmd(char *fmt, char *params, int nparams)
 
 int com_send_data(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
     uint8_t rep[1];
     com_data_t *data_to_send = (com_data_t *)params;
 
     // Send the data buffer to node and wait 1 seg. for the confirmation
     int rc = csp_transaction(CSP_PRIO_NORM, data_to_send->node, SCH_TRX_PORT_TM,
-                             1000, data_to_send->data, sizeof(data_to_send)-1, rep, 1);
+                             1000, (uint8_t *)&data_to_send->frame,
+                             sizeof(data_to_send->frame), rep, 1);
 
     if(rc > 0 && rep[0] == 200)
     {

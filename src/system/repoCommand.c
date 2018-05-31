@@ -281,6 +281,7 @@ int cmd_repo_init(void)
     cmd_drp_init();
 #if SCH_COMM_ENABLE
     cmd_com_init();
+    cmd_tm_init();
 #endif
     cmd_console_init();
 #if SCH_FP_ENABLED

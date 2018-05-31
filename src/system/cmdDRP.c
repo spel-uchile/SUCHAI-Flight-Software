@@ -28,11 +28,44 @@ static const char *tag = "cmdDRP";
  */
 void cmd_drp_init(void)
 {
+    cmd_add("ebf", drp_execute_before_flight, "%d", 1);
     cmd_add("print_vars", drp_print_system_vars, "", 0);
     cmd_add("update_sys_var", drp_update_sys_var_idx, "%d %d", 2);
     cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
     cmd_add("clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
     cmd_add("sample_obc_sensors", drp_sample_obc_sensors, "", 0);
+}
+
+int drp_execute_before_flight(char *fmt, char *params, int nparams)
+{
+    int magic;
+    if(nparams == sscanf(params, fmt, &magic))
+    {
+        if(magic == SCH_DRP_MAGIC)
+        {
+            // Reset all status variables values to 0
+            dat_system_t var;
+            for(var = dat_obc_opmode; var < dat_system_last_var; var++)
+            {
+                dat_set_system_var(var, 0);
+            }
+            // Set all status variables default values
+            dat_set_system_var(dat_rtc_date_time, (int)time(NULL));
+            // dat_set_system_var(dat_custom, default_value);
+
+            return CMD_OK;
+        }
+        else
+        {
+            LOGW(tag, "EBF executed with incorrect magic number!")
+            return CMD_FAIL;
+        }
+    }
+    else
+    {
+        LOGW(tag, "EBF executed with invalid parameter!")
+        return CMD_FAIL;
+    }
 }
 
 int drp_print_system_vars(char *fmt, char *params, int nparams)

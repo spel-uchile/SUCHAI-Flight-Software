@@ -24,11 +24,27 @@
     #include <hmc5843.h>
 #endif
 
+#define SCH_DRP_MAGIC (1010)    ///< Magic number to execute critical commands
 
 /**
  * Register data repository (DRP) commands in the system
  */
 void cmd_drp_init(void);
+
+/**
+ * Execute before flight. This command reset the satellite status variables to
+ * their default settings. The default value depends on the variable; however
+ * the value represents the status of the satellite just before the launch.
+ * launch.
+ * The command is executed with a "Magic Number" as parameter to avoid
+ * unintended calls. See @SCH_DRP_MAGIC.
+ *
+ * @param fmt Str. Parameters format: "%d"
+ * @param params Str. Parameters as string: "<MAGIC_NUMBER>"
+ * @param nparams Int. Number of parameters: 0
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int drp_execute_before_flight(char *fmt, char *params, int nparams);
 
 /**
  * Display system related variables. Variables are read from system variables

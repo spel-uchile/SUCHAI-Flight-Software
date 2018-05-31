@@ -73,7 +73,7 @@ typedef enum dat_system{
     //dat_custom              ///< Variable description
 
     /// LAST ELEMENT: DO NOT EDIT
-            dat_system_last_var       ///< Dummy element, the number of status variables
+    dat_system_last_var       ///< Dummy element, the number of status variables
 } dat_system_t;
 
 /**
