@@ -65,6 +65,24 @@ int clean_suite2(void)
     return 0;
 }
 
+/* The suite initialization function.
+ * Initializes
+ */
+int init_suite3(void)
+{
+    dat_repo_init();
+    cmd_repo_init();
+    drp_execute_before_flight(NULL, "1010", 0);
+    return 0;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite3(void)
+{
+    return 0;
+}
 
 // Test of parse cmd from string
 void testParseCommands(void)
@@ -142,6 +160,14 @@ void testFPDELETE(void)
     CU_ASSERT(CMD_OK == result);
 }
 
+//Test of drp_test_system_vars
+void testSYSVARS(void)
+{
+    int result;
+    result = drp_test_system_vars("", "", 0);
+    CU_ASSERT(CMD_OK == result);
+}
+
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
  * CUnit error code on failure.
@@ -181,6 +207,21 @@ int main()
 
     /* add the tests to the suite */
     if ((NULL == CU_add_test(pSuite, "test of cmd_parse_from_str()", testParseCommands))){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /*
+     * SUITE 3: Repo data unit tests
+     */
+    pSuite = CU_add_suite("Suite repo data", init_suite3, clean_suite3);
+    if (NULL == pSuite) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /* add the tests to the suite */
+    if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", testSYSVARS))){
         CU_cleanup_registry();
         return CU_get_error();
     }

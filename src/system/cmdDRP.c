@@ -34,6 +34,7 @@ void cmd_drp_init(void)
     cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
     cmd_add("clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
     cmd_add("sample_obc_sensors", drp_sample_obc_sensors, "", 0);
+    cmd_add("test_system_vars", drp_test_system_vars, "", 0);
 }
 
 int drp_execute_before_flight(char *fmt, char *params, int nparams)
@@ -170,4 +171,28 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
 #endif
 
     return CMD_OK;
+}
+
+int drp_test_system_vars(char *fmt, char *params, int nparams)
+{
+    int var_index;
+    int var;
+    int init_value;
+    int test_value = 85;
+    int return_value = CMD_OK;
+
+    for (var_index = 0; var_index < dat_system_last_var; var_index++)
+    {
+        init_value = dat_get_system_var((dat_system_t) var_index);
+        dat_set_system_var((dat_system_t) var_index, test_value);
+        var = dat_get_system_var((dat_system_t) var_index);
+        dat_set_system_var((dat_system_t) var_index, init_value);
+        LOGV(tag, "Variable:%d, value: %d, expected %d", var, var, test_value);
+        if (var != test_value)
+        {
+            return_value = CMD_FAIL;
+        }
+    }
+
+    return return_value;
 }
