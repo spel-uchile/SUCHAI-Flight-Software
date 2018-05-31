@@ -108,7 +108,6 @@ int storage_table_flight_plan_init(int drop)
         }
     }
 
-    //FIXME: memory leak detected
     sql = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS %s("
                                   "time int PRIMARY KEY , "
                                   "command text, "
@@ -122,13 +121,13 @@ int storage_table_flight_plan_init(int drop)
     if (rc != SQLITE_OK )
     {
         LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", fp_table, err_msg, sql);
-
+        sqlite3_free(sql);
         return -1;
     }
     else
     {
         LOGD(tag, "Table %s created successfully", fp_table);
-
+        sqlite3_free(sql);
         return 0;
     }
 }
@@ -276,16 +275,18 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** exe
     int row;
     int col;
 
-    //FIXME: memory leak detected
     char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
 
 
     // execute statement
-    //FIXME: memory leak detected
     sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
 
     if(row==0 || col==0)
     {
+        sqlite3_free(sql);
+        LOGV(tag, "SQL error: %s", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_free_table(results);
         return -1;
     }
     else

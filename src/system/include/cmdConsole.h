@@ -11,9 +11,6 @@
 #ifndef CMD_CONSOLE_H
 #define CMD_CONSOLE_H
 
-#ifdef LINUX
-    #include "csp/csp.h"
-#endif
 
 #include "repoCommand.h"
 

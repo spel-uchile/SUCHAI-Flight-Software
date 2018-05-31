@@ -31,7 +31,7 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               LOG_LVL_DEBUG        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define LOG_LEVEL               LOG_LVL_INFO        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
@@ -48,11 +48,11 @@
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
 #define SCH_TRX_PORT_CMD        (12)               ///< Commads port (execute console commands)
-#define SCH_COMM_ZMQ_OUT        "tcp://127.0.0.1:8001"    ///< Out socket URI
-#define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"     ///< In socket URI
+#define SCH_COMM_ZMQ_OUT        "tcp://127.0.0.1:8001"  ///< Out socket URI
+#define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
-#define SCH_STORAGE_FILE        "/tmp/suchai.db"
+#define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
 #endif	/* SUCHAI_CONFIG_H */

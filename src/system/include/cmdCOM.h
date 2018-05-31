@@ -17,7 +17,7 @@
 
 #include "repoCommand.h"
 
-#ifndef AVR32
+#if SCH_COMM_ENABLE
 #include "csp/csp.h"
 #endif
 

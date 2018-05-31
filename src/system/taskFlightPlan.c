@@ -44,15 +44,20 @@ void taskFlightPlan(void *param)
         //printf("%d\n", (int)elapsed_sec);
 
         //FIXME: memory leak detected
-        char* command = malloc(sizeof(char)*50);
-        char* args = malloc(sizeof(char)*50);
+        char* command = malloc(CMD_MAX_STR_PARAMS);
+        char* args = malloc(CMD_MAX_STR_PARAMS);
         int* executions = malloc(sizeof(int));
         int* periodical = malloc(sizeof(int));
 
         int rc = dat_get_fp((int)elapsed_sec, &command, &args, &executions, &periodical);
 
-        if(rc == -1)
+        if(rc == -1){
+            free(command);
+            free(args);
+            free(executions);
+            free(periodical);
             continue;
+        }
 
         char* fixed_args = fix_fmt(args);
         int i;
