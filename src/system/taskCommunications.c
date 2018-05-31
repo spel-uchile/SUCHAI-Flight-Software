@@ -1,7 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ void taskCommunications(void *param)
     /* Pointer to current connection, packet and socket */
     csp_conn_t *conn;
     csp_packet_t *packet;
-    csp_packet_t *response;
+    csp_packet_t *rep_ok_tmp;
+    csp_packet_t *rep_ok;
 
     csp_socket_t *sock = csp_socket(CSP_SO_NONE);
     if((rc = csp_bind(sock, CSP_ANY)) != CSP_ERR_NONE)
@@ -46,13 +47,9 @@ void taskCommunications(void *param)
         return;
     }
 
-    response = csp_buffer_get(sizeof(csp_packet_t) + 3);
-    if( response == NULL ) {
-        LOGE(stderr, "Could not allocate memory for response packet!\n");
-        return;
-    }
-    memcpy(response->data, "OK", 3);
-    response->length = 4;
+    rep_ok_tmp = csp_buffer_get(1);
+    memset(rep_ok_tmp->data, 200, 1);
+    rep_ok_tmp->length = 1;
 
     while(1)
     {
@@ -70,21 +67,49 @@ void taskCommunications(void *param)
                     /* Process incoming TC */
                     com_receive_tc(packet);
                     csp_buffer_free(packet);
-                    csp_send(conn, response, 1000);
+                    // Create a response packet and send
+//                    rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    rep_ok = csp_buffer_get(1);
+                    rep_ok->data[0] = 200;
+                    rep_ok->length = 1;
+                    csp_send(conn, rep_ok, 1000);
                     break;
 
-                case SCH_TRX_PORT_DEBUG:
-                    /* Debug port, only to print strings */
-                    LOGI(tag, (char *)(packet->data));
+                case SCH_TRX_PORT_TM:
+                    /* TODO: Process incoming TM */
                     csp_buffer_free(packet);
-                    csp_send(conn, response, 1000);
+                    // Create a response packet and send
+                    rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    csp_send(conn, rep_ok, 1000);
+
+                case SCH_TRX_PORT_RPT:
+                    // Digital repeater port, resend the received packet
+                    if(csp_conn_dst(conn) == SCH_COMM_ADDRESS)
+                    {
+                        rc = csp_sendto(CSP_PRIO_NORM, CSP_BROADCAST_ADDR,
+                                        SCH_TRX_PORT_RPT, SCH_TRX_PORT_RPT,
+                                        CSP_O_NONE, packet, 1000);
+                        if (rc != 0)
+                            csp_buffer_free(packet); // Free the packet in case of errors
+                    }
+                    // If i am receiving a broadcast packet just print
+                    else
+                    {
+                        LOGI(tag, "RPT: %s", (char *)(packet->data));
+                        csp_buffer_free(packet);
+                    }
                     break;
 
-                case SCH_TRX_PORT_CONSOLE:
-                    /* Debug port, executes console commands */
+                case SCH_TRX_PORT_CMD:
+                    /* Command port, executes console commands */
                     com_receive_cmd(packet);
                     csp_buffer_free(packet);
-                    csp_send(conn, response, 1000);
+                    // Create a response packet and send
+                    //rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    rep_ok = csp_buffer_get(1);
+                    rep_ok->data[0] = 200;
+                    rep_ok->length = 1;
+                    csp_send(conn, rep_ok, 1000);
                     break;
 
                 default:
@@ -102,54 +127,36 @@ void taskCommunications(void *param)
 /**
  * Parse TC frames and generates corresponding commands
  *
- * @param packet TC Buffer
+ * @param packet A csp buffer containing a null terminated string with the
+ *               format <command> [parameters]
  */
 static void com_receive_tc(csp_packet_t *packet)
 {
-    int next;
-    int n_args;
-    static cmd_t *new_cmd;
-    char tmp_cmd[packet->length];
-    char tmp_arg[packet->length];
-    char buffer[packet->length];
-    strncpy(buffer, (char *)(packet->data), (size_t)packet->length);
-    LOGI(tag, "New TC: %s (%d)", buffer, packet->length);
+    /* TODO: this function should receive several (cmd,args) pairs */
+    /* TODO: check com_receive_cmd implementation */
 
-    n_args = sscanf(buffer, "%s %n", tmp_cmd, &next);
-    LOGV(tag, "Parsed %d: %s (%d))", n_args, tmp_cmd, next);
-    strncpy(tmp_arg, buffer+next, (size_t)(packet->length));
-    LOGV(tag, "Parsed args: %s", tmp_arg);
+    // Make sure the buffer is a null terminated string
+    packet->data[packet->length] = '\0';
+    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
 
-    if (n_args == 1)
-    {
-        new_cmd = cmd_get_str(tmp_cmd);
-        if(new_cmd)
-        {
-            if(next > 1)
-            {
-                cmd_add_params_str(new_cmd, tmp_arg);
-            }
-            else
-            {
-                cmd_add_params_str(new_cmd, "");
-            }
-
-            cmd_send(new_cmd);
-        }
-    }
-    else
-    {
-        LOGE(tag, "Invalid number of arguments (%d)", n_args)
-    }
+    // Send command to execution if not null
+    if(new_cmd != NULL)
+        cmd_send(new_cmd);
 }
 
 /**
- * Parse tc frame as console commands
- * @note NOT IMPLEMENTED YET
- * @param packet TC Buffer
+ * Parse tc frame as console commands and execute the commands
+ *
+ * @param packet A csp buffer containing a null terminated string with the
+ *               format <command> [parameters]
  */
 static void com_receive_cmd(csp_packet_t *packet)
 {
-    /* FIXME: Not implemented */
-    LOGW(tag, "com_receive_cmd NOT implemented! (%s)", (char *)(packet->data))
+    // Make sure the buffer is a null terminated string
+    packet->data[packet->length] = '\0';
+    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
+
+    // Send command to execution if not null
+    if(new_cmd != NULL)
+        cmd_send(new_cmd);
 }

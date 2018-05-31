@@ -4,7 +4,6 @@
  * @date 2018
  * @copyright GNU GPL v3
  *
- *
  * This task implements a client that controls watchdog timers.
  */
 

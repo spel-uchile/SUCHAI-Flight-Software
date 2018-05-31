@@ -62,7 +62,7 @@ void taskTest(void *param)
     cmd_send(test_cmd);
     osDelay(500);
     // Check if the command worked
-    int hours_alive = dat_get_system_var(dat_obc_hours_alive);
+    int hours_alive = dat_get_system_var(dat_obc_hrs_alive);
     assertf(hours_alive == 123, tag, "Failed to set variable, read: %d", hours_alive);
 
     LOGI(tag, "Test: print_vars");

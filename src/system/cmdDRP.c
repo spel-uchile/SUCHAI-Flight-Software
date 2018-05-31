@@ -28,6 +28,7 @@ static const char *tag = "cmdDRP";
  */
 void cmd_drp_init(void)
 {
+    cmd_add("ebf", drp_execute_before_flight, "%d", 1);
     cmd_add("print_vars", drp_print_system_vars, "", 0);
     cmd_add("update_sys_var", drp_update_sys_var_idx, "%d %d", 2);
     cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
@@ -35,34 +36,53 @@ void cmd_drp_init(void)
     cmd_add("sample_obc_sensors", drp_sample_obc_sensors, "", 0);
 }
 
+int drp_execute_before_flight(char *fmt, char *params, int nparams)
+{
+    int magic;
+    if(nparams == sscanf(params, fmt, &magic))
+    {
+        if(magic == SCH_DRP_MAGIC)
+        {
+            // Reset all status variables values to 0
+            dat_system_t var;
+            for(var = dat_obc_opmode; var < dat_system_last_var; var++)
+            {
+                dat_set_system_var(var, 0);
+            }
+            // Set all status variables default values
+            dat_set_system_var(dat_rtc_date_time, (int)time(NULL));
+            // dat_set_system_var(dat_custom, default_value);
+
+            return CMD_OK;
+        }
+        else
+        {
+            LOGW(tag, "EBF executed with incorrect magic number!")
+            return CMD_FAIL;
+        }
+    }
+    else
+    {
+        LOGW(tag, "EBF executed with invalid parameter!")
+        return CMD_FAIL;
+    }
+}
+
 int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
 
-    //Take log_mutex to take control of the console
-    int rc = osSemaphoreTake(&log_mutex, portMAX_DELAY);
-    if(rc == CSP_SEMAPHORE_OK)
+    printf("system variables repository\n");
+    printf("index\t value\n");
+
+    int var_index;
+    for (var_index = 0; var_index < dat_system_last_var; var_index++)
     {
-        printf("system variables repository\n");
-        printf("index\t value\n");
-
-        int var_index;
-        for (var_index = 0; var_index < dat_system_last_var; var_index++)
-        {
-            int var = dat_get_system_var((dat_system_t)var_index);
-            printf("%d\t %d\n", var_index, var);
-        }
-
-        //Exit critical zone
-        osSemaphoreGiven(&log_mutex);
-
-        return CMD_OK;
+        int var = dat_get_system_var((dat_system_t)var_index);
+        printf("%d\t %d\n", var_index, var);
     }
-    else
-    {
-        LOGE(tag, "Unable to acquire console mutex");
-        return CMD_FAIL;
-    }
+
+    return CMD_OK;
 }
 
 int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
@@ -98,14 +118,14 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &value) == nparams)
     {
         // Adds <value> to current hours alive
-        current = dat_get_system_var(dat_obc_hours_alive);
+        current = dat_get_system_var(dat_obc_hrs_alive);
         current += value;
-        dat_set_system_var(dat_obc_hours_alive, current);
+        dat_set_system_var(dat_obc_hrs_alive, current);
 
         // Adds <value> to current hours without reset
-        current = dat_get_system_var(dat_obc_hours_without_reset);
+        current = dat_get_system_var(dat_obc_hrs_wo_reset);
         current += value;
-        dat_set_system_var(dat_obc_hours_without_reset, current);
+        dat_set_system_var(dat_obc_hrs_wo_reset, current);
         return CMD_OK;
     }
     else
@@ -117,7 +137,7 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
 
 int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
 {
-    dat_set_system_var(dat_gnd_wdt, 0);
+    dat_set_system_var(dat_obc_sw_wdt, 0);
     return CMD_OK;
 }
 

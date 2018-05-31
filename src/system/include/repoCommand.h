@@ -1,8 +1,8 @@
 /**
- * @file  cmdRepoitory.h
+ * @file  repoCommand.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2017
+ * @date 2018
  * @copyright GNU GPL v3
  *
  * This header have definitions related to command repository
@@ -26,6 +26,7 @@
 #endif
 #if SCH_COMM_ENABLE
     #include "cmdCOM.h"
+    #include "cmdTM.h"
 #endif
 #if SCH_TEST_ENABLED
     #include "cmdTestCommand.h"
@@ -44,15 +45,18 @@
 /**
  * Define return the command
  */
-#define CMD_OK 1
-#define CMD_FAIL 0
-#define CMD_ERROR -1
+#define CMD_OK 1        ///< Command executed successfully
+#define CMD_FAIL 0      ///< Command not executed as expected
+#define CMD_ERROR -1    ///< Command returned an error
 
 /**
+ * TODO: Make this settings globals
+ * FIXME: (carlgonz) I don't think that use CMD_MAX_STR_PARAMS is correct because
+ * the parameters use malloc to reserve memory.
  * Fixed buffers lengths
  */
-#define CMD_MAX_LEN 100
-#define CMD_MAX_STR_PARAMS 64
+#define CMD_MAX_LEN 100         ///< Max number of commands in the repository
+#define CMD_MAX_STR_PARAMS 64   ///< Limit to the parameters length
 
 /**
  *  Defines the prototype of a command
@@ -83,6 +87,7 @@ typedef struct cmd_list_type{
 } cmd_list_t;
 
 /* Function definitions */
+
 /**
  * Registers a command in the system
  *
@@ -91,12 +96,13 @@ typedef struct cmd_list_type{
  * @param nparam Int. number of parameters, according to @fparams
  * @return Int. Length of command list in case of success or CMD_ERROR (-1) if
  * an error occurred.
- * @example:
  *
+ * @code
  *      // Adds command foo with 2 params: integer and string
  *      cmd_add("foo", foo, "%d %s", 2);
  *      // Adds command bar with 3 params: integers and double
  *      cmd_add("bar", bar, "&d %d %f", 3);
+ * @endcode
  */
 int cmd_add(char *name, cmdFunction function, char *fmt, int nparams);
 
@@ -123,34 +129,54 @@ cmd_t * cmd_get_idx(int idx);
  * string so the user must free the array.
  *
  * @param idx Int. Command index or id
- * @param name *char. Pointer to char variable. The function allocates memory so
- * make sure to free the array after use.
  * @return Int. CMD_OK if the command was found, CMD_ERROR otherwise.
  */
 char * cmd_get_name(int idx);
 
 /**
+ * Fills command parameters as raw data using memcpy.@len bytes will be copied
+ * from @params to @cmd->params.
+ *
+ * @note make sure that @params contains at least @len bytes.
+ *
+ * @param cmd cmd_t *. Command to fill parameters
+ * @param params void *. Pointer to the data buffer
+ * @param len int. Lenght of the data buffer.
+ *
+ * @code
+ *      char *data = {0,1,2,3,4,5};
+ *      cmd_t *foo = cmd_get_str("foo");
+ *      cmd_add_params_raw(foo, data, 6);
+ * @endcode
+ */
+void cmd_add_params_raw(cmd_t *cmd, void *params, int len);
+
+/**
  * Fills command parameters as string
+ * @note does not check the parameters format or if the command requires param.
+ *
  * @param cmd cmd_t. Command to fill parameters
  * @param params Str. String with parameters
- * @example
  *
+ * @code
  *      //Fill two parameters to foo command
  *      cmd_t *foo = cmd_get_str("foo"); // foo.fmt is '%d %s'
  *      cmd_add_params(foo, "123 abc");
  *      //Fill three parameters to bar command
  *      cmd_t *bar = cmd_get_str("bar"); // bar.fmt is '%d %d %f'
  *      cmd_add_params(bar, "1 2 3.4");
+ * @endcode
  */
 void cmd_add_params_str(cmd_t *cmd, char *params);
 
 /**
- * Fills command parameters by variables.
- * Note variables are converted to string
+ * Fills command parameters by variables using the registered parameters format.
+ * @note variables are converted to string
+ *
  * @param cmd cmd_t. Command to fill parameters
  * @param ... List of variables to fill as parameters
- * @example
  *
+ * @code
  *      //Fill two parameters to foo command
  *      int a = 123; char *b = "abc";
  *      cmd_t *foo = cmd_get_str("foo"); // foo.fmt is '%d %s'
@@ -159,9 +185,25 @@ void cmd_add_params_str(cmd_t *cmd, char *params);
  *      int c = 1; int d = 2; float e = 3.4;
  *      cmd_t *bar = cmd_get_str("bar"); // bar.fmt is '%d %d %f'
  *      cmd_add_params_fmt(bar, c, d, e);
+ * @endcode
  */
 void cmd_add_params_var(cmd_t *cmd, ...);
 
+/**
+ * Returns a new command with parameters form a string with the format:
+ * <command> [parameters]. The [parameters] field is optional. Returns NULL if
+ * the command is not found or in case of errors.
+ *
+ * @param buff str. A null terminated string with the format <command> [parameters]
+ * @return cmd_t. A new command (uses malloc) or NULL in case of errors.
+ *
+ * @code
+ *      char *str_cmd = "obc_debug 1";
+ *      cmd_t *cmd = cmd_parse_from_str(str_cmd);
+ *      assert(cmd != NULL);
+ * @endcode
+ */
+cmd_t *cmd_parse_from_str(char *buff);
 
 /**
  * Destroys a command and frees the allocated memory
@@ -181,9 +223,16 @@ void cmd_print_all(void);
 int cmd_repo_init(void);
 
 /**
+ * Cleans the repo buffer. Frees allocated memories
+ */
+void cmd_repo_close(void);
+
+/**
  * Null command, just print to stdout
  *
- * @param param Not used
+ * @params fmt Not used
+ * @params param Not used
+ * @params nparams Not Used
  * @return 1, allways successful
  */
 int cmd_null(char *fmt, char *params, int nparams);
@@ -208,10 +257,10 @@ int cmd_print(cmd_t* cmd);
 char* cmd_get_fmt(char* name);
 
 /**
- * Fix the format to be used in the set function of the flight plan
+ * Fix the format to be used in the set function of the flight plan.
+ * The function allocates memory so make sure to free the array after use.
  *
- * @param name *char. Pointer to char variable. The function allocates memory so
- * make sure to free the array after use.
+ * @param fmt *char. pointer to the format string to fix
  * @return char* with the command's format
  */
 char* fix_fmt(char* fmt);

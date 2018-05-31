@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2017, Tomas Opazo Toro, toopazo@ing.uchile.cl
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2018, Tomas Opazo Toro, toopazo@ing.uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -30,8 +30,8 @@ void cmd_obc_init(void)
     cmd_add("get_mem", obc_get_os_memory, "", 0);
     cmd_add("set_time", obc_set_time,"%d",1);
     cmd_add("show_time", obc_show_time,"%d",1);
-    cmd_add("test_fp", test_fp, "%d %s %d", 3);
     cmd_add("reset_wdt", obc_reset_wdt, "", 0);
+    cmd_add("system", obc_system, "%s", 1);
 }
 
 int obc_debug(char *fmt, char *params, int nparams)
@@ -84,7 +84,10 @@ int obc_reset(char *fmt, char *params, int nparams)
     printf("Resetting system NOW!!\n");
 
     #ifdef LINUX
-        exit(0);
+        if(params != NULL && strcmp(params, "reboot")==0)
+            system("sudo reboot");
+        else
+            exit(0);
     #endif
     #ifdef AVR32
         reset_do_soft_reset();
@@ -162,19 +165,30 @@ int obc_show_time(char* fmt, char* params,int nparams)
     }
 }
 
-// #FIXME: This function do not belong here (carlgonz)
-int test_fp(char* fmt, char* params,int nparams)
+int obc_system(char* fmt, char* params, int nparams)
 {
-    int num1, num2;
-    char str[CMD_MAX_STR_PARAMS];
-    if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
+#ifdef LINUX
+    if(params != NULL)
     {
-        printf("Los parametros leidos son: %d ; %s ; %d \n",num1, str ,num2);
-        return CMD_OK;
+        int rc = system(params);
+        if(rc < 0)
+        {
+            LOGE(tag, "Call to system failed! (%d)", rc)
+            return CMD_FAIL;
+        }
+        else
+        {
+            LOGV(tag, "Call to system returned (%d)", rc);
+            return CMD_OK;
+        }
     }
     else
     {
-        LOGW(tag, "test_fp used with invalid params: %s", params);
+        LOGE(tag, "Parameter null");
         return CMD_FAIL;
     }
+#else
+    LOGW(tag, "Command not suported!");
+    return CMD_FAIL;
+#endif
 }

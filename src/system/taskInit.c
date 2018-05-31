@@ -1,7 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,8 +65,9 @@ void taskInit(void *param)
 
     LOGD(tag, "Creating client tasks ...");
     // FIXME: This memory values seems not work on nanomind (tested 5)
-    unsigned short task_memory = 5*256;
-    os_thread thread_id[4];
+    unsigned short task_memory = 15*256;
+    int n_threads = 4;
+    os_thread thread_id[n_threads];
 
     /* Creating clients tasks */
     osCreateTask(taskConsole, "console", task_memory, NULL, 2, &(thread_id[0]));
@@ -74,7 +76,8 @@ void taskInit(void *param)
     osCreateTask(taskHousekeeping, "housekeeping", task_memory, NULL, 2, &(thread_id[1]));
 #endif
 #if SCH_COMM_ENABLE
-    init_communications();
+    //FIXME: Init_communications is found in init.c and taskInit.c
+    //init_communications();
     osCreateTask(taskCommunications, "comm", task_memory, NULL, 2, &(thread_id[2]));
 #endif
 #if SCH_FP_ENABLED

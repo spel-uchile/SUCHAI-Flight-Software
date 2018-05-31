@@ -2,12 +2,10 @@
  * @file  taskConsole.h
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2012
+ * @date 2018
  * @copyright GNU GPL v3
  *
- * @id 0x1102
- *
- * This task implements a listener that works as a serial console.
+ * This task implements a client that works as a serial console.
  */
 
 #ifndef T_COSOLE_H
@@ -28,6 +26,5 @@
 void taskConsole(void *param);
 int console_init(void);
 int console_read(char *buffer, int len);
-cmd_t * console_parse(char *buffer);
 
 #endif //T_CONSOLE_H

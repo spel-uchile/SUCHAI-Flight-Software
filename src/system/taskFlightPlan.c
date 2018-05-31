@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,38 +41,31 @@ void taskFlightPlan(void *param)
 #else
         elapsed_sec = time(NULL);
 #endif
-        //printf("%d\n", (int)elapsed_sec);
 
+        char command[CMD_MAX_STR_PARAMS];
+        char args[CMD_MAX_STR_PARAMS];
+        int executions;
+        int periodical;
 
-        char* command = malloc(sizeof(char)*50);
-        char* args = malloc(sizeof(char)*50);
-        int* executions = malloc(sizeof(int));
-        int* periodical = malloc(sizeof(int));
+        int rc = dat_get_fp((int)elapsed_sec, command, args, &executions, &periodical);
 
-        int rc = dat_get_fp((int)elapsed_sec, &command, &args, &executions, &periodical);
-
-        if(rc == -1)
+        if(rc == -1){
             continue;
+        }
 
         char* fixed_args = fix_fmt(args);
         int i;
-        for(i=0; i < (*executions); i++)
+        for(i=0; i < executions; i++)
         {
             cmd_t *new_cmd = cmd_get_str(command);
             cmd_add_params_str(new_cmd, fixed_args);
 
             LOGD(tag, "Command: %s", command);
             LOGD(tag, "Arguments: %s", fixed_args);
-            LOGD(tag, "Executions: %d", *executions);
-            LOGD(tag, "Periodical: %d", *periodical);
+            LOGD(tag, "Executions: %d", executions);
+            LOGD(tag, "Periodical: %d", periodical);
             cmd_send(new_cmd);
         }
-
-        free(command);
-        free(args);
-        free(fixed_args);
-        free(executions);
-        free(periodical);
     }
 }
 

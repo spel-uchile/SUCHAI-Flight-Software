@@ -71,7 +71,7 @@ next line `fp_del_cmd 27 12 2017 06 00 00`
 - Parameters : This command has not parameters
 
 - Function : Show the flight plan table, if the flight plan table is empty just show
-a message saying this
+a message saying it
 
 #### Reset the flight plan
 

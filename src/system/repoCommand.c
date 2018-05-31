@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2013, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2013, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,8 +123,8 @@ char * cmd_get_name(int idx)
         cmd_list_t cmd_found = cmd_list[idx];
         osSemaphoreGiven(&repo_cmd_sem);
 
-        LOGD(tag, cmd_found.name);
-        name = (char *)malloc((strlen(cmd_found.name)+1)*sizeof(char));
+        LOGV(tag, "Cmd name found: %s", cmd_found.name);
+        name = (char *)malloc(strlen(cmd_found.name)+1);
         if(name == NULL)
         {
             LOGW(tag, "Error allocating memory in cmd_get_name");
@@ -140,6 +140,16 @@ char * cmd_get_name(int idx)
     }
 
     return name;
+}
+
+void cmd_add_params_raw(cmd_t *cmd, void *params, int len)
+{
+    // Check pointers
+    if(cmd != NULL && params != NULL)
+    {
+        cmd->params = (char *)malloc((size_t)len);
+        memcpy(cmd->params, params, (size_t)len);
+    }
 }
 
 void cmd_add_params_str(cmd_t *cmd, char *params)
@@ -169,9 +179,65 @@ void cmd_add_params_var(cmd_t *cmd, ...)
     cmd_add_params_str(cmd, str_params);
 }
 
+cmd_t *cmd_parse_from_str(char *buff)
+{
+    cmd_t *new_cmd = NULL;
+    size_t len = strlen(buff);
+    int ok = 0;
+
+    // Do not use sscanf in empty string
+    if(len > 0)
+    {
+        int next;
+        char tmp_cmd[len + 1];
+        memset(tmp_cmd, '\0', (size_t)len+1);
+
+        // Scan a command and parameter string: <command> [parameters]
+        LOGV(tag, "New TC: %s (%d)", buff, (int)len);
+        ok = sscanf(buff, "%s %n", tmp_cmd, &next);
+        LOGV(tag, "Parsed cmd: %s (a: %d, n: %d)", tmp_cmd, ok, next);
+
+        // Check that at least one str was found (the command name)
+        if (ok > 0)
+        {
+            new_cmd = cmd_get_str(tmp_cmd);
+
+            // Check if the command exist
+            if (new_cmd != NULL)
+            {
+                // Check if a parameter was found too (optional)
+                if (next < len)
+                {
+                    memset(tmp_cmd, '\0', (size_t)len+1);
+                    strncpy(tmp_cmd, buff + next, (size_t) (len - next));
+                    LOGV(tag, "Parsed args: %s", tmp_cmd);
+                    cmd_add_params_str(new_cmd, tmp_cmd);
+                }
+                else
+                {
+                    cmd_add_params_str(new_cmd, "");
+                }
+            }
+            else
+            {
+                ok = 0;
+            }
+        }
+    }
+
+    if(ok <= 0)
+    {
+        LOGE(tag, "Error parsing command!");
+    }
+
+    // Return the command filled with parameters or a NULL pointer
+    return new_cmd;
+}
+
 void cmd_free(cmd_t *cmd)
 {
-    if(cmd != NULL) {
+    if(cmd != NULL)
+    {
         // Free the params if allocated, we don't need free cmd->fmt because
         // it has not been copied with malloc (see cmd_get_idx)
         free(cmd->params);
@@ -185,6 +251,8 @@ void cmd_print_all(void)
 
     LOGD(tag, "Command list");
     osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
+
+    //Make sure no LOG functions are used in this zone
     osSemaphoreTake(&log_mutex, portMAX_DELAY);
     printf("Index\t name\t Params\n");
     int i;
@@ -193,6 +261,8 @@ void cmd_print_all(void)
         printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
     osSemaphoreGiven(&log_mutex);
+    //End log_mutex, can use LOG functions
+
     osSemaphoreGiven(&repo_cmd_sem);
 
 }
@@ -201,14 +271,6 @@ int cmd_repo_init(void)
 {
     // Init repository mutex
     osSemaphoreCreate(&repo_cmd_sem);
-
-    // Reset command buffer with cmd_null command
-    int n_cmd = 0;
-    do
-    {
-        n_cmd = cmd_add("null", cmd_null, "", 0);
-    }
-    while(n_cmd < CMD_MAX_LEN);
     cmd_index = 0;  // Reset registered command counter
 
     // Init repos
@@ -219,13 +281,37 @@ int cmd_repo_init(void)
     cmd_drp_init();
 #if SCH_COMM_ENABLE
     cmd_com_init();
+    cmd_tm_init();
 #endif
     cmd_console_init();
 #if SCH_FP_ENABLED
     cmd_fp_init();
 #endif
 
+    int n_cmd;
+    int last_cmd_index = cmd_index;
+
+    // Fill command buffer with cmd_null command
+    do
+    {
+        n_cmd = cmd_add("null", cmd_null, "", 0);
+    }
+    while(n_cmd < CMD_MAX_LEN);
+
+    // Restore the number of not null commands
+    cmd_index = last_cmd_index;
+
     return CMD_OK;
+}
+
+void cmd_repo_close(void)
+{
+    int i;
+    for(i=0; i<CMD_MAX_LEN; i++)
+    {
+        free(cmd_list[i].name);
+        free(cmd_list[i].fmt);
+    }
 }
 
 int cmd_null(char *fparams, char *params, int nparam)
@@ -262,7 +348,7 @@ char* cmd_get_fmt(char* name)
 
 char* fix_fmt(char* fmt)
 {
-    char* new_fmt = malloc(sizeof(char)*30);
+    char* new_fmt = malloc(sizeof(char)*CMD_MAX_STR_PARAMS);
     char* aux = new_fmt;
     while(*fmt != 0)
     {

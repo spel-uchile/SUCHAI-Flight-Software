@@ -1,7 +1,7 @@
 /**
  * @file utils.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2017
+ * @date 2018
  * @copyright GNU GPL v3
  *
  * This header have definitions related with general utilities such as logging,
@@ -42,8 +42,8 @@ typedef enum {
 #define LOGOUT stdout   ///<! Log to stdout
 //#define LOGOUT stderr   ///<! Log to stderr
 
-#define LF   "\n"
-#define CRLF "\r\n"
+#define LF   "\n"       ///< Use LF terminated log strings
+#define CRLF "\r\n"     ///< USE CRLF terminated log strings
 
 osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 
@@ -71,7 +71,7 @@ static inline int log_init(void)
 #define LOGV(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_VERBOSE) {fprintf(LOGOUT,"[VERB ][%s] ", tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,LF); fflush(LOGOUT);}
 #endif
 
-// Assert functions
+/// Assert functions
 #define clean_errno() (errno == 0 ? "None" : strerror(errno))
 //#define log_error(T, M, ...) LOGE(T, "(%s:%d: errno: %s) " M, __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)
 #define assertf(A, T, M, ...) if(!(A)) {log_error(T, M, ##__VA_ARGS__); assert(A); }

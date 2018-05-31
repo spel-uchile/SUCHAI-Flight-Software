@@ -1,20 +1,12 @@
 /**
- * @file  commandRepoitory.h
+ * @file  repoData.h
  * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @date 2018
  * @copyright GNU GPL v3
  *
- * This header is an API to Status Repository and Data Repository:
- *  Status Repository:
- *      dat_system_var
- *
- *  Data Repository:
- *      DAT_FligthPlanBuff
- *      DAT_TeleCmdBuff
- *      DAT_PayloadVar
- *      DAT_GnrlPurpBuff
+ * This header is an API to system status repository and data repository:
  */
 
 #ifndef DATA_REPO_H
@@ -30,12 +22,12 @@
     #include "data_storage.h"
 #endif
 
-#define FP_MAX_ENTRIES          100
+#define FP_MAX_ENTRIES          100 ///< Max number of flight plan entries
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
 
-#define DAT_REPO_SYSTEM "dat_system"
+#define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
 
 /**
  * System level status variables
@@ -52,49 +44,37 @@ typedef struct fp_entry {
  * System level status variables
  */
 typedef enum dat_system{
-    //OBC => (C&DH subsystem)
-    dat_obc_opmode=0,           ///< General operation mode
-    dat_obc_lastResetSource,    ///< Last reset source
-    dat_obc_hours_alive,         ///< Hours since first boot
-    dat_obc_hours_without_reset, ///< Hours since last reset
-    dat_obc_reset_counter,       ///< Number of reset since first boot
-    dat_gnd_wdt,                ///< GND watchdog timer counter
+    /// OBC: on borad computer related variables.
+    dat_obc_opmode = 0,        ///< General operation mode
+    dat_obc_last_reset,        ///< Last reset source
+    dat_obc_hrs_alive,         ///< Hours since first boot
+    dat_obc_hrs_wo_reset,      ///< Hours since last reset
+    dat_obc_reset_counter,     ///< Number of reset since first boot
+    dat_obc_sw_wdt,            ///< Software watchdog timer counter
 
-    //DEP => (C&DH subsystem)
-    dat_dep_ant_deployed,       ///< Is antena deployed?
+    /// DEP: deployment related variables.
+    dat_dep_ant_deployed,      ///< Was the antenna deployed?
+    dat_dep_date_time,         ///< Deployment unix time
 
-    //RTC => (C&DH subsystem)
-    dat_rtc_year,               ///< System current date and clock
-    dat_rtc_month,              ///< System current date and clock
-    dat_rtc_week_day,           ///< System current date and clock
-    dat_rtc_day_number,         ///< System current date and clock
-    dat_rtc_hours,              ///< System current date and clock
-    dat_rtc_minutes,            ///< System current date and clock
-    dat_rtc_seconds,            ///< System current date and clock
+    /// RTC: related variables
+    dat_rtc_date_time,         /// RTC current unix time
 
-    //EPS => (Energy subsystem)
-    dat_eps_status,             ///< Energy system general status
-    dat_eps_soc,                ///< Current availible energy level
+    /// COM: communications system variables.
+    dat_com_opmode,            ///< TRX Operation mode
+    dat_com_count_tm,          ///< number of TM sent
+    dat_com_count_tc,          ///< number of received TC
+    dat_com_last_tc,           ///< Unix time of the last received tc
 
-    //TRX => (Communication subsystem)
-    dat_trx_opmode,             ///< TRX Operation mode
-    dat_trx_beacon_pwr,         ///< TRX Beacon power level
-    dat_trx_telemetry_pwr,      ///< TRX Telemetry Power
-    dat_trx_count_tm,           ///< number of sended TM
-    dat_trx_count_tc,           ///< number of received TC
-    dat_trx_lastcmd_day,        ///< day of the last received tc (since 1/1/00)
+    /// FPL: flight plant related variables
+    dat_fpl_last,              ///< Last executed flight plan (unix time)
+    dat_fpl_queue,             ///< Flight plan queue length
 
-    // Cmd buffer control
-    dat_trx_newTcFrame,         ///< Exist any unprocessed TC?
-    dat_trx_newCmdBuff,         ///< Exist unprocessed CMD in the internal buffer?
+    /// Add custom status variables here
+    //dat_custom              ///< Variable description
 
-    //FLIGHT PLAN
-    dat_fpl_index,              ///< Flight plan entry to be edited
-
-    /* Add custom status variables here */
-
-    dat_system_last_var         ///< Dummy element
-}dat_system_t;
+    /// LAST ELEMENT: DO NOT EDIT
+    dat_system_last_var       ///< Dummy element, the number of status variables
+} dat_system_t;
 
 /**
  * Initializes data repositories including buffers and mutexes
@@ -123,35 +103,32 @@ void dat_set_system_var(dat_system_t index, int value);
 int dat_get_system_var(dat_system_t index);
 
 /**
- *
  * Get the necessary parameters to send a command and set the values in
  * the variables command, args, repeat and periodical
  *
  * @param elapsed_sec Int. time in unixtime
  * @param command Save the command name
  * @param args Save the command arguments
- * @param repeat Save the times to execute the command
+ * @param executions Save the times to execute the command
  * @param periodical Save the periodical value (1 is periodical, 0 is not periodical)
  * @return 0 OK, -1 Error
  */
-int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical);
+int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical);
 
 /**
- *
  * Set a command with its args, executions (how many times will be executed)
  * and periodical (seconds to be executed again) to be executed at a certain time
  *
  * @param timetodo Int. time to execute the command
  * @param command Str. command name
  * @param args Str. command arguments
- * @param repeat Int. times to execute the command
+ * @param executions Int. times to execute the command
  * @param periodical Int. periodical value (in seconds)
  * @return 0 OK, -1 Error
  */
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical);
 
 /**
- *
  * Detelete a flight plan command that will be executed at a certain time
  *
  * @param timetodo Int. time to execute the command
@@ -168,7 +145,6 @@ int dat_del_fp(int timetodo);
 int dat_reset_fp(void);
 
 /**
- *
  *Show the flight plan
  *
  * @return 0 OK, 1 Error
@@ -176,7 +152,6 @@ int dat_reset_fp(void);
 int dat_show_fp (void);
 
 /**
- *
  * Get the system time
  *
  * @return time_t actual system time (in seconds)
@@ -184,7 +159,6 @@ int dat_show_fp (void);
 time_t dat_get_time(void);
 
 /**
- *
  * Without Linux this function update a second in the system time
  *
  * @return 0 OK, 1 Error
@@ -192,7 +166,6 @@ time_t dat_get_time(void);
 int dat_update_time(void);
 
 /**
- *
  * Set the system time (only if not Linux)
  *
  * @param new_time Int. time to set as system time
@@ -201,32 +174,11 @@ int dat_update_time(void);
 int dat_set_time(int new_time);
 
 /**
- *
  * Show the system time in the format given
  *
- * @param command Int. format , 0 for ISO, 1 for UNIX TIME
+ * @param format Int. Date time format: 0 for ISO, 1 for UNIX TIME
  * @return 0 OK, 1 Error
  */
 int dat_show_time(int format);
 
-
-
-
-
-
-
-/* The following is an API to interface with the repoData cubesat fligthPlan */
-//typedef enum _DAT_FligthPlanBuff{
-//    dat_fpb_last_one
-//}DAT_FligthPlanBuff;
-//
-//DispCmd dat_getFlightPlan(unsigned int index);
-//int dat_setFlightPlan_cmd(unsigned int index, unsigned int cmdID);
-//int dat_setFlightPlan_param(unsigned int index, int param);
-//int dat_onResetFlightPlan(void);
-//void dat_erase_FlightPlanBuff(void);
-
-
-
 #endif // DATA_REPO_H
-

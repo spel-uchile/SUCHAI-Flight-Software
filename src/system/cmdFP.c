@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2017, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2017, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ void cmd_fp_init(void)
     cmd_add("fp_del_cmd", fp_delete, "%d %d %d %d %d %d", 6);
     cmd_add("fp_show", fp_show, "", 0);
     cmd_add("fp_reset", fp_reset,"", 0);
+    cmd_add("test_fp_params", test_fp_params, "%d %s %d", 3);
 }
 
 int fp_set(char *fmt, char *params, int nparams)
@@ -117,5 +118,21 @@ int fp_reset(char* fmt, char* params, int nparams)
         return CMD_OK;
     else
         return CMD_FAIL;
+}
+
+int test_fp_params(char* fmt, char* params,int nparams)
+{
+    int num1, num2;
+    char str[CMD_MAX_STR_PARAMS];
+    if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
+    {
+        printf("The parameters are: %d ; %s ; %d \n",num1, str ,num2);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGW(tag, "test_fp used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
 }
 

@@ -2,7 +2,7 @@
  * @file  cmdFP.h
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2017
+ * @date 2018
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related to the flight plan
@@ -65,5 +65,15 @@ int fp_show(char* fmt, char* params, int nparams);
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int fp_reset(char* fmt, char* params, int nparams);
+
+/**
+ * Test that the command parameters are well read
+ *
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int test_fp_params(char* fmt, char* params,int nparams);
 
 #endif //CMD_FLIGHTPLAN_H
