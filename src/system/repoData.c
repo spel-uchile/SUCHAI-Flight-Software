@@ -146,13 +146,13 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     {
         if(elapsed_sec == data_base[i].unixtime)
         {
-            strcpy(*command, data_base[i].cmd);
-            strcpy(*args,data_base[i].args);
-            **executions = data_base[i].executions;
-            **periodical = data_base[i].periodical;
+            strcpy(command, data_base[i].cmd);
+            strcpy(args,data_base[i].args);
+            *executions = data_base[i].executions;
+            *periodical = data_base[i].periodical;
 
             if (data_base[i].periodical > 0)
-                dat_set_fp(elapsed_sec+**periodical,data_base[i].cmd,data_base[i].args,**executions,**periodical);
+                dat_set_fp(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
 
 
             dat_del_fp(elapsed_sec);
