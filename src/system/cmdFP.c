@@ -126,7 +126,7 @@ int test_fp(char* fmt, char* params,int nparams)
     char str[CMD_MAX_STR_PARAMS];
     if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
     {
-        printf("Los parametros leidos son: %d ; %s ; %d \n",num1, str ,num2);
+        printf("The parameters are: %d ; %s ; %d \n",num1, str ,num2);
         return CMD_OK;
     }
     else
