@@ -19,25 +19,23 @@
 #include <string.h>
 
 /* Select one operating system */
-//#define LINUX                               ///< Use Linux
-#define FREERTOS                          ///< Use FreeRTOS (select arch below)
+#define LINUX                              ///< LINUX | FREERTOS
+//#define FREERTOS                          ///< Use FreeRTOS (select arch below)
 /* Select the correct architecture */
 #ifdef FREERTOS
-//    #define ESP32                         ///< Uncomment to run in ESP32
-    #define AVR32                         ///< Uncomment to run in AVR32
-//    #define NANOMIND                      ///< Uncomment to run in Nanomind A3200
+    #define ESP32                        ///< ESP32 | AVR32 | NANOMIND
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL       LOG_LVL_INFO     ///< Define debug levels
+#define LOG_LEVEL   LOG_LVL_INFO     ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN            (256)   ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE             1       ///< TaskCommunications enabled
-#define SCH_FP_ENABLED              0       ///< TaskFlightPlan enabled
-#define SCH_HK_ENABLED              0       ///< TaskHousekeeping enabled
-#define SCH_TEST_ENABLED            0       ///< Set to run tests
-#define SCH_MAX_WDT_TIMER           3       ///< Seconds to send wdt_reset command
+#define SCH_COMM_ENABLE             0       ///< TaskCommunications enabled (0 | 1)
+#define SCH_FP_ENABLED              0       ///< TaskFlightPlan enabled (0 | 1)
+#define SCH_HK_ENABLED              0       ///< TaskHousekeeping enabled (0 | 1)
+#define SCH_TEST_ENABLED            0       ///< Set to run tests (0 | 1)
+#define SCH_MAX_WDT_TIMER           10      ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER       (3600*48)  ///< Seconds to reset the OBC if the ground watchdog was not clear
 
 /* Communications system settings */
@@ -52,8 +50,5 @@
 /* Data repository settings */
 #define SCH_STORAGE_MODE   	0   ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_FILE    "/tmp/suchai.db"
-
-#define READ_I2C 0
-#define WRITE_I2C 1
 
 #endif	/* SUCHAI_CONFIG_H */
