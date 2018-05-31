@@ -12,6 +12,8 @@ set(SOURCE_FILES
         ../../src/system/cmdDRP.c
         ../../src/system/cmdFP.c
         ../../src/system/cmdConsole.c
+        ../../src/system/cmdCOM.c
+        ../../src/system/cmdTM.c
         src/system/main.c
         )
 
