@@ -57,6 +57,11 @@ void taskInit(void *param)
     LOGV(tag, "\tSetting SPI magnetometer...");
     hmc5843_init();
 #endif
+#ifdef AVR32
+    /* Init I2C */
+    LOGV(tag, "\tSetting I2C driver...");
+    twi_init();
+#endif
 
     LOGD(tag, "Creating client tasks ...");
     // FIXME: This memory values seems not work on nanomind (tested 5)

@@ -15,7 +15,7 @@
 #include "stdint.h"
 #include "config.h"
 
-#include "repoCommand.h"    
+#include "repoCommand.h"
 #include "csp/csp.h"
 
 

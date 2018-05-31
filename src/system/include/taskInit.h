@@ -19,6 +19,7 @@
 /* Task includes */
 #include "taskConsole.h"
 
+
 #if SCH_HK_ENABLED
 #include "taskHousekeeping.h"
 #endif
