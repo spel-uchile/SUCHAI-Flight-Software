@@ -2,7 +2,7 @@
 
 echo "Downloading toolchain..."
 wget -N data.spel.cl/atmel.tar.gz
-tar -xzf atmel.tar.gz
+tar -k -xzf atmel.tar.gz
 
 echo "Linking AVR32 headers..."
 cd avr32-gnu-toolchain-linux_x86_64/avr32/include/
