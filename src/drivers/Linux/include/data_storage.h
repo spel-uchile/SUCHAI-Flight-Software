@@ -117,7 +117,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
  * @param repeat Int. Value of times to run the command
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, int** periodical);
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* repeat, int* periodical);
 
 /**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that

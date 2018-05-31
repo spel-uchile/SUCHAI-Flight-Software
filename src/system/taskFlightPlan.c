@@ -41,43 +41,31 @@ void taskFlightPlan(void *param)
 #else
         elapsed_sec = time(NULL);
 #endif
-        //printf("%d\n", (int)elapsed_sec);
 
-        //FIXME: memory leak detected
-        char* command = malloc(CMD_MAX_STR_PARAMS);
-        char* args = malloc(CMD_MAX_STR_PARAMS);
-        int* executions = malloc(sizeof(int));
-        int* periodical = malloc(sizeof(int));
+        char command[CMD_MAX_STR_PARAMS];
+        char args[CMD_MAX_STR_PARAMS];
+        int executions;
+        int periodical;
 
-        int rc = dat_get_fp((int)elapsed_sec, &command, &args, &executions, &periodical);
+        int rc = dat_get_fp((int)elapsed_sec, command, args, &executions, &periodical);
 
         if(rc == -1){
-            free(command);
-            free(args);
-            free(executions);
-            free(periodical);
             continue;
         }
 
         char* fixed_args = fix_fmt(args);
         int i;
-        for(i=0; i < (*executions); i++)
+        for(i=0; i < executions; i++)
         {
             cmd_t *new_cmd = cmd_get_str(command);
             cmd_add_params_str(new_cmd, fixed_args);
 
             LOGD(tag, "Command: %s", command);
             LOGD(tag, "Arguments: %s", fixed_args);
-            LOGD(tag, "Executions: %d", *executions);
-            LOGD(tag, "Periodical: %d", *periodical);
+            LOGD(tag, "Executions: %d", executions);
+            LOGD(tag, "Periodical: %d", periodical);
             cmd_send(new_cmd);
         }
-
-        free(command);
-        free(args);
-        free(fixed_args);
-        free(executions);
-        free(periodical);
     }
 }
 

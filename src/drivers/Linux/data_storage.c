@@ -268,7 +268,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     }
 }
 
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** executions, int** periodical)
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical)
 {
     char **results;
     char *err_msg;
@@ -277,8 +277,6 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** exe
 
     char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
 
-
-    // execute statement
     sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
 
     if(row==0 || col==0)
@@ -291,15 +289,15 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** exe
     }
     else
     {
-        strcpy(*command, results[6]);
-        strcpy(*args,results[7]);
-        **executions = atoi(results[8]);
-        **periodical = atoi(results[9]);
+        strcpy(command, results[6]);
+        strcpy(args,results[7]);
+        *executions = atoi(results[8]);
+        *periodical = atoi(results[9]);
 
         storage_flight_plan_erase(timetodo);
 
         if (atoi(results[9]) > 0)
-            storage_flight_plan_set(timetodo+**periodical,results[6],results[7],**executions,**periodical);
+            storage_flight_plan_set(timetodo+*periodical,results[6],results[7],*executions,*periodical);
 
         sqlite3_free(sql);
         return 0;

@@ -138,7 +138,7 @@ int dat_get_system_var(dat_system_t index)
     return value;
 }
 
-int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical)
+int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
 {
 #if SCH_STORAGE_MODE == 0
     int i;

@@ -113,7 +113,7 @@ int dat_get_system_var(dat_system_t index);
  * @param periodical Save the periodical value (1 is periodical, 0 is not periodical)
  * @return 0 OK, -1 Error
  */
-int dat_get_fp(int elapsed_sec, char** command, char** args, int** executions, int** periodical);
+int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical);
 
 /**
  * Set a command with its args, executions (how many times will be executed)
