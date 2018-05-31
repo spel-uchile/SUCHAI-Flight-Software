@@ -18,7 +18,7 @@
 #include "repoCommand.h"
 
 #if SCH_COMM_ENABLE
-#include "csp/csp.h"
+    #include "csp/csp.h"
 #endif
 
 #define COM_FRAME_MAX_LEN (SCH_BUFF_MAX_LEN - 2 * sizeof(uint16_t))

@@ -13,7 +13,7 @@ tar -xjf gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
 
 echo "Linking source code into SDK..."
 cd a3200-sdk-lite-v1.2/
-mv src src.old
+mv src/ src.old/
 ln -s -f ../../../../src
 mv wscript wscript.old
 cd -
