@@ -46,6 +46,8 @@ void taskHousekeeping(void *param)
         cmd_add_params_var(cmd_dbg, 0);
         cmd_send(cmd_dbg);
 
+        dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
+
         if((elapsed_sec % 2) == 0)
         {
             cmd_t *cmd_2s = cmd_get_str("sample_obc_sensors");
