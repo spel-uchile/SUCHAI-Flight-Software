@@ -51,6 +51,8 @@ void taskCommunications(void *param)
     memset(rep_ok_tmp->data, 200, 1);
     rep_ok_tmp->length = 1;
 
+    int count_tc = 0;
+
     while(1)
     {
         /* CSP SERVER */
@@ -113,6 +115,9 @@ void taskCommunications(void *param)
                     break;
 
                 default:
+                    count_tc++;
+                    dat_set_system_var(dat_com_count_tc, count_tc);
+                    dat_set_system_var(dat_com_last_tc, (int) time(NULL));
                     /* Let the service handler reply pings, buffer use, etc. */
                     csp_service_handler(conn, packet);
                     break;

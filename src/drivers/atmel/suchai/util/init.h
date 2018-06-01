@@ -19,6 +19,7 @@
 #include "rtc.h"
 #include "usart.h"
 #include "pm.h"
+#include "dev/i2c.h"
 
 
 
@@ -33,5 +34,7 @@ void hexdump(char *desc, void *addr, int len);
 __attribute__((__interrupt__)) void rtc_irq(void);
 void on_close(int signal);
 void on_reset(void);
+
+void twi_init(void);
 
 #endif //__INIT_H

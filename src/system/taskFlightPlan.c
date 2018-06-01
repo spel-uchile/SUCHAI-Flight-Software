@@ -64,6 +64,7 @@ void taskFlightPlan(void *param)
             LOGD(tag, "Arguments: %s", fixed_args);
             LOGD(tag, "Executions: %d", executions);
             LOGD(tag, "Periodical: %d", periodical);
+            dat_set_system_var(dat_fpl_last, (int) elapsed_sec);
             cmd_send(new_cmd);
         }
     }
