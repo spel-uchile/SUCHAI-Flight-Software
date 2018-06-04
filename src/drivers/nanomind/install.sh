@@ -21,9 +21,14 @@ cd -
 echo "Coping custom waf script..."
 cp wscript a3200-sdk-lite-v1.2/wscript
 
-#echo "Linking libcsp..."
-#ln -s -f ../../../../../../drivers/atmel/libcsp
-#cd -
+echo "Adding libcsp to sdk lib folder"
+if [ ! -d "./libcsp" ]; then
+    git clone https://github.com/libcsp/libcsp
+fi
+cp -f libcsp_wscript ./libcsp/wscript
+cd a3200-sdk-lite-v1.2/lib/
+ln -s -f ../../libcsp
+cd -
 
 echo "---------"
 echo "Finished. Compile and program with:"

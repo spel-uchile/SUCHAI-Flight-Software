@@ -11,7 +11,7 @@ top = '.'
 out = 'build'
 
 # Scan modules in local lib dir
-modules = ['lib/libasf', 'lib/liba3200', 'lib/libutil']
+modules = ['lib/libasf', 'lib/liba3200', 'lib/libutil', 'lib/libcsp']
 
 def options(ctx):
     ctx.load('gcc')
@@ -43,7 +43,7 @@ def configure(ctx):
     ctx.env.append_unique('CXXFLAGS',           ['-Wall', '-g', '-O2', '-fno-exceptions', '-ffunction-sections', '-masm-addr-pseudos', '-mpart='+ctx.options.part, '-Wempty-body', '-Wtype-limits', '-Wuninitialized'])
     ctx.env.append_unique('ASFLAGS',            ['-xassembler-with-cpp', '-c', '-mpart='+ctx.options.part])
 
-    ctx.env.append_unique('EXCLUDES_NANOMIND',  ['src/system/cmdCOM.c', 'src/system/taskCommunications.c'])
+    # ctx.env.append_unique('EXCLUDES_NANOMIND',  ['src/system/cmdCOM.c', 'src/system/taskCommunications.c'])
     ctx.env.append_unique('LINKFLAGS_NANOMIND', ['-mpart='+ctx.options.part, '-Wl,-Map,nanomind.map', '-Wl,--gc-sections', '--rodata-writable', '-Wl,--direct-data'])
     
     # Add files
@@ -67,6 +67,9 @@ def configure(ctx):
     # Options for liba3200
     ctx.options.enable_param = False
     ctx.options.enable_board_init = False
+
+    # Options for libcsp
+    # ctx.options.with_os = 'freertos'
 
     # Store configuration options
     ctx.define('USART_CONSOLE', ctx.options.with_console)
