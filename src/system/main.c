@@ -44,14 +44,14 @@ int main(void)
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
     if(dispatcher_queue == 0)
         LOGE(tag, "Error creating dispatcher queue");
-    executer_stat_queue = osQueueCreate(1,sizeof(int));
+    executer_stat_queue = osQueueCreate(2,sizeof(int));
     if(executer_stat_queue == 0)
         LOGE(tag, "Error creating executer stat queue");
-    executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
+    executer_cmd_queue = osQueueCreate(2,sizeof(cmd_t *));
     if(executer_cmd_queue == 0)
         LOGE(tag, "Error creating executer cmd queue");
 
-    int n_threads = 4;
+    int n_threads = 5;
     os_thread threads_id[n_threads];
 
     LOGI(tag, "Creating basic tasks...");
@@ -59,8 +59,9 @@ int main(void)
     // FIXME: This memory values seems not work on nanomind (tested 5,5,10,5)
     osCreateTask(taskWatchdog, "watchdog", 5*256, NULL, 2, &threads_id[0]);
     osCreateTask(taskDispatcher,"dispatcher", 5*256, NULL, 3, &threads_id[1]);
-    osCreateTask(taskExecuter, "executer", 5*256, NULL, 4, &threads_id[2]);
-    osCreateTask(taskInit, "init", 5*256, NULL, 4, &threads_id[3]);
+    osCreateTask(taskExecuterA, "executer_A", 5*256, NULL, 4, &threads_id[2]);
+    osCreateTask(taskExecuterB, "executer_B", 5*256, NULL, 4, &threads_id[3]);
+    osCreateTask(taskInit, "init", 5*256, NULL, 4, &threads_id[4]);
 
 #ifndef ESP32
     /* Start the scheduler. Should never return */
