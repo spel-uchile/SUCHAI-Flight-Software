@@ -37,6 +37,12 @@
 #include <spn_fl512s.h>
 #include <adc_channels.h>
 
+#include "utils.h"
+#if SCH_COMM_ENABLE
+    #include <csp/csp.h>
+    #include <csp/interfaces/csp_if_zmqhub.h>
+#endif
+
 void on_reset(void);
 void init_spi(void);
 void init_spn_fl512(void);

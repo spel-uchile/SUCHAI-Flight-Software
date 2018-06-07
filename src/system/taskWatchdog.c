@@ -23,7 +23,7 @@ static const char *tag = "WDT";
 
 void taskWatchdog(void *param)
 {
-    LOGD(tag, "Started");
+    LOGI(tag, "Started");
 
     portTick delay_ms    = 1000;        //Task period in [ms]
     unsigned int max_obc_wdt = SCH_MAX_WDT_TIMER;     // Seconds to send "reset_wdt" command
@@ -39,8 +39,6 @@ void taskWatchdog(void *param)
         elapsed_obc_timer++; // Increase timer to reset the obc wdt
         elapsed_sw_timer = (unsigned  int)dat_get_system_var(dat_obc_sw_wdt) + 1; //Increase software timer counter. Should be cleared by a gnd command
         dat_set_system_var(dat_obc_sw_wdt, elapsed_sw_timer); // Save increased software timer
-
-        LOGV(tag, "GND_WDT (%d)", elapsed_sw_timer);
 
         // Periodically reset the OBC watchdog
         if(elapsed_obc_timer > max_obc_wdt)

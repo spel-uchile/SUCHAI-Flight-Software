@@ -19,7 +19,7 @@
 
 #include "init.h"
 
-static const char *tag = "Initializer";
+static const char *tag = "on_reset";
 
 void on_close(int signal)
 {

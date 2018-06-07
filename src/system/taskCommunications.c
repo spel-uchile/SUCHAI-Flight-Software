@@ -26,7 +26,7 @@ static void com_receive_cmd(csp_packet_t *packet);
 
 void taskCommunications(void *param)
 {
-    LOGD(tag, "Started");
+    LOGI(tag, "Started");
     int rc;
 
     /* Pointer to current connection, packet and socket */

@@ -87,7 +87,7 @@ def build(ctx):
         includes=['include', 'src/system/include', 'src/os/include', 'src/drivers/nanomind/include'],
         defines = ctx.env.DEFINES_NANOMIND,
         linkflags = ctx.env.LINKFLAGS_NANOMIND,
-        use=['asf', 'a3200', 'util'],
+        use=['asf', 'a3200', 'util', 'csp'],
         lib=['m', 'stdc++'])
     ctx(rule='${OBJCOPY} -O binary -j .text -j .exception -j .data ${SRC} ${TGT}', source='nanomind.elf', target='nanomind.bin', name='objcopy')
     ctx(name="size", rule='${SIZE} --format=berkeley ${SRC}', source='nanomind.elf', always=True)

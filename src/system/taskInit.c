@@ -39,7 +39,7 @@ void taskInit(void *param)
     LOGV(tag, "\tLast reset source:");
     int reset_source = reset_cause_get_causes();
     print_rst_cause(reset_source);
-    dat_set_system_var(dat_obc_lastResetSource, reset_source);
+    dat_set_system_var(dat_obc_last_reset, reset_source);
 
     /* RTC + 32kHz OSC */
     LOGV(tag, "\tSetting RTC...");
