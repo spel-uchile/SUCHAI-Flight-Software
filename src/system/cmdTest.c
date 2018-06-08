@@ -18,11 +18,14 @@
  */
 #include "cmdTest.h"
 
-static const char* tag = "cmdTestn";
+static const char* tag = "cmdTest";
 
 void cmd_fp_init(void)
 {
     cmd_add("test_fp_params", test_fp_params, "%d %s %d", 3);
+    cmd_add("test_mult_exe", test_mult_exe,"",0);
+    cmd_add("test_print_int", test_print_int, "", 0);
+    cmd_add("test_print_char", test_print_char, "", 0);
 }
 
 int test_fp_params(char* fmt, char* params,int nparams)
@@ -41,3 +44,26 @@ int test_fp_params(char* fmt, char* params,int nparams)
     }
 }
 
+int test_mult_exe(char* fmt, char* params, int nparams)
+{
+    cmd_send(test_print_char);
+    cmd_send(test_print_int);
+}
+
+int test_print_int(char* fmt, char* params, int nparams)
+{
+    int a = 0;
+    while(a<10){
+        printf("%d",a);
+        a++;
+    }
+}
+
+int test_print_char(char* fmt, char* params, int nparams)
+{
+    char a = 'a';
+    while(a<'j'){
+        printf("%d",a);
+        a++;
+    }
+}
