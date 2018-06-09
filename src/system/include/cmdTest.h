@@ -7,6 +7,7 @@
 
 #include "config.h"
 #include "repoCommand.h"
+#include "osDelay.h"
 
 /**
  * This function registers the list of command in the system, initializing the
@@ -29,5 +30,7 @@ int test_mult_exe(char* fmt, char* params, int nparams);
 int test_print_char(char* fmt, char* params, int nparams);
 
 int test_print_int(char* fmt, char* params, int nparams);
+
+int test_print_char2(char* fmt, char* params, int nparams);
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_CMDTEST_H

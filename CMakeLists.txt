@@ -30,7 +30,9 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
-        src/system/taskExecuterB.c src/system/include/taskExecuterB.h src/system/cmdTest.c src/system/include/cmdTest.h)
+        src/system/taskExecuterB.c
+        src/system/cmdTest.c
+        src/system/taskTest.c)
 
 include_directories(
         src/system/include/

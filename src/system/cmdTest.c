@@ -26,6 +26,7 @@ void cmd_test_init(void)
     cmd_add("test_mult_exe", test_mult_exe,"",0);
     cmd_add("test_print_int", test_print_int, "", 0);
     cmd_add("test_print_char", test_print_char, "", 0);
+    cmd_add("test_print_char2", test_print_char2, "", 0);
 }
 
 int test_fp_params(char* fmt, char* params,int nparams)
@@ -48,20 +49,27 @@ int test_mult_exe(char* fmt, char* params, int nparams)
 {
     char* cmd1 = "test_print_int";
     char* cmd2 = "test_print_char";
+    char* cmd3 = "test_print_char2";
     cmd_t *test_int = cmd_get_str(cmd1);
     cmd_add_params_str(test_int, "");
     cmd_t *test_char = cmd_get_str(cmd2);
     cmd_add_params_str(test_char, "");
+    cmd_t *test_char2 = cmd_get_str(cmd3);
+    cmd_add_params_str(test_char2, "");
     cmd_send(test_int);
     cmd_send(test_char);
+    cmd_send(test_char2);
     return CMD_OK;
 }
 
 int test_print_int(char* fmt, char* params, int nparams)
 {
     int a = 0;
+    portTick delay_ms = 1000;
+    portTick xLastWakeTime = osTaskGetTickCount();
     while(a<10){
         printf("%d\n",a);
+        osTaskDelayUntil(&xLastWakeTime, delay_ms);
         a++;
     }
     return CMD_OK;
@@ -70,8 +78,24 @@ int test_print_int(char* fmt, char* params, int nparams)
 int test_print_char(char* fmt, char* params, int nparams)
 {
     char a = 'a';
+    portTick delay_ms = 500;
+    portTick xLastWakeTime = osTaskGetTickCount();
     while(a<'j'){
-        printf("%cc\n",a);
+        printf("%c\n",a);
+        osTaskDelayUntil(&xLastWakeTime, delay_ms);
+        a++;
+    }
+    return CMD_OK;
+}
+
+int test_print_char2(char* fmt, char* params, int nparams)
+{
+    char a = 'A';
+    portTick delay_ms = 500;
+    portTick xLastWakeTime = osTaskGetTickCount();
+    while(a<'J'){
+        printf("%c\n",a);
+        osTaskDelayUntil(&xLastWakeTime, delay_ms);
         a++;
     }
     return CMD_OK;

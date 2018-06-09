@@ -66,7 +66,7 @@ void taskInit(void *param)
     LOGD(tag, "Creating client tasks ...");
     // FIXME: This memory values seems not work on nanomind (tested 5)
     unsigned short task_memory = 15*256;
-    int n_threads = 4;
+    int n_threads = 5;
     os_thread thread_id[n_threads];
 
     /* Creating clients tasks */
@@ -83,7 +83,9 @@ void taskInit(void *param)
 #if SCH_FP_ENABLED
     osCreateTask(taskFlightPlan,"flightplan", task_memory,NULL, 2, &(thread_id[3]));
 #endif
-
+#if SCH_TEST_ENABLED
+    osCreateTask(taskTest,"test", task_memory,NULL, 2, &(thread_id[4]));
+#endif
     osTaskDelete(NULL);
 }
 
