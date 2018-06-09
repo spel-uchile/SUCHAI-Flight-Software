@@ -285,7 +285,10 @@ int cmd_repo_init(void)
 #if SCH_FP_ENABLED
     cmd_fp_init();
 #endif
+#if SCH_TEST_ENABLED
     cmd_test_init();
+#endif
+
 
     int n_cmd;
     int last_cmd_index = cmd_index;
