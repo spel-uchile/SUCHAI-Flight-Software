@@ -30,7 +30,7 @@
     #include "cmdTM.h"
 #endif
 #if SCH_TEST_ENABLED
-    #include "cmdTestCommand.h"
+    #include "cmdTest.h"
 #endif
 
 
