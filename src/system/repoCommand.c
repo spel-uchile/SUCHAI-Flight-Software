@@ -331,7 +331,7 @@ int cmd_print(cmd_t* cmd)
 
 char* cmd_get_fmt(char* name)
 {
-    char* format = malloc(sizeof(char)*30);
+    char* format = malloc(sizeof(char)*CMD_MAX_STR_PARAMS);
     int i, ok;
     for(i=0; i<CMD_MAX_LEN; i++)
     {
