@@ -23,12 +23,12 @@
 const static char *tag = "repoCmd";
 
 /* Global variables */
-cmd_list_t cmd_list[CMD_MAX_LEN];
+cmd_list_t cmd_list[SCH_CMD_MAX_ENTRIES];
 int cmd_index = 0;
 
 int cmd_add(char *name, cmdFunction function, char *fparams, int nparam)
 {
-    if (cmd_index < CMD_MAX_LEN)
+    if (cmd_index < SCH_CMD_MAX_ENTRIES)
     {
         // Create new command
         size_t l_name = strlen(name);
@@ -63,7 +63,7 @@ cmd_t * cmd_get_str(char *name)
 
     //Find inside command buffer
     int i, ok;
-    for(i=0; i<CMD_MAX_LEN; i++)
+    for(i=0; i<SCH_CMD_MAX_ENTRIES; i++)
     {
         osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
         ok = strcmp(name, cmd_list[i].name);
@@ -88,7 +88,7 @@ cmd_t * cmd_get_idx(int idx)
 {
     cmd_t *cmd_new = NULL;
 
-    if (idx < CMD_MAX_LEN)
+    if (idx < SCH_CMD_MAX_ENTRIES)
     {
         // Get found command
         osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
@@ -116,7 +116,7 @@ cmd_t * cmd_get_idx(int idx)
 char * cmd_get_name(int idx)
 {
     char *name = NULL;
-    if (idx < CMD_MAX_LEN)
+    if (idx < SCH_CMD_MAX_ENTRIES)
     {
         // Get found command
         osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
@@ -147,6 +147,8 @@ void cmd_add_params_raw(cmd_t *cmd, void *params, int len)
     // Check pointers
     if(cmd != NULL && params != NULL)
     {
+        LOGW(tag, "Parameters larger than CMD_MAX_STR_PARAMS!( (%d > %d)", len,
+             SCH_CMD_MAX_STR_PARAMS);
         cmd->params = (char *)malloc((size_t)len);
         memcpy(cmd->params, params, (size_t)len);
     }
@@ -155,6 +157,12 @@ void cmd_add_params_raw(cmd_t *cmd, void *params, int len)
 void cmd_add_params_str(cmd_t *cmd, char *params)
 {
     size_t len_param = strlen(params);
+    if(len_param > SCH_CMD_MAX_STR_PARAMS)
+    {
+        LOGW(tag, "Parameters larger than CMD_MAX_STR_PARAMS will be shorted!( (%d > %d)",
+             (int)len_param, SCH_CMD_MAX_STR_PARAMS);
+        len_param = SCH_CMD_MAX_STR_PARAMS;
+    }
 
     // Check pointers
     if(cmd != NULL && len_param)
@@ -170,7 +178,7 @@ void cmd_add_params_var(cmd_t *cmd, ...)
     va_start(args, cmd);
 
     //Parsing arguments to string
-    char str_params[CMD_MAX_STR_PARAMS];
+    char str_params[SCH_CMD_MAX_STR_PARAMS];
     vsprintf(str_params, cmd->fmt, args);
 
     va_end(args);
@@ -296,7 +304,7 @@ int cmd_repo_init(void)
     {
         n_cmd = cmd_add("null", cmd_null, "", 0);
     }
-    while(n_cmd < CMD_MAX_LEN);
+    while(n_cmd < SCH_CMD_MAX_ENTRIES);
 
     // Restore the number of not null commands
     cmd_index = last_cmd_index;
@@ -307,7 +315,7 @@ int cmd_repo_init(void)
 void cmd_repo_close(void)
 {
     int i;
-    for(i=0; i<CMD_MAX_LEN; i++)
+    for(i=0; i<SCH_CMD_MAX_ENTRIES; i++)
     {
         free(cmd_list[i].name);
         free(cmd_list[i].fmt);
@@ -331,7 +339,7 @@ char* cmd_get_fmt(char* name)
 {
     char* format = malloc(sizeof(char)*30);
     int i, ok;
-    for(i=0; i<CMD_MAX_LEN; i++)
+    for(i=0; i<SCH_CMD_MAX_ENTRIES; i++)
     {
         osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
         ok = strcmp(name, cmd_list[i].name);
@@ -348,7 +356,7 @@ char* cmd_get_fmt(char* name)
 
 char* fix_fmt(char* fmt)
 {
-    char* new_fmt = malloc(sizeof(char)*CMD_MAX_STR_PARAMS);
+    char* new_fmt = malloc(sizeof(char)*SCH_CMD_MAX_STR_PARAMS);
     char* aux = new_fmt;
     while(*fmt != 0)
     {

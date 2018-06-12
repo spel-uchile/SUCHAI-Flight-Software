@@ -22,7 +22,6 @@
     #include "data_storage.h"
 #endif
 
-#define FP_MAX_ENTRIES          100 ///< Max number of flight plan entries
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation

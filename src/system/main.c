@@ -33,6 +33,7 @@ int main(void)
 #endif
 {
     /* On reset */
+    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n\n");
     on_reset();
 
     /* Init software subsystems */
@@ -56,11 +57,16 @@ int main(void)
 
     LOGI(tag, "Creating basic tasks...");
     /* Crating system task (the others are created inside taskInit) */
-    // FIXME: This memory values seems not work on nanomind (tested 5,5,10,5)
-    osCreateTask(taskWatchdog, "watchdog", 5*256, NULL, 2, &threads_id[0]);
-    osCreateTask(taskDispatcher,"dispatcher", 5*256, NULL, 3, &threads_id[1]);
-    osCreateTask(taskExecuter, "executer", 5*256, NULL, 4, &threads_id[2]);
-    osCreateTask(taskInit, "init", 5*256, NULL, 4, &threads_id[3]);
+    int t_inv_ok = osCreateTask(taskDispatcher,"invoker", SCH_TASK_DIS_STACK, NULL, 3, &threads_id[1]);
+    int t_exe_ok = osCreateTask(taskExecuter, "receiver", SCH_TASK_EXE_STACK, NULL, 4, &threads_id[2]);
+    int t_wdt_ok = osCreateTask(taskWatchdog, "watchdog", SCH_TASK_WDT_STACK, NULL, 2, &threads_id[0]);
+    int t_ini_ok = osCreateTask(taskInit, "init", SCH_TASK_INI_STACK, NULL, 3, &threads_id[3]);
+
+    /* Check if the task were created */
+    if(t_inv_ok != 0) LOGE(tag, "Task invoker not created!");
+    if(t_exe_ok != 0) LOGE(tag, "Task receiver not created!");
+    if(t_wdt_ok != 0) LOGE(tag, "Task watchdog not created!");
+    if(t_ini_ok != 0) LOGE(tag, "Task init not created!");
 
 #ifndef ESP32
     /* Start the scheduler. Should never return */

@@ -64,24 +64,27 @@ void taskInit(void *param)
 #endif
 
     LOGD(tag, "Creating client tasks ...");
-    // FIXME: This memory values seems not work on nanomind (tested 5)
-    unsigned short task_memory = 15*256;
+    int t_ok;
     int n_threads = 4;
     os_thread thread_id[n_threads];
 
     /* Creating clients tasks */
-    osCreateTask(taskConsole, "console", task_memory, NULL, 2, &(thread_id[0]));
+    t_ok = osCreateTask(taskConsole, "console", SCH_TASK_CON_STACK, NULL, 2, &(thread_id[0]));
+    if(t_ok != 0) LOGE(tag, "Task console not created!");
 
 #if SCH_HK_ENABLED
-    osCreateTask(taskHousekeeping, "housekeeping", task_memory, NULL, 2, &(thread_id[1]));
+    t_ok = osCreateTask(taskHousekeeping, "housekeeping", SCH_TASK_HKP_STACK, NULL, 2, &(thread_id[1]));
+    if(t_ok != 0) LOGE(tag, "Task housekeeping not created!");
 #endif
 #if SCH_COMM_ENABLE
-    //FIXME: Init_communications is found in init.c and taskInit.c
-    //init_communications();
-    osCreateTask(taskCommunications, "comm", task_memory, NULL, 2, &(thread_id[2]));
+    init_communications();
+    t_ok = osCreateTask(taskCommunications, "comm", SCH_TASK_COM_STACK, NULL, 2, &(thread_id[2]));
+    if(t_ok != 0) LOGE(tag, "Task communications not created!");
+
 #endif
 #if SCH_FP_ENABLED
-    osCreateTask(taskFlightPlan,"flightplan", task_memory,NULL, 2, &(thread_id[3]));
+    t_ok = osCreateTask(taskFlightPlan,"flightplan", SCH_TASK_FPL_STACK, NULL, 2, &(thread_id[3]));
+    if(t_ok != 0) LOGE(tag, "Task flightplan not created!");
 #endif
 
     osTaskDelete(NULL);

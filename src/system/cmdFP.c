@@ -35,8 +35,8 @@ int fp_set(char *fmt, char *params, int nparams)
     struct tm str_time;
     time_t unixtime;
     int day, month, year, hour, min, sec;
-    char command[CMD_MAX_STR_PARAMS];
-    char args[CMD_MAX_STR_PARAMS];
+    char command[SCH_CMD_MAX_STR_PARAMS];
+    char args[SCH_CMD_MAX_STR_PARAMS];
     int executions,periodical;
 
     if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &executions, &periodical) == nparams)
@@ -123,7 +123,7 @@ int fp_reset(char* fmt, char* params, int nparams)
 int test_fp_params(char* fmt, char* params,int nparams)
 {
     int num1, num2;
-    char str[CMD_MAX_STR_PARAMS];
+    char str[SCH_CMD_MAX_STR_PARAMS];
     if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
     {
         printf("The parameters are: %d ; %s ; %d \n",num1, str ,num2);

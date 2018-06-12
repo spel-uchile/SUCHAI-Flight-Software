@@ -35,7 +35,7 @@ void cmd_console_init(void)
  */
 int con_debug_msg(char *fmt, char *params, int nparams)
 {
-    char msg[CMD_MAX_STR_PARAMS];
+    char msg[SCH_CMD_MAX_STR_PARAMS];
     if(sscanf(params,fmt, msg) == nparams)
     {
         printf("[Debug Msg] %s\n", msg);

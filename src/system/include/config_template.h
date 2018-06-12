@@ -55,4 +55,27 @@
 #define SCH_STORAGE_MODE        {{SCH_STORAGE}}    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
-#endif	/* SUCHAI_CONFIG_H */
+/**
+ * Memory settings.
+ *
+ * Control the memory used by task stacks, static allocated buffers, etc.
+ * Note that in FreeRTOS the stack size is measured in words not bytes, so the
+ * final stack size depends on the architecture stack wide
+ * (@see https://www.freertos.org/a00125.html)
+ */
+#define SCH_TASK_DEF_STACK        (1*256)   ///< Default task stack size in words
+#define SCH_TASK_DIS_STACK        (5*256)   ///< Dispatcher task stack size in words
+#define SCH_TASK_EXE_STACK        (5*256)   ///< Executer task stack size in words
+#define SCH_TASK_WDT_STACK        (5*256)   ///< Watchdog task stack size in words
+#define SCH_TASK_INI_STACK        (5*256)   ///< Init task stack size in words
+#define SCH_TASK_COM_STACK        (4*256)   ///< Communications task stack size in words
+#define SCH_TASK_FPL_STACK        (4*256)   ///< Flight plan task stack size in words
+#define SCH_TASK_CON_STACK        (4*256)   ///< Console task stack size in words
+#define SCH_TASK_HKP_STACK        (4*256)   ///< Housekeeping task stack size in words
+#define SCH_TASK_CSP_STACK        (500)     ///< CSP route task stack size in words
+
+#define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
+#define SCH_BUFFERS_CSP           (5)       ///< Number of available CSP buffers
+#define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
+#define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
+#define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length

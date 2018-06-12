@@ -32,7 +32,7 @@ time_t sec = 0;
 
 #if SCH_STORAGE_MODE == 0
     int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
-    fp_entry_t data_base [FP_MAX_ENTRIES];
+    fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
 
@@ -57,7 +57,7 @@ void dat_repo_init(void)
 
         //Init internal flight plan table
         int i;
-        for(i=0;i<FP_MAX_ENTRIES;i++)
+        for(i=0;i<SCH_FP_MAX_ENTRIES;i++)
         {
             data_base[i].unixtime = 0;
             data_base[i].cmd = NULL;
@@ -142,7 +142,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
 {
 #if SCH_STORAGE_MODE == 0
     int i;
-    for(i = 0;i < FP_MAX_ENTRIES;i++)
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
         if(elapsed_sec == data_base[i].unixtime)
         {
@@ -171,7 +171,7 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
 #if SCH_STORAGE_MODE == 0
     //TODO : agregar signal de segment para responder falla
     int i;
-    for(i = 0;i < FP_MAX_ENTRIES;i++)
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
         if(data_base[i].unixtime == 0)
         {
@@ -198,7 +198,7 @@ int dat_del_fp(int timetodo)
 {
 #if SCH_STORAGE_MODE ==0
     int i;
-    for(i = 0;i < FP_MAX_ENTRIES;i++)
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
         if(timetodo == data_base[i].unixtime)
         {
@@ -220,7 +220,7 @@ int dat_reset_fp(void)
 {
 #if SCH_STORAGE_MODE == 0
     int i;
-    for(i=0;i<FP_MAX_ENTRIES;i++)
+    for(i=0;i<SCH_FP_MAX_ENTRIES;i++)
     {
         data_base[i].unixtime = 0;
         data_base[i].cmd = NULL;
@@ -239,7 +239,7 @@ int dat_show_fp (void)
 #if SCH_STORAGE_MODE ==0
     int cont = 0;
     int i;
-    for(i = 0;i < FP_MAX_ENTRIES; i++)
+    for(i = 0;i < SCH_FP_MAX_ENTRIES; i++)
     {
         if(data_base[i].unixtime!=0)
         {

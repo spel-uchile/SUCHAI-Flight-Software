@@ -45,8 +45,8 @@ int com_ping(char *fmt, char *params, int nparams)
 int com_send_rpt(char *fmt, char *params, int nparams)
 {
     int node;
-    char msg[CMD_MAX_STR_PARAMS];
-    memset(msg, '\0', CMD_MAX_STR_PARAMS);
+    char msg[SCH_CMD_MAX_STR_PARAMS];
+    memset(msg, '\0', SCH_CMD_MAX_STR_PARAMS);
 
     // format: <node> <string>
     if(sscanf(params, fmt, &node, msg) == nparams)
@@ -87,14 +87,14 @@ int com_send_cmd(char *fmt, char *params, int nparams)
 {
     int node, next, n_args;
     char rep[0];
-    char msg[CMD_MAX_STR_PARAMS];
-    memset(msg, '\0', CMD_MAX_STR_PARAMS);
+    char msg[SCH_CMD_MAX_STR_PARAMS];
+    memset(msg, '\0', SCH_CMD_MAX_STR_PARAMS);
 
     //format: <node> <command> [parameters]
     n_args = sscanf(params, fmt, &node, &next);
     if(n_args == nparams && next > 1)
     {
-        strncpy(msg, params+next, (size_t)CMD_MAX_STR_PARAMS);
+        strncpy(msg, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
         LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, msg, next);
 
         // Sending message to node TC port and wait for response

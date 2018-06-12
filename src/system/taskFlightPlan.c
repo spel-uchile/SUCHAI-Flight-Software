@@ -42,8 +42,8 @@ void taskFlightPlan(void *param)
         elapsed_sec = time(NULL);
 #endif
 
-        char command[CMD_MAX_STR_PARAMS];
-        char args[CMD_MAX_STR_PARAMS];
+        char command[SCH_CMD_MAX_STR_PARAMS];
+        char args[SCH_CMD_MAX_STR_PARAMS];
         int executions;
         int periodical;
 

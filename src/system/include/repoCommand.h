@@ -50,15 +50,6 @@
 #define CMD_ERROR -1    ///< Command returned an error
 
 /**
- * TODO: Make this settings globals
- * FIXME: (carlgonz) I don't think that use CMD_MAX_STR_PARAMS is correct because
- * the parameters use malloc to reserve memory.
- * Fixed buffers lengths
- */
-#define CMD_MAX_LEN 100         ///< Max number of commands in the repository
-#define CMD_MAX_STR_PARAMS 64   ///< Limit to the parameters length
-
-/**
  *  Defines the prototype of a command
  */
 typedef int (*cmdFunction)(char *fmt, char *params, int nparams);
