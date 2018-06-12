@@ -12,9 +12,10 @@
 /**
  * create a task in FreeRTOS
  */
-void osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority, os_thread *thread)
+int osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority, os_thread *thread)
 {
-    xTaskCreate((*functionTask), name, size, parameters, priority, NULL);
+    BaseType_t created = xTaskCreate((*functionTask), name, size, parameters, priority, NULL);
+    return created == pdPASS ? 0 : 1;
 }
 
 void osTaskDelete(void *task_handle)

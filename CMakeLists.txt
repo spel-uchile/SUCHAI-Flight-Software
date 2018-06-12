@@ -43,4 +43,8 @@ link_directories(src/drivers/Linux/libcsp/lib)
 
 link_libraries(-lpthread -lsqlite3 -lcsp -lzmq)
 
+# Use pthread_setname_np included in <features.h>
+add_definitions(-D_GNU_SOURCE)
+
 add_executable(SUCHAI_Flight_Software ${SOURCE_FILES})
+
