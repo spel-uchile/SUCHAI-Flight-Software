@@ -92,12 +92,43 @@ void init_communications(void)
 #if SCH_COMM_ENABLE
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
-    /* Init buffer system with 5 packets of maximum 300 bytes each */
-    csp_buffer_init(5, 300);
+
+    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    {
+        csp_debug_set_level(CSP_ERROR, 1);
+        csp_debug_set_level(CSP_WARN, 1);
+        csp_debug_set_level(CSP_INFO, 1);
+        csp_debug_set_level(CSP_BUFFER, 1);
+        csp_debug_set_level(CSP_PACKET, 1);
+        csp_debug_set_level(CSP_PROTOCOL, 1);
+        csp_debug_set_level(CSP_LOCK, 0);
+    }
+    else
+    {
+        csp_debug_set_level(CSP_ERROR, 1);
+        csp_debug_set_level(CSP_WARN, 1);
+        csp_debug_set_level(CSP_INFO, 1);
+        csp_debug_set_level(CSP_BUFFER, 0);
+        csp_debug_set_level(CSP_PACKET, 0);
+        csp_debug_set_level(CSP_PROTOCOL, 0);
+        csp_debug_set_level(CSP_LOCK, 0);
+    }
+
+    int t_ok;
+    /* Init buffer system with 5 packets of maximum SCH_BUFF_MAX_LEN bytes each */
+    t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
+    if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
     /* Init CSP with address MY_ADDRESS */
     csp_init(SCH_COMM_ADDRESS);
-    /* Start router task with 500 word stack, OS task priority 1 */
-    csp_route_start_task(500, 1);
+    /* Start router task with SCH_TASK_CSP_STACK word stack, OS task priority 1 */
+    t_ok = csp_route_start_task(SCH_TASK_CSP_STACK, 1);
+    if(t_ok != 0) LOGE(tag, "Task router not created!");
+
+#ifdef LINUX
+    /* Set ZMQ interface */
+    csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
+#endif
 
     LOGD(tag, "Route table");
     csp_route_print_table();

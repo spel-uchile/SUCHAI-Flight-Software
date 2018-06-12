@@ -168,48 +168,10 @@ void on_reset(void)
     usart_init(USART_CONSOLE, sysclk_get_peripheral_bus_hz(USART), 500000);
     usart_stdio_id = USART_CONSOLE;
 
-//    LOGV(tag, "\tSetting SPI devices...");
+    /* Setting SPI devices */
     init_spi();
     lm70_init();
     fm33256b_init();
-
-#if SCH_COMM_ENABLE
-    /* Init communications */
-    LOGI(tag, "Initialising CSP...");
-
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
-    {
-        csp_debug_set_level(CSP_ERROR, 1);
-        csp_debug_set_level(CSP_WARN, 1);
-        csp_debug_set_level(CSP_INFO, 1);
-        csp_debug_set_level(CSP_BUFFER, 1);
-        csp_debug_set_level(CSP_PACKET, 1);
-        csp_debug_set_level(CSP_PROTOCOL, 1);
-        csp_debug_set_level(CSP_LOCK, 0);
-    }
-    else
-    {
-        csp_debug_set_level(CSP_ERROR, 1);
-        csp_debug_set_level(CSP_WARN, 1);
-        csp_debug_set_level(CSP_INFO, 1);
-        csp_debug_set_level(CSP_BUFFER, 0);
-        csp_debug_set_level(CSP_PACKET, 0);
-        csp_debug_set_level(CSP_PROTOCOL, 0);
-        csp_debug_set_level(CSP_LOCK, 0);
-    }
-
-    /* Init buffer system with 5 packets of maximum SCH_BUFF_MAX_LEN bytes each */
-    csp_buffer_init(3, SCH_BUFF_MAX_LEN);
-    /* Init CSP with address MY_ADDRESS */
-    csp_init(SCH_COMM_ADDRESS);
-    /* Start router task with 500 word stack, OS task priority 1 */
-    csp_route_start_task(500, 1);
-
-    LOGD(tag, "Route table");
-    csp_route_print_table();
-    LOGD(tag, "Interfaces");
-    csp_route_print_interfaces();
-#endif
 
     /* Init LED */
     led_init();
