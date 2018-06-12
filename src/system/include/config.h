@@ -31,9 +31,10 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               LOG_LVL_VERBOSE        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define LOG_LEVEL               LOG_LVL_INFO        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
 
 /* General system settings */
+#define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
 #define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          1      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
@@ -51,7 +52,7 @@
 #define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        0    ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
 /**
@@ -79,4 +80,4 @@
 #define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
 
-#endif	/* SUCHAI_CONFIG_H */
+#endif //SUCHAI_CONFIG_H

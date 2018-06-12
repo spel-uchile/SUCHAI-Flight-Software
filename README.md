@@ -47,12 +47,12 @@ Currently, it has been tested in the following OS/Architectures :
 
 #### Library Requirements
 Linux installation requires the following libraries:
+* (build-essentials)
 * cmake
 * pthread 
-* sqlite3
-* zmq
-* libcsp
-
+* sqlite3 (libsqlite3-dev)
+* zmq (libzmq3-dev)
+* unzip
 
 #### Clone
 Clone this repository
