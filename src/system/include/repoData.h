@@ -50,6 +50,9 @@ typedef enum dat_system{
     dat_obc_hrs_wo_reset,      ///< Hours since last reset
     dat_obc_reset_counter,     ///< Number of reset since first boot
     dat_obc_sw_wdt,            ///< Software watchdog timer counter
+    dat_obc_temp_1,            ///< Temperature value of the first sensor
+    dat_obc_temp_2,            ///< Temperature value of the second sensor
+    dat_obc_temp_3,         ///< Temperature value of the gyroscope
 
     /// DEP: deployment related variables.
     dat_dep_ant_deployed,      ///< Was the antenna deployed?
@@ -70,6 +73,14 @@ typedef enum dat_system{
 
     /// Add custom status variables here
     //dat_custom              ///< Variable description
+
+    /// ADS: Attitude determination system
+    dat_ads_acc_x,            ///< Gyroscope acceleration value along the x axis
+    dat_ads_acc_y,            ///< Gyroscope acceleration value along the y axis
+    dat_ads_acc_z,            ///< Gyroscope acceleration value along the z axis
+    dat_ads_mag_x,            ///< Magnetometer x axis
+    dat_ads_mag_y,            ///< Magnetometer y axis
+    dat_ads_mag_z,            ///< Magnetometer z axis
 
     /// LAST ELEMENT: DO NOT EDIT
     dat_system_last_var       ///< Dummy element, the number of status variables
