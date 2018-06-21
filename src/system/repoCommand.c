@@ -96,7 +96,7 @@ cmd_t * cmd_get_idx(int idx)
         osSemaphoreGiven(&repo_cmd_sem);
 
         // Creates a new command
-        cmd_new = (cmd_t *)malloc(sizeof(cmd_t));
+        cmd_new = (cmd_t *)malloc(sizeof(cmd_t));  //TODO: posible memory leak
 
         // Fill parameters
         cmd_new->id = idx;
