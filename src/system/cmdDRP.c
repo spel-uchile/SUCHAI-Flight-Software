@@ -162,6 +162,18 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     /* Read magnetometer */
     hmc5843_read_single(&hmc_reading);
 
+    /* Set sensors status variables */
+    // TODO: Fix type of ADS variables. Currently saving floats as ints.
+    dat_set_system_var(dat_obc_temp_1, sensor1/10.);
+    dat_set_system_var(dat_obc_temp_2, sensor2/10.);
+    dat_set_system_var(dat_obc_temp_3, gyro_temp);
+    dat_set_system_var(dat_ads_acc_x, gyro_reading.gyro_x);
+    dat_set_system_var(dat_ads_acc_y, gyro_reading.gyro_y);
+    dat_set_system_var(dat_ads_acc_z, gyro_reading.gyro_z);
+    dat_set_system_var(dat_ads_mag_x, hmc_reading.x);
+    dat_set_system_var(dat_ads_mag_y, hmc_reading.y);
+    dat_set_system_var(dat_ads_mag_z, hmc_reading.z);
+
     /* Print readings */
 #if LOG_LEVEL >= LOG_LVL_INFO
     printf("\r\nTemp1: %.1f, Temp2 %.1f, Gyro temp: %.2f\r\n", sensor1/10., sensor2/10., gyro_temp);
