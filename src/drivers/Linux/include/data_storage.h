@@ -159,4 +159,56 @@ int storage_show_table(void);
  */
 int storage_close(void);
 
+/* Second Mission specific data functions */
+
+/**
+ * Init gps payload data table
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param drop Int. set to 1 to drop table and 0 to create
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_gps_init(char* table, int drop);
+
+/**
+ * Init pressure payload data table
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param drop Int. set to 1 to drop table and 0 to create
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_pressure_init(char* table, int drop);
+
+/**
+ * Init deploy payload data table
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param drop Int. set to 1 to drop table and 0 to create
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_deploy_init(char* table, int drop);
+
+/**
+ * Init generic payload data table with provided initialization string
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param init_sql Str, sql string to initialize table.
+ * @param drop Int. set to 1 to drop table and 0 to create
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_generic_init(char* table, char* init_sql, int drop);
+
+
 #endif //SCH_PERSISTENT_H

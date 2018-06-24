@@ -28,6 +28,10 @@
 
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
 
+#define DAT_GPS_TABLE "gps_table"
+#define DAT_PRS_TABLE "pressure_table"
+#define DAT_DPL_TABLE "deploy_table"
+
 /**
  * System level status variables
  */

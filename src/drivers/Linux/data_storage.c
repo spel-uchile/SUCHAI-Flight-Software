@@ -369,6 +369,8 @@ int storage_show_table (void) {
     return 0;
 }
 
+
+
 int storage_close(void)
 {
     if(db != NULL)
@@ -389,3 +391,92 @@ static int dummy_callback(void *data, int argc, char **argv, char **names)
 {
     return 0;
 }
+
+
+/* Second Mission specific data functions */
+
+int storage_table_gps_init(char* table, int drop)
+{
+    char * init_sql;
+    init_sql= "CREATE TABLE IF NOT EXISTS %s("
+            "idx INTEGER PRIMARY KEY, "
+            "date_time TEXT,"
+            "fix_time INTEGER, "
+            "latitude REAL, "
+            "longitude REAL, "
+            "height REAL, "
+            "velocity_x REAL, "
+            "velocity_y REAL, "
+            "satelites_number INTEGER, "
+            "mode INTEGER);";
+    return storage_table_generic_init(table, init_sql, drop);
+}
+
+int storage_table_pressure_init(char* table, int drop)
+{
+    char * init_sql;
+    init_sql= "CREATE TABLE IF NOT EXISTS %s("
+            "idx INTEGER PRIMARY KEY, "
+            "pressure REAL, "
+            "temperature REAL, "
+            "height REAL);";
+    return storage_table_generic_init(table, init_sql, drop);
+}
+
+int storage_table_deploy_init(char* table, int drop)
+{
+    char * init_sql;
+    init_sql= "CREATE TABLE IF NOT EXISTS %s("
+            "idx INTEGER PRIMARY KEY, "
+            "lineal_actuator INTEGER, "
+            "servo_motor INTEGER);";
+    return storage_table_generic_init(table, init_sql, drop);
+}
+
+int storage_table_generic_init(char* table, char* init_sql, int drop)
+{
+    char *err_msg;
+    char *sql;
+    int rc;
+
+    if(drop)
+    {
+        sql = sqlite3_mprintf("DROP TABLE %s", table);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+        if (rc != SQLITE_OK )
+        {
+            LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", table, err_msg, sql);
+            sqlite3_free(err_msg);
+            sqlite3_free(sql);
+            return -1;
+        }
+        else
+        {
+            LOGD(tag, "Table %s drop successfully", table);
+            sqlite3_free(sql);
+        }
+    }
+    else
+    {
+        sql = sqlite3_mprintf(init_sql, table);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+        if (rc != SQLITE_OK )
+        {
+            LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", table, err_msg, sql);
+            sqlite3_free(err_msg);
+            sqlite3_free(sql);
+            return -1;
+        }
+        else
+        {
+            LOGD(tag, "Table %s created successfully", table);
+            sqlite3_free(sql);
+            return 0;
+        }
+
+    }
+}
+
+
