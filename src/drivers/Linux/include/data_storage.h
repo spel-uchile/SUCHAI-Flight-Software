@@ -203,12 +203,107 @@ int storage_table_deploy_init(char* table, int drop);
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param table Str. table name
- * @param init_sql Str, sql string to initialize table.
+ * @param init_sql Str. sql string to initialize table
  * @param drop Int. set to 1 to drop table and 0 to create
  *
  * @return 0 OK, -1 Error
  */
 int storage_table_generic_init(char* table, char* init_sql, int drop);
 
+typedef struct gps_data {
+    float latitude;
+    float longitude;
+    float height;
+    float velocity_x;
+    float velocity_y;
+    int satellites_number;
+    int mode;
+} gps_data;
+
+/**
+ * Set a gps data frame
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param data Struct. struct containing gps data
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_gps_set(const char* table, gps_data* data);
+
+/**
+ * Get n gps data frames
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param data Struct array. array with gps data
+ * @param n Int. number of frames obtained
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_gps_get(const char* table, gps_data data[], int n);
+
+typedef struct prs_data {
+    float pressure;
+    float temperature;
+    float height;
+} prs_data;
+
+/**
+ * Set a pressure data frame
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param data Struct. struct containing prs data
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_prs_set(const char* table, prs_data* data);
+
+/**
+ * Get n prs data frames
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param data Struct array. array with prs data
+ * @param n Int. number of frames obtained
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_prs_get(const char* table, prs_data data[], int n);
+
+typedef struct dpl_data {
+    int lineal_actuator;
+    int servo_motor;
+} dpl_data;
+
+/**
+ * Set a deploy data frame
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param data Struct. struct containing dpl data
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_dpl_set(const char* table, dpl_data* data);
+
+/**
+ * Get n dpl data frames
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param table Str. table name
+ * @param data Struct array. array with dpl data
+ * @param n Int. number of frames obtained
+ *
+ * @return 0 OK, -1 Error
+ */
+int storage_table_dpl_get(const char* table, dpl_data data[], int n);
 
 #endif //SCH_PERSISTENT_H
