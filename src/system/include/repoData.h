@@ -75,9 +75,6 @@ typedef enum dat_system{
     dat_fpl_last,              ///< Last executed flight plan (unix time)
     dat_fpl_queue,             ///< Flight plan queue length
 
-    /// Add custom status variables here
-    //dat_custom              ///< Variable description
-
     /// ADS: Attitude determination system
     dat_ads_acc_x,            ///< Gyroscope acceleration value along the x axis
     dat_ads_acc_y,            ///< Gyroscope acceleration value along the y axis
@@ -85,6 +82,12 @@ typedef enum dat_system{
     dat_ads_mag_x,            ///< Magnetometer x axis
     dat_ads_mag_y,            ///< Magnetometer y axis
     dat_ads_mag_z,            ///< Magnetometer z axis
+
+    /// Add custom status variables here
+    dat_balloon_phase,          ///< Balloon phase (0: (A0) base, 1: (A) ascend, 2: (B) equilibrium, 3: (B1) deploy1, 4: (B2) deploy2, 5: (C) descend, 6: (C1) landing).
+    dat_balloon_deploys,        ///< Number of balloons
+    dat_balloon_height,         ///< Current height
+    dat_balloon_pressure,       ///< Current pressure
 
     /// LAST ELEMENT: DO NOT EDIT
     dat_system_last_var       ///< Dummy element, the number of status variables

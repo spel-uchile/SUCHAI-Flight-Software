@@ -98,10 +98,25 @@ void dat_repo_init(void)
 
     /* TODO: Initialize custom variables */
     LOGD(tag, "Initializing system variables values...")
-    dat_set_system_var(dat_obc_hrs_alive, 0);
+//    dat_set_system_var(dat_obc_hrs_alive, 0);
     dat_set_system_var(dat_obc_hrs_wo_reset, 0);
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);  //TODO: This is a non-volatile variable
     dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+
+    if(dat_get_system_var(dat_obc_hrs_alive) ==-1) {
+        LOGI(tag, "setting hours alive");
+        dat_set_system_var(dat_obc_hrs_alive, 0);
+    }
+
+    if(dat_get_system_var(dat_balloon_phase) ==-1) {
+        LOGI(tag, "setting baloon phase");
+        dat_set_system_var(dat_balloon_phase, 0);
+    }
+
+    if(dat_get_system_var(dat_balloon_deploys) ==-1) {
+        LOGI(tag, "setting baloon globos");
+        dat_set_system_var(dat_balloon_deploys, 2);
+    }
 }
 
 void dat_repo_close(void)
