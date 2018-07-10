@@ -211,6 +211,7 @@ int storage_table_deploy_init(char* table, int drop);
 int storage_table_generic_init(char* table, char* init_sql, int drop);
 
 typedef struct gps_data {
+    char timestamp[25];
     float latitude;
     float longitude;
     float height;

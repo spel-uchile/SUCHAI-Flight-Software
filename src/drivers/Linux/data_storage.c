@@ -401,7 +401,7 @@ int storage_table_gps_init(char* table, int drop)
     init_sql= "CREATE TABLE IF NOT EXISTS %s("
             "idx INTEGER PRIMARY KEY, "
             "date_time TEXT, "
-            "fix_time INTEGER, "
+            "timestamp TEXT, "
             "latitude REAL, "
             "longitude REAL, "
             "height REAL, "
@@ -487,9 +487,9 @@ int storage_table_gps_set(const char* table, gps_data* data)
 
     char *sql = sqlite3_mprintf(
             "INSERT OR REPLACE INTO %s "
-                    "(date_time, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode)\n "
-                    "VALUES (datetime(\"now\"), %f, %f, %f, %f, %f, %u, %u);",
-            table, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode);
+                    "(date_time, timestamp, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode)\n "
+                    "VALUES (datetime(\"now\"), %s, %f, %f, %f, %f, %f, %u, %u);",
+            table, data->timestamp, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode);
 
     rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
@@ -540,13 +540,15 @@ int storage_table_gps_get(const char* table, gps_data data[], int n)
 
         for (i = 0; i < row; i++)
         {
-            data[i].latitude =  atof(results[(i*col)+col+2]);
-            data[i].longitude = atof(results[(i*col)+col+3]);
-            data[i].height = atof(results[(i*col)+col+4]);
-            data[i].velocity_x = atof(results[(i*col)+col+5]);
-            data[i].velocity_y = atof(results[(i*col)+col+6]);
-            data[i].satellites_number = atoi(results[(i*col)+col+7]);
-            data[i].mode = atoi(results[(i*col)+col+8]);
+            // maybe memcpy?
+            strcpy(data[i].timestamp, results[(i*col)+col+2]);
+            data[i].latitude =  atof(results[(i*col)+col+3]);
+            data[i].longitude = atof(results[(i*col)+col+4]);
+            data[i].height = atof(results[(i*col)+col+5]);
+            data[i].velocity_x = atof(results[(i*col)+col+6]);
+            data[i].velocity_y = atof(results[(i*col)+col+7]);
+            data[i].satellites_number = atoi(results[(i*col)+col+8]);
+            data[i].mode = atoi(results[(i*col)+col+9]);
         }
     }
     return 0;

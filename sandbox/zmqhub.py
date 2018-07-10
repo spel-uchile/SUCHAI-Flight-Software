@@ -80,7 +80,7 @@ def console(port="8001"):
             hdr_b = re.findall("........",hdr)[::-1]
             # print("con:", hdr_b, ["{:02x}".format(int(i, 2)) for i in hdr_b])
             hdr = bytearray([int(i,2) for i in hdr_b])
-            msg = bytearray(dst) + hdr + bytearray(data, "ascii")
+            msg = bytearray([dst,]) + hdr + bytearray(data, "ascii")
             # print("con:", msg)
             sock.send(msg)
         except Exception as e:

@@ -290,6 +290,7 @@ int cmd_repo_init(void)
 #if SCH_COMM_ENABLE
     cmd_com_init();
     cmd_tm_init();
+    cmd_subsys_init();
 #endif
     cmd_console_init();
 #if SCH_FP_ENABLED

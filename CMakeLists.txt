@@ -18,6 +18,7 @@ set(SOURCE_FILES
         src/system/cmdFP.c
         src/system/cmdTM.c
         src/system/cmdConsole.c
+        src/system/cmdSubSys.c
         src/system/repoCommand.c
         src/system/repoData.c
         src/system/taskDispatcher.c
@@ -30,7 +31,7 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
-)
+        src/system/cmdSubSys.c src/system/include/cmdSubSys.h)
 
 include_directories(
         src/system/include/

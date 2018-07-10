@@ -27,6 +27,7 @@
 #if SCH_COMM_ENABLE
     #include "cmdCOM.h"
     #include "cmdTM.h"
+    #include "cmdSubSys.h"
 #endif
 #if SCH_TEST_ENABLED
     #include "cmdTestCommand.h"
