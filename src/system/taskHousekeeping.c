@@ -61,9 +61,9 @@ void taskHousekeeping(void *param)
     {
 
         osTaskDelayUntil(&xLastWakeTime, delay_ms); // Suspend task
-        elapsed_sec+=1; //= delay_ms/1000; // Update seconds counts
+        elapsed_sec+=10; //= delay_ms/1000; // Update seconds counts
 
-        change_system_phase();
+//        change_system_phase();
         phase = dat_get_system_var(dat_balloon_phase); // Determine current phase
 
         /**
@@ -72,10 +72,8 @@ void taskHousekeeping(void *param)
         if ((elapsed_sec % 10) == 0) {
             cmd_t *cmd_get_gps = cmd_get_str("get_gps_data");
             cmd_send(cmd_get_gps);
-            osTaskDelayUntil(&xLastWakeTime, 100);
             cmd_t *cmd_get_prs = cmd_get_str("get_prs_data");
             cmd_send(cmd_get_prs);
-            osTaskDelayUntil(&xLastWakeTime, 100);
             cmd_t *cmd_get_dpl = cmd_get_str("get_dpl_data");
             cmd_send(cmd_get_dpl);
         }
