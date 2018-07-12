@@ -90,8 +90,6 @@ int com_send_cmd(char *fmt, char *params, int nparams)
     char msg[SCH_CMD_MAX_STR_PARAMS];
     memset(msg, '\0', SCH_CMD_MAX_STR_PARAMS);
 
-    printf("asdasdasdasdasdasdasdasdasdasdasdasdasdasdasd\n");
-
     //format: <node> <command> [parameters]
     n_args = sscanf(params, fmt, &node, &next);
     if(n_args == nparams && next > 1)
