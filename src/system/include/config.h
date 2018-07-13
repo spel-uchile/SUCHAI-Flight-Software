@@ -42,6 +42,10 @@
 #define SCH_MAX_WDT_TIMER       10000000                 ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
 
+
+
+
+
 /* Communications system settings */
 #define SCH_COMM_ADDRESS        1  ///< Node address
 #define SCH_TRX_PORT_TM         (9)                ///< Telemetry port
@@ -53,7 +57,7 @@
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
-#define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
+#define SCH_STORAGE_FILE        "suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
 /**
  * Memory settings.

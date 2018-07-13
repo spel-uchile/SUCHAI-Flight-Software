@@ -18,7 +18,7 @@ void cmd_subsys_init(void) {
 
 int get_gps_data(char *fmt, char *params, int nparams) {
     char* param="5 get_gps_data";
-    cmd_t *cmd_send_gps = cmd_get_str("send_cmd");
+    cmd_t *cmd_send_gps = cmd_get_str("send_rpt");
     cmd_add_params_str(cmd_send_gps, param);
     cmd_send(cmd_send_gps);
     printf("Getting data!\n");
@@ -27,7 +27,7 @@ int get_gps_data(char *fmt, char *params, int nparams) {
 
 int get_dpl_data(char *fmt, char *params, int nparams) {
     char* param="2 get_dpl_data";
-    cmd_t *cmd_send_gps = cmd_get_str("send_cmd");
+    cmd_t *cmd_send_gps = cmd_get_str("send_rpt");
     cmd_add_params_str(cmd_send_gps, param);
     cmd_send(cmd_send_gps);
     printf("Getting data!\n");
@@ -36,7 +36,7 @@ int get_dpl_data(char *fmt, char *params, int nparams) {
 
 int get_prs_data(char *fmt, char *params, int nparams) {
     char* param="4 get_prs_data";
-    cmd_t *cmd_send_gps = cmd_get_str("send_cmd");
+    cmd_t *cmd_send_gps = cmd_get_str("send_rpt");
     cmd_add_params_str(cmd_send_gps, param);
     cmd_send(cmd_send_gps);
     printf("Getting data!\n");
