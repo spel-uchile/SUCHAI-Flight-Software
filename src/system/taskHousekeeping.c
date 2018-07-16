@@ -32,12 +32,21 @@ enum phase_n{
     phase_c1, // 6: (C1) landing
 };
 
+/*
 const int  MIN_PHASE_A  =   5;
 const int  MIN_PHASE_B  = 115;
 const int  MIN_PHASE_B1 = 155;
 const int  MIN_PHASE_B2 = 157;
 const int  MIN_PHASE_C  = 159;
 const int  MIN_PHASE_C1 = 189;
+*/
+/* Test Flight Plan*/
+const int  MIN_PHASE_A  =   5;
+const int  MIN_PHASE_B  =  15;
+const int  MIN_PHASE_B1 =  20;
+const int  MIN_PHASE_B2 =  25;
+const int  MIN_PHASE_C  =  30;
+const int  MIN_PHASE_C1 =  35;
 
 void taskHousekeeping(void *param)
 {
@@ -59,7 +68,7 @@ void taskHousekeeping(void *param)
     
     while(1)
     {
-        printf("elapsed second %d: ", elapsed_sec);
+        LOGD(tag, "elapsed second %u", elapsed_sec);
 
         osTaskDelayUntil(&xLastWakeTime, delay_ms); // Suspend task
         elapsed_sec++; //= delay_ms/1000; // Update seconds counts
@@ -70,17 +79,17 @@ void taskHousekeeping(void *param)
         /**
          * In all Phases sample prs, dpl and gps every 10 seconds
          */
-        if ((elapsed_sec % 10) == 0) {
+        if ((elapsed_sec % 10) == 1) {
             cmd_t *cmd_get_gps = cmd_get_str("get_gps_data");
             cmd_send(cmd_get_gps);
         }
 
-        if ((elapsed_sec % 10) == 2) {
+        if ((elapsed_sec % 10) == 4) {
             cmd_t *cmd_get_prs = cmd_get_str("get_prs_data");
             cmd_send(cmd_get_prs);
         }
 
-        if ((elapsed_sec % 10) == 5) {
+        if ((elapsed_sec % 10) == 7) {
             cmd_t *cmd_get_dpl = cmd_get_str("get_dpl_data");
             cmd_send(cmd_get_dpl);
         }
@@ -110,7 +119,6 @@ void taskHousekeeping(void *param)
          * Always to do list
          */
         /* 1 min actions, update minutes alive counter*/
-//        if((elapsed_sec % 1) == 0)
         if((elapsed_sec % _01min_check) == 0)
         {
             LOGD(tag, "1 hour check");
@@ -124,10 +132,12 @@ void taskHousekeeping(void *param)
 
 void change_system_phase()
 {
-    int min_alive;
     int current_phase = dat_get_system_var(dat_balloon_phase);
-    min_alive = dat_get_system_var(dat_obc_hrs_alive);
-    printf("minutes alive:  %d \n", min_alive);
+    int min_alive= dat_get_system_var(dat_obc_hrs_alive);
+    LOGD(tag, "minutes alive:  %d", min_alive);
+
+    if( min_alive == -1)
+        return;
 
     if(min_alive <= MIN_PHASE_A)
     {
@@ -135,7 +145,6 @@ void change_system_phase()
         // We are in phase A0
         if(current_phase != phase_a0) {
             dat_set_system_var(dat_balloon_phase, phase_a0);
-
         }
     }
     else if (min_alive > MIN_PHASE_A && min_alive <= MIN_PHASE_B)
@@ -152,7 +161,6 @@ void change_system_phase()
         LOGD(tag, "######################### We are in PHASE B #########################");
         // We are in phase B
         if(current_phase != phase_b){
-
             dat_set_system_var(dat_balloon_phase, phase_b);
         }
 
@@ -162,7 +170,6 @@ void change_system_phase()
         LOGD(tag, "######################### We are in PHASE B1 #########################");
         // We are in phase B1
         if(current_phase != phase_b1){
-
             dat_set_system_var(dat_balloon_phase, phase_b1);
         }
 
@@ -172,7 +179,6 @@ void change_system_phase()
         LOGD(tag, "######################### We are in PHASE B2 #########################");
         // We are in phase B2
         if(current_phase != phase_b2){
-
             dat_set_system_var(dat_balloon_phase, phase_b2);
         }
 
@@ -182,7 +188,6 @@ void change_system_phase()
         LOGD(tag, "######################### We are in PHASE C #########################");
         // We are in phase C
         if(current_phase != phase_c) {
-
             dat_set_system_var(dat_balloon_phase, phase_c);
         }
 
@@ -192,7 +197,6 @@ void change_system_phase()
         LOGD(tag, "######################### We are in PHASE C1 #########################");
         // We are in phase C1
         if(current_phase != phase_c1){
-
             dat_set_system_var(dat_balloon_phase, phase_c1);
         }
     }

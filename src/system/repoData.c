@@ -160,6 +160,8 @@ int dat_get_system_var(dat_system_t index)
         value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
     #endif
 
+    LOGD(tag, "value obtained from id: %d, is: %d", index, value);
+
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
