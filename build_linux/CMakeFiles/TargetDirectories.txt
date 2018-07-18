@@ -1,0 +1,3 @@
+/home/pi/Spel/SUCHAI-Flight-Software/build_linux/CMakeFiles/rebuild_cache.dir
+/home/pi/Spel/SUCHAI-Flight-Software/build_linux/CMakeFiles/edit_cache.dir
+/home/pi/Spel/SUCHAI-Flight-Software/build_linux/CMakeFiles/SUCHAI_Flight_Software.dir

@@ -488,7 +488,7 @@ int storage_table_gps_set(const char* table, gps_data* data)
     char *sql = sqlite3_mprintf(
             "INSERT OR REPLACE INTO %s "
                     "(date_time, timestamp, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode)\n "
-                    "VALUES (datetime(\"now\"), %s, %f, %f, %f, %f, %f, %u, %u);",
+                    "VALUES (datetime(\"now\"), \"%s\", %f, %f, %f, %f, %f, %d, %d);",
             table, data->timestamp, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode);
 
     rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
@@ -630,7 +630,7 @@ int storage_table_dpl_set(const char* table, dpl_data* data)
     char *sql = sqlite3_mprintf(
             "INSERT OR REPLACE INTO %s "
                     "(date_time, lineal_actuator, servo_motor)\n "
-                    "VALUES (datetime(\"now\"), %f, %f);",
+                    "VALUES (datetime(\"now\"), %d, %d);",
             table, data->lineal_actuator, data->servo_motor);
 
     rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);

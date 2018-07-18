@@ -32,12 +32,21 @@ enum phase_n{
     phase_c1, // 6: (C1) landing
 };
 
-const int  MIN_PHASE_A  =   1;
-const int  MIN_PHASE_B  = 110;
-const int  MIN_PHASE_B1 = 150;
-const int  MIN_PHASE_B2 = 155;
-const int  MIN_PHASE_C  = 160;
-const int  MIN_PHASE_C1 = 270;
+/*
+const int  MIN_PHASE_A  =   5;
+const int  MIN_PHASE_B  = 115;
+const int  MIN_PHASE_B1 = 155;
+const int  MIN_PHASE_B2 = 157;
+const int  MIN_PHASE_C  = 159;
+const int  MIN_PHASE_C1 = 189;
+*/
+/* Test Flight Plan*/
+const int  MIN_PHASE_A  =   5;
+const int  MIN_PHASE_B  =  15;
+const int  MIN_PHASE_B1 =  20;
+const int  MIN_PHASE_B2 =  25;
+const int  MIN_PHASE_C  =  30;
+const int  MIN_PHASE_C1 =  35;
 
 void taskHousekeeping(void *param)
 {
@@ -59,6 +68,7 @@ void taskHousekeeping(void *param)
     
     while(1)
     {
+        LOGD(tag, "elapsed second %u", elapsed_sec);
 
         osTaskDelayUntil(&xLastWakeTime, delay_ms); // Suspend task
         elapsed_sec++; //= delay_ms/1000; // Update seconds counts
@@ -67,110 +77,48 @@ void taskHousekeeping(void *param)
         phase = dat_get_system_var(dat_balloon_phase); // Determine current phase
 
         /**
-         * Phases A(0), A1(1), B(2) and C(3): sample radiosonde data at 1Hz and
-         * send beacon at 1/4 Hz
+         * In all Phases sample prs, dpl and gps every 10 seconds
          */
-        if (phase < phase_c) {
-            //1 second action: sample radiosonde data
-            if ((elapsed_sec % 5) == 0) {
-//                cmd_t *cmd_sonde_1 = cmd_get_str("get_weather");
-//                cmd_send(cmd_sonde_1);
-            }
+        if ((elapsed_sec % 10) == 1) {
+            cmd_t *cmd_get_gps = cmd_get_str("get_gps_data");
+            cmd_send(cmd_get_gps);
+        }
 
-            // 4 seconds actions: download radiosonde data
+        if ((elapsed_sec % 10) == 4) {
+            cmd_t *cmd_get_prs = cmd_get_str("get_prs_data");
+            cmd_send(cmd_get_prs);
+        }
+
+        if ((elapsed_sec % 10) == 7) {
+            cmd_t *cmd_get_dpl = cmd_get_str("get_dpl_data");
+            cmd_send(cmd_get_dpl);
+        }
+
+
+        /**
+         * In Phase B1 deploy linear actuator every 10 seconds
+        */
+        if(phase == phase_b1) {
             if ((elapsed_sec % 10) == 0) {
-//                cmd_t *cmd_send_sonde_trx = cmd_get_str("send_weather_data");
-//                cmd_send(cmd_send_sonde_trx);
-//                cmd_t *cmd_send_sonde_trx_2 = cmd_get_str("send_weather_data");
-//                cmd_send(cmd_send_sonde_trx_2);
+                cmd_t *cmd_open_la = cmd_get_str("open_dpl_la");
+                cmd_send(cmd_open_la);
             }
         }
 
         /**
-         * Phase A1 y B: execute star tracker + sample and send radiosonde data
-         * (see code above)
-         */
-        if (phase == phase_a || phase == phase_b) {
-            if ((elapsed_sec % _05min_check) == 0) {
-//                cmd_t *cmd_startracker = cmd_get_str("cmd_system");
-//                cmd_add_params_str(cmd_startracker, "startracker");
-//                cmd_send(cmd_startracker);
+         * In Phase B2 deploy servo motor every 10 seconds
+        */
+        if(phase == phase_b2) {
+            if ((elapsed_sec % 10) == 0) {
+                cmd_t *cmd_open_sm = cmd_get_str("open_dpl_sm");
+                cmd_send(cmd_open_sm);
             }
-        }
-
-
-        if (phase == phase_b1) {
-            /* Send command to cut the one balloon */
-            balloons = dat_get_system_var(dat_balloon_deploys);
-            if (balloons > 1) {
-                balloons--;
-                dat_set_system_var(dat_balloon_deploys, balloons);
-//                cmd_t *cmd_cut_balloon = cmd_get_str("cut_balloon");
-                // or 13
-//                cmd_add_params_var(cmd_cut_balloon, 12); /* Cut first balloon */
-//                cmd_send(cmd_cut_balloon);
-            }
-        }
-
-        /**
-         * Phase C: cut balloon, sample radiosonde data at 1Hz, send radiosonde
-         * data via Iridium at 1/10Hz, execute super-resolution experiment
-         * every minute.
-         */
-
-        if (phase == phase_c) {
-            /* Sample radiosonde data at 1HZ */
-            if ((elapsed_sec % 5) == 0) {
-//                cmd_t *cmd_sonde_2 = cmd_get_str("get_weather");
-//                cmd_send(cmd_sonde_2);
-            }
-
-            /* Send radiosonde data via Iridium every 10 seconds */
-            if ((elapsed_sec % _10sec_check) == 0) {
-//                cmd_t *cmd_iridium = cmd_get_str("send_iridium");
-//                cmd_add_params_var(cmd_iridium, 1);
-//                cmd_send(cmd_iridium);
-            }
-
-            /* Execute super-resolution experiment every minute */
-            if ((elapsed_sec % _01min_check) == 0) {
-//                cmd_t *cmd_startracker = cmd_get_str("cmd_system");
-//                cmd_add_params_str(cmd_startracker, "superres");
-//                cmd_send(cmd_startracker);
-            }
-        }
-
-        /**
-         * Phase C1: cut the second balloon, keep sending radiosonde data via
-         * Iridium
-         */
-        if(phase == phase_c1)
-        {
-            /* Send command to cut the second balloon */
-            balloons = dat_get_system_var(dat_balloon_deploys);   // balloons available
-            if(balloons > 0)
-            {
-                balloons --;
-                dat_set_system_var(dat_balloon_deploys, balloons);
-//                cmd_t *cmd_cut_balloon = cmd_get_str("cut_balloon");
-//                cmd_add_params_var(cmd_cut_balloon, 13); /* Cut second balloon */
-//                cmd_send(cmd_cut_balloon);
-            }
-
-            /* Do not sample radiosonde data, but send existing radiosonde data
-             * via Iridium every 10 seconds */
-//            if((elapsed_sec % _10sec_check) == 0)
-//            {
-//                cmd_t *cmd_iridium = cmd_get_str("send_iridium");
-//                cmd_send(cmd_iridium);
-//            }
         }
 
         /**
          * Always to do list
          */
         /* 1 min actions, update minutes alive counter*/
-//        if((elapsed_sec % 1) == 0)
         if((elapsed_sec % _01min_check) == 0)
         {
             LOGD(tag, "1 hour check");
@@ -184,22 +132,24 @@ void taskHousekeeping(void *param)
 
 void change_system_phase()
 {
-    int min_alive;
     int current_phase = dat_get_system_var(dat_balloon_phase);
-    min_alive = dat_get_system_var(dat_obc_hrs_alive);
+    int min_alive= dat_get_system_var(dat_obc_hrs_alive);
+    LOGD(tag, "minutes alive:  %d", min_alive);
+
+    if( min_alive == -1)
+        return;
 
     if(min_alive <= MIN_PHASE_A)
     {
-        LOGD(tag, "We are in PHASE A0");
+        LOGD(tag, "######################### We are in PHASE A0 #########################");
         // We are in phase A0
         if(current_phase != phase_a0) {
             dat_set_system_var(dat_balloon_phase, phase_a0);
-
         }
     }
     else if (min_alive > MIN_PHASE_A && min_alive <= MIN_PHASE_B)
     {
-        LOGD(tag, "We are in PHASE A");
+        LOGD(tag, "######################### We are in PHASE A #########################");
         // We are in phase A1
         if(current_phase != phase_a){
             dat_set_system_var(dat_balloon_phase, phase_a);
@@ -208,50 +158,45 @@ void change_system_phase()
     }
     else if (min_alive > MIN_PHASE_B && min_alive <= MIN_PHASE_B1)
     {
-        LOGD(tag, "We are in PHASE B");
+        LOGD(tag, "######################### We are in PHASE B #########################");
         // We are in phase B
         if(current_phase != phase_b){
-
             dat_set_system_var(dat_balloon_phase, phase_b);
         }
 
     }
     else if (min_alive > MIN_PHASE_B1 && min_alive <= MIN_PHASE_B2)
     {
-        LOGD(tag, "We are in PHASE B1");
+        LOGD(tag, "######################### We are in PHASE B1 #########################");
         // We are in phase B1
         if(current_phase != phase_b1){
-
             dat_set_system_var(dat_balloon_phase, phase_b1);
         }
 
     }
     else if (min_alive > MIN_PHASE_B2 && min_alive <= MIN_PHASE_C)
     {
-        LOGD(tag, "We are in PHASE B2");
+        LOGD(tag, "######################### We are in PHASE B2 #########################");
         // We are in phase B2
         if(current_phase != phase_b2){
-
             dat_set_system_var(dat_balloon_phase, phase_b2);
         }
 
     }
     else if (min_alive > MIN_PHASE_C && min_alive <= MIN_PHASE_C1)
     {
-        LOGD(tag, "We are in PHASE C");
+        LOGD(tag, "######################### We are in PHASE C #########################");
         // We are in phase C
         if(current_phase != phase_c) {
-
             dat_set_system_var(dat_balloon_phase, phase_c);
         }
 
     }
     else if (min_alive > MIN_PHASE_C1)
     {
-        LOGD(tag, "We are in PHASE C1");
+        LOGD(tag, "######################### We are in PHASE C1 #########################");
         // We are in phase C1
         if(current_phase != phase_c1){
-
             dat_set_system_var(dat_balloon_phase, phase_c1);
         }
     }

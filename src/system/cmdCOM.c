@@ -98,7 +98,7 @@ int com_send_cmd(char *fmt, char *params, int nparams)
         LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, msg, next);
 
         // Sending message to node TC port and wait for response
-        int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_TC, 1000,
+        int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_TC, 100,
                                  (void *)msg, (int)strlen(msg), rep, 1);
 
         if(rc > 0 && rep[0] == 200)
