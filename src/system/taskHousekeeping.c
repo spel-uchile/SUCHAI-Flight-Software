@@ -41,12 +41,12 @@ const int  MIN_PHASE_C  = 159;
 const int  MIN_PHASE_C1 = 189;
 */
 /* Test Flight Plan*/
-const int  MIN_PHASE_A  =   5;
-const int  MIN_PHASE_B  =  15;
-const int  MIN_PHASE_B1 =  20;
-const int  MIN_PHASE_B2 =  25;
-const int  MIN_PHASE_C  =  30;
-const int  MIN_PHASE_C1 =  35;
+const int  MIN_PHASE_A  =   2;
+const int  MIN_PHASE_B  =  4;
+const int  MIN_PHASE_B1 =  6;
+const int  MIN_PHASE_B2 =  8;
+const int  MIN_PHASE_C  =  10;
+const int  MIN_PHASE_C1 =  12;
 
 void taskHousekeeping(void *param)
 {
@@ -96,22 +96,36 @@ void taskHousekeeping(void *param)
 
 
         /**
-         * In Phase B1 deploy linear actuator every 10 seconds
+         * In Phase B1:
+            -deploy linear actuator every 10 seconds
+            -send data through iridium
         */
         if(phase == phase_b1) {
             if ((elapsed_sec % 10) == 0) {
                 cmd_t *cmd_open_la = cmd_get_str("open_dpl_la");
                 cmd_send(cmd_open_la);
             }
+
+            if ((elapsed_sec % 20) == 0) {
+                cmd_t *cmd_send_iridium = cmd_get_str("send_iridium_data");
+                cmd_send(cmd_send_iridium);
+            }
         }
 
         /**
-         * In Phase B2 deploy servo motor every 10 seconds
+         * In Phase B2:
+            -deploy servo motor every 10 seconds
+            -send data through iridium
         */
         if(phase == phase_b2) {
             if ((elapsed_sec % 10) == 0) {
                 cmd_t *cmd_open_sm = cmd_get_str("open_dpl_sm");
                 cmd_send(cmd_open_sm);
+            }
+
+            if ((elapsed_sec % 20) == 0) {
+                cmd_t *cmd_send_iridium = cmd_get_str("send_iridium_data");
+                cmd_send(cmd_send_iridium);
             }
         }
 

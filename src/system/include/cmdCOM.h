@@ -103,4 +103,7 @@ int com_send_cmd(char *fmt, char *param, int nparams);
  */
 int com_send_data(char *fmt, char *params, int nparams);
 
+/* TODO: DOC */
+int com_send_data_nreply(char *fmt, char *params, int nparams);
+
 #endif /* CMD_COM_H */

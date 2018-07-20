@@ -159,6 +159,13 @@ void cmd_add_params_raw(cmd_t *cmd, void *params, int len);
  *      cmd_add_params(bar, "1 2 3.4");
  * @endcode
  */
+
+void cmd_add_params_strAndraw(cmd_t *cmd, char *paramStr, void *paramsRaw, int len);
+
+/* TO DO
+
+*/
+
 void cmd_add_params_str(cmd_t *cmd, char *params);
 
 /**

@@ -49,7 +49,12 @@ int com_send_rpt(char *fmt, char *params, int nparams)
     memset(msg, '\0', SCH_CMD_MAX_STR_PARAMS);
 
     // format: <node> <string>
-    if(sscanf(params, fmt, &node, msg) == nparams)
+    int rc = sscanf(params, fmt, &node, msg);
+    printf("***************************sscanf=%d\n", rc);
+    printf("***************************nparams=%d\n", nparams);
+    printf("***************************params=%s\n", (char *)params);
+    printf("***************************msg=%s\n", (char *)msg);
+    if( rc == nparams)
     {
         // Create a packet with the message
         size_t msg_len = strlen(msg);
@@ -141,6 +146,45 @@ int com_send_data(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
+        return CMD_FAIL;
+    }
+}
+
+int com_send_data_nreply(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
+    uint8_t rep[1];
+    com_data_t *data_to_send = (com_data_t *)params;
+
+    // Create a packet with the message
+    size_t msg_len =  sizeof(data_to_send->frame);
+    csp_packet_t *packet = csp_buffer_get(msg_len);
+    if(packet == NULL)
+    {
+        LOGE(tag, "Could not allocate packet!");
+        return CMD_FAIL;
+    }
+    packet->length = (uint16_t)(msg_len);
+    memcpy(packet->data, (uint8_t *)&data_to_send->frame, msg_len);
+
+    // Send the data buffer to node and wait 1 seg. for the confirmation
+    int rc = csp_sendto(CSP_PRIO_NORM, (uint8_t)data_to_send->node, SCH_TRX_PORT_TM, 
+                        SCH_TRX_PORT_TM, CSP_O_NONE, packet, 1000);
+
+    if(rc == 0)
+    {
+        LOGV(tag, "Data sent successfully. (rc: %d)", rc);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGE(tag, "Error sending data. (rc: %d)", rc);
+        csp_buffer_free(packet);
         return CMD_FAIL;
     }
 }
