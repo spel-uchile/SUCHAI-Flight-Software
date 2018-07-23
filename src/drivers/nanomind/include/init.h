@@ -49,5 +49,6 @@ void init_spn_fl512(void);
 void init_rtc(void);
 void print_rst_cause(int reset_cause);
 void twi_init(void);
+void test_sdram(int size, int do_free);
 
 #endif //_INIT_H
