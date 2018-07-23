@@ -31,6 +31,12 @@ void cmd_com_init(void)
 
 int com_ping(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
     int node;
     if(sscanf(params, fmt, &node) == nparams)
     {
@@ -44,6 +50,12 @@ int com_ping(char *fmt, char *params, int nparams)
 
 int com_send_rpt(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
     int node;
     char msg[SCH_CMD_MAX_STR_PARAMS];
     memset(msg, '\0', SCH_CMD_MAX_STR_PARAMS);
@@ -85,6 +97,12 @@ int com_send_rpt(char *fmt, char *params, int nparams)
 
 int com_send_cmd(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
     int node, next, n_args;
     char rep[0];
     char msg[SCH_CMD_MAX_STR_PARAMS];

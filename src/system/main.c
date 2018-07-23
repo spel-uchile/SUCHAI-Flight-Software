@@ -33,8 +33,8 @@ int main(void)
 #endif
 {
     /* On reset */
-    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n\n");
     on_reset();
+    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n\n");
 
     /* Init software subsystems */
     log_init();      // Logging system
