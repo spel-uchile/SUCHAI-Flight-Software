@@ -41,6 +41,7 @@
 #define SCH_TEST_ENABLED        {{SCH_EN_TEST}}    ///< Set to run tests (0 | 1)
 #define SCH_MAX_WDT_TIMER       10                 ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
+#define SCH_UART_BAUDRATE       (576000)           ///< UART baud rate for serial console
 
 /* Communications system settings */
 #define SCH_COMM_ADDRESS        {{SCH_COMM_NODE}}  ///< Node address
@@ -63,16 +64,16 @@
  * final stack size depends on the architecture stack wide
  * (@see https://www.freertos.org/a00125.html)
  */
-#define SCH_TASK_DEF_STACK        (1*256)   ///< Default task stack size in words
+#define SCH_TASK_DEF_STACK        (2*256)   ///< Default task stack size in words
 #define SCH_TASK_DIS_STACK        (5*256)   ///< Dispatcher task stack size in words
 #define SCH_TASK_EXE_STACK        (5*256)   ///< Executer task stack size in words
 #define SCH_TASK_WDT_STACK        (5*256)   ///< Watchdog task stack size in words
 #define SCH_TASK_INI_STACK        (5*256)   ///< Init task stack size in words
-#define SCH_TASK_COM_STACK        (4*256)   ///< Communications task stack size in words
-#define SCH_TASK_FPL_STACK        (4*256)   ///< Flight plan task stack size in words
-#define SCH_TASK_CON_STACK        (4*256)   ///< Console task stack size in words
-#define SCH_TASK_HKP_STACK        (4*256)   ///< Housekeeping task stack size in words
-#define SCH_TASK_CSP_STACK        (500)     ///< CSP route task stack size in words
+#define SCH_TASK_COM_STACK        (5*256)   ///< Communications task stack size in words
+#define SCH_TASK_FPL_STACK        (5*256)   ///< Flight plan task stack size in words
+#define SCH_TASK_CON_STACK        (5*256)   ///< Console task stack size in words
+#define SCH_TASK_HKP_STACK        (5*256)   ///< Housekeeping task stack size in words
+#define SCH_TASK_CSP_STACK        (5*256)     ///< CSP route task stack size in words
 
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
 #define SCH_BUFFERS_CSP           (5)       ///< Number of available CSP buffers
