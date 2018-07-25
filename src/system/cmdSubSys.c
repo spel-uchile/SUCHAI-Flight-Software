@@ -15,7 +15,8 @@ void cmd_subsys_init(void) {
     cmd_add("open_dpl_sm", open_dpl_sm, "", 0);
     cmd_add("close_dpl_sm", close_dpl_sm, "", 0);
     cmd_add("send_iridium_data", send_iridium_data, "", 2);
-
+    cmd_add("send_iridium_msg1", send_iridium_msg1, "", 0);
+    cmd_add("send_iridium_msg2", send_iridium_msg2, "", 0);
 }
 
 int get_gps_data(char *fmt, char *params, int nparams) {
@@ -99,4 +100,19 @@ int send_iridium_data(char *fmt, char *params, int nparams) {
     memcpy(data.frame.data.data8, (char *)&msg, strlen(msg));
     printf("msg=%d\n", strlen(msg));
     return com_send_data_nreply(NULL, (char *)&data, 0);
+}
+
+int send_iridium_msg1(char *fmt, char *params, int nparams) {
+    char* param="6 StartingMission";
+    cmd_t *cmd_msg = cmd_get_str("send_rpt");
+    cmd_add_params_str(cmd_msg, param);
+    cmd_send(cmd_msg);
+    return CMD_OK;
+}
+int send_iridium_msg2(char *fmt, char *params, int nparams) {
+    char* param="6 EndMission";
+    cmd_t *cmd_msg = cmd_get_str("send_rpt");
+    cmd_add_params_str(cmd_msg, param);
+    cmd_send(cmd_msg);
+    return CMD_OK;
 }
