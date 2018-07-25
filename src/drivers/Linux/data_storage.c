@@ -408,7 +408,8 @@ int storage_table_gps_init(char* table, int drop)
             "velocity_x REAL, "
             "velocity_y REAL, "
             "satellites_number INTEGER, "
-            "mode INTEGER);";
+            "mode INTEGER, "
+            "phase INTEGER);";
     return storage_table_generic_init(table, init_sql, drop);
 }
 
@@ -487,9 +488,9 @@ int storage_table_gps_set(const char* table, gps_data* data)
 
     char *sql = sqlite3_mprintf(
             "INSERT OR REPLACE INTO %s "
-                    "(date_time, timestamp, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode)\n "
-                    "VALUES (datetime(\"now\"), \"%s\", %f, %f, %f, %f, %f, %d, %d);",
-            table, data->timestamp, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode);
+                    "(date_time, timestamp, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode, phase)\n "
+                    "VALUES (datetime(\"now\"), \"%s\", %f, %f, %f, %f, %f, %d, %d, %d);",
+            table, data->timestamp, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode, data->phase);
 
     rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
@@ -549,6 +550,7 @@ int storage_table_gps_get(const char* table, gps_data data[], int n)
             data[i].velocity_y = atof(results[(i*col)+col+7]);
             data[i].satellites_number = atoi(results[(i*col)+col+8]);
             data[i].mode = atoi(results[(i*col)+col+9]);
+            data[i].phase = atoi(results[(i*col)+col+10]);
         }
     }
     return 0;

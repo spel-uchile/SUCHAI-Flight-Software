@@ -219,6 +219,7 @@ typedef struct gps_data {
     float velocity_y;
     int satellites_number;
     int mode;
+    int phase;
 } gps_data;
 
 /**

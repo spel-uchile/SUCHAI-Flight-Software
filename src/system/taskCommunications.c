@@ -199,10 +199,11 @@ static void com_receive_tm(csp_packet_t *packet, int src)
         float velocity_y;
         int satellites_number;
         int mode;
+        int phase = dat_get_system_var(dat_balloon_phase);      // current phase
     //    memset(timestamp, '\0', (size_t)25+1);
 
         // Scan a command and parameter string: <command> [parameters]
-        ok = sscanf((char*)packet->data, "%s %f %f %f %f %f %d %d", timestamp, &latitude, &longitude, &height, &velocity_x, &velocity_y, &satellites_number, &mode);
+        ok = sscanf((char*)packet->data, "%s %f %f %f %f %f %d %d %d", timestamp, &latitude, &longitude, &height, &velocity_x, &velocity_y, &satellites_number, &mode, &phase);
 
         gps_data data;
         strcpy(data.timestamp, timestamp);
@@ -213,6 +214,7 @@ static void com_receive_tm(csp_packet_t *packet, int src)
         data.velocity_y = velocity_y;
         data.satellites_number = satellites_number;
         data.mode = mode;
+        data.phase = phase;
 
     //    printf("timestamp is: %s \n", data.timestamp);
     //    printf("latitud is: %f \n", data.latitude);
