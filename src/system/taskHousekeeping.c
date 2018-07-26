@@ -65,20 +65,21 @@ void taskHousekeeping(void *param)
     int balloons = dat_get_system_var(dat_balloon_deploys); // balloons available
 
     portTick xLastWakeTime = osTaskGetTickCount();
-    time_t t0;
-    time_t t0_2;
-    time_t t_now;
-    struct tm * timeinfo;
-    time(&t0);
-    timeinfo = localtime (&t0);
-    printf ( "*****************************Initial time: %s", asctime (timeinfo));
-    
+    printf("----- TICK %u %u\n", xLastWakeTime, *(&xLastWakeTime));
+//    time_t t0;
+//    time_t t0_2;
+//    time_t t_now;
+//    struct tm * timeinfo;
+//    time(&t0);
+//    timeinfo = localtime (&t0);
+//    printf ( "*****************************Initial time: %s", asctime (timeinfo));
+//
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); // Suspend task
-        //elapsed_sec++; //= delay_ms/1000; // Update seconds counts
-        time(&t_now);
-        elapsed_sec = difftime(t_now,t0);
+        elapsed_sec++; //= delay_ms/1000; // Update seconds counts
+//        time(&t_now);
+//        elapsed_sec = difftime(t_now,t0);
 
         /**
          * Phases Setup
@@ -94,7 +95,8 @@ void taskHousekeeping(void *param)
         /**
          * In all Phases sample prs, dpl and gps every 10 seconds
          */
-        if (difftime(t0_2,t_now)!=0) {
+        //if (difftime(t0_2,t_now)!=0) {
+        if (1) {
             LOGD(tag, "elapsed second %u", elapsed_sec);
 
             // printf("****************t_now-t0=%.f", difftime(t_now,t0));
@@ -128,7 +130,7 @@ void taskHousekeeping(void *param)
                     cmd_send(cmd_close_la);
                 }
 
-                if ((elapsed_sec % _01min_check) == 0) {
+                if ((elapsed_sec % _05min_check) == 0) {
                     cmd_t *cmd_send_iridium = cmd_get_str("send_iridium_data");
                     cmd_send(cmd_send_iridium);
                 }
@@ -145,7 +147,7 @@ void taskHousekeeping(void *param)
                     cmd_send(cmd_open_sm);
                 }
 
-                if ((elapsed_sec % _01min_check) == 0) {
+                if ((elapsed_sec % _05min_check) == 0) {
                     cmd_t *cmd_send_iridium = cmd_get_str("send_iridium_data");
                     cmd_send(cmd_send_iridium);
                 }
@@ -157,7 +159,7 @@ void taskHousekeeping(void *param)
                 -send final msg through iridium (just once)
             */
             if(phase == phase_c) {
-                if ((elapsed_sec % _01min_check) == 0) {
+                if ((elapsed_sec % _05min_check) == 0) {
                     cmd_t *cmd_send_iridium = cmd_get_str("send_iridium_data");
                     cmd_send(cmd_send_iridium);
                 }
@@ -178,8 +180,8 @@ void taskHousekeeping(void *param)
                 cmd_send(cmd_1h);
                 LOGI(tag, "Phase: %d", phase);
             }
-       }
-       t0_2 = t_now;
+        }
+//        t0_2 = t_now;
     }
 }
 
