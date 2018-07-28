@@ -32,7 +32,7 @@ portTick osTaskGetTickCount(void)
     struct timespec time;
     clock_gettime(CLOCK_MONOTONIC_RAW, &time);
     //return time in microseconds
-    return (portTick)(time.tv_sec*1e+6 + time.tv_nsec*1e-3);
+    return (portTick)(time.tv_sec*1000000+time.tv_nsec/1000);
 }
 
 void osDelay(uint32_t mseconds)
@@ -51,11 +51,14 @@ void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds)
     // Return if more than desired milli seconds have passed
     if(d_usec > s_usec)
     {
+        // Tag last delay ticks
+        *lastTime = osTaskGetTickCount() - (d_usec - s_usec);
         return;
     }
 
     // Delay left ticks
     uint32_t s_msec = (s_usec - d_usec)/1000;
+    printf("---> Going to sleep %u (c_usec %u, d_usec %u, s_usec %u, last_time %u\n", s_msec, c_usec, d_usec, s_usec, *lastTime);
     osDelay(s_msec);
 
     // Tag last delay ticks
