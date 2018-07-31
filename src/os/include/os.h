@@ -13,7 +13,7 @@
 #include "config.h"
 
 #ifdef LINUX
-    #define portMAX_DELAY (uint32_t) 0      //0xffffffff
+    #define portMAX_DELAY (uint32_t) 0xffffffff
     #define pdPASS				     1
     #define configMINIMAL_STACK_SIZE 1
     #define portBASE_TYPE	short

@@ -46,8 +46,13 @@ void taskDispatcher(void *param)
                 osQueueSend(executer_cmd_queue, &new_cmd, portMAX_DELAY);
                 LOGD(tag, "Cmd: %X, Param: %p, Orig: %X", new_cmd->id, &(new_cmd->params), -1);
 
-                /* Get the result from Executer Stat Queue - BLOCKING */
-                osQueueReceive(executer_stat_queue, &cmd_result, portMAX_DELAY);
+                /* Get the result from Executer Stat Queue - NO BLOCKING */
+                status = osQueueReceive(executer_stat_queue, &cmd_result, 0);
+                if(status == pdPASS)
+                {
+                    /* Do something with the command result */
+                    LOGV(tag, "Command result: %d", cmd_result);
+                }
             }
         }
     }

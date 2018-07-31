@@ -41,6 +41,7 @@
 #define SCH_TEST_ENABLED        1    ///< Set to run tests (0 | 1)
 #define SCH_MAX_WDT_TIMER       100000                 ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
+#define SCH_N_EXECUTER          (2)         ///< Number of available executer
 
 /* Communications system settings */
 #define SCH_COMM_ADDRESS        1  ///< Node address

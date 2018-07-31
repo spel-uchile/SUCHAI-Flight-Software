@@ -59,8 +59,10 @@ int main(void)
     // FIXME: This memory values seems not work on nanomind (tested 5,5,10,5)
     osCreateTask(taskWatchdog, "watchdog", 5*256, NULL, 2, &threads_id[0]);
     osCreateTask(taskDispatcher,"dispatcher", 5*256, NULL, 3, &threads_id[1]);
-    osCreateTask(taskExecuter, "executer_A", 5*256, NULL, 4, &threads_id[2]);
-    osCreateTask(taskExecuterB, "executer_B", 5*256, NULL, 4, &threads_id[3]);
+    osCreateTask(taskExecuter, "executer", 5*256, NULL, 4, &threads_id[2]);
+#if SCH_N_EXECUTER > 1
+    osCreateTask(taskExecuter, "executer_B", 5*256, NULL, 4, &threads_id[3]);
+#endif
     osCreateTask(taskInit, "init", 5*256, NULL, 4, &threads_id[4]);
 
 #ifndef ESP32
