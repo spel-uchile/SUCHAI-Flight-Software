@@ -21,60 +21,46 @@ void cmd_subsys_init(void) {
 
 int get_gps_data(char *fmt, char *params, int nparams) {
     char* param="5 get_gps_data";
-    cmd_t *cmd_send_gps = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_send_gps, param);
-    cmd_send(cmd_send_gps);
+    com_send_rpt("%d %s", param, 2);
     LOGD(tag, "Getting data!");
     return CMD_OK;
 }
 
 int get_dpl_data(char *fmt, char *params, int nparams) {
     char* param="2 get_dpl_data";
-    cmd_t *cmd_send_gps = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_send_gps, param);
-    cmd_send(cmd_send_gps);
+    com_send_rpt("%d %s", param, 2);
     LOGD(tag, "Getting data!");
     return CMD_OK;
 }
 
 int get_prs_data(char *fmt, char *params, int nparams) {
     char* param="4 get_prs_data";
-    cmd_t *cmd_send_gps = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_send_gps, param);
-    cmd_send(cmd_send_gps);
+    com_send_rpt("%d %s", param, 2);
     LOGD(tag, "Getting data!");
     return CMD_OK;
 }
 
 int open_dpl_la(char *fmt, char *params, int nparams) {
     char* param="2 open_dpl_la";
-    cmd_t *cmd_open_lal = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_open_lal, param);
-    cmd_send(cmd_open_lal);
+    com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
 
 int close_dpl_la(char *fmt, char *params, int nparams) {
     char* param="2 close_dpl_la";
-    cmd_t *cmd_close_lal = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_close_lal, param);
-    cmd_send(cmd_close_lal);
+    com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
 
 int open_dpl_sm(char *fmt, char *params, int nparams) {
     char* param="2 open_dpl_sm";
-    cmd_t *cmd_open_sm = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_open_sm, param);
-    cmd_send(cmd_open_sm);
+    com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
 
 int close_dpl_sm(char *fmt, char *params, int nparams) {
     char* param="2 close_dpl_sm";
-    cmd_t *cmd_close_sm = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_close_sm, param);
-    cmd_send(cmd_close_sm);
+    com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
 
@@ -104,15 +90,12 @@ int send_iridium_data(char *fmt, char *params, int nparams) {
 
 int send_iridium_msg1(char *fmt, char *params, int nparams) {
     char* param="6 StartingMission";
-    cmd_t *cmd_msg = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_msg, param);
-    cmd_send(cmd_msg);
+    com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
+
 int send_iridium_msg2(char *fmt, char *params, int nparams) {
     char* param="6 EndMission";
-    cmd_t *cmd_msg = cmd_get_str("send_rpt");
-    cmd_add_params_str(cmd_msg, param);
-    cmd_send(cmd_msg);
+    com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }

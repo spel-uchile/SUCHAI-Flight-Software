@@ -50,10 +50,8 @@ int com_send_rpt(char *fmt, char *params, int nparams)
 
     // format: <node> <string>
     int rc = sscanf(params, fmt, &node, msg);
-    printf("***************************sscanf=%d\n", rc);
-    printf("***************************nparams=%d\n", nparams);
-    printf("***************************params=%s\n", (char *)params);
-    printf("***************************msg=%s\n", (char *)msg);
+    LOGD(tag, "Parsed: %d %s", node, msg);
+
     if( rc == nparams)
     {
         // Create a packet with the message
