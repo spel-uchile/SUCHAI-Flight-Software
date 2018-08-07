@@ -218,6 +218,7 @@ void on_reset(void)
     init_spi();
     lm70_init();
     fm33256b_init();
+    init_rtc();
 
     /* Init LED */
     led_init();

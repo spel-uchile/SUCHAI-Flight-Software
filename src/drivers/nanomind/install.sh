@@ -32,6 +32,8 @@ cd -
 
 echo "Coping custom waf script..."
 cp wscript a3200-sdk-lite-v1.2/wscript
+echo "Coping custom syscalls_basic.c..."
+cp -f syscalls_basic.c a3200-sdk-lite-v1.2/lib/libasf/gomspace/freertos/avr32/
 
 echo "Adding libcsp to sdk lib folder"
 if [ ! -d "./libcsp" ]; then
