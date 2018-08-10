@@ -13,7 +13,7 @@ fi
 if [ ! -d "~/.local/bin" ]; then
     mkdir ~/.local/bin
 fi
-if [ ! -d "~/.local/bin" ]; then
+if [ ! -d "~/.local/share" ]; then
     mkdir ~/.local/share
 fi
 ./install-avr32.sh

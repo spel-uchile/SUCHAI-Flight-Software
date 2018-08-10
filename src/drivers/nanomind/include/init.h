@@ -36,6 +36,7 @@
 #include <pwr_switch.h>
 #include <spn_fl512s.h>
 #include <adc_channels.h>
+#include <gs_pwm.h>
 
 #include "utils.h"
 #if SCH_COMM_ENABLE

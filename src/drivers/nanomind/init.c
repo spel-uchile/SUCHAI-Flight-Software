@@ -218,7 +218,21 @@ void on_reset(void)
     init_spi();
     lm70_init();
     fm33256b_init();
+
+    /* Init RTC */
     init_rtc();
+
+    /* Init pwm */
+    gs_pwm_init();
+    int channel = 0;
+    float duty = 0;
+    float freq = 500;
+    /* Enable pwm channel */
+    gs_pwm_enable(channel);
+    /* Set requested frequency and get the achieved frequncy returned */
+    float freq_achieved = gs_pwm_set_freq(channel, freq);
+    /* Set the duty cycle in percentage */
+    gs_pwm_set_duty(channel, duty);
 
     /* Init LED */
     led_init();
