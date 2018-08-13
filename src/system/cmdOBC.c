@@ -213,6 +213,6 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
     }
 #else
     LOGW(tag, "Command not suported!");
-    return CMD_FAIL
+    return CMD_FAIL;
 #endif
 }
