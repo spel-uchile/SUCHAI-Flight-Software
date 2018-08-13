@@ -36,19 +36,17 @@
 #include <pwr_switch.h>
 #include <spn_fl512s.h>
 #include <adc_channels.h>
+#include <scif_uc3c.h>
 
 #include "utils.h"
-#if SCH_COMM_ENABLE
-    #include <csp/csp.h>
-    #include <csp/interfaces/csp_if_zmqhub.h>
-#endif
+#include "config.h"
 
 void on_reset(void);
-void init_spi(void);
-void init_spn_fl512(void);
+void init_spi1(void);
 void init_rtc(void);
-void print_rst_cause(int reset_cause);
+void log_reset_cause(int reset);
 void twi_init(void);
+void init_can(int enable_can);
 void test_sdram(int size, int do_free);
 
 #endif //_INIT_H

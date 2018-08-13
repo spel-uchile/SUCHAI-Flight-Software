@@ -21,7 +21,8 @@
 
 static const char *tag = "on_reset";
 
-void init_spi(void) {
+void init_spi1(void) {
+    /* Setting up the GPIO map for SPI on the board */
     gpio_map_t spi_piomap = {
             {AVR32_SPI1_SCK_0_1_PIN, AVR32_SPI1_SCK_0_1_FUNCTION},
             {AVR32_SPI1_MOSI_0_1_PIN, AVR32_SPI1_MOSI_0_1_FUNCTION},
@@ -29,18 +30,12 @@ void init_spi(void) {
             {AVR32_SPI1_MISO_0_1_PIN, AVR32_SPI1_MISO_0_1_FUNCTION},
             {AVR32_SPI1_NPCS_2_2_PIN, AVR32_SPI1_NPCS_2_2_FUNCTION},
             {AVR32_SPI1_NPCS_3_2_PIN, AVR32_SPI1_NPCS_3_2_FUNCTION},
-#ifdef ENABLE_SPANSION
-    {AVR32_SPI1_NPCS_0_PIN, AVR32_SPI1_NPCS_0_FUNCTION},
-		{AVR32_SPI1_NPCS_1_2_PIN, AVR32_SPI1_NPCS_1_2_FUNCTION},
-#endif
+            {AVR32_SPI1_NPCS_0_PIN, AVR32_SPI1_NPCS_0_FUNCTION},
+            {AVR32_SPI1_NPCS_1_2_PIN, AVR32_SPI1_NPCS_1_2_FUNCTION},
     };
-#ifdef ENABLE_SPANSION
     gpio_enable_module(spi_piomap, 8);
-#else
-    gpio_enable_module(spi_piomap, 6);
-#endif
 
-    /* SPI1 setup */
+    /* Setup of SPI controller one */
     sysclk_enable_pba_module(SYSCLK_SPI1);
     spi_reset(&AVR32_SPI1);
     spi_set_master_mode(&AVR32_SPI1);
@@ -52,12 +47,33 @@ void init_spi(void) {
     spi_enable(&AVR32_SPI1);
 }
 
-void init_spn_fl512(void) {
-    spn_fl512s_init((unsigned int) 0);
+void init_can(int enable_can) {
+
+    /* Setup the generic clock for CAN */
+    scif_gc_setup(AVR32_SCIF_GCLK_CANIF, SCIF_GCCTRL_OSC0, AVR32_SCIF_GC_NO_DIV_CLOCK, 0);
+    if (enable_can) {
+        /* Enable the generic clock */
+        scif_gc_enable(AVR32_SCIF_GCLK_CANIF);
+
+        /* Setup GPIO map for CAN connection in stack */
+        static const gpio_map_t CAN_GPIO_MAP = {
+                {AVR32_CANIF_RXLINE_0_0_PIN, AVR32_CANIF_RXLINE_0_0_FUNCTION},
+                {AVR32_CANIF_TXLINE_0_0_PIN, AVR32_CANIF_TXLINE_0_0_FUNCTION}
+        };
+        /* Assign GPIO to CAN */
+        gpio_enable_module(CAN_GPIO_MAP, sizeof(CAN_GPIO_MAP) / sizeof(CAN_GPIO_MAP[0]));
+
+        /* Initialize PA15 (CANMODE) GPIO, must be pulled low to enable CAN Transceiver TI SN65HVD230 */
+        gpio_configure_pin(AVR32_PIN_PA15, GPIO_DIR_OUTPUT | GPIO_INIT_LOW);
+    } else {
+        /* Stop the generic clock */
+        scif_stop_gclk(AVR32_SCIF_GCLK_CANIF);
+        /* Ensure can output is low to disable/power down transceiver */
+        gpio_configure_pin(AVR32_PIN_PA15, (GPIO_DIR_OUTPUT | GPIO_INIT_HIGH));
+    }
 }
 
 void init_rtc(void) {
-
     /* Setup RTC */
     uint8_t cmd[] = {FM33_WRPC, 0x18, 0x3D};
     fm33256b_write(cmd, 3);
@@ -67,59 +83,73 @@ void init_rtc(void) {
 
     /* 32kHz Crystal setup */
     osc_enable(OSC_ID_OSC32);
-
 }
 
-void print_rst_cause(int reset_cause) {
-    printf("Reset cause ");
-    switch (reset_cause) {
+/**
+ * Log reset cause
+ * @param reset reset cause
+ */
+void log_reset_cause(int reset) {
+    switch (reset) {
         case RESET_CAUSE_WDT:
-            printf("WDT\r\n");
+            LOGI(tag, "Reset cause: Watchdog timeout (%d)", reset);
             break;
         case RESET_CAUSE_SOFT:
-            printf("SOFT\r\n");
+            LOGI(tag, "Reset cause: Software reset (%d)", reset);
             break;
         case RESET_CAUSE_SLEEP:
-            printf("SLEEP\r\n");
+            LOGI(tag, "Reset cause: Wake from Shutdown sleep mode (%d)", reset);
             break;
         case RESET_CAUSE_EXTRST:
-            printf("EXT RST\r\n");
+            LOGI(tag, "Reset cause: External reset (%d)", reset);
             break;
         case RESET_CAUSE_CPU_ERROR:
-            printf("CPU ERROR\r\n");
+            LOGI(tag, "Reset cause: CPU Error (%d)", reset);
             break;
         case RESET_CAUSE_BOD_CPU:
-            printf("BOD CPU\r\n");
+            LOGI(tag, "Reset cause: Brown-out detected on CPU power domain (%d)", reset);
             break;
         case RESET_CAUSE_POR:
-            printf("POR\r\n");
+            LOGI(tag, "Reset cause: Power-on-reset (%d)", reset);
             break;
         case RESET_CAUSE_JTAG:
-            printf("JTAG\r\n");
+            LOGI(tag, "Reset cause: JTAG (%d)", reset);
             break;
         case RESET_CAUSE_OCD:
-            printf("OCD\r\n");
+            LOGI(tag, "Reset cause: On-chip debug system (%d)", reset);
             break;
         case RESET_CAUSE_BOD_IO:
-            printf("BOD IO\r\n");
+            LOGI(tag, "Reset cause: Brown-out detected on I/O power domain (%d)", reset);
             break;
         default:
-            printf("UNKNOWN\r\n");
+            LOGI(tag, "Reset cause: Undefined! (%d)", reset);
     }
 }
 
-/* Init I2C */
+/**
+ * Init I2C for OBC and PC104 stack
+ */
 void twi_init(void) {
-    /* GPIO map setup */
+    /* I2C2 Pins for OBC sensors */
     const gpio_map_t TWIM_GPIO_MAP = {
             {AVR32_TWIMS2_TWCK_0_0_PIN, AVR32_TWIMS2_TWCK_0_0_FUNCTION},
             {AVR32_TWIMS2_TWD_0_0_PIN, AVR32_TWIMS2_TWD_0_0_FUNCTION}
     };
-    gpio_enable_module(TWIM_GPIO_MAP,
-                       sizeof(TWIM_GPIO_MAP) / sizeof(TWIM_GPIO_MAP[0]));
+    gpio_enable_module(TWIM_GPIO_MAP, sizeof(TWIM_GPIO_MAP) / sizeof(TWIM_GPIO_MAP[0]));
 
-    /* Init twi master controller 2 with addr 5 and 100 kHz clock */
+    /* I2C0 Pins for PC104 connector*/
+    const gpio_map_t TWIM_GPIO_MAP2 = {
+            {AVR32_TWIMS0_TWCK_0_0_PIN, AVR32_TWIMS0_TWCK_0_0_FUNCTION},
+            {AVR32_TWIMS0_TWD_0_0_PIN, AVR32_TWIMS0_TWD_0_0_FUNCTION}
+    };
+    gpio_enable_module(TWIM_GPIO_MAP2, sizeof(TWIM_GPIO_MAP2) / sizeof(TWIM_GPIO_MAP2[0]));
+
+    /* Init I2C2 controller with addr 5 and 100 kHz clock */
     i2c_init_master(2, 5, 100);
+
+    /* I2C0 initialized with LibCSP in TaskInit
+     * Ex: csp_i2c_init(node, handle, speed_khz);
+     */
 }
 
 /**
@@ -137,7 +167,7 @@ void test_sdram(int size, int do_free) {
         printf("---- malloc failed! ----\n\n");
     }
     else{
-        printf("data @ %p\n", data, sizeof(int));
+        printf("data @ %p\n", data);
     }
 
 
@@ -165,10 +195,15 @@ void test_sdram(int size, int do_free) {
 
 void on_reset(void)
 {
+    /* Init LED */
+    led_init();
+    led_on(LED_CPUOK);
+    led_off(LED_A);
+
     /* Reset watchdog */
     wdt_disable();
     wdt_clear();
-    wdt_opt_t wdtopt = { .us_timeout_period = 10000000 };
+    wdt_opt_t wdtopt = { .us_timeout_period = SCH_WDT_PERIOD*1000000 };
     wdt_enable(&wdtopt);
 
     /* Initialize interrupt handling.
@@ -209,20 +244,9 @@ void on_reset(void)
             {USART_RXD_PIN, USART_RXD_FUNCTION},
             {USART_TXD_PIN, USART_TXD_FUNCTION},
     };
-    gpio_enable_module(USART_GPIO_MAP,
-                       sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
+    gpio_enable_module(USART_GPIO_MAP, sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
     usart_init(USART_CONSOLE, sysclk_get_peripheral_bus_hz(USART), SCH_UART_BAUDRATE);
     usart_stdio_id = USART_CONSOLE;
-
-    /* Setting SPI devices */
-    init_spi();
-    lm70_init();
-    fm33256b_init();
-
-    /* Init LED */
-    led_init();
-    led_on(LED_CPUOK);
-    led_on(LED_A);
 
     /**
      * Test the external SDRAM. If working properly we are able to reserve this
@@ -233,4 +257,8 @@ void on_reset(void)
 #if 0
     test_sdram(100000, 1);
 #endif
+
+    /* Finish on reset, both led on */
+    led_on(LED_CPUOK);
+    led_on(LED_A);
 }

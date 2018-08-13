@@ -24,6 +24,11 @@
 #include "taskHousekeeping.h"
 #endif
 #if SCH_COMM_ENABLE
+#include <csp/csp.h>
+#include <csp/csp_rtable.h>
+#ifdef NANOMIND
+#include <csp/interfaces/csp_if_i2c.h>
+#endif
 #include "taskCommunications.h"
 #endif
 #if SCH_FP_ENABLED

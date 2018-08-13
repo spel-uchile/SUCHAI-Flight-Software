@@ -24,43 +24,40 @@ static const char *tag = "taskInit";
 void taskInit(void *param)
 {
 #ifdef NANOMIND
-    LOGI(tag, "Setting pheripherals...");
-
-    /* SPI device drivers */
-    osDelay(100);
-    adc_channels_init();
-    osDelay(100);
-
-    /* Init I2C */
-    LOGV(tag, "\tSetting I2C driver...");
-    twi_init();
-
-    /* Latest reset source */
-    LOGV(tag, "\tLast reset source:");
-    int reset_source = reset_cause_get_causes();
-    print_rst_cause(reset_source);
-    dat_set_system_var(dat_obc_last_reset, reset_source);
-
-    /* RTC + 32kHz OSC */
-    LOGV(tag, "\tSetting RTC...");
+    /**
+     * Setting SPI devices
+     */
+    init_spi1();
+    /* Init temperature sensors */
+    lm70_init();
+    /* Init spansion chip */
+    spn_fl512s_init((unsigned int) 0);  // Creates a lock
+    /* Init RTC and FRAM chip */
+    fm33256b_init();  // Creates a lock
     init_rtc();
 
-    /* Init spansion chip */
-    LOGV(tag, "\tSetting FL512...");
-    init_spn_fl512();
-
-    /* Init gyro */
-    LOGV(tag, "\tSetting SPI gyros...");
-    mpu3300_init(MPU3300_BW_5, MPU3300_FSR_225);
-
-    /* Init magnetometer */
-    LOGV(tag, "\tSetting SPI magnetometer...");
-    hmc5843_init();
-#endif
-#ifdef AVR32
-    /* Init I2C */
-    LOGV(tag, "\tSetting I2C driver...");
+    /**
+     * Setting I2C devices
+     */
     twi_init();
+    /* Init gyroscope */
+    mpu3300_init(MPU3300_BW_5, MPU3300_FSR_225);
+    /* Init magnetometer */
+    hmc5843_init();
+    /* Setup ADC channels for current measurements */
+    adc_channels_init();  // Creates a lock
+    /* Setup motherboard switches */
+    //mb_switch_init();
+
+    /**
+     * Init CAN devices
+     */
+    init_can(0); // Init can, default disabled
+
+    /* Latest reset source */
+    int reset_source = reset_cause_get_causes();
+    log_reset_cause(reset_source);
+    dat_set_system_var(dat_obc_last_reset, reset_source);
 #endif
 
     LOGD(tag, "Creating client tasks ...");
@@ -80,7 +77,6 @@ void taskInit(void *param)
     init_communications();
     t_ok = osCreateTask(taskCommunications, "comm", SCH_TASK_COM_STACK, NULL, 2, &(thread_id[2]));
     if(t_ok != 0) LOGE(tag, "Task communications not created!");
-
 #endif
 #if SCH_FP_ENABLED
     t_ok = osCreateTask(taskFlightPlan,"flightplan", SCH_TASK_FPL_STACK, NULL, 2, &(thread_id[3]));
@@ -117,21 +113,44 @@ void init_communications(void)
         csp_debug_set_level(CSP_LOCK, 0);
     }
 
+    /* Init buffer system */
     int t_ok;
-    /* Init buffer system with 5 packets of maximum SCH_BUFF_MAX_LEN bytes each */
     t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
     if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
-    /* Init CSP with address MY_ADDRESS */
-    csp_init(SCH_COMM_ADDRESS);
-    /* Start router task with SCH_TASK_CSP_STACK word stack, OS task priority 1 */
-    t_ok = csp_route_start_task(SCH_TASK_CSP_STACK, 1);
-    if(t_ok != 0) LOGE(tag, "Task router not created!");
+    csp_set_hostname("SUCHAI-OBC");
+    csp_init(SCH_COMM_ADDRESS); // Init CSP with address MY_ADDRESS
 
+    /**
+     * Set interfaces and routes
+     *  Platform dependent
+     */
 #ifdef LINUX
+    csp_set_model("LINUX")
     /* Set ZMQ interface */
     csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
 #endif
+
+#ifdef NANOMIND
+    csp_set_model("A3200");
+    /* Init csp i2c interface with address 1 and 400 kHz clock */
+    LOGI(tag, "csp_i2c_init...");
+    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400);
+    if(t_ok != CSP_ERR_NONE) LOGE(tag, "\tcsp_i2c_init failed!");
+
+    /**
+     * Setting route table
+     * Build with options: --enable-if-i2c --with-rtable cidr
+     *  csp_rtable_load("8/2 I2C 5");
+     *  csp_rtable_load("0/0 I2C");
+     */
+    csp_rtable_set(8, 2, &csp_if_i2c, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C node TRX
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c, CSP_NODE_MAC); // All traffic to I2C using node as i2c address
+#endif
+
+    /* Start router task with SCH_TASK_CSP_STACK word stack, OS task priority 1 */
+    t_ok = csp_route_start_task(SCH_TASK_CSP_STACK, 1);
+    if(t_ok != 0) LOGE(tag, "Task router not created!");
 
     LOGD(tag, "Route table");
     csp_route_print_table();

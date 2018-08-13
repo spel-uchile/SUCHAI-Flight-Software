@@ -39,12 +39,15 @@
 #define SCH_FP_ENABLED          {{SCH_EN_FP}}      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          {{SCH_EN_HK}}      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        {{SCH_EN_TEST}}    ///< Set to run tests (0 | 1)
-#define SCH_MAX_WDT_TIMER       10                 ///< Seconds to send wdt_reset command
+#define SCH_WDT_PERIOD          10                 ///< CPU watchdog timer period in seconds
+#define SCH_MAX_WDT_TIMER       5                  ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
 #define SCH_UART_BAUDRATE       (576000)           ///< UART baud rate for serial console
 
 /* Communications system settings */
 #define SCH_COMM_ADDRESS        {{SCH_COMM_NODE}}  ///< Node address
+#define SCH_TRX_ADDRESS         5                  ///< TRX node address
+#define SCH_EPS_ADDRESS         2                  ///< EPS node address
 #define SCH_TRX_PORT_TM         (9)                ///< Telemetry port
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)

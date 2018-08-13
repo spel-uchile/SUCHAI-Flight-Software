@@ -27,7 +27,7 @@
 #define LINUX                                      ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
-    #define ESP32                                ///< ESP32 | AVR32 | NANOMIND
+    #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
 #endif
 
 /* System debug configurations */
@@ -39,12 +39,15 @@
 #define SCH_FP_ENABLED          1      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
-#define SCH_MAX_WDT_TIMER       10                 ///< Seconds to send wdt_reset command
+#define SCH_WDT_PERIOD          10   ///< CPU watchdog timer period in seconds
+#define SCH_MAX_WDT_TIMER       5                 ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
 #define SCH_UART_BAUDRATE       (576000)           ///< UART baud rate for serial console
 
 /* Communications system settings */
 #define SCH_COMM_ADDRESS        1      ///< Node address
+#define SCH_TRX_ADDRESS         5      ///< TRX node address
+#define SCH_EPS_ADDRESS         2      ///< EPS node address
 #define SCH_TRX_PORT_TM         (9)    ///< Telemetry port
 #define SCH_TRX_PORT_TC         (10)   ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)   ///< Digirepeater port (resend packets)
