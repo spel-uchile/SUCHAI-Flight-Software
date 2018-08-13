@@ -103,4 +103,13 @@ int com_send_cmd(char *fmt, char *param, int nparams);
  */
 int com_send_data(char *fmt, char *params, int nparams);
 
+/**
+ * Show CSP debug information, currently the route table and interfaces
+ * @param fmt Not used
+ * @param params Not used
+ * @param nparams Not used
+ * @return CMD_OK
+ */
+int com_debug(char *fmt, char *params, int nparams);
+
 #endif /* CMD_COM_H */

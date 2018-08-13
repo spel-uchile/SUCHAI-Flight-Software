@@ -27,6 +27,7 @@ void cmd_com_init(void)
     cmd_add("send_rpt", com_send_rpt, "%d %s", 2);
     cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
     cmd_add("send_data", com_send_data, "%p", 1);
+    cmd_add("com_debug", com_debug, "", 0);
 }
 
 int com_ping(char *fmt, char *params, int nparams)
@@ -161,4 +162,14 @@ int com_send_data(char *fmt, char *params, int nparams)
         LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
         return CMD_FAIL;
     }
+}
+
+int com_debug(char *fmt, char *params, int nparams)
+{
+    LOGD(tag, "Route table");
+    csp_route_print_table();
+    LOGD(tag, "Interfaces");
+    csp_route_print_interfaces();
+
+    return CMD_OK;
 }
