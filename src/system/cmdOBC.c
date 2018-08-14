@@ -32,6 +32,7 @@ void cmd_obc_init(void)
     cmd_add("show_time", obc_show_time,"%d",1);
     cmd_add("reset_wdt", obc_reset_wdt, "", 0);
     cmd_add("system", obc_system, "%s", 1);
+    cmd_add("set_pwm_duty", obc_set_pwm_duty, "%d %d", 2);
 }
 
 int obc_debug(char *fmt, char *params, int nparams)
@@ -185,6 +186,29 @@ int obc_system(char* fmt, char* params, int nparams)
     else
     {
         LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
+#else
+    LOGW(tag, "Command not suported!");
+    return CMD_FAIL;
+#endif
+}
+
+int obc_set_pwm_duty(char* fmt, char* params, int nparams)
+{
+#ifdef NANOMIND
+    int channel;
+    int duty;
+    if(sscanf(params, fmt, &channel, &duty) == nparams)
+    {
+        LOGI(tag, "Setting duty %d to Channel %d", duty, channel);
+        gs_pwm_set_duty(channel, duty);
+        return CMD_OK;
+
+    }
+    else
+    {
+        LOGW(tag, "set_pwm_duty used with invalid params: %s", params);
         return CMD_FAIL;
     }
 #else

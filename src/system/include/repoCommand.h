@@ -132,7 +132,7 @@ char * cmd_get_name(int idx);
  *
  * @param cmd cmd_t *. Command to fill parameters
  * @param params void *. Pointer to the data buffer
- * @param len int. Lenght of the data buffer.
+ * @param len int. Length of the data buffer.
  *
  * @code
  *      char *data = {0,1,2,3,4,5};

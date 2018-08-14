@@ -32,7 +32,7 @@ portTick osTaskGetTickCount(void)
     struct timespec time;
     clock_gettime(CLOCK_MONOTONIC_RAW, &time);
     //return time in microseconds
-    return (portTick)(time.tv_sec*1e+6 + time.tv_nsec*1e-3);
+    return (portTick)(time.tv_sec*1000000+time.tv_nsec/1000);
 }
 
 void osDelay(uint32_t mseconds)
@@ -51,6 +51,8 @@ void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds)
     // Return if more than desired milli seconds have passed
     if(d_usec > s_usec)
     {
+        // Tag last delay ticks
+        *lastTime = osTaskGetTickCount()-(d_usec-s_usec);
         return;
     }
 

@@ -87,11 +87,11 @@ def console(port="8001", ip="localhost", origin=10):
                 hdr_b = re.findall("........",hdr)[::-1]
                 # print("con:", hdr_b, ["{:02x}".format(int(i, 2)) for i in hdr_b])
                 hdr = bytearray([int(i,2) for i in hdr_b])
-                msg = bytearray(node) + hdr + bytearray(data, "ascii")
-                # print("con:", msg)
+                msg = bytearray([node,]) + hdr + bytearray(data, "ascii")
+                #print("con:", msg)
                 sock.send(msg)
         except Exception as e:
-            raise(e)
+            print(e)
 
         time.sleep(0.25)
 
@@ -99,7 +99,7 @@ def get_parameters():
     """ Parse command line parameters """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-n", "--node", default=b'', help="Node address")
+    parser.add_argument("-n", "--node", default=10, help="Node address")
     parser.add_argument("-d", "--ip", default="localhost", help="Hub IP address")
     parser.add_argument("-i", "--in_port", default="8001", help="Input port")
     parser.add_argument("-o", "--out_port", default="8002", help="Output port")

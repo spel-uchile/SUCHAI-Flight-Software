@@ -41,19 +41,20 @@
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
 #define SCH_MAX_WDT_TIMER       10                 ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
+#define SCH_UART_BAUDRATE       (576000)           ///< UART baud rate for serial console
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS        1  ///< Node address
-#define SCH_TRX_PORT_TM         (9)                ///< Telemetry port
-#define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
-#define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
-#define SCH_TRX_PORT_CMD        (12)               ///< Commads port (execute console commands)
+#define SCH_COMM_ADDRESS        1      ///< Node address
+#define SCH_TRX_PORT_TM         (9)    ///< Telemetry port
+#define SCH_TRX_PORT_TC         (10)   ///< Telecommands port
+#define SCH_TRX_PORT_RPT        (11)   ///< Digirepeater port (resend packets)
+#define SCH_TRX_PORT_CMD        (12)   ///< Commands port (execute console commands)
 #define SCH_COMM_ZMQ_OUT        "tcp://127.0.0.1:8001"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
-#define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
+#define SCH_STORAGE_MODE        1                ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_FILE        "/tmp/suchai.db" ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
 /**
  * Memory settings.
@@ -63,16 +64,16 @@
  * final stack size depends on the architecture stack wide
  * (@see https://www.freertos.org/a00125.html)
  */
-#define SCH_TASK_DEF_STACK        (1*256)   ///< Default task stack size in words
+#define SCH_TASK_DEF_STACK        (2*256)   ///< Default task stack size in words
 #define SCH_TASK_DIS_STACK        (5*256)   ///< Dispatcher task stack size in words
 #define SCH_TASK_EXE_STACK        (5*256)   ///< Executer task stack size in words
 #define SCH_TASK_WDT_STACK        (5*256)   ///< Watchdog task stack size in words
 #define SCH_TASK_INI_STACK        (5*256)   ///< Init task stack size in words
-#define SCH_TASK_COM_STACK        (4*256)   ///< Communications task stack size in words
-#define SCH_TASK_FPL_STACK        (4*256)   ///< Flight plan task stack size in words
-#define SCH_TASK_CON_STACK        (4*256)   ///< Console task stack size in words
-#define SCH_TASK_HKP_STACK        (4*256)   ///< Housekeeping task stack size in words
-#define SCH_TASK_CSP_STACK        (500)     ///< CSP route task stack size in words
+#define SCH_TASK_COM_STACK        (5*256)   ///< Communications task stack size in words
+#define SCH_TASK_FPL_STACK        (5*256)   ///< Flight plan task stack size in words
+#define SCH_TASK_CON_STACK        (5*256)   ///< Console task stack size in words
+#define SCH_TASK_HKP_STACK        (5*256)   ///< Housekeeping task stack size in words
+#define SCH_TASK_CSP_STACK        (5*256)     ///< CSP route task stack size in words
 
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
 #define SCH_BUFFERS_CSP           (5)       ///< Number of available CSP buffers

@@ -23,6 +23,7 @@
  */
 
 #include "main.h"
+#include "taskTest.h"
 
 const char *tag = "main";
 
@@ -34,7 +35,6 @@ int main(void)
 {
     /* On reset */
     on_reset();
-    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n\n");
 
     /* Init software subsystems */
     log_init();      // Logging system
@@ -42,7 +42,7 @@ int main(void)
     dat_repo_init(); // Update status repository
 
     /* Initializing shared Queues */
-    dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
+    dispatcher_queue = osQueueCreate(10,sizeof(cmd_t *));
     if(dispatcher_queue == 0)
         LOGE(tag, "Error creating dispatcher queue");
     executer_stat_queue = osQueueCreate(1,sizeof(int));
@@ -56,17 +56,11 @@ int main(void)
     os_thread threads_id[n_threads];
 
     LOGI(tag, "Creating basic tasks...");
-    /* Crating system task (the others are created inside taskInit) */
-    int t_inv_ok = osCreateTask(taskDispatcher,"invoker", SCH_TASK_DIS_STACK, NULL, 3, &threads_id[1]);
-    int t_exe_ok = osCreateTask(taskExecuter, "receiver", SCH_TASK_EXE_STACK, NULL, 4, &threads_id[2]);
-    int t_wdt_ok = osCreateTask(taskWatchdog, "watchdog", SCH_TASK_WDT_STACK, NULL, 2, &threads_id[0]);
-    int t_ini_ok = osCreateTask(taskInit, "init", SCH_TASK_INI_STACK, NULL, 3, &threads_id[3]);
+    /* Crating system task (the others are created inside taskDeployment) */
+    osCreateTask(taskDispatcher,"dispatcher", 2*configMINIMAL_STACK_SIZE,NULL,3, &threads_id[0]);
+    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
 
-    /* Check if the task were created */
-    if(t_inv_ok != 0) LOGE(tag, "Task invoker not created!");
-    if(t_exe_ok != 0) LOGE(tag, "Task receiver not created!");
-    if(t_wdt_ok != 0) LOGE(tag, "Task watchdog not created!");
-    if(t_ini_ok != 0) LOGE(tag, "Task init not created!");
+    osCreateTask(taskTest, "test1", 2*configMINIMAL_STACK_SIZE, "TEST 1", 2, &threads_id[2]);
 
 #ifndef ESP32
     /* Start the scheduler. Should never return */

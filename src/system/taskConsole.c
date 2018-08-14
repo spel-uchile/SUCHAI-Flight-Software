@@ -37,7 +37,7 @@ ______________________________________________________________________________\n
 
 void taskConsole(void *param)
 {
-    LOGD(tag, "Started");
+    LOGI(tag, "Started");
 
     portTick delay_ms = 250;
     cmd_t *new_cmd =  NULL;

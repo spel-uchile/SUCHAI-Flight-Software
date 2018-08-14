@@ -24,7 +24,7 @@ static const char *tag = "Housekeeping";
 
 void taskHousekeeping(void *param)
 {
-    LOGD(tag, "Started");
+    LOGI(tag, "Started");
 
     portTick delay_ms    = 1000;            //Task period in [ms]
 

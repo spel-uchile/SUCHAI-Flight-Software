@@ -36,6 +36,7 @@
 #include <pwr_switch.h>
 #include <spn_fl512s.h>
 #include <adc_channels.h>
+#include <gs_pwm.h>
 
 #include "utils.h"
 #if SCH_COMM_ENABLE
@@ -49,5 +50,6 @@ void init_spn_fl512(void);
 void init_rtc(void);
 void print_rst_cause(int reset_cause);
 void twi_init(void);
+void test_sdram(int size, int do_free);
 
 #endif //_INIT_H

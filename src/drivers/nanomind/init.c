@@ -122,6 +122,47 @@ void twi_init(void) {
     i2c_init_master(2, 5, 100);
 }
 
+/**
+ * Test SDRAM or SRAM. Reserves with malloc a buffer is size @size words (in the
+ * AVR21 words are 4 bytes), print the reserved memory pointer address and run a
+ * test over the memory. The this write and reads a pattern value in the RAM and
+ * checks the patterns matches.
+ *
+ * @param size Int. Size of the allocated buffer in words (aka. 4 bytes)
+ * @param do_free Int. If 1 the frees the buffer, else do not.
+ */
+void test_sdram(int size, int do_free) {
+    int *data = (int *)malloc(size*sizeof(int));
+    if(data == NULL){
+        printf("---- malloc failed! ----\n\n");
+    }
+    else{
+        printf("data @ %p\n", data, sizeof(int));
+    }
+
+
+    printf("Writing to SDRAM...\r\n");
+
+    for(int * p = data; p < (int *) data+size; p++) {
+        *p = (uintptr_t) p;
+    }
+
+    printf("Reading from SDRAM...\r\n");
+
+    for(int * p = data; p < (int *) data+size; p++) {
+        if ((uintptr_t) p != (uintptr_t) *p) {
+            printf("SDRAM ERROR!\r\n");
+            return;
+        }
+    }
+
+    printf("SDRAM OK\r\n");
+
+    if(do_free)
+        free(data);
+
+}
+
 void on_reset(void)
 {
     /* Reset watchdog */
@@ -148,8 +189,13 @@ void on_reset(void)
     /* Init SDRAM, do this before malloc is called */
     sdramc_init(sysclk_get_cpu_hz());
 
-    /* We have to trust that the SDRAM is working by now */
-#if 0
+    /**
+     * Set heap address to the external SDRAM, so malloc calls will use the
+     * 32MB external SDRAM. Otherwise only the 68kB internal SRAM are available
+     * @warning Do not touch this lines. See Gomspace framework docs and AVR32
+     * application notes on SDRAM and Linker Scripts usages for further details.
+     */
+#if 1
     extern void *heap_start, *heap_end;
 	heap_start = (void *) 0xD0000000 + 0x100000;
 	heap_end = (void *) 0xD0000000 + 0x2000000 - 1000;
@@ -165,7 +211,7 @@ void on_reset(void)
     };
     gpio_enable_module(USART_GPIO_MAP,
                        sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
-    usart_init(USART_CONSOLE, sysclk_get_peripheral_bus_hz(USART), 500000);
+    usart_init(USART_CONSOLE, sysclk_get_peripheral_bus_hz(USART), SCH_UART_BAUDRATE);
     usart_stdio_id = USART_CONSOLE;
 
     /* Setting SPI devices */
@@ -173,8 +219,33 @@ void on_reset(void)
     lm70_init();
     fm33256b_init();
 
+    /* Init RTC */
+    init_rtc();
+
+    /* Init pwm */
+    gs_pwm_init();
+    int channel = 0;
+    float duty = 0;
+    float freq = 500;
+    /* Enable pwm channel */
+    gs_pwm_enable(channel);
+    /* Set requested frequency and get the achieved frequncy returned */
+    float freq_achieved = gs_pwm_set_freq(channel, freq);
+    /* Set the duty cycle in percentage */
+    gs_pwm_set_duty(channel, duty);
+
     /* Init LED */
     led_init();
     led_on(LED_CPUOK);
     led_on(LED_A);
+
+    /**
+     * Test the external SDRAM. If working properly we are able to reserve this
+     * large amount of memory and will use and address higher than 0xD0000000.
+     * Otherwise, the internal SRAM is not big enough then malloc will raise an
+     * error and the device will be reset.
+     */
+#if 0
+    test_sdram(100000, 1);
+#endif
 }

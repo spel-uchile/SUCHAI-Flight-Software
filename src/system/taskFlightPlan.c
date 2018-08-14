@@ -25,7 +25,7 @@ static const char *tag = "FlightPlan";
 void taskFlightPlan(void *param)
 {
 
-    LOGD(tag, "Started");
+    LOGI(tag, "Started");
 
     portTick delay_ms = 1000;          //Task period in [ms]
     portTick xLastWakeTime = osTaskGetTickCount();
