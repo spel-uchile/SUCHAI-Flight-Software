@@ -29,6 +29,7 @@
     #include "led.h"
     #include "wdt.h"
     #include "dev/cpu.h"
+    #include <gs_pwm.h>
 #endif
 
 #ifdef ESP32
@@ -135,5 +136,17 @@ int obc_system(char* fmt, char* params, int nparams);
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int test_fp(char* fmt, char* params,int nparams);
+
+/**
+ * Change duty cycle of pwm in channel
+ * params, so use this command carefully. @see man system
+ * @warning only available in Nanomind
+ *
+ * @param fmt str. Parameters format: "%d %d"
+ * @param params  str. Parameters as string <int> <int>,
+ * @param nparams int. Number of parameters: 2
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_set_pwm_duty(char* fmt, char* params, int nparams);
 
 #endif /* CMD_OBC_H */

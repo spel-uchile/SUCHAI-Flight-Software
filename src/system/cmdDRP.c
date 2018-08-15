@@ -76,11 +76,36 @@ int drp_print_system_vars(char *fmt, char *params, int nparams)
     printf("system variables repository\n");
     printf("index\t value\n");
 
+    /*typedef union sensors_value{
+        float f;
+        int32_t i;
+    } value;*/
+
     int var_index;
-    for (var_index = 0; var_index < dat_system_last_var; var_index++)
+    value var_read;
+
+    for (var_index = 0; var_index < dat_obc_temp_1; var_index++)
     {
         int var = dat_get_system_var((dat_system_t)var_index);
         printf("%d\t %d\n", var_index, var);
+    }
+
+    for (var_index = dat_obc_temp_1; var_index < dat_dep_ant_deployed; var_index++)
+    {
+        var_read.i = dat_get_system_var((dat_system_t)var_index);
+        printf("%d\t %d | %f\n", var_index, var_read.i, var_read.f);
+    }
+
+    for (var_index = dat_dep_ant_deployed; var_index < dat_ads_acc_x; var_index++)
+    {
+        int var = dat_get_system_var((dat_system_t)var_index);
+        printf("%d\t %d\n", var_index, var);
+    }
+
+    for (var_index = dat_ads_acc_x; var_index < dat_system_last_var; var_index++)
+    {
+        var_read.i = dat_get_system_var((dat_system_t)var_index);
+        printf("%d\t %d | %f\n", var_index, var_read.i, var_read.f);
     }
 
     return CMD_OK;
@@ -164,7 +189,49 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
 
     /* Set sensors status variables */
     // TODO: Fix type of ADS variables. Currently saving floats as ints.
-    dat_set_system_var(dat_obc_temp_1, sensor1/10.);
+
+    /*typedef union sensors_value{
+        float f;
+        int32_t i;
+    } value;*/
+
+    value temp_1;
+    temp_1.f = (float)(sensor1/10.0);
+    dat_set_system_var(dat_obc_temp_1, temp_1.i);
+
+    value temp_2;
+    temp_2.f = (float)(sensor2/10.0);
+    dat_set_system_var(dat_obc_temp_2, temp_2.i);
+
+    value temp_3;
+    temp_3.f = gyro_temp;
+    dat_set_system_var(dat_obc_temp_3, temp_3.i);
+
+    value acc_x;
+    acc_x.f = gyro_reading.gyro_x;
+    dat_set_system_var(dat_ads_acc_x, acc_x.i);
+
+    value acc_y;
+    acc_y.f = gyro_reading.gyro_y;
+    dat_set_system_var(dat_ads_acc_y, acc_y.i);
+
+    value acc_z;
+    acc_z.f = gyro_reading.gyro_z;
+    dat_set_system_var(dat_ads_acc_z, acc_z.i);
+
+    value mag_x;
+    mag_x.f = hmc_reading.x;
+    dat_set_system_var(dat_ads_mag_x, mag_x.i);
+
+    value mag_y;
+    mag_y.f = hmc_reading.y;
+    dat_set_system_var(dat_ads_mag_y, mag_y.i);
+
+    value mag_z;
+    mag_z.f = hmc_reading.z;
+    dat_set_system_var(dat_ads_mag_z, mag_z.i);
+
+    /*dat_set_system_var(dat_obc_temp_1, sensor1/10.);
     dat_set_system_var(dat_obc_temp_2, sensor2/10.);
     dat_set_system_var(dat_obc_temp_3, gyro_temp);
     dat_set_system_var(dat_ads_acc_x, gyro_reading.gyro_x);
@@ -172,7 +239,7 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     dat_set_system_var(dat_ads_acc_z, gyro_reading.gyro_z);
     dat_set_system_var(dat_ads_mag_x, hmc_reading.x);
     dat_set_system_var(dat_ads_mag_y, hmc_reading.y);
-    dat_set_system_var(dat_ads_mag_z, hmc_reading.z);
+    dat_set_system_var(dat_ads_mag_z, hmc_reading.z);*/
 
     /* Print readings */
 #if LOG_LEVEL >= LOG_LVL_INFO
