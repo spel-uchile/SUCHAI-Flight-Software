@@ -75,7 +75,8 @@ if __name__ == "__main__":
                 result = os.system('sh install.sh')
             if args.clean:
                 result = os.system('sh build.sh clean')
-            result = os.system('sh build.sh')
+            else
+                result = os.system('sh build.sh')
 
     if result != 0:
         exit(1)
