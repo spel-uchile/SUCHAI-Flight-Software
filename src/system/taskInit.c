@@ -125,7 +125,7 @@ void init_communications(void)
      *  Platform dependent
      */
 #ifdef LINUX
-    csp_set_model("LINUX")
+    csp_set_model("LINUX");
     /* Set ZMQ interface */
     csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
