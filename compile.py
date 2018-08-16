@@ -36,6 +36,8 @@ if __name__ == "__main__":
                           'src/system/include/config_template.h',
                           'src/system/include/config.h')
 
+    result = 0
+
     # Build
     if args.os == "LINUX":
         # Install CSP drivers
@@ -48,12 +50,12 @@ if __name__ == "__main__":
         os.system('mkdir build_linux')
         os.chdir('build_linux')
         os.system('cmake ..')
-        os.system('make')
+        result = os.system('make')
 
     else: #args.os = FREERTOS
         if args.arch == "ESP32":
             #TODO: Install IDF drivers
-            os.system('make')
+            system = os.system('make')
 
         else: #args.arch = AVR32
             os.chdir('src/drivers/atmel')
@@ -61,5 +63,7 @@ if __name__ == "__main__":
             if args.drivers:
                 os.system('sh install.sh')
             os.chdir('xdk-asf-3.33.0/avr32/applications/suchai/xplained/gcc')
-            os.system('sh build.sh')
+            result = os.system('sh build.sh')
             os.chdir(cwd_root)
+
+    exit(result)
