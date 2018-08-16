@@ -55,7 +55,7 @@ if __name__ == "__main__":
     else: #args.os = FREERTOS
         if args.arch == "ESP32":
             #TODO: Install IDF drivers
-            system = os.system('make')
+            result = os.system('make')
 
         else: #args.arch = AVR32
             os.chdir('src/drivers/atmel')
@@ -65,5 +65,7 @@ if __name__ == "__main__":
             os.chdir('xdk-asf-3.33.0/avr32/applications/suchai/xplained/gcc')
             result = os.system('sh build.sh')
             os.chdir(cwd_root)
-    exit(1)
+
+    if result != 0:
+        exit(1)
 
