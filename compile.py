@@ -74,7 +74,7 @@ if __name__ == "__main__":
             if args.drivers:
                 result = os.system('sh install.sh')
             if args.clean:
-                result os.system('sh build.sh clean')
+                result = os.system('sh build.sh clean')
             result = os.system('sh build.sh')
 
     if result != 0:
