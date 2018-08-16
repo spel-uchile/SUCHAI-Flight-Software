@@ -16,13 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "include/cmdTest.h"
+#include "cmdTest.h"
 
 static const char* tag = "cmdTest";
 
 void cmd_test_init(void)
 {
     cmd_add("test_mult_exe", test_mult_exe, "%d ", 1);
+
+}
+
+int test_fp_params(char* fmt, char* params,int nparams)
+{
+    int num1, num2;
+    char str[CMD_MAX_STR_PARAMS];
+    if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
+    {
+        printf("The parameters are: %d ; %s ; %d \n",num1, str ,num2);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGW(tag, "test_fp used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
 }
 
 int test_mult_exe(char* fmt, char* params, int nparams)

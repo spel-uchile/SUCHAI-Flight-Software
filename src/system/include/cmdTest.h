@@ -8,7 +8,6 @@
 #include "config.h"
 #include "repoCommand.h"
 #include "osDelay.h"
-#include "taskTest.h"
 
 /**
  * This function registers the list of command in the system, initializing the

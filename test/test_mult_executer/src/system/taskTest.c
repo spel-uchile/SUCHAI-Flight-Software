@@ -22,15 +22,18 @@ static const char *tag = "Test";
 
 void taskTest(void *param)
 {
-    char* cmd = "test_multi_exe";
+    //Start time
+    portTick start_time = osTaskGetTickCount();
+    LOGI(tag,"Tiempo de inicio: %d",start_time)
+    char* cmd = "test_mult_exe";
     cmd_t *test1 = cmd_get_str(cmd);
     cmd_add_params_str(test1, "10");
     cmd_t *test2 = cmd_get_str(cmd);
-    cmd_add_params_str(test1, "5");
+    cmd_add_params_str(test2, "5");
     cmd_t *test3 = cmd_get_str(cmd);
-    cmd_add_params_str(test1, "20");
+    cmd_add_params_str(test3, "20");
     cmd_t *test4 = cmd_get_str(cmd);
-    cmd_add_params_str(test1, "30");
+    cmd_add_params_str(test4, "30");
     cmd_send(test1);
     cmd_send(test2);
     cmd_send(test3);

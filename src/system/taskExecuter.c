@@ -20,11 +20,15 @@
 
 #include "taskExecuter.h"
 
-static const char *tag = "Executer";
+
 
 void taskExecuter(void *param)
 {
-    LOGI(tag, "Started");
+
+    static const char *tag = "Executer";
+
+    LOGI((char*)param, "Started");
+
 
     cmd_t *run_cmd = NULL;
 
@@ -39,7 +43,7 @@ void taskExecuter(void *param)
         {
 #if LOG_LEVEL >= LOG_LVL_INFO
             char *cmd_name = cmd_get_name(run_cmd->id);
-            LOGI(tag, "Running the command: %s...", cmd_name);
+            LOGI((char*)param, "Running the command: %s...", cmd_name);
             free(cmd_name);
 #endif
             /* Commands may take a long time, so reset the WDT */
@@ -60,7 +64,7 @@ void taskExecuter(void *param)
 
             /* Commands may take a long time, so reset the WDT */
             //ClrWdt();
-            LOGI(tag, "Command result: %d ; Execution time: %d", cmd_stat, delta);
+            LOGI((char*)param, "Command result: %d ; Execution time: %d ; End time: %d ", cmd_stat, delta, finish_time);
 
             /* Send the result to Dispatcher - BLOCKING */
             osQueueSend(executer_stat_queue, &cmd_stat, portMAX_DELAY);

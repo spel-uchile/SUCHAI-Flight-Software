@@ -16,6 +16,7 @@
 #include "utils.h"
 #include "globals.h"
 
+
 /* Add files with commands */
 #include "cmdOBC.h"
 #include "cmdDRP.h"
@@ -29,6 +30,8 @@
     #include "cmdTM.h"
 #endif
 #if SCH_TEST_ENABLED
+
+#include "cmdTest.h"
 #endif
 
 

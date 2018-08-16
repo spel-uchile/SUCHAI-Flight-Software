@@ -22,7 +22,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "main.h"
+#include "include/main.h"
 
 const char *tag = "main";
 
@@ -57,11 +57,13 @@ int main(void)
     LOGI(tag, "Creating basic tasks...");
     /* Crating system task (the others are created inside taskInit) */
     // FIXME: This memory values seems not work on nanomind (tested 5,5,10,5)
-    osCreateTask(taskWatchdog, "watchdog", 5*256, NULL, 2, &threads_id[0]);
+    //osCreateTask(taskWatchdog, "watchdog", 5*256, NULL, 2, &threads_id[0]);
+    osCreateTask(taskTest, "test", 5*256, NULL, 4, &threads_id[0]);
+
     osCreateTask(taskDispatcher,"dispatcher", 5*256, NULL, 3, &threads_id[1]);
-    osCreateTask(taskExecuter, "executer_A", 5*256, NULL, 4, &threads_id[2]);
+    osCreateTask(taskExecuter, "executer_A", 5*256,"Executer A", 4, &threads_id[2]);
 #if SCH_N_EXECUTER > 1
-    osCreateTask(taskExecuter, "executer_B", 5*256, NULL, 4, &threads_id[3]);
+    osCreateTask(taskExecuter, "executer_B", 5*256, "Executer B", 4, &threads_id[3]);
 #endif
     osCreateTask(taskInit, "init", 5*256, NULL, 4, &threads_id[4]);
 

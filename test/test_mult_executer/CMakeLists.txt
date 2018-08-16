@@ -21,9 +21,10 @@ set(SOURCE_FILES
         ../../src/system/taskDispatcher.c
         ../../src/system/taskExecuter.c
         ../../src/system/taskInit.c
-        src/system/taskTest.c
-        src/system/cmdTest.c
+        ../../src/system/taskConsole.c
+        ../../src/system/cmdTest.c
         src/system/main.c
+        src/system/taskTest.c
         )
 
 include_directories(
