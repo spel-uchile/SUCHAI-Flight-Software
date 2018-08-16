@@ -65,5 +65,5 @@ if __name__ == "__main__":
             os.chdir('xdk-asf-3.33.0/avr32/applications/suchai/xplained/gcc')
             result = os.system('sh build.sh')
             os.chdir(cwd_root)
+    exit(1)
 
-    exit(result)
