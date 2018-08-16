@@ -55,7 +55,7 @@ if __name__ == "__main__":
             #TODO: Install IDF drivers
             os.system('make')
 
-        else: #args.arch = AVR32
+        if args.arch == "AVR32":
             os.chdir('src/drivers/atmel')
             # Install ASF
             if args.drivers:
@@ -63,3 +63,10 @@ if __name__ == "__main__":
             os.chdir('xdk-asf-3.33.0/avr32/applications/suchai/xplained/gcc')
             os.system('sh build.sh')
             os.chdir(cwd_root)
+
+        if args.arch == "NANOMIND":
+            os.chdir('src/drivers/nanomind')
+            # Install Nanomind SDK and LibCSP
+            if args.drivers:
+                result = os.system('sh install.sh')
+            result = os.system('sh build.sh')
