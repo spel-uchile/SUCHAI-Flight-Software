@@ -80,7 +80,6 @@
 
 /* Task includes */
 #if SCH_TEST_ENABLED
-    #include "taskTest.h"
 #endif
 
 #include "taskDispatcher.h"

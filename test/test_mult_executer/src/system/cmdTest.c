@@ -16,22 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "taskTest.h"
+#include "include/cmdTest.h"
 
-static const char *tag = "Test";
+static const char* tag = "cmdTest";
 
-void taskTest(void *param)
+void cmd_test_init(void)
 {
-    char* cmd1 = "test_print_int";
-    char* cmd2 = "test_print_char";
-    char* cmd3 = "test_print_char2";
-    cmd_t *test_int = cmd_get_str(cmd1);
-    cmd_add_params_str(test_int, "");
-    cmd_t *test_char = cmd_get_str(cmd2);
-    cmd_add_params_str(test_char, "");
-    cmd_t *test_char2 = cmd_get_str(cmd3);
-    cmd_add_params_str(test_char2, "");
-    cmd_send(test_int);
-    cmd_send(test_char);
-    cmd_send(test_char2);
+    cmd_add("test_mult_exe", test_mult_exe, "%d ", 1);
 }
+
+int test_mult_exe(char* fmt, char* params, int nparams)
+{
+    int sec_sleep;
+
+    if(sscanf(params, fmt, &sec_sleep) == nparams)
+    {
+        int rc = test_sleep(sec_sleep);
+
+        if(rc==0)
+            return CMD_OK;
+        else
+            return CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "test_mult_exe used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
+}
+

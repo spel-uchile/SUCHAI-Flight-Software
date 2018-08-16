@@ -29,9 +29,7 @@ set(SOURCE_FILES
         src/system/cmdFP.c
         src/system/taskInit.c
         src/system/taskWatchdog.c
-        src/system/main.c
-        src/system/cmdTest.c
-        src/system/taskTest.c)
+        src/system/main.c)
 
 include_directories(
         src/system/include/

@@ -20,7 +20,6 @@
 #include "cmdOBC.h"
 #include "cmdDRP.h"
 #include "cmdConsole.h"
-#include "cmdTest.h"
 
 #if SCH_FP_ENABLED
     #include "cmdFP.h"
@@ -30,7 +29,6 @@
     #include "cmdTM.h"
 #endif
 #if SCH_TEST_ENABLED
-    #include "cmdTest.h"
 #endif
 
 

@@ -30,7 +30,6 @@
 #include "taskFlightPlan.h"
 #endif
 
-#include "taskTest.h"
 
 void taskInit(void *param);
 void init_communications(void);
