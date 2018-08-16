@@ -83,9 +83,6 @@ void taskInit(void *param)
 #if SCH_FP_ENABLED
     osCreateTask(taskFlightPlan,"flightplan", task_memory,NULL, 2, &(thread_id[3]));
 #endif
-#if SCH_TEST_ENABLED
-    osCreateTask(taskTest,"test", task_memory,NULL, 2, &(thread_id[4]));
-#endif
     osTaskDelete(NULL);
 }
 
