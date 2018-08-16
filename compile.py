@@ -23,6 +23,8 @@ def get_parameters():
     parser.add_argument('--sch_st_mode', type=str, default="1")
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
+    # Force clean
+    parser.add_argument('--clean', action="store_true", help="Clean befero build")
 
     return parser.parse_args()
 
@@ -71,6 +73,8 @@ if __name__ == "__main__":
             # Install Nanomind SDK and LibCSP
             if args.drivers:
                 result = os.system('sh install.sh')
+            if args.clean:
+                result os.system('sh build.sh clean')
             result = os.system('sh build.sh')
 
     if result != 0:
