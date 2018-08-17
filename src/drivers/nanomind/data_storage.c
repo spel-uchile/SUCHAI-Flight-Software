@@ -13,7 +13,11 @@ static int dummy_callback(void *data, int argc, char **argv, char **names);
 
 int storage_init(const char *file)
 {
+    /* Init RTC storage */
     fm33256b_init();
+
+    /* Init FLASH NOR storage */
+    spn_fl512s_init((unsigned int) 0);
 
     return 0;
 }
@@ -25,7 +29,6 @@ int storage_table_repo_init(char* table, int drop)
 
 int storage_table_flight_plan_init(int drop)
 {
-
     return 0;
 }
 
@@ -92,6 +95,29 @@ int storage_show_table (void)
 int storage_close(void)
 {
     return 0;
+}
+
+int storage_set_payload_data(int index, int value, int payload)
+{
+    data32_t data;
+    data.data32 = (uint32_t)value;
+    uint16_t len = (uint16_t)(sizeof(data));
+    uint16_t add = (uint16_t)(index*len);
+
+    LOGV(tag, "Writing 0x%X", (unsigned int)data.data32);
+    spn_fl512s_write_data(add, data.data8_p, len);
+    return 0;
+}
+
+int storage_get_payload_data(int index, int payload)
+{
+    data32_t data;
+    uint16_t len = (uint16_t)(sizeof(uint32_t));
+    uint16_t add = (uint16_t)(index*len);
+    spn_fl512s_read_data(add, data.data8_p, len);
+
+    LOGV(tag, "Read 0x%X", (unsigned int)data.data32);
+    return (int)(data.data32);
 }
 
 static int dummy_callback(void *data, int argc, char **argv, char **names)
