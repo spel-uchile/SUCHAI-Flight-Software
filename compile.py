@@ -81,3 +81,5 @@ if __name__ == "__main__":
     if result != 0:
         exit(1)
 
+    print (result)
+
