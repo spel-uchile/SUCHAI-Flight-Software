@@ -18,7 +18,7 @@ can extend the functionalities adding new commands to the system (with low
 impact in the whole software) or adding new clients that can request any of the available
 commands depending on their custom control strategy. Commands and control modules 
 can be added or removed with zero impact in the software main functionalities.
-Onece a command is implmented, it can be used in the software itself and also
+Once a command is implemented, it can be used in the software itself and also
 as a ground station telecommand.
 
 Visit http://spel.ing.uchile.cl to get latest news about SUCHAI project
@@ -119,7 +119,7 @@ Refs:
 - http://learning-0mq-with-pyzmq.readthedocs.io/en/latest/pyzmq/devices/forwarder.html
 
 ### Build for other architectures
-Currently the fight software supports the following architecutes (some platforms
+Currently the fight software supports the following architectures (some platforms
 may have limited or under development support):
 
 - Nanomind A3200: ```python3 compile.py FREERTOS --arch NANOMIND```
@@ -127,7 +127,7 @@ may have limited or under development support):
 - Raspberry Pi: ```python3 compile.py LINUX```
 - Esspressif ESP32: ```python3 compile.py FREERTOS --arch ESP32 --sch_com 0```
 
-Plese refer to the documentation for more details
+Please refer to the documentation for more details
 
 ## Contact
 
