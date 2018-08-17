@@ -72,7 +72,7 @@ if __name__ == "__main__":
             os.chdir('src/drivers/nanomind')
             # Install Nanomind SDK and LibCSP
             if args.drivers:
-                result1 = os.system('sh install.sh')
+                result = os.system('sh install.sh')
             if args.clean:
                 result = os.system('sh build.sh clean')
             else:
@@ -80,6 +80,4 @@ if __name__ == "__main__":
 
     if result != 0:
         exit(1)
-
-    print (result1)
 
