@@ -36,6 +36,11 @@ More: http://tesis.uchile.cl/handle/2250/115307
 
 - Build and test status: https://jenkins.spel.cl/
 - Build visual status: https://data.spel.cl/
+- Last software architecture image generated:
+
+<p align="center">
+<img src="https://data.spel.cl/viz_svg/last.svg" alt="Last architecture extracted" height="500px"/>
+</p>
 
 ## Build notes
 
