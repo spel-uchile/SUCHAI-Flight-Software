@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Downloading toolchain..."
-wget -N api.spel.cl/atmel.tar.gz
+wget -N data.spel.cl/atmel.tar.gz
 tar -k -xzf atmel.tar.gz
 
 echo "Linking AVR32 headers..."
@@ -16,7 +16,7 @@ sed -i "s/#define configTICK_TC_IRQ             ATPASTE2(AVR32_TC_IRQ, configTIC
 
 
 echo "Downloading Gomspace SDK..."
-wget -N api.spel.cl/gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
+wget -N data.spel.cl/gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
 tar -xjf gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
 
 
