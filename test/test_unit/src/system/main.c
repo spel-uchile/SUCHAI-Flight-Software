@@ -72,7 +72,7 @@ int init_suite3(void)
 {
     dat_repo_init();
     cmd_repo_init();
-    drp_execute_before_flight(NULL, "1010", 0);
+    drp_execute_before_flight("%d", "1010", 1);
     return 0;
 }
 
@@ -157,7 +157,7 @@ void testFPDELETE(void)
     int nparams = 6;
     int result;
     result = fp_delete(fmt, params, nparams);
-    CU_ASSERT(CMD_OK == result);
+    CU_ASSERT_EQUAL(CMD_OK, result);
 }
 
 //Test of drp_test_system_vars
