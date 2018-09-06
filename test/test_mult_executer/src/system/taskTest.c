@@ -45,7 +45,7 @@ void taskTest(void *param)
     cmd_send(test4);
     cmd_t *test5 = cmd_get_str(cmd);
     current_time = osTaskGetTickCount();
-    cmd_add_params_var(test4, 15, current_time);
+    cmd_add_params_var(test5, 15, current_time);
     cmd_send(test5);
 }
 

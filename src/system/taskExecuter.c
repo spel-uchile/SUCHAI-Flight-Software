@@ -61,7 +61,7 @@ void taskExecuter(void *param)
             run_cmd = NULL;
             /* Commands may take a long time, so reset the WDT */
             //ClrWdt();
-            LOGI((char*)param, "Command result: %d ; End time: %d ", cmd_stat, finish_time);
+            LOGI((char*)param, "Command result: %d ; End time: %u ", cmd_stat, finish_time);
 
             /* Send the result to Dispatcher - BLOCKING */
             osQueueSend(executer_stat_queue, &cmd_stat, portMAX_DELAY);

@@ -13,9 +13,10 @@ a type of interruption to a pulling communication.
 
 ##Test
 
-Here you can see two graphics, in each one the command stack start with
+Here you can see two graphics where the command stack start with
 five commands to be executed.
 
-The first one is with just one taskEcecuter and the second is with 2 
-taskExecuters.
+![Graphic](img/test_mult_executer.png)
+
+
 
