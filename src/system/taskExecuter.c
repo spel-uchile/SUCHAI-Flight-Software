@@ -49,22 +49,19 @@ void taskExecuter(void *param)
             /* Commands may take a long time, so reset the WDT */
             //ClrWdt();
 
-            //Start time
-            portTick start_time = osTaskGetTickCount();
-
             /* Execute the command */
             // TODO: Check that we are dereferencing a valid function pointer
             cmd_stat = run_cmd->function(run_cmd->fmt, run_cmd->params, run_cmd->nparams);
-
             //Finish time
             portTick finish_time = osTaskGetTickCount();
-            portTick delta = finish_time - start_time;
+            //int dummy;
+            //portTick init_time;
+            //sscanf(run_cmd->params, run_cmd->fmt, &dummy, &
             cmd_free(run_cmd);
             run_cmd = NULL;
-
             /* Commands may take a long time, so reset the WDT */
             //ClrWdt();
-            LOGI((char*)param, "Command result: %d ; Execution time: %d ; End time: %d ", cmd_stat, delta, finish_time);
+            LOGI((char*)param, "Command result: %d ; End time: %d ", cmd_stat, finish_time);
 
             /* Send the result to Dispatcher - BLOCKING */
             osQueueSend(executer_stat_queue, &cmd_stat, portMAX_DELAY);

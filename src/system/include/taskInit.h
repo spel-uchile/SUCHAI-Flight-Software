@@ -30,8 +30,15 @@
 #include "taskFlightPlan.h"
 #endif
 
-
+/**
+ * This function starts other threads
+ */
 void taskInit(void *param);
+
+/**
+ * This function initialize the csp communication if SCH_COMM_ENABLE is on
+ *
+*/
 void init_communications(void);
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_TASKINIT_H

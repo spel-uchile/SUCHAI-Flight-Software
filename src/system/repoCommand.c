@@ -286,7 +286,7 @@ int cmd_repo_init(void)
     cmd_fp_init();
 #endif
 #if SCH_TEST_ENABLED
-    cmd_test_init();
+    //cmd_test_init();
 #endif
 
 

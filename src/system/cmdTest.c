@@ -22,7 +22,8 @@ static const char* tag = "cmdTest";
 
 void cmd_test_init(void)
 {
-    cmd_add("test_mult_exe", test_mult_exe, "%d ", 1);
+    cmd_add("test_mult_exe", test_mult_exe, "%d %ul", 2);
+    cmd_add("test_fp_params", test_fp_params, "%d %s %d", 3);
 
 }
 
@@ -44,11 +45,11 @@ int test_fp_params(char* fmt, char* params,int nparams)
 
 int test_mult_exe(char* fmt, char* params, int nparams)
 {
-    int sec_sleep;
+    int sec_sleep, actual_time;
 
-    if(sscanf(params, fmt, &sec_sleep) == nparams)
+    if(sscanf(params, fmt, &sec_sleep, &actual_time) == nparams)
     {
-        int rc = test_sleep(sec_sleep);
+        int rc = test_sleep(sec_sleep, actual_time);
 
         if(rc==0)
             return CMD_OK;

@@ -22,25 +22,34 @@ static const char *tag = "Test";
 
 void taskTest(void *param)
 {
-    //Start time
-    portTick start_time = osTaskGetTickCount();
-    LOGI(tag,"Tiempo de inicio: %d",start_time)
+    portTick s_delay = 3000;
+    portTick xLastWakeTime = osTaskGetTickCount();
+    osTaskDelayUntil(&xLastWakeTime, s_delay);
     char* cmd = "test_mult_exe";
     cmd_t *test1 = cmd_get_str(cmd);
-    cmd_add_params_str(test1, "10");
-    cmd_t *test2 = cmd_get_str(cmd);
-    cmd_add_params_str(test2, "5");
-    cmd_t *test3 = cmd_get_str(cmd);
-    cmd_add_params_str(test3, "20");
-    cmd_t *test4 = cmd_get_str(cmd);
-    cmd_add_params_str(test4, "30");
+    portTick current_time = osTaskGetTickCount();
+    cmd_add_params_var(test1, 10, current_time);
+    printf("Intial Time: %ul\n" , current_time );
     cmd_send(test1);
+    cmd_t *test2 = cmd_get_str(cmd);
+    current_time = osTaskGetTickCount();
+    cmd_add_params_var(test2, 5, current_time);
     cmd_send(test2);
+    cmd_t *test3 = cmd_get_str(cmd);
+    current_time = osTaskGetTickCount();
+    cmd_add_params_var(test3, 20, current_time);
     cmd_send(test3);
+    cmd_t *test4 = cmd_get_str(cmd);
+    current_time = osTaskGetTickCount();
+    cmd_add_params_var(test4, 30, current_time);
     cmd_send(test4);
+    cmd_t *test4 = cmd_get_str(cmd);
+    current_time = osTaskGetTickCount();
+    cmd_add_params_var(test4, 15, current_time);
+    cmd_send(test5);
 }
 
-int test_sleep(int s_sleep){
+int test_sleep(int s_sleep, int actual_time){
 
     portTick s_delay = (portTick)s_sleep*1000;
     portTick xLastWakeTime = osTaskGetTickCount();
