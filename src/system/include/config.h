@@ -35,9 +35,9 @@
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE         1   ///< TaskCommunications enabled (0 | 1)
-#define SCH_FP_ENABLED          1      ///< TaskFlightPlan enabled (0 | 1)
-#define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
+#define SCH_COMM_ENABLE         0   ///< TaskCommunications enabled (0 | 1)
+#define SCH_FP_ENABLED          0      ///< TaskFlightPlan enabled (0 | 1)
+#define SCH_HK_ENABLED          0      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        1    ///< Set to run tests (0 | 1)
 #define SCH_MAX_WDT_TIMER       100000                 ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
