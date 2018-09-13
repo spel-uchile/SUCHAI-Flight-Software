@@ -58,34 +58,6 @@ CSRCS = \
        $(PROJ_ROOT)/os/FreeRTOS/osScheduler.c             \
        $(PROJ_ROOT)/os/FreeRTOS/osSemphr.c                \
        $(PROJ_ROOT)/os/FreeRTOS/osThread.c                \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_io.c            \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_services.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_service_handler.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_bridge.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_buffer.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_conn.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_crc32.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_debug.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_dedup.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_endian.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_iflist.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_port.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_promisc.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_qfifo.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_route.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/csp_sfp.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/transport/csp_rdp.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/transport/csp_udp.c          \
-       $(PROJ_ROOT)/libcsp/libcsp/src/rtable/csp_rtable_static.c        \
-       $(PROJ_ROOT)/libcsp/libcsp/src/interfaces/csp_if_i2c.c           \
-       $(PROJ_ROOT)/libcsp/libcsp/src/interfaces/csp_if_lo.c           \
-       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_malloc.c        \
-       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_queue.c         \
-       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_semaphore.c     \
-       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_system.c        \
-       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_thread.c        \
-       $(PROJ_ROOT)/libcsp/libcsp/src/arch/freertos/csp_time.c          \
-       $(PROJ_ROOT)/gomspace/drivers/avr32/i2c.c          \
        avr32/boards/uc3_a3_xplained/init.c                \
        avr32/boards/uc3_a3_xplained/led.c                 \
        avr32/drivers/flashc/flashc.c                      \

@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include "utils.h"
 #include "fm33256b.h"
+#include "spn_fl512s.h"
 #include "config.h"
 
 /**
@@ -176,6 +177,31 @@ int storage_flight_plan_reset(void);
 int storage_show_table(void);
 
 /**
+ * Set or update a value in index address for specific payload
+ * in NOR FLASH
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param index Int. index address in NOR FLASH
+ * @param value Int. value to store in address
+ * @param payload Int. payload to store
+ * @return 0 OK, -1 Error
+ */
+int storage_set_payload_data(int index, int value, int payload);
+
+/**
+ * Get a value from index address for specific payload
+ * in NOR FLASH
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param index Int. index address in NOR FLASH
+ * @param payload Int. payload to get value
+ * @return value from address
+ */
+int storage_get_payload_data(int index, int payload);
+
+/**
  * Close the opened database
  *
  * @note: NOT IMPLEMENTEDs
@@ -184,5 +210,9 @@ int storage_show_table(void);
  * @return 0 OK, -1 Error
  */
 int storage_close(void);
+
+
+
+
 
 #endif //SCH_PERSISTENT_H

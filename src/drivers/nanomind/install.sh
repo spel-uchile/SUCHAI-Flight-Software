@@ -1,6 +1,6 @@
 #!/bin/sh
 # echo "Downloading toolchain..."
-# wget -N api.spel.cl/gs-avr32-toolchain-3.4.2.tar.gz
+# wget -N data.spel.cl/gs-avr32-toolchain-3.4.2.tar.gz
 # tar -xzf gs-avr32-toolchain-3.4.2.tar.gz
 # cd gs-avr32-toolchain-3.4.2
 # echo "Installing toolchain..."
@@ -20,7 +20,7 @@
 # cd -
 
 echo "Downloading Gomspace SDK..."
-wget -N api.spel.cl/gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
+wget -N data.spel.cl/gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
 tar -xjf gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
 
 echo "Linking source code into SDK..."

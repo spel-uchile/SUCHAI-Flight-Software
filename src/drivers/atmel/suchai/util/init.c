@@ -198,6 +198,7 @@ __attribute__((__interrupt__)) void rtc_irq(void)
     //print_sec = 1;
 }
 
+#if SCH_COMM_ENABLE
 void twi_init(void) {
     sysclk_init();
     /* GPIO map setup */
@@ -211,6 +212,7 @@ void twi_init(void) {
     /* Init twi master controller 2 with addr 5 and 100 kHz clock */
     i2c_init_master(0, 5, 100);
 }
+#endif
 
 void on_close(int signal)
 {

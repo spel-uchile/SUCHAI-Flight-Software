@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include "CUnit/Basic.h"
 #include "cmdFP.h"
 #include "cmdOBC.h"
@@ -82,26 +81,6 @@ int init_suite3(void)
  * Returns zero on success, non-zero otherwise.
  */
 int clean_suite3(void)
-{
-    return 0;
-}
-
-/* The suite initialization function.
- * Initializes
- */
-int init_suite4(void)
-{
-    dat_repo_init();
-    cmd_repo_init();
-    drp_execute_before_flight("%d", "1010", 1);
-    srand(time(NULL));
-    return 0;
-}
-
-/* The suite cleanup function.
- * Returns zero on success, non-zero otherwise.
- */
-int clean_suite4(void)
 {
     return 0;
 }
@@ -179,7 +158,7 @@ void testFPDELETE(void)
     int nparams = 6;
     int result;
     result = fp_delete(fmt, params, nparams);
-    CU_ASSERT(CMD_OK == result);
+    CU_ASSERT_EQUAL(CMD_OK, result);
 }
 
 //Test of drp_test_system_vars

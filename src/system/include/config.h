@@ -27,7 +27,7 @@
 #define LINUX                                      ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
-    #define ESP32                                ///< ESP32 | AVR32 | NANOMIND
+    #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
 #endif
 
 /* System debug configurations */
@@ -35,8 +35,8 @@
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
-#define SCH_FP_ENABLED          1      ///< TaskFlightPlan enabled (0 | 1)
+#define SCH_COMM_ENABLE         0    ///< TaskCommunications enabled (0 | 1)
+#define SCH_FP_ENABLED          0      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
 #define SCH_WDT_PERIOD          10                 ///< CPU watchdog timer period in seconds
@@ -51,7 +51,7 @@
 #define SCH_TRX_PORT_TM         (9)                ///< Telemetry port
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
-#define SCH_TRX_PORT_CMD        (12)               ///< Commads port (execute console commands)
+#define SCH_TRX_PORT_CMD        (12)               ///< Commands port (execute console commands)
 #define SCH_COMM_ZMQ_OUT        "tcp://127.0.0.1:8001"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
 

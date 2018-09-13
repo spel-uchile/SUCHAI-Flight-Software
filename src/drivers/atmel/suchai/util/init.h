@@ -19,7 +19,6 @@
 #include "rtc.h"
 #include "usart.h"
 #include "pm.h"
-#include "dev/i2c.h"
 
 
 
