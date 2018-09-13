@@ -31,7 +31,11 @@ time_t sec = 0;
 
 
 #if SCH_STORAGE_MODE == 0
-    int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
+    #if SCH_STORAGE_TRIPLE_WR == 1
+        int DAT_SYSTEM_VAR_BUFF[dat_system_last_var*3];
+    #else
+        int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
+    #endif
     fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
@@ -100,7 +104,7 @@ void dat_repo_close(void)
 #endif
 }
 
-void dat_set_system_var(dat_system_t index, int value)
+void _dat_set_system_var(dat_system_t index, int value)
 {
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
@@ -117,7 +121,7 @@ void dat_set_system_var(dat_system_t index, int value)
     osSemaphoreGiven(&repo_data_sem);
 }
 
-int dat_get_system_var(dat_system_t index)
+int _dat_get_system_var(dat_system_t index)
 {
     int value = 0;
 
@@ -135,7 +139,83 @@ int dat_get_system_var(dat_system_t index)
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
-    return value;
+        return value;
+}
+
+void dat_set_system_var(dat_system_t index, int value)
+{
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    //Uses internal memory
+    #if SCH_STORAGE_MODE == 0
+        DAT_SYSTEM_VAR_BUFF[index] = value;
+        //Uses tripled writing
+        #if SCH_STORAGE_TRIPLE_WR == 1
+            DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var] = value;
+            DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var * 2] = value;
+        #endif
+    //Uses external memory
+    #else
+        storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
+        //Uses tripled writing
+        #if SCH_STORAGE_TRIPLE_WR == 1
+            storage_repo_set_value_idx(index + dat_system_last_var, value, DAT_REPO_SYSTEM);
+            storage_repo_set_value_idx(index + dat_system_last_var * 2, value, DAT_REPO_SYSTEM);
+        #endif
+    #endif
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+}
+
+int dat_get_system_var(dat_system_t index)
+{
+    int value_1 = 0;
+    int value_2 = 0;
+    int value_3 = 0;
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    //Use internal (volatile) memory
+    #if SCH_STORAGE_MODE == 0
+        value_1 = DAT_SYSTEM_VAR_BUFF[index];
+        //Uses tripled writing
+        #if SCH_STORAGE_TRIPLE_WR == 1
+            value_2 = DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var];
+            value_3 = DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var * 2];
+        #endif
+    //Uses external (non-volatile) memory
+    #else
+        value_1 = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
+        //Uses tripled writing
+        #if SCH_STORAGE_TRIPLE_WR == 1
+            value_2 = storage_repo_get_value_idx(index + dat_system_last_var, DAT_REPO_SYSTEM);
+            value_3 = storage_repo_get_value_idx(index + dat_system_last_var * 2, DAT_REPO_SYSTEM);
+        #endif
+    #endif
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+    #if SCH_STORAGE_TRIPLE_WR == 1
+        //Compare value and its copies
+        if (value_1 == value_2 || value_1 == value_3)
+        {
+            return value_1;
+        }
+        else if (value_2 == value_3)
+        {
+            return value_2;
+        }
+        else
+        {
+            LOGE(tag, "Unable to get a correct value for index %d", index);
+            return value_1;
+        }
+    #else
+        return value_1;
+    #endif
 }
 
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
