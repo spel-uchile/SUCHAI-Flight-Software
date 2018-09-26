@@ -60,6 +60,7 @@
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        {{SCH_STORAGE}}    ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_TRIPLE_WR   {{SCH_STORAGE_TRIPLE_WR}}   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
 /**

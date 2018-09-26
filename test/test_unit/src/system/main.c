@@ -72,7 +72,8 @@ int init_suite3(void)
 {
     dat_repo_init();
     cmd_repo_init();
-    drp_execute_before_flight(NULL, "1010", 0);
+    drp_execute_before_flight("%d", "1010", 1);
+    srand(time(NULL));
     return 0;
 }
 
@@ -157,7 +158,7 @@ void testFPDELETE(void)
     int nparams = 6;
     int result;
     result = fp_delete(fmt, params, nparams);
-    CU_ASSERT(CMD_OK == result);
+    CU_ASSERT_EQUAL(CMD_OK, result);
 }
 
 //Test of drp_test_system_vars
@@ -167,6 +168,85 @@ void testSYSVARS(void)
     result = drp_test_system_vars("", "", 0);
     CU_ASSERT(CMD_OK == result);
 }
+
+//Test of dat_set_system_var
+void testDATSET_SYSVAR(void)
+{
+    int rand_ind = rand() % dat_system_last_var;
+    int rand_val = rand();
+    int val_1, val_2, val_3;
+
+    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    {
+        if (i == rand_ind)
+        {
+            dat_set_system_var(i, rand_val);
+        }
+        else
+        {
+            dat_set_system_var(i, i + 5);
+        }
+    }
+
+    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    {
+        val_1 = _dat_get_system_var(i);
+        val_2 = _dat_get_system_var(i + dat_system_last_var);
+        val_3 = _dat_get_system_var(i + dat_system_last_var * 2);
+        if (i == rand_ind)
+        {
+            CU_ASSERT_EQUAL(val_1, rand_val);
+            CU_ASSERT_EQUAL(val_2, rand_val);
+            CU_ASSERT_EQUAL(val_3, rand_val);
+        }
+        else
+        {
+            CU_ASSERT_EQUAL(val_1, i + 5);
+            CU_ASSERT_EQUAL(val_2, i + 5);
+            CU_ASSERT_EQUAL(val_3, i + 5)
+        }
+    }
+}
+
+//Test of dat_get_system_var
+void testDATGET_SYSVAR(void)
+{
+    int rand_ind = rand() % dat_system_last_var;
+    int rand_val = rand();
+    int val;
+
+    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    {
+        if (i == rand_ind)
+        {
+            _dat_set_system_var(i, 1);
+            _dat_set_system_var(i + dat_system_last_var, 2);
+            _dat_set_system_var(i + 2 * dat_system_last_var, 3);
+        }
+        else
+        {
+            _dat_set_system_var(i, rand_val);
+            _dat_set_system_var(i + dat_system_last_var, rand_val);
+            _dat_set_system_var(i + 2 * dat_system_last_var, rand_val);
+        }
+    }
+
+    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    {
+        val = dat_get_system_var(i);
+
+        if (i == rand_ind)
+        {
+            CU_ASSERT_EQUAL(val, 1);
+        }
+
+        else
+        {
+            CU_ASSERT_EQUAL(val, rand_val);
+        }
+    }
+}
+
 
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
@@ -221,7 +301,9 @@ int main()
     }
 
     /* add the tests to the suite */
-    if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", testSYSVARS))){
+    if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", testSYSVARS)) ||
+            (NULL == CU_add_test(pSuite, "test of dat_set_system_var", testDATSET_SYSVAR)) ||
+            (NULL == CU_add_test(pSuite, "test of dat_get_system_var", testDATGET_SYSVAR))){
         CU_cleanup_registry();
         return CU_get_error();
     }

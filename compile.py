@@ -21,6 +21,7 @@ def get_parameters():
     parser.add_argument('--sch_zmq_out', type=str, default="tcp://127.0.0.1:8001")
     parser.add_argument('--sch_zmq_in', type=str, default="tcp://127.0.0.1:8002")
     parser.add_argument('--sch_st_mode', type=str, default="1")
+    parser.add_argument('--sch_st_triple_wr', type=str, default="1")
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
     # Force clean

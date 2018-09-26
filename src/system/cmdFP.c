@@ -47,10 +47,9 @@ int fp_set(char *fmt, char *params, int nparams)
         str_time.tm_hour = hour;
         str_time.tm_min = min;
         str_time.tm_sec = sec;
+        str_time.tm_isdst = 0;
 
         unixtime = mktime(&str_time);
-
-        //printf("Tiempo cmd: %d", (int)unixtime);
 
         int rc = dat_set_fp((int)unixtime, command, args, executions, periodical);
 
@@ -81,6 +80,7 @@ int fp_delete(char* fmt, char* params, int nparams)
         str_time.tm_hour = hour;
         str_time.tm_min = min;
         str_time.tm_sec = sec;
+        str_time.tm_isdst = 0;
 
         unixtime = mktime(&str_time);
 
