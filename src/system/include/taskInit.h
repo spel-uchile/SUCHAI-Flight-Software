@@ -26,6 +26,8 @@
 #if SCH_COMM_ENABLE
 #include <csp/csp.h>
 #include <csp/csp_rtable.h>
+#include <csp/interfaces/csp_if_kiss.h>
+#include <csp/drivers/usart.h>
 #ifdef NANOMIND
 #include <csp/interfaces/csp_if_i2c.h>
 #endif

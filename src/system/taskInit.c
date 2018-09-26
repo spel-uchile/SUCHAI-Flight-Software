@@ -21,6 +21,14 @@
 
 static const char *tag = "taskInit";
 
+#ifdef LINUX
+    static csp_iface_t csp_if_kiss;
+    static csp_kiss_handle_t csp_kiss_driver;
+    void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
+        csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
+    }
+#endif
+
 void taskInit(void *param)
 {
 #ifdef NANOMIND
@@ -126,6 +134,19 @@ void init_communications(void)
      */
 #ifdef LINUX
     csp_set_model("LINUX");
+
+    struct usart_conf conf;
+    conf.device = SCH_KISS_DEVICE;
+    conf.baudrate = SCH_KISS_UART_BAUDRATE;
+    usart_init(&conf);
+
+    csp_kiss_init(&csp_if_kiss, &csp_kiss_driver, usart_putc, usart_insert, "KISS");
+
+    /* Setup callback from USART RX to KISS RS */
+    usart_set_callback(my_usart_rx);
+    csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_kiss, CSP_NODE_MAC);
+
     /* Set ZMQ interface */
     csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
