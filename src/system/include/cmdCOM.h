@@ -13,13 +13,19 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdint.h"
+
 #include "config.h"
 
-#include "repoCommand.h"
 #include "csp/csp.h"
+#include "repoCommand.h"
 
+#include "ax100_param.h"
+#include "ax100_param_radio.h"
+#include "param/rparam_client.h"
+//#include "param/param_string.h"
 
 #define COM_FRAME_MAX_LEN (SCH_BUFF_MAX_LEN - 2 * sizeof(uint16_t))
+#define AX100_PORT_RPARAM   7
 
 typedef struct com_frame{
     uint16_t frame;
@@ -111,5 +117,71 @@ int com_send_data(char *fmt, char *params, int nparams);
  * @return CMD_OK
  */
 int com_debug(char *fmt, char *params, int nparams);
+
+/**
+ * Reset the TRX GND Watchdog timer at @node node by sending a CSP command to the
+ * AX100_PORT_GNDWDT_RESET (9) port. This command targets the AX100 TRX.
+ * If the <node> param is given, then the message is send to that node, if no
+ * parameters given then the message is sent to SCH_TRX_ADDRESS node.
+ *
+ * @param fmt Str. Parameters format: "%d"
+ * @param params Str. Parameters: [node], the TRX node number
+ * @param nparams Str. Number of parameters: 0|1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ *
+ * @code
+ *      // Function usage
+ *      com_reset_gnd_wdt("%d", "5", 1);  // Reset gnd wdt of node 5
+ *      com_reset_gnd_wdt("", "", 0);     // Reset gnd wdt of default TRX node
+ *
+ *      // Send reset gnd wdt to node 5
+ *      cmd_t *send_cmd = cmd_get_str("com_reset_wdt"); // Get the command
+ *      cmd_add_params_var(send_cmd, 5)  // Set param node to 5
+ *      cmd_send(send_cmd);
+ *
+ *      // Send reset gnd_wdt to default SCH_TRX_ADDRESS node
+ *      cmd_t *send_cmd = cmd_get_str("com_reset_wdt"); // Get the command
+ *      cmd_send(send_cmd);  // Send command without parameters;
+ *
+ * @endcode
+ */
+int com_reset_wdt(char *fmt, char *params, int nparams);
+
+/**
+ * Print TRX housekeeping information
+ * @warning not implemented yet
+ *
+ * @param fmt
+ * @param params
+ * @param nparams
+ * @return
+ */
+int com_get_hk(char *fmt, char *params, int nparams);
+
+/**
+ * Get settings values from the TRX. The TRX has a list of parameters to set and
+ * get (@see ax100_param.h and ax100_param_radio.h). Use this command to get
+ * any parameter value by name. The special argument 'help' can be
+ * used to print the list of available parameters.
+ *
+ * @param fmt Str. Parameters format: "%s"
+ * @param params Str. Parameters: <param_name>, the parameter name
+ * @param nparams Str. Number of parameters: 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ *
+ * @code
+ *      // Function usage
+ *      com_get_config("%s", "help", 1);     // Print the parameter list
+ *      com_get_config("%s", "csp_node", 1); // Read and print the TRX node
+ *
+ *      // Command usage to get a TRX parameter
+ *      cmd_t *send_cmd = cmd_get_str("com_get_config"); // Get the command
+ *      cmd_add_params(send_cmd, "tx_pwr")  // Read param "tx_pwr"
+ *      cmd_send(send_cmd);
+ *
+ * @endcode
+ *
+ */
+int com_get_config(char *fmt, char *params, int nparams);
 
 #endif /* CMD_COM_H */
