@@ -22,10 +22,8 @@
 #include "ax100_param.h"
 #include "ax100_param_radio.h"
 #include "param/rparam_client.h"
-//#include "param/param_string.h"
 
 #define COM_FRAME_MAX_LEN (SCH_BUFF_MAX_LEN - 2 * sizeof(uint16_t))
-#define AX100_PORT_RPARAM   7
 
 typedef struct com_frame{
     uint16_t frame;
@@ -159,7 +157,7 @@ int com_reset_wdt(char *fmt, char *params, int nparams);
 int com_get_hk(char *fmt, char *params, int nparams);
 
 /**
- * Get settings values from the TRX. The TRX has a list of parameters to set and
+ * Get TRX settings values. The TRX has a list of parameters to set and
  * get (@see ax100_param.h and ax100_param_radio.h). Use this command to get
  * any parameter value by name. The special argument 'help' can be
  * used to print the list of available parameters.
@@ -178,10 +176,35 @@ int com_get_hk(char *fmt, char *params, int nparams);
  *      cmd_t *send_cmd = cmd_get_str("com_get_config"); // Get the command
  *      cmd_add_params(send_cmd, "tx_pwr")  // Read param "tx_pwr"
  *      cmd_send(send_cmd);
- *
  * @endcode
  *
  */
 int com_get_config(char *fmt, char *params, int nparams);
+
+/**
+ * Set TRX settings values. The TRX has a list of parameters to set and
+ * get (@see ax100_param.h and ax100_param_radio.h). Use this command to set
+ * any parameter value by name. The special argument 'help 0' can be
+ * used to print the list of available parameters.
+ *
+ * @param fmt Str. Parameters format: "%s %s"
+ * @param params Str. Parameters: <param_name> <param_value>, the parameter name
+ * and value as strings.
+ * @param nparams Str. Number of parameters: 2
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ *
+ * @code
+ *      // Function usage
+ *      com_set_config("%s %s", "help 0", 1);     // Print the parameter list
+ *      com_set_config("%s %s", "csp_node 5", 1); // Set and print the TRX node
+ *
+ *      // Command usage to set a TRX parameter
+ *      cmd_t *send_cmd = cmd_get_str("com_set_config"); // Get the command
+ *      cmd_add_params(send_cmd, "tx_pwr 0")  // Set param "tx_pwr" to 0
+ *      cmd_send(send_cmd);
+ * @endcode
+ *
+ */
+int com_set_config(char *fmt, char *params, int nparams);
 
 #endif /* CMD_COM_H */
