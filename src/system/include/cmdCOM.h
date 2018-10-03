@@ -19,9 +19,11 @@
 #include "csp/csp.h"
 #include "repoCommand.h"
 
-#include "ax100_param.h"
-#include "ax100_param_radio.h"
-#include "param/rparam_client.h"
+#ifdef NANOMIND
+    #include "ax100_param.h"
+    #include "ax100_param_radio.h"
+    #include "param/rparam_client.h"
+#endif
 
 #define COM_FRAME_MAX_LEN (SCH_BUFF_MAX_LEN - 2 * sizeof(uint16_t))
 
