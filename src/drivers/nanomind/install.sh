@@ -59,6 +59,14 @@ cd a3200-sdk-lite-v1.2/lib/
 ln -s -f ../../libcsp
 cd -
 
+echo "Downloading GomSpace drivers..."
+wget -N data.spel.cl/gs-drivers.tar.gz
+tar -xzf gs-drivers.tar.gz
+echo "Adding GomSpace drivers..."
+cd a3200-sdk-lite-v1.2/lib/
+ln -s -f ../../gs-drivers/libparam
+cd -
+
 #echo "---------"
 #echo "Do not forget to add the following to your .bashrc file"
 #echo "export PATH=\"\~/.local/bin:\$PATH\""

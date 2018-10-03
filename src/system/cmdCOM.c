@@ -21,6 +21,11 @@
 
 static const char *tag = "cmdCOM";
 
+#ifdef NANOMIND
+static void _com_config_help(void);
+static void _com_config_find(char *param_name, int *table, param_table_t **param);
+#endif
+
 void cmd_com_init(void)
 {
     cmd_add("ping", com_ping, "%d", 1);
@@ -28,6 +33,11 @@ void cmd_com_init(void)
     cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
     cmd_add("send_data", com_send_data, "%p", 1);
     cmd_add("com_debug", com_debug, "", 0);
+#ifdef NANOMIND
+    cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
+    cmd_add("com_get_config", com_get_config, "%s", 1);
+    cmd_add("com_set_config", com_set_config, "%s %s", 2);
+#endif
 }
 
 int com_ping(char *fmt, char *params, int nparams)
@@ -105,7 +115,7 @@ int com_send_cmd(char *fmt, char *params, int nparams)
     }
 
     int node, next, n_args;
-    char rep[0];
+    uint8_t rep[1];
     char msg[SCH_CMD_MAX_STR_PARAMS];
     memset(msg, '\0', SCH_CMD_MAX_STR_PARAMS);
 
@@ -173,3 +183,229 @@ int com_debug(char *fmt, char *params, int nparams)
 
     return CMD_OK;
 }
+
+#ifdef NANOMIND
+int com_reset_wdt(char *fmt, char *params, int nparams)
+{
+
+    int rc, node, n_args = 0;
+
+    // If no params received, try to reset the default SCH_TRX_ADDRESS node
+    if(params == NULL)
+        node = SCH_TRX_ADDRESS;
+
+    //format: <node>
+    n_args = sscanf(params, fmt, &node);
+    // If no params received, try to reset the default SCH_TRX_ADDRESS node
+    if(n_args != nparams)
+        node = SCH_TRX_ADDRESS;
+
+    // Send and empty message to GNDWDT_RESET (9) port
+//    rc = csp_transaction(CSP_PRIO_CRITICAL, SCH_TRX_ADDRESS, AX100_PORT_GNDWDT_RESET, 1000, NULL, 0 NULL, 0);
+
+    if(rc > 0)
+    {
+        LOGV(tag, "GND Reset sent successfully. (rc: %d)", rc);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGE(tag, "Error sending GND Reset. (rc: %d)", rc);
+        return CMD_FAIL;
+    }
+}
+
+int com_get_hk(char *fmt, char *params, int nparams)
+{
+    //TODO: Implement
+    return CMD_FAIL;
+}
+
+int com_get_config(char *fmt, char *params, int nparams)
+{
+    int rc, n_args;
+    char param[SCH_CMD_MAX_STR_PARAMS];
+    memset(param, '\0', SCH_CMD_MAX_STR_PARAMS);
+
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_FAIL;
+    }
+
+    // Format: <param_name>
+    n_args = sscanf(params, fmt, &param);
+    if(n_args == nparams)
+    {
+        int table = 0;
+        param_table_t *param_i;
+
+        // If param is 'help' then show the available param names
+        if(strcmp(param, "help") == 0)
+        {
+            _com_config_help();
+            return CMD_OK;
+        }
+
+        // Find the given parameter by name and get the size, index, type and
+        // table; param_i is set to NULL if the parameter is not found.
+        _com_config_find(param, &table, &param_i);
+
+        // Warning if the parameter name was not found
+        if(param_i == NULL)
+        {
+            LOGW(tag, "Param %s not found!", param);
+            return CMD_FAIL;
+        }
+
+        // Actually get the parameter value
+        void *out = malloc(param_i->size);
+        rc = rparam_get_single(out, param_i->addr, param_i->type, param_i->size,
+                table, SCH_TRX_ADDRESS, AX100_PORT_RPARAM, 1000);
+
+        // Process the answer
+        if(rc > 0)
+        {
+            char param_str[SCH_CMD_MAX_STR_PARAMS];
+            param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS);
+            LOGI(tag, "Param %s (table %d): %s", param_i->name, table, param_str);
+            free(out);
+            return CMD_OK;
+        }
+        else
+        {
+            LOGE(tag, "Error getting parameter %s! (rc: %d)", param, rc);
+            free(out);
+            return CMD_FAIL;
+        }
+    }
+}
+
+int com_set_config(char *fmt, char *params, int nparams)
+{
+    int rc, n_args;
+    char param[SCH_CMD_MAX_STR_PARAMS];
+    char value[SCH_CMD_MAX_STR_PARAMS];
+    memset(param, '\0', SCH_CMD_MAX_STR_PARAMS);
+    memset(value, '\0', SCH_CMD_MAX_STR_PARAMS);
+
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_FAIL;
+    }
+
+    // Format: <param_name> <value>
+    n_args = sscanf(params, fmt, &param, &value);
+    if(n_args == nparams)
+    {
+        int table = 0;
+        param_table_t *param_i;
+
+        // If param is 'help' then show the available param names
+        if(strcmp(param, "help") == 0)
+        {
+            _com_config_help();
+            return CMD_OK;
+        }
+
+        // Find the given parameter by name and get the size, index, type and
+        // table; param_i is set to NULL if the parameter is not found.
+        _com_config_find(param, &table, &param_i);
+
+        // Warning if the parameter name was not found
+        if(param_i == NULL)
+        {
+            LOGW(tag, "Param %s not found!", param);
+            return CMD_FAIL;
+        }
+
+        // Actually get the parameter value
+        void *out = malloc(param_i->size);
+        param_from_string(param_i, value, out);
+        rc = rparam_set_single(out, param_i->addr, param_i->type, param_i->size,
+                               table, SCH_TRX_ADDRESS, AX100_PORT_RPARAM, 1000);
+
+        // Process the answer
+        if(rc > 0)
+        {
+            char param_str[SCH_CMD_MAX_STR_PARAMS];
+            param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS);
+            LOGI(tag, "Param %s (table %d) set to: %s", param_i->name, table, param_str);
+            free(out);
+            return CMD_OK;
+        }
+        else
+        {
+            LOGE(tag, "Error setting parameter %s! (rc: %d)", param, rc);
+            free(out);
+            return CMD_FAIL;
+        }
+    }
+}
+
+
+/* Auxiliary functions */
+
+/**
+ * Print the list of available parameters
+ */
+void _com_config_help(void)
+{
+    int i;
+    LOGI(tag, "List of available TRX parameters:")
+    for(i=0; i<ax100_config_count; i++)
+    {
+        printf("\t%s\n", ax100_config[i].name);
+    }
+    for(i=0; i<ax100_config_tx_count; i++)
+    {
+        printf("\t%s\n", ax100_tx_config[i].name);
+    }
+}
+
+/**
+ * Find the parameter table structure and table index by name. This function is
+ * used before @rparam_get_single and @rparam_set_single to obtain the parameter
+ * type, index and size. If not found, the @param is set to NULL.
+ *
+ * @param param_name Str. Parameter name
+ * @param table int *. The parameter table index will be stored here.
+ * @param param param_table_t *. The parameter type, size and index will be
+ * stored here. If the parameter is not found, this pointer is set to NULL.
+ */
+void _com_config_find(char *param_name, int *table, param_table_t **param)
+{
+    int i = 0;
+    *param = NULL;
+
+    // Find the given parameter name in the AX100 CONFIG table
+    for(i=0; i < ax100_config_count; i++)
+    {
+        printf("%d, %s\n", i, ax100_config[i].name);
+        if(strcmp(param_name, ax100_config[i].name) == 0)
+        {
+            printf("%d, %s\n", i, ax100_config[i].name);
+            *param = &(ax100_config[i]);
+            *table = AX100_PARAM_RUNNING;
+            return;
+        }
+    }
+
+    // Find the given parameter name in the AX100 TX table
+    if(*param == NULL)
+    {
+        for(i = 0; i < ax100_config_tx_count; i++)
+        {
+            printf("%d, %s\n", i, ax100_tx_config[i].name);
+            if(strcmp(param_name, ax100_tx_config[i].name) == 0)
+            {
+                printf("%d, %s\n", i, ax100_tx_config[i].name);
+                *param = &(ax100_tx_config[i]);
+                *table = AX100_PARAM_TX(0);
+                return;
+            }
+        }
+    }
+}
+#endif //NANOMIND
