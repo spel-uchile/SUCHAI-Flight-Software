@@ -41,11 +41,11 @@ echo "Custom syscallbasic..."
 mv a3200-sdk-lite-v1.2/lib/libasf/gomspace/freertos/avr32/syscalls_basic.c a3200-sdk-lite-v1.2/lib/libasf/gomspace/freertos/avr32/syscalls_basic.c.old
 cp syscalls_basic.c.suchai a3200-sdk-lite-v1.2/lib/libasf/gomspace/freertos/avr32/syscalls_basic.c
 
-echo "Adding libcsp v1.4 to sdk lib folder"
+echo "Adding libcsp v1.5.dev to sdk lib folder"
 if [ ! -d "./libcsp" ]; then
     git clone https://github.com/libcsp/libcsp
     cd libcsp
-    git checkout v1.4
+    git checkout release-1.5
     echo "Replacing csp drivers..."
     mv include/csp/drivers/ include/csp/drivers.bak
     sed -i "s/#include <csp\/drivers\/i2c.h>/#include <dev\/i2c.h>/g" src/interfaces/csp_if_i2c.c
@@ -53,7 +53,9 @@ if [ ! -d "./libcsp" ]; then
     # I had a bug in arch: using sed the file loss permissions
     chmod 644 src/interfaces/csp_if_i2c.c
     chmod 644 include/csp/interfaces/csp_if_i2c.h
+    mv wscript wscript.old
     cd -
+    cp wscript.libcsp libcsp/wscript
 fi
 cd a3200-sdk-lite-v1.2/lib/
 ln -s -f ../../libcsp

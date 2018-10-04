@@ -22,7 +22,7 @@ def options(ctx):
     ctx.add_option('--arch', action='store', default='ucr3fp', help='MCU arch')
     ctx.add_option('--part', action='store', default='uc3c0512c', help='MCU part')
     ctx.add_option('--toolchain', action='store', default='avr32-', help='Set toolchain prefix')
-    
+
     gr = ctx.add_option_group("A3200 options")
     gr.add_option('--with-console', metavar='HANDLE', default=2, type=int, help='Choose USART[0,1,2,3] for console')
 
@@ -31,7 +31,7 @@ def configure(ctx):
     ctx.env.CXX = ctx.options.toolchain + "g++"
     ctx.env.AR = ctx.options.toolchain + "ar"
     ctx.load('gcc gxx')
-    
+
     # Locate programs
     ctx.find_program('avr32program', var='AVR32PROGRAM')
     ctx.find_program(ctx.options.toolchain + 'size', var='SIZE')
@@ -42,17 +42,17 @@ def configure(ctx):
     ctx.env.append_unique('CFLAGS',             ['-Wall', '-std=gnu99', '-g', '-O1', '-fno-exceptions', '-ffunction-sections', '-masm-addr-pseudos', '-mpart='+ctx.options.part, '-Wempty-body', '-Wtype-limits', '-Wmissing-parameter-type', '-Wuninitialized'])
     ctx.env.append_unique('CXXFLAGS',           ['-Wall', '-g', '-O2', '-fno-exceptions', '-ffunction-sections', '-masm-addr-pseudos', '-mpart='+ctx.options.part, '-Wempty-body', '-Wtype-limits', '-Wuninitialized'])
     ctx.env.append_unique('ASFLAGS',            ['-xassembler-with-cpp', '-c', '-mpart='+ctx.options.part])
-    
+
     ctx.env.append_unique('EXCLUDES_NANOMIND',  [])
     ctx.env.append_unique('LINKFLAGS_NANOMIND', ['-mpart='+ctx.options.part, '-Wl,-Map,nanomind.map', '-Wl,--gc-sections', '--rodata-writable', '-Wl,--direct-data'])
-    
+
     # Add files
     ctx.env.append_unique('FILES_NANOMIND',     ['src/system/*.c', 'src/os/FreeRTOS/*.c', 'src/drivers/nanomind/*.c'])
     ctx.env.PART = ctx.options.part.upper()
 
     # Linker script
     ctx.env.append_unique('LINKFLAGS_NANOMIND', '-T../lib/liba3200/linkscripts/avr32{0}.lds'.format(ctx.options.part))
-    
+
     # Options for libutil
     ctx.options.with_log = 'disable'
 
@@ -63,7 +63,7 @@ def configure(ctx):
     ctx.options.clock = 'tick'
     if not ctx.options.sleep_mode:
         ctx.options.sleep_mode = 'IDLE'
-    
+
     # Options for liba3200
     ctx.options.enable_param = False
     ctx.options.enable_board_init = False

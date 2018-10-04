@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-echo "Downloading libcsp v1.4"
-[ ! -e libcsp ] && git clone https://github.com/libcsp/libcsp 
+echo "Downloading libcsp v1.5.dev"
+if [ ! -d "./libcsp" ]; then
+    git clone https://github.com/libcsp/libcsp
+    cd libcsp
+    git checkout release-1.5
+    mv wscript wscript.old
+    cd -
+    cp wscript libcsp/wscript
+fi
 
 cd libcsp
-git pull origin master
-
-[ -e ../wscript ] && cp -rf ../wscript ./
-
 echo "Build libcsp"
-./waf configure --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-driver-usart=linux --install-csp --prefix=../ build install
-
+python2 ./waf configure --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-driver-usart=linux --install-csp --prefix=../ build install
 cd -
