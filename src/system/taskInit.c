@@ -122,18 +122,28 @@ void init_communications(void)
     }
 
     /* Init buffer system */
+    csp_conf_t sch_csp_conf;
+    //csp_conf_get_defaults(&sch_csp_conf);
+    sch_csp_conf.address = SCH_COMM_ADDRESS;
+    sch_csp_conf.conn_max = 10;
+    sch_csp_conf.conn_queue_length = 10;
+    sch_csp_conf.conn_dfl_so = CSP_O_NONE;
+    sch_csp_conf.fifo_length = 25;
+    sch_csp_conf.port_max_bind = 24;
+    sch_csp_conf.rdp_max_window = 20;
+
     int t_ok;
     t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
     if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
-    csp_set_hostname("SUCHAI-OBC");
-    csp_init(SCH_COMM_ADDRESS); // Init CSP with address MY_ADDRESS
+    //csp_set_hostname("SUCHAI-OBC");
+    csp_init(&sch_csp_conf); // Init CSP with address MY_ADDRESS
 
     /**
      * Set interfaces and routes
      *  Platform dependent
      */
 #ifdef LINUX
-    csp_set_model("LINUX");
+    //csp_set_model("LINUX");
 
     struct usart_conf conf;
     conf.device = SCH_KISS_DEVICE;
@@ -153,7 +163,7 @@ void init_communications(void)
 #endif
 
 #ifdef NANOMIND
-    csp_set_model("A3200");
+    //csp_set_model("A3200");
     /* Init csp i2c interface with address 1 and 400 kHz clock */
     LOGI(tag, "csp_i2c_init...");
     t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400);

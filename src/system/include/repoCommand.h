@@ -171,11 +171,11 @@ void cmd_add_params_str(cmd_t *cmd, char *params);
  *      //Fill two parameters to foo command
  *      int a = 123; char *b = "abc";
  *      cmd_t *foo = cmd_get_str("foo"); // foo.fmt is '%d %s'
- *      cmd_add_params_fmt(foo, a, b);
+ *      cmd_add_params_var(foo, a, b);
  *      //Fill three parameters to bar command
  *      int c = 1; int d = 2; float e = 3.4;
  *      cmd_t *bar = cmd_get_str("bar"); // bar.fmt is '%d %d %f'
- *      cmd_add_params_fmt(bar, c, d, e);
+ *      cmd_add_params_var(bar, c, d, e);
  * @endcode
  */
 void cmd_add_params_var(cmd_t *cmd, ...);
