@@ -17,6 +17,7 @@ set(SOURCE_FILES
         src/system/cmdCOM.c
         src/system/cmdFP.c
         src/system/cmdTM.c
+        src/system/cmdEPS.c
         src/system/cmdConsole.c
         src/system/repoCommand.c
         src/system/repoData.c

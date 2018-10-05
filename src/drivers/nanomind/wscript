@@ -47,7 +47,7 @@ def configure(ctx):
     ctx.env.append_unique('LINKFLAGS_NANOMIND', ['-mpart='+ctx.options.part, '-Wl,-Map,nanomind.map', '-Wl,--gc-sections', '--rodata-writable', '-Wl,--direct-data'])
 
     # Add files
-    ctx.env.append_unique('FILES_NANOMIND',     ['src/system/*.c', 'src/os/FreeRTOS/*.c', 'src/drivers/nanomind/*.c'])
+    ctx.env.append_unique('FILES_NANOMIND',     ['src/system/*.c', 'src/os/FreeRTOS/*.c', 'src/drivers/nanomind/*.c', 'src/drivers/nanomind/gs-drivers/nanopower2.c'])
     ctx.env.PART = ctx.options.part.upper()
 
     # Linker script
@@ -82,7 +82,7 @@ def build(ctx):
     ctx.program(
         source=ctx.path.ant_glob(ctx.env.FILES_NANOMIND, excl=ctx.env.EXCLUDES_NANOMIND),
         target='nanomind.elf',
-        includes=['../include', '../gs-drivers/include/', 'src/system/include', 'src/os/include'],
+        includes=['src/drivers/nanomind/include', 'src/drivers/nanomind/gs-drivers/include/', 'src/system/include', 'src/os/include'],
         defines = ctx.env.DEFINES_NANOMIND,
         linkflags = ctx.env.LINKFLAGS_NANOMIND,
         use=['libparam-client', 'asf', 'a3200', 'util', 'csp'],

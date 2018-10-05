@@ -20,6 +20,7 @@
 #include "cmdOBC.h"
 #include "cmdDRP.h"
 #include "cmdConsole.h"
+#include "cmdEPS.h"
 
 #if SCH_FP_ENABLED
     #include "cmdFP.h"
