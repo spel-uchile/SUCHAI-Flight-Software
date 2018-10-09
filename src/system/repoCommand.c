@@ -287,7 +287,9 @@ int cmd_repo_init(void)
 #endif
     cmd_obc_init();
     cmd_drp_init();
+#ifdef SCH_USE_NANOPOWER
     cmd_eps_init();
+#endif
 #if SCH_COMM_ENABLE
     cmd_com_init();
     cmd_tm_init();
