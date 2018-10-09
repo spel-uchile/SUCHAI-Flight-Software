@@ -57,7 +57,10 @@ if __name__ == "__main__":
 
     else: #args.os = FREERTOS
         if args.arch == "ESP32":
-            #TODO: Install IDF drivers
+            if args.drivers:
+                os.chdir('src/drivers/esp32')
+                os.system('sh install.sh')
+                os.chdir(cwd_root)
             result = os.system('make')
 
         if args.arch == "AVR32":

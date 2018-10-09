@@ -21,13 +21,15 @@
 
 static const char *tag = "taskInit";
 
+#if SCH_COMM_ENABLE
 #ifdef LINUX
     static csp_iface_t csp_if_kiss;
     static csp_kiss_handle_t csp_kiss_driver;
     void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
         csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
     }
-#endif
+#endif //LINUX
+#endif //SCH_COMM_ENABLE
 
 void taskInit(void *param)
 {
@@ -156,11 +158,12 @@ void init_communications(void)
     usart_set_callback(my_usart_rx);
     csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_kiss, CSP_NODE_MAC);
+    csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
 
     /* Set ZMQ interface */
     csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
-#endif
+#endif //LINUX
 
 #ifdef NANOMIND
     //csp_set_model("A3200");
@@ -177,7 +180,7 @@ void init_communications(void)
      */
     csp_rtable_set(8, 2, &csp_if_i2c, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C node TRX
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c, CSP_NODE_MAC); // All traffic to I2C using node as i2c address
-#endif
+#endif //NANOMIND
 
     /* Start router task with SCH_TASK_CSP_STACK word stack, OS task priority 1 */
     t_ok = csp_route_start_task(SCH_TASK_CSP_STACK, 1);
@@ -187,5 +190,5 @@ void init_communications(void)
     csp_route_print_table();
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
-#endif
+#endif //SCH_COMM_ENABLE
 }

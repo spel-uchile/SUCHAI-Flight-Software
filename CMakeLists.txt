@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(SUCHAI_Flight_Software)
 
+option(USE_NANOPOWER "Use and build nanopower drivers")
+
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
@@ -46,6 +48,13 @@ link_libraries(-lpthread -lsqlite3 -lcsp -lzmq)
 
 # Use pthread_setname_np included in <features.h>
 add_definitions(-D_GNU_SOURCE)
+
+# Build nanopower drivers
+if(USE_NANOPOWER)
+    add_definitions(-DSCH_USE_NANOPOWER)
+    list(APPEND SOURCE_FILES src/drivers/Linux/gs-drivers/nanopower2.c)
+    include_directories(src/drivers/Linux/gs-drivers/include)
+endif()
 
 add_executable(SUCHAI_Flight_Software ${SOURCE_FILES})
 

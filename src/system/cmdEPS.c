@@ -24,7 +24,7 @@ static const char *tag = "cmdEPS";
 
 void cmd_eps_init(void)
 {
-#ifdef NANOMIND
+#ifdef SCH_USE_NANOPOWER
     //EPS io driver requires some initialization
     eps_set_node(SCH_EPS_ADDRESS);
     eps_set_timeout(1000);
@@ -37,14 +37,14 @@ void cmd_eps_init(void)
 #endif
 }
 
-#ifdef NANOMIND
+#ifdef SCH_USE_NANOPOWER
 int eps_hard_reset(char *fmt, char *params, int nparams)
 {
     if(eps_hardreset() > 0)
         return CMD_OK;
 
     LOGE(tag, "Unable to reset the EPS!");
-    return CMD_FAIL
+    return CMD_FAIL;
 }
 
 int eps_get_hk(char *fmt, char *params, int nparams)
@@ -100,4 +100,4 @@ int eps_set_heater(char *fmt, char *params, int nparams)
         return CMD_FAIL;
     }
 }
-#endif
+#endif //SCH_USE_NANOPOWER
