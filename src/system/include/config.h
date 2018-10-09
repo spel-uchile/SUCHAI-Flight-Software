@@ -30,6 +30,11 @@
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
 #endif
 
+#ifdef NANOMIND
+    #define SCH_USE_NANOPOWER
+    #define SCH_USE_NANOCOM
+#endif
+
 /* System debug configurations */
 #define LOG_LEVEL               LOG_LVL_INFO        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
 

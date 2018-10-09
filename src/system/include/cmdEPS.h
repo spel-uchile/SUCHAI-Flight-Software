@@ -13,7 +13,7 @@
 #include "config.h"
 #include "utils.h"
 
-#ifdef NANOMIND
+#ifdef SCH_USE_NANOPOWER
     #include "nanopower2.h"
     #include "bpx.h"
 #endif

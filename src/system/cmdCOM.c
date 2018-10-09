@@ -21,7 +21,7 @@
 
 static const char *tag = "cmdCOM";
 
-#ifdef NANOMIND
+#ifdef SCH_USE_NANOCOM
 static void _com_config_help(void);
 static void _com_config_find(char *param_name, int *table, param_table_t **param);
 #endif
@@ -33,7 +33,7 @@ void cmd_com_init(void)
     cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
     cmd_add("send_data", com_send_data, "%p", 1);
     cmd_add("com_debug", com_debug, "", 0);
-#ifdef NANOMIND
+#ifdef SCH_USE_NANOCOM
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%s", 1);
     cmd_add("com_set_config", com_set_config, "%s %s", 2);
@@ -184,7 +184,7 @@ int com_debug(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
-#ifdef NANOMIND
+#ifdef SCH_USE_NANOCOM
 int com_reset_wdt(char *fmt, char *params, int nparams)
 {
 
@@ -408,4 +408,4 @@ void _com_config_find(char *param_name, int *table, param_table_t **param)
         }
     }
 }
-#endif //NANOMIND
+#endif //SCH_USE_NANOCOM

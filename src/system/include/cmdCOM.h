@@ -19,7 +19,7 @@
 #include "csp/csp.h"
 #include "repoCommand.h"
 
-#ifdef NANOMIND
+#ifdef SCH_USE_NANOCOM
     #include "ax100_param.h"
     #include "ax100_param_radio.h"
     #include "param/rparam_client.h"
