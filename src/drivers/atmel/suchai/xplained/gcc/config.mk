@@ -39,6 +39,7 @@ CSRCS = \
        $(PROJ_ROOT)/system/cmdFP.c                        \
        $(PROJ_ROOT)/system/cmdOBC.c                       \
        $(PROJ_ROOT)/system/cmdCOM.c                       \
+       $(PROJ_ROOT)/system/cmdEPS.c                       \
        $(PROJ_ROOT)/system/repoCommand.c                  \
        $(PROJ_ROOT)/system/repoData.c                     \
        $(PROJ_ROOT)/system/taskWatchdog.c                 \
