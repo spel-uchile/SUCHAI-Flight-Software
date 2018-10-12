@@ -84,15 +84,43 @@ void dat_repo_init(void)
         //Init system flight plan table
         rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
+
+        //Mission specific initialization data
+        //Init gps data table subsystem
+        rc=storage_table_gps_init(DAT_GPS_TABLE, 0);
+        assertf(rc==0, tag, "Unable to create gps table");
+
+        //Init pressure data table subsystem
+        rc=storage_table_pressure_init(DAT_PRS_TABLE, 0);
+        assertf(rc==0, tag, "Unable to create gps table");
+
+        //Init deploy data table subsystem
+        rc=storage_table_deploy_init(DAT_DPL_TABLE, 0);
+        assertf(rc==0, tag, "Unable to create gps table");
     }
 #endif
 
     /* TODO: Initialize custom variables */
     LOGD(tag, "Initializing system variables values...")
-    dat_set_system_var(dat_obc_hrs_alive, 0);
+//    dat_set_system_var(dat_obc_hrs_alive, 0);
     dat_set_system_var(dat_obc_hrs_wo_reset, 0);
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);  //TODO: This is a non-volatile variable
     dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+
+    if(dat_get_system_var(dat_obc_hrs_alive) ==-1) {
+        LOGI(tag, "setting hours alive");
+        dat_set_system_var(dat_obc_hrs_alive, 0);
+    }
+
+    if(dat_get_system_var(dat_balloon_phase) ==-1) {
+        LOGI(tag, "setting baloon phase");
+        dat_set_system_var(dat_balloon_phase, 0);
+    }
+
+    if(dat_get_system_var(dat_balloon_deploys) ==-1) {
+        LOGI(tag, "setting baloon globos");
+        dat_set_system_var(dat_balloon_deploys, 2);
+    }
 }
 
 void dat_repo_close(void)
@@ -135,6 +163,8 @@ int _dat_get_system_var(dat_system_t index)
     #else
         value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
     #endif
+
+    LOGD(tag, "value obtained from id: %d, is: %d", index, value);
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);

@@ -369,6 +369,8 @@ int storage_show_table (void) {
     return 0;
 }
 
+
+
 int storage_close(void)
 {
     if(db != NULL)
@@ -389,3 +391,307 @@ static int dummy_callback(void *data, int argc, char **argv, char **names)
 {
     return 0;
 }
+
+
+/* Second Mission specific data functions */
+
+int storage_table_gps_init(char* table, int drop)
+{
+    char * init_sql;
+    init_sql= "CREATE TABLE IF NOT EXISTS %s("
+            "idx INTEGER PRIMARY KEY, "
+            "date_time TEXT, "
+            "timestamp TEXT, "
+            "latitude REAL, "
+            "longitude REAL, "
+            "height REAL, "
+            "velocity_x REAL, "
+            "velocity_y REAL, "
+            "satellites_number INTEGER, "
+            "mode INTEGER, "
+            "phase INTEGER);";
+    return storage_table_generic_init(table, init_sql, drop);
+}
+
+int storage_table_pressure_init(char* table, int drop)
+{
+    char * init_sql;
+    init_sql= "CREATE TABLE IF NOT EXISTS %s("
+            "idx INTEGER PRIMARY KEY, "
+            "date_time TEXT, "
+            "pressure REAL, "
+            "temperature REAL, "
+            "height REAL);";
+    return storage_table_generic_init(table, init_sql, drop);
+}
+
+int storage_table_deploy_init(char* table, int drop)
+{
+    char * init_sql;
+    init_sql= "CREATE TABLE IF NOT EXISTS %s("
+            "idx INTEGER PRIMARY KEY, "
+            "date_time TEXT, "
+            "lineal_actuator INTEGER, "
+            "servo_motor INTEGER);";
+    return storage_table_generic_init(table, init_sql, drop);
+}
+
+int storage_table_generic_init(char* table, char* init_sql, int drop)
+{
+    char *err_msg;
+    char *sql;
+    int rc;
+
+    if(drop)
+    {
+        sql = sqlite3_mprintf("DROP TABLE %s", table);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+        if (rc != SQLITE_OK )
+        {
+            LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", table, err_msg, sql);
+            sqlite3_free(err_msg);
+            sqlite3_free(sql);
+            return -1;
+        }
+        else
+        {
+            LOGD(tag, "Table %s drop successfully", table);
+            sqlite3_free(sql);
+        }
+    }
+    else
+    {
+        sql = sqlite3_mprintf(init_sql, table);
+        rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+        if (rc != SQLITE_OK )
+        {
+            LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", table, err_msg, sql);
+            sqlite3_free(err_msg);
+            sqlite3_free(sql);
+            return -1;
+        }
+        else
+        {
+            LOGD(tag, "Table %s created successfully", table);
+            sqlite3_free(sql);
+            return 0;
+        }
+    }
+}
+
+int storage_table_gps_set(const char* table, gps_data* data)
+{
+    char *err_msg;
+    int rc;
+
+    char *sql = sqlite3_mprintf(
+            "INSERT OR REPLACE INTO %s "
+                    "(date_time, timestamp, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode, phase)\n "
+                    "VALUES (datetime(\"now\"), \"%s\", %f, %f, %f, %f, %f, %d, %d, %d);",
+            table, data->timestamp, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode, data->phase);
+
+    rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+
+    if (rc != SQLITE_OK)
+    {
+        LOGE(tag, "SQL error: %s", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return -1;
+    }
+    else
+    {
+        LOGI(tag, "Inserted  gps data");
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return 0;
+    }
+}
+
+int storage_table_gps_get(const char* table, gps_data data[], int n)
+{
+    char **results;
+    char *err_msg;
+
+    char *sql = sqlite3_mprintf("SELECT * FROM %s ORDER BY idx DESC LIMIT %d", table, n);
+
+    int row;
+    int col;
+
+    // execute statement
+    sqlite3_get_table(db, sql, &results, &row, &col, &err_msg);
+
+    if(row==0 || col==0)
+    {
+        LOGI(tag, "GPS table empty");
+        return 0;
+    }
+    else
+    {
+        LOGI(tag, "GPS table")
+        int i;
+        for (i = 0; i < (col*row)+col; i++)
+        {
+            printf("%s\t", results[i]);
+            if ((i + 1) % col == 0)
+                printf("\n");
+        }
+
+        for (i = 0; i < row; i++)
+        {
+            // maybe memcpy?
+            strcpy(data[i].timestamp, results[(i*col)+col+2]);
+            data[i].latitude =  atof(results[(i*col)+col+3]);
+            data[i].longitude = atof(results[(i*col)+col+4]);
+            data[i].height = atof(results[(i*col)+col+5]);
+            data[i].velocity_x = atof(results[(i*col)+col+6]);
+            data[i].velocity_y = atof(results[(i*col)+col+7]);
+            data[i].satellites_number = atoi(results[(i*col)+col+8]);
+            data[i].mode = atoi(results[(i*col)+col+9]);
+            data[i].phase = atoi(results[(i*col)+col+10]);
+        }
+    }
+    return 0;
+}
+
+int storage_table_prs_set(const char* table, prs_data* data)
+{
+    char *err_msg;
+    int rc;
+
+    char *sql = sqlite3_mprintf(
+            "INSERT OR REPLACE INTO %s "
+                    "(date_time, pressure, temperature, height)\n "
+                    "VALUES (datetime(\"now\"), %f, %f, %f);",
+            table, data->pressure, data->temperature, data->height);
+
+    rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+
+    if (rc != SQLITE_OK)
+    {
+        LOGE(tag, "SQL error: %s", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return -1;
+    }
+    else
+    {
+        LOGI(tag, "Inserted  prs data");
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return 0;
+    }
+}
+
+int storage_table_prs_get(const char* table, prs_data data[], int n)
+{
+    char **results;
+    char *err_msg;
+
+    char *sql = sqlite3_mprintf("SELECT * FROM %s ORDER BY idx DESC LIMIT %d", table, n);
+
+    int row;
+    int col;
+
+    // execute statement
+    sqlite3_get_table(db, sql, &results, &row, &col, &err_msg);
+
+    if(row==0 || col==0)
+    {
+        LOGI(tag, "PRS table empty");
+        return 0;
+    }
+    else
+    {
+        LOGI(tag, "PRS table")
+        int i;
+        for (i = 0; i < (col*row)+col; i++)
+        {
+            printf("%s\t", results[i]);
+            if ((i + 1) % col == 0)
+                printf("\n");
+        }
+
+        for (i = 0; i < row; i++)
+        {
+            data[i].pressure =  atof(results[(i*col)+col+2]);
+            data[i].temperature = atof(results[(i*col)+col+3]);
+            data[i].height = atof(results[(i*col)+col+4]);
+        }
+    }
+    return 0;
+}
+
+int storage_table_dpl_set(const char* table, dpl_data* data)
+{
+    char *err_msg;
+    int rc;
+
+    char *sql = sqlite3_mprintf(
+            "INSERT OR REPLACE INTO %s "
+                    "(date_time, lineal_actuator, servo_motor)\n "
+                    "VALUES (datetime(\"now\"), %d, %d);",
+            table, data->lineal_actuator, data->servo_motor);
+
+    rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+
+    if (rc != SQLITE_OK)
+    {
+        LOGE(tag, "SQL error: %s", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return -1;
+    }
+    else
+    {
+        LOGI(tag, "Inserted  dpl data");
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return 0;
+    }
+}
+
+int storage_table_dpl_get(const char* table, dpl_data data[], int n)
+{
+    char **results;
+    char *err_msg;
+
+    char *sql = sqlite3_mprintf("SELECT * FROM %s ORDER BY idx DESC LIMIT %d", table, n);
+
+    int row;
+    int col;
+
+    // execute statement
+    sqlite3_get_table(db, sql, &results, &row, &col, &err_msg);
+
+    if(row==0 || col==0)
+    {
+        LOGI(tag, "DPL table empty");
+        return 0;
+    }
+    else
+    {
+        LOGI(tag, "DPL table")
+        int i;
+        for (i = 0; i < (col*row)+col; i++)
+        {
+            printf("%s\t", results[i]);
+            if ((i + 1) % col == 0)
+                printf("\n");
+        }
+
+        for (i = 0; i < row; i++)
+        {
+            data[i].lineal_actuator =  atof(results[(i*col)+col+2]);
+            data[i].servo_motor= atof(results[(i*col)+col+3]);
+        }
+    }
+    return 0;
+}
+
+
+
+
+

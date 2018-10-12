@@ -35,6 +35,7 @@
 #include "repoCommand.h"
 
 void taskHousekeeping(void *param);
+void change_system_phase(void);
 
 #endif //T_HOUSEKEEPING_H
 

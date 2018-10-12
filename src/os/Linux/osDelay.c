@@ -58,6 +58,7 @@ void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds)
 
     // Delay left ticks
     uint32_t s_msec = (s_usec - d_usec)/1000;
+    //printf("---> Going to sleep %u (c_usec %u, d_usec %u, s_usec %u, last_time %u\n", s_msec, c_usec, d_usec, s_usec, *lastTime);
     osDelay(s_msec);
 
     // Tag last delay ticks

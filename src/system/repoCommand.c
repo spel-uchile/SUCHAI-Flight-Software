@@ -154,6 +154,28 @@ void cmd_add_params_raw(cmd_t *cmd, void *params, int len)
     }
 }
 
+void cmd_add_params_strAndraw(cmd_t *cmd, char *paramStr, void *paramsRaw, int len)
+{
+    size_t len_paramStr = strlen(paramStr);
+    if(len_paramStr + len> SCH_CMD_MAX_STR_PARAMS)
+    {
+        LOGW(tag, "Parameters larger than CMD_MAX_STR_PARAMS will be shorted!( (%d > %d)",
+             (int)(len_paramStr+len), SCH_CMD_MAX_STR_PARAMS);
+    }
+
+    // Check pointers
+    if(cmd != NULL && len_paramStr)
+    {
+        cmd->params = (char *)malloc(sizeof(char)*(len_paramStr+1)+(size_t)len);
+        strncpy(cmd->params, paramStr, len_paramStr+1);
+        printf("***************************cmd->params=%s\n", cmd->params);
+        printf("***************************paramsRaw=%s\n", (char *)paramsRaw);
+        strcat(cmd->params, paramsRaw);
+        printf("***************************cmd->params2=%s\n", cmd->params);
+        // strncpy(cmd->params+len_paramStr+1, paramsRaw, (size_t)len);
+    }
+}
+
 void cmd_add_params_str(cmd_t *cmd, char *params)
 {
     size_t len_param = strlen(params);
@@ -293,6 +315,7 @@ int cmd_repo_init(void)
 #if SCH_COMM_ENABLE
     cmd_com_init();
     cmd_tm_init();
+    cmd_subsys_init();
 #endif
     cmd_console_init();
 #if SCH_FP_ENABLED

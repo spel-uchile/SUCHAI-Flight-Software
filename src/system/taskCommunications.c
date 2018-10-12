@@ -17,11 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//#include <csp/csp_types.h>
 #include "taskCommunications.h"
 
 static const char *tag = "Communications";
 
 static void com_receive_tc(csp_packet_t *packet);
+static void com_receive_tm(csp_packet_t *packet, int src);
 static void com_receive_cmd(csp_packet_t *packet);
 
 void taskCommunications(void *param)
@@ -63,10 +65,12 @@ void taskCommunications(void *param)
         /* Read packets. Timeout is 500 ms */
         while ((packet = csp_read(conn, 500)) != NULL)
         {
+            printf("packet received with destiny: %d \n", csp_conn_dport(conn) );
             switch (csp_conn_dport(conn))
             {
                 case SCH_TRX_PORT_TC:
                     /* Process incoming TC */
+                    printf("Telemcommand obtained \n");
                     com_receive_tc(packet);
                     csp_buffer_free(packet);
                     // Create a response packet and send
@@ -79,13 +83,19 @@ void taskCommunications(void *param)
 
                 case SCH_TRX_PORT_TM:
                     /* TODO: Process incoming TM */
+                    printf("Telemetry obtained \n");
+                    int source = csp_conn_src(conn);
+                    printf("Source node is %d \n", source);
+                    com_receive_tm(packet, source);
                     csp_buffer_free(packet);
                     // Create a response packet and send
                     rep_ok = csp_buffer_clone(rep_ok_tmp);
                     csp_send(conn, rep_ok, 1000);
+                    break;
 
                 case SCH_TRX_PORT_RPT:
                     // Digital repeater port, resend the received packet
+                    printf("Repeat obtained \n");
                     if(csp_conn_dst(conn) == SCH_COMM_ADDRESS)
                     {
                         rc = csp_sendto(CSP_PRIO_NORM, CSP_BROADCAST_ADDR,
@@ -164,4 +174,88 @@ static void com_receive_cmd(csp_packet_t *packet)
     // Send command to execution if not null
     if(new_cmd != NULL)
         cmd_send(new_cmd);
+}
+
+/**
+ * Parse TM frames
+ *
+ * @param packet A csp buffer containing a null terminated string with the
+ *               format <command> [parameters]
+ */
+static void com_receive_tm(csp_packet_t *packet, int src)
+{
+    // Make sure the buffer is a null terminated string
+    packet->data[packet->length] = '\0';
+    printf("Parsing Telemetry Data \n");
+    printf("%s \n", (char*)packet->data);
+    int ok = 0;
+
+    if(src == COM_GPS_NODE) {
+        char timestamp[25];
+        float latitude;
+        float longitude;
+        float height;
+        float velocity_x;
+        float velocity_y;
+        int satellites_number;
+        int mode;
+        int phase = dat_get_system_var(dat_balloon_phase);      // current phase
+    //    memset(timestamp, '\0', (size_t)25+1);
+
+        // Scan a command and parameter string: <command> [parameters]
+        ok = sscanf((char*)packet->data, "%s %f %f %f %f %f %d %d %d", timestamp, &latitude, &longitude, &height, &velocity_x, &velocity_y, &satellites_number, &mode, &phase);
+
+        gps_data data;
+        strcpy(data.timestamp, timestamp);
+        data.latitude = latitude;
+        data.longitude = longitude;
+        data.height = height;
+        data.velocity_x = velocity_x;
+        data.velocity_y = velocity_y;
+        data.satellites_number = satellites_number;
+        data.mode = mode;
+        data.phase = phase;
+
+    //    printf("timestamp is: %s \n", data.timestamp);
+    //    printf("latitud is: %f \n", data.latitude);
+    //    printf("longitude is: %f \n", data.longitude);
+    //    printf("heigth is: %f \n", data.height);
+    //    printf("velocity_x is: %f \n", data.velocity_x);
+    //    printf("veclocity_y is: %f \n", data.velocity_y);
+    //    printf("sat number is: %d \n", data.satellites_number);
+    //    printf("mode is: %d \n", data.mode);
+
+        storage_table_gps_set(DAT_GPS_TABLE, &data);
+    } else if (src == COM_DPL_NODE) {
+        //dpl
+        int lineal_actuator;
+        int servo_motor;
+
+        // Scan a command and parameter string: <command> [parameters]
+        ok = sscanf((char*)packet->data, "%d %d", &lineal_actuator, &servo_motor);
+
+        dpl_data data;
+        data.lineal_actuator = lineal_actuator;
+        data.servo_motor = servo_motor;
+
+        storage_table_dpl_set(DAT_DPL_TABLE, &data);
+
+    } else if (src == COM_PRS_NODE) {
+        //prs
+        float pressure;
+        float temperature;
+        float height;
+
+        // Scan a command and parameter string: <command> [parameters]
+        ok = sscanf((char*)packet->data, "%f %f %f", &pressure, &temperature, &height);
+
+
+        prs_data data;
+        printf("pressure: %f", data.pressure);
+        data.pressure = pressure;
+        data.temperature = temperature;
+        data.height = height;
+
+        storage_table_prs_set(DAT_PRS_TABLE, &data);
+    }
 }

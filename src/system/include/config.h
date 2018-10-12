@@ -40,7 +40,7 @@
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE         0    ///< TaskCommunications enabled (0 | 1)
+#define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          0      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
@@ -88,7 +88,7 @@
 #define SCH_TASK_CSP_STACK        (5*256)     ///< CSP route task stack size in words
 
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
-#define SCH_BUFFERS_CSP           (5)       ///< Number of available CSP buffers
+#define SCH_BUFFERS_CSP           (10)       ///< Number of available CSP buffers
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
