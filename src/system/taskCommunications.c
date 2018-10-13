@@ -23,6 +23,7 @@ static const char *tag = "Communications";
 
 static void com_receive_tc(csp_packet_t *packet);
 static void com_receive_cmd(csp_packet_t *packet);
+static void com_receive_tm(csp_packet_t *packet);
 
 void taskCommunications(void *param)
 {
@@ -48,10 +49,10 @@ void taskCommunications(void *param)
     }
 
     rep_ok_tmp = csp_buffer_get(1);
-    memset(rep_ok_tmp->data, 200, 1);
+    rep_ok_tmp->data[0] = 200;
     rep_ok_tmp->length = 1;
 
-    int count_tc = 0;
+    int count_tc;
 
     while(1)
     {
@@ -63,6 +64,10 @@ void taskCommunications(void *param)
         /* Read packets. Timeout is 500 ms */
         while ((packet = csp_read(conn, 500)) != NULL)
         {
+            count_tc = dat_get_system_var(dat_com_count_tc) + 1;
+            dat_set_system_var(dat_com_count_tc, count_tc);
+            dat_set_system_var(dat_com_last_tc, (int) time(NULL));
+
             switch (csp_conn_dport(conn))
             {
                 case SCH_TRX_PORT_TC:
@@ -70,19 +75,17 @@ void taskCommunications(void *param)
                     com_receive_tc(packet);
                     csp_buffer_free(packet);
                     // Create a response packet and send
-//                    rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    rep_ok = csp_buffer_get(1);
-                    rep_ok->data[0] = 200;
-                    rep_ok->length = 1;
+                    rep_ok = csp_buffer_clone(rep_ok_tmp);
                     csp_send(conn, rep_ok, 1000);
                     break;
 
                 case SCH_TRX_PORT_TM:
-                    /* TODO: Process incoming TM */
+                    com_receive_tm(packet);
                     csp_buffer_free(packet);
                     // Create a response packet and send
                     rep_ok = csp_buffer_clone(rep_ok_tmp);
                     csp_send(conn, rep_ok, 1000);
+                    break;
 
                 case SCH_TRX_PORT_RPT:
                     // Digital repeater port, resend the received packet
@@ -107,17 +110,11 @@ void taskCommunications(void *param)
                     com_receive_cmd(packet);
                     csp_buffer_free(packet);
                     // Create a response packet and send
-                    //rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    rep_ok = csp_buffer_get(1);
-                    rep_ok->data[0] = 200;
-                    rep_ok->length = 1;
+                    rep_ok = csp_buffer_clone(rep_ok_tmp);
                     csp_send(conn, rep_ok, 1000);
                     break;
 
                 default:
-                    count_tc++;
-                    dat_set_system_var(dat_com_count_tc, count_tc);
-                    dat_set_system_var(dat_com_last_tc, (int) time(NULL));
                     /* Let the service handler reply pings, buffer use, etc. */
                     csp_service_handler(conn, packet);
                     break;
@@ -164,4 +161,29 @@ static void com_receive_cmd(csp_packet_t *packet)
     // Send command to execution if not null
     if(new_cmd != NULL)
         cmd_send(new_cmd);
+}
+
+/**
+ * Process a TM frame, determine TM type and call corresponding parsing command
+ * @param packet a csp buffer containing a com_frame_t structure.
+ */
+static void com_receive_tm(csp_packet_t *packet)
+{
+    cmd_t *cmd_parse_tm;
+    com_frame_t *frame = (com_frame_t *)packet->data;
+
+    LOGD(tag, "Received %d bytes", packet->length);
+    LOGD(tag, "Frame: %d", frame->frame);
+    LOGD(tag, "Type : %d", frame->type);
+
+    switch(frame->type)
+    {
+        case TM_TYPE_STATUS:
+            cmd_parse_tm = cmd_get_str("tm_parse_status");
+            cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
+            cmd_send(cmd_parse_tm);
+            break;
+        default:
+            LOGW(tag, "Undefined telemetry type %d!", frame->type);
+    }
 }
