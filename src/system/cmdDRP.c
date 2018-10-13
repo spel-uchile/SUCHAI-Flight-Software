@@ -39,6 +39,9 @@ void cmd_drp_init(void)
 
 int drp_execute_before_flight(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+        return CMD_ERROR;
+
     int magic;
     if(nparams == sscanf(params, fmt, &magic))
     {
@@ -73,40 +76,9 @@ int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
 
-    printf("system variables repository\n");
-    printf("index\t value\n");
-
-    /*typedef union sensors_value{
-        float f;
-        int32_t i;
-    } value;*/
-
-    int var_index;
-    value var_read;
-
-    for (var_index = 0; var_index < dat_obc_temp_1; var_index++)
-    {
-        int var = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d\n", var_index, var);
-    }
-
-    for (var_index = dat_obc_temp_1; var_index < dat_dep_ant_deployed; var_index++)
-    {
-        var_read.i = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d | %f\n", var_index, var_read.i, var_read.f);
-    }
-
-    for (var_index = dat_dep_ant_deployed; var_index < dat_ads_acc_x; var_index++)
-    {
-        int var = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d\n", var_index, var);
-    }
-
-    for (var_index = dat_ads_acc_x; var_index < dat_system_last_var; var_index++)
-    {
-        var_read.i = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d | %f\n", var_index, var_read.i, var_read.f);
-    }
+    dat_status_t status;
+    dat_status_to_struct(&status);
+    dat_print_status(&status);
 
     return CMD_OK;
 }

@@ -1,6 +1,7 @@
 /**
  * @file  repoData.h
- * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @author Camilo Rojas M - camrojas@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @date 2018
@@ -28,10 +29,17 @@
 
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
 
+/** Copy a system @var to a status strcture @st */
+#define DAT_CPY_SYSTEM_VAR(st, var) st->var = dat_get_system_var(var)
+/** Print the name and vale of a integer system status variable */
+#define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %d\n", #var, st->var)
+/** Print the name and vale of a float system status variable */
+#define DAT_PRINT_SYSTEM_VAR_F(st, var) printf("\t%s: %f\n", #var, st->var)
+
 /**
  * System level status variables
  */
-typedef struct fp_entry {
+typedef struct __attribute__((packed)) fp_entry {
     int unixtime;               ///< time to execute in unixtime
     char* cmd;                  ///< command to execute
     char* args;                 ///< command arguments
@@ -42,8 +50,8 @@ typedef struct fp_entry {
 /**
  * System level status variables
  */
-typedef enum dat_system{
-    /// OBC: on borad computer related variables.
+typedef enum dat_system {
+    /// OBC: on board computer related variables.
     dat_obc_opmode = 0,        ///< General operation mode
     dat_obc_last_reset,        ///< Last reset source
     dat_obc_hrs_alive,         ///< Hours since first boot
@@ -87,6 +95,53 @@ typedef enum dat_system{
 } dat_system_t;
 
 /**
+ * System level status variables
+ */
+typedef struct __attribute__((packed)) dat_status_s {
+    /// OBC: on board computer related variables.
+    int32_t dat_obc_opmode;         ///< General operation mode
+    int32_t dat_obc_last_reset;     ///< Last reset source
+    int32_t dat_obc_hrs_alive;      ///< Hours since first boot
+    int32_t dat_obc_hrs_wo_reset;   ///< Hours since last reset
+    int32_t dat_obc_reset_counter;  ///< Number of reset since first boot
+    int32_t dat_obc_sw_wdt;         ///< Software watchdog timer counter
+    int32_t dat_obc_temp_1;         ///< Temperature value of the first sensor
+    int32_t dat_obc_temp_2;         ///< Temperature value of the second sensor
+    int32_t dat_obc_temp_3;         ///< Temperature value of the gyroscope
+
+    /// DEP: deployment related variables.
+    int32_t dat_dep_ant_deployed;   ///< Was the antenna deployed?
+    int32_t dat_dep_date_time;      ///< Deployment unix time
+
+    /// RTC: related variables
+    int32_t dat_rtc_date_time;      /// RTC current unix time
+
+    /// COM: communications system variables.
+    int32_t dat_com_opmode;         ///< TRX Operation mode
+    int32_t dat_com_count_tm;       ///< number of TM sent
+    int32_t dat_com_count_tc;       ///< number of received TC
+    int32_t dat_com_last_tc;        ///< Unix time of the last received tc
+
+    /// FPL: flight plant related variables
+    int32_t dat_fpl_last;           ///< Last executed flight plan (unix time)
+    int32_t dat_fpl_queue;          ///< Flight plan queue length
+
+    /// Add custom status variables here
+    //int32_t dat_custom            ///< Variable description
+
+    /// ADS: Attitude determination system
+    float dat_ads_acc_x;            ///< Gyroscope acceleration value along the x axis
+    float dat_ads_acc_y;            ///< Gyroscope acceleration value along the y axis
+    float dat_ads_acc_z;            ///< Gyroscope acceleration value along the z axis
+    float dat_ads_mag_x;            ///< Magnetometer x axis
+    float dat_ads_mag_y;            ///< Magnetometer y axis
+    float dat_ads_mag_z;            ///< Magnetometer z axis
+
+    /// LAST ELEMENT: DO NOT EDIT
+    int32_t dat_system_last_var;    ///< Dummy element, the number of status variables
+} dat_status_t;
+
+/**
  * Initializes data repositories including buffers and mutexes
  */
 void dat_repo_init(void);
@@ -111,6 +166,23 @@ void dat_set_system_var(dat_system_t index, int value);
  * @return Variable value
  */
 int dat_get_system_var(dat_system_t index);
+
+/**
+ * Copy the list of status variables to a dat_status_t struct.
+ * This function can be useful to debug status variables @seealso dat_print_status
+ * and to pack the variables prior to send it using libcsp @seealso tm_send_status.
+ *
+ * @param status dat_status_t *. Pointer to destination structure
+ */
+void dat_status_to_struct(dat_status_t *status);
+
+/**
+ * Print the name a values of the system status variables.
+ * @seealso dat_status_to_struct.
+ *
+ * @param status dat_status_t *. Pointer to the status variables struct
+ */
+void dat_print_status(dat_status_t *status);
 
 /**
  * Get the necessary parameters to send a command and set the values in

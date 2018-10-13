@@ -2,6 +2,7 @@
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
  *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2018, Camilo Rojas Milla, camrojas@uchile.cl
  *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
  *
@@ -27,7 +28,6 @@ char* table = "flightPlan";
 #ifdef AVR32
 time_t sec = 0;
 #endif
-
 
 
 #if SCH_STORAGE_MODE == 0
@@ -216,6 +216,63 @@ int dat_get_system_var(dat_system_t index)
     #else
         return value_1;
     #endif
+}
+
+void dat_status_to_struct(dat_status_t *status)
+{
+    assert(status != NULL);
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_opmode);        ///< General operation mode
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_last_reset);    ///< Last reset source
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_hrs_alive);     ///< Hours since first boot
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_hrs_wo_reset);  ///< Hours since last reset
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_reset_counter); ///< Number of reset since first boot
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_sw_wdt);        ///< Software watchdog timer counter
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_temp_1);        ///< Temperature value of the first sensor
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_temp_2);        ///< Temperature value of the second sensor
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_temp_3);        ///< Temperature value of the gyroscope
+    DAT_CPY_SYSTEM_VAR(status, dat_dep_ant_deployed);  ///< Was the antenna deployed?
+    DAT_CPY_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix time
+    DAT_CPY_SYSTEM_VAR(status, dat_rtc_date_time);     /// RTC current unix time
+    DAT_CPY_SYSTEM_VAR(status, dat_com_opmode);        ///< TRX Operation mode
+    DAT_CPY_SYSTEM_VAR(status, dat_com_count_tm);      ///< number of TM sent
+    DAT_CPY_SYSTEM_VAR(status, dat_com_count_tc);      ///< number of received TC
+    DAT_CPY_SYSTEM_VAR(status, dat_com_last_tc);       ///< Unix time of the last received tc
+    DAT_CPY_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
+    DAT_CPY_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
+    DAT_CPY_SYSTEM_VAR(status, dat_ads_acc_x);         ///< Gyroscope acceleration value along the x axis
+    DAT_CPY_SYSTEM_VAR(status, dat_ads_acc_y);         ///< Gyroscope acceleration value along the y axis
+    DAT_CPY_SYSTEM_VAR(status, dat_ads_acc_z);         ///< Gyroscope acceleration value along the z axis
+    DAT_CPY_SYSTEM_VAR(status, dat_ads_mag_x);         ///< Magnetometer x axis
+    DAT_CPY_SYSTEM_VAR(status, dat_ads_mag_y);         ///< Magnetometer y axis
+    DAT_CPY_SYSTEM_VAR(status, dat_ads_mag_z);         ///< Magnetometer z axis
+}
+
+void dat_print_status(dat_status_t *status)
+{
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_opmode);            ///< General operation mode
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_last_reset);        ///< Last reset source
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_hrs_alive);         ///< Hours since first boot
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_hrs_wo_reset);      ///< Hours since last reset
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_reset_counter);     ///< Number of reset since first boot
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_sw_wdt);            ///< Software watchdog timer counter
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_temp_1);            ///< Temperature value of the first sensor
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_temp_2);            ///< Temperature value of the second sensor
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_temp_3);            ///< Temperature value of the gyroscope
+    DAT_PRINT_SYSTEM_VAR(status, dat_dep_ant_deployed);      ///< Was the antenna deployed?
+    DAT_PRINT_SYSTEM_VAR(status, dat_dep_date_time);         ///< Deployment unix time
+    DAT_PRINT_SYSTEM_VAR(status, dat_rtc_date_time);         /// RTC current unix time
+    DAT_PRINT_SYSTEM_VAR(status, dat_com_opmode);            ///< TRX Operation mode
+    DAT_PRINT_SYSTEM_VAR(status, dat_com_count_tm);          ///< number of TM sent
+    DAT_PRINT_SYSTEM_VAR(status, dat_com_count_tc);          ///< number of received TC
+    DAT_PRINT_SYSTEM_VAR(status, dat_com_last_tc);           ///< Unix time of the last received tc
+    DAT_PRINT_SYSTEM_VAR(status, dat_fpl_last);              ///< Last executed flight plan (unix time)
+    DAT_PRINT_SYSTEM_VAR(status, dat_fpl_queue);             ///< Flight plan queue length
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_x);           ///< Gyroscope acceleration value along the x axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_y);           ///< Gyroscope acceleration value along the y axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_z);           ///< Gyroscope acceleration value along the z axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_x);           ///< Magnetometer x axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_y);           ///< Magnetometer y axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_z);           ///< Magnetometer z axis
 }
 
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)

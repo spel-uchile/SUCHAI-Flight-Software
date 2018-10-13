@@ -115,5 +115,4 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams);
  */
 int drp_test_system_vars(char *fmt, char *params, int nparams);
 
-
 #endif /* CMD_DRP_H */
