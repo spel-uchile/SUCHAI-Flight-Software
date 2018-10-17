@@ -19,9 +19,14 @@
 # ./install-avr32.sh
 # cd -
 
-echo "Downloading Gomspace SDK..."
-wget -N data.spel.cl/gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
-tar -xjf gs-sw-nanomind-a3200-sdk-lite-v1.2.tar.bz2
+echo "Downloading OBC drivers SDK..."
+if [ ! -d "a3200-sdk-lite-v1.2" ]; then
+    git clone https://github.com/spel-uchile/suchai-drivers-obc a3200-sdk-lite-v1.2
+else
+    cd a3200-sdk-lite-v1.2
+    git pull
+    cd -
+fi
 
 echo "Linking source code into SDK..."
 cd a3200-sdk-lite-v1.2/
@@ -29,20 +34,8 @@ mv src/ src.old/
 ln -s -f ../../../../src
 cd -
 
-echo "Coping custom waf script..."
-mv a3200-sdk-lite-v1.2/wscript a3200-sdk-lite-v1.2/wscript.old
-cp wscript a3200-sdk-lite-v1.2/wscript
-
-echo "Custom i2c.h..."
-mv a3200-sdk-lite-v1.2/lib/libasf/gomspace/drivers/include/dev/i2c.h a3200-sdk-lite-v1.2/lib/libasf/gomspace/drivers/include/dev/i2c.h.old
-cp i2c.h.suchai a3200-sdk-lite-v1.2/lib/libasf/gomspace/drivers/include/dev/i2c.h
-
-echo "Custom syscallbasic..."
-mv a3200-sdk-lite-v1.2/lib/libasf/gomspace/freertos/avr32/syscalls_basic.c a3200-sdk-lite-v1.2/lib/libasf/gomspace/freertos/avr32/syscalls_basic.c.old
-cp syscalls_basic.c.suchai a3200-sdk-lite-v1.2/lib/libasf/gomspace/freertos/avr32/syscalls_basic.c
-
 echo "Adding libcsp v1.5.dev to sdk lib folder"
-if [ ! -d "./libcsp" ]; then
+if [ ! -d "libcsp" ]; then
     git clone https://github.com/libcsp/libcsp
     cd libcsp
     git checkout release-1.5
@@ -57,14 +50,22 @@ if [ ! -d "./libcsp" ]; then
     cd -
     cp wscript.libcsp libcsp/wscript
 fi
+
+echo "Linking libcsp into SDK"
 cd a3200-sdk-lite-v1.2/lib/
 ln -s -f ../../libcsp
 cd -
 
-echo "Downloading GomSpace drivers..."
-wget -N data.spel.cl/gs-drivers.tar.gz
-tar -xzf gs-drivers.tar.gz
-echo "Adding GomSpace drivers..."
+echo "Downloading BUS drivers..."
+if [ ! -d "gs-drivers" ]; then
+    git clone https://github.com/spel-uchile/suchai-drivers-bus gs-drivers
+else
+    cd gs-drivers
+    git pull
+    cd -
+fi
+
+echo "Linking BUS drivers into SDK"
 cd a3200-sdk-lite-v1.2/lib/
 ln -s -f ../../gs-drivers/libparam
 cd -
