@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* Select one operating system */
-#define LINUX                                      ///< LINUX | FREERTOS
+#define FREERTOS                                     ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
@@ -35,7 +35,7 @@
 
 /* General system settings */
 #define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE         0    ///< TaskCommunications enabled (0 | 1)
+#define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          0      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
@@ -58,6 +58,8 @@
 /* Data repository settings */
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
+
+#define SCH_MAX_DATA_SIZE 10000
 
 /**
  * Memory settings.
@@ -83,5 +85,8 @@
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
+
+#define SCH_FLASH_INIT_MEMORY 5000
+
 
 #endif //SUCHAI_CONFIG_H
