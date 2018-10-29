@@ -86,7 +86,7 @@
 #define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
 
-#define SCH_FLASH_INIT_MEMORY 5000
+#define SCH_FLASH_INIT_MEMORY 0
 
 
 #endif //SUCHAI_CONFIG_H

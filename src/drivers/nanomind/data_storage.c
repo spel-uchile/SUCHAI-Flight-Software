@@ -24,6 +24,9 @@ int storage_init(const char *file)
     /* Init FLASH NOR storage */
     spn_fl512s_init((unsigned int) 0);
 
+    /* Erase Blovk */
+//    spn_fl512s_erase_block(0);
+
 
     data_map[0] = (uint16_t) (sizeof(tempdata));
     data_map[1] = (uint16_t) (sizeof(adsdata));
@@ -131,7 +134,6 @@ int storage_set_payload_data(int index, void* data, int payload)
 //    uint8_t  dat = 4;
     printf("Writing in addresss: %u \n", add);
     printf("Writing value %d \n", *(uint8_t*)data);
-    spn_fl512s_erase_block(add);
     int ret = spn_fl512s_write_data(add, data, 1);
 //    printf("Writing return: %d \n", ret);
     return 0;

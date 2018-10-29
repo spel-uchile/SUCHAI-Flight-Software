@@ -35,7 +35,8 @@ void taskHousekeeping(void *param)
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
-    int in = 4;
+    int in = 0;
+    spn_fl512s_erase_block(0);
     
     while(1)
     {
@@ -44,7 +45,7 @@ void taskHousekeeping(void *param)
         elapsed_sec += delay_ms/1000; //Update seconds counts
 
         if( in < SCH_MAX_DATA_SIZE) {
-//            printf("Writing value %f in index %d NOR FLASH\n", (float)in, in);
+            printf("Writing value %f in index %d NOR FLASH\n", (float)in, in);
             struct temp_data data = {(float) in, (float) in, (float) in};
             uint8_t dat = (uint8_t) in % 200;
             storage_set_payload_data(in, &dat, temp_sensors);
