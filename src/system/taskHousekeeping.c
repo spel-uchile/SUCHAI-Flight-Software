@@ -35,7 +35,7 @@ void taskHousekeeping(void *param)
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
-    int in = 0;
+    int in = 4;
     
     while(1)
     {
@@ -48,6 +48,8 @@ void taskHousekeeping(void *param)
             struct temp_data data = {(float) in, (float) in, (float) in};
             uint8_t dat = (uint8_t) in % 200;
             storage_set_payload_data(in, &dat, temp_sensors);
+
+            osTaskDelayUntil(&xLastWakeTime, 500);
 
             struct temp_data data2;
             uint8_t dat2;

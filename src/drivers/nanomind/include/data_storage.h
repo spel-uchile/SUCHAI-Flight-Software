@@ -11,6 +11,7 @@
 #include "fm33256b.h"
 #include "spn_fl512s.h"
 #include "config.h"
+#include "globals.h"
 
 enum payload_id {
     temp_sensors=0,
