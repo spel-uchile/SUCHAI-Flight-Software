@@ -60,7 +60,7 @@ typedef enum dat_system {
     dat_obc_sw_wdt,            ///< Software watchdog timer counter
     dat_obc_temp_1,            ///< Temperature value of the first sensor
     dat_obc_temp_2,            ///< Temperature value of the second sensor
-    dat_obc_temp_3,         ///< Temperature value of the gyroscope
+    dat_obc_temp_3,            ///< Temperature value of the gyroscope
 
     /// DEP: deployment related variables.
     dat_dep_ant_deployed,      ///< Was the antenna deployed?
@@ -70,17 +70,19 @@ typedef enum dat_system {
     dat_rtc_date_time,         /// RTC current unix time
 
     /// COM: communications system variables.
-    dat_com_opmode,            ///< TRX Operation mode
-    dat_com_count_tm,          ///< number of TM sent
-    dat_com_count_tc,          ///< number of received TC
+    dat_com_count_tm,          ///< Number of TM sent
+    dat_com_count_tc,          ///< Number of received TC
     dat_com_last_tc,           ///< Unix time of the last received tc
+    dat_com_freq,              ///< Frequency [Hz]
+    dat_com_tx_pwr,            ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
+    dat_com_baud,              ///< Baudrate [bps]
+    dat_com_mode,              ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
+    dat_com_bcn_period,        ///< Number of seconds between beacon packets
+
 
     /// FPL: flight plant related variables
     dat_fpl_last,              ///< Last executed flight plan (unix time)
     dat_fpl_queue,             ///< Flight plan queue length
-
-    /// Add custom status variables here
-    //dat_custom              ///< Variable description
 
     /// ADS: Attitude determination system
     dat_ads_acc_x,            ///< Gyroscope acceleration value along the x axis
@@ -89,6 +91,15 @@ typedef enum dat_system {
     dat_ads_mag_x,            ///< Magnetometer x axis
     dat_ads_mag_y,            ///< Magnetometer y axis
     dat_ads_mag_z,            ///< Magnetometer z axis
+
+    /// EPS: Energy power system
+    dat_eps_vbatt,            ///< Voltage of battery [mV]
+    dat_eps_cur_sun,          ///< Current from boost converters [mA]
+    dat_eps_cur_sys,          ///< Current out of battery [mA]
+    dat_eps_temp_bat0,        ///< Battery temperature sensor
+
+    /// Add custom status variables here
+    //dat_custom              ///< Variable description
 
     /// LAST ELEMENT: DO NOT EDIT
     dat_system_last_var       ///< Dummy element, the number of status variables
@@ -117,17 +128,18 @@ typedef struct __attribute__((packed)) dat_status_s {
     int32_t dat_rtc_date_time;      /// RTC current unix time
 
     /// COM: communications system variables.
-    int32_t dat_com_opmode;         ///< TRX Operation mode
     int32_t dat_com_count_tm;       ///< number of TM sent
     int32_t dat_com_count_tc;       ///< number of received TC
     int32_t dat_com_last_tc;        ///< Unix time of the last received tc
+    uint32_t dat_com_freq;          ///< Frequency [Hz]
+    uint32_t dat_com_tx_pwr;        ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
+    uint32_t dat_com_baud;          ///< Baudrate [bps]
+    uint32_t dat_com_mode;          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
+    uint32_t dat_com_bcn_period;    ///< Number of seconds between beacon packets
 
     /// FPL: flight plant related variables
     int32_t dat_fpl_last;           ///< Last executed flight plan (unix time)
     int32_t dat_fpl_queue;          ///< Flight plan queue length
-
-    /// Add custom status variables here
-    //int32_t dat_custom            ///< Variable description
 
     /// ADS: Attitude determination system
     float dat_ads_acc_x;            ///< Gyroscope acceleration value along the x axis
@@ -136,6 +148,12 @@ typedef struct __attribute__((packed)) dat_status_s {
     float dat_ads_mag_x;            ///< Magnetometer x axis
     float dat_ads_mag_y;            ///< Magnetometer y axis
     float dat_ads_mag_z;            ///< Magnetometer z axis
+
+    /// EPS: Energy power system
+    uint32_t dat_eps_vbatt;         ///< Voltage of battery [mV]
+    uint32_t dat_eps_cur_sun;       ///< Current from boost converters [mA]
+    uint32_t dat_eps_cur_sys;       ///< Current out of battery [mA]
+    uint32_t dat_eps_temp_bat0;     ///< Battery temperature sensor
 
     /// LAST ELEMENT: DO NOT EDIT
     int32_t dat_system_last_var;    ///< Dummy element, the number of status variables
