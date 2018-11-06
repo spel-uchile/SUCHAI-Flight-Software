@@ -209,4 +209,6 @@ int com_get_config(char *fmt, char *params, int nparams);
  */
 int com_set_config(char *fmt, char *params, int nparams);
 
+int com_update_status_vars(char *fmt, char *params, int nparams);
+
 #endif /* CMD_COM_H */

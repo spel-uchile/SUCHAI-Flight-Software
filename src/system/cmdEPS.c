@@ -34,6 +34,7 @@ void cmd_eps_init(void)
     cmd_add("eps_get_hk", eps_get_hk, "", 0);
     cmd_add("eps_get_config", eps_get_config, "", 0);
     cmd_add("eps_set_heater", eps_set_heater, "%d %d", 2);
+    cmd_add("eps_update_status", eps_update_status_vars, "", 0);
 #endif
 }
 
@@ -100,4 +101,22 @@ int eps_set_heater(char *fmt, char *params, int nparams)
         return CMD_FAIL;
     }
 }
+
+int eps_update_status_vars(char *fmt, char *params, int nparams)
+{
+    eps_hk_t hk = {};
+    if(eps_hk_get(&hk) > 0)
+    {
+        dat_set_system_var(dat_eps_vbatt, hk.vbatt);
+        dat_set_system_var(dat_eps_cur_sun, hk.cursun);
+        dat_set_system_var(dat_eps_cur_sys, hk.cursys);
+        dat_set_system_var(dat_eps_temp_bat0, hk.temp[4]);
+    }
+    else
+    {
+        return CMD_FAIL;
+    }
+    return CMD_OK;
+}
+
 #endif //SCH_USE_NANOPOWER
