@@ -38,6 +38,7 @@ void cmd_com_init(void)
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%s", 1);
     cmd_add("com_set_config", com_set_config, "%s %s", 2);
+    cmd_add("com_update_status", com_set_config, "", 2);
 #endif
 }
 
@@ -343,6 +344,47 @@ int com_set_config(char *fmt, char *params, int nparams)
             return CMD_FAIL;
         }
     }
+}
+
+int com_update_status_vars(char *fmt, char *params, int nparams)
+{
+    char *names[5] = {"freq", "tx_pwr", "baud", "mode", "bcn_interval"};
+    dat_system_t vars[5] = {dat_com_freq, dat_com_tx_pwr, dat_com_bcn_period,
+                             dat_com_mode, dat_com_bcn_period};
+    int table = 0;
+    param_table_t *param_i = NULL;
+
+    int i = 0;
+    for(i=0; i<5; i++)
+    {
+        // Find the given parameter by name and get the size, index, type and
+        // table; param_i is set to NULL if the parameter is not found.
+        _com_config_find(names[i], &table, &param_i);
+
+        // Warning if the parameter name was not found
+        assert(param_i != NULL);
+
+        // Actually get the parameter value
+        void *out = malloc(param_i->size);
+        rc = rparam_get_single(out, param_i->addr, param_i->type, param_i->size,
+                               table, SCH_TRX_ADDRESS, AX100_PORT_RPARAM, 1000);
+
+        // Process the answer, save value to status variables
+        if(rc > 0)
+        {
+            if(param_i->size == sizeof(int))
+                dat_set_system_var(vars[i], *((int *)out));
+            else if(param_i->size == sizeof(uint8_t))
+                dat_set_system_var(vars[i], *((uint8_t *)out));
+            else
+                LOGE(tag, "Error casting status variable");
+
+            LOGI(tag, "Param %s (table %d) %d", param_i->name, table, dat_get_system_var(vars[i]));
+            free(out);
+        }
+    }
+
+    return CMD_OK;
 }
 
 
