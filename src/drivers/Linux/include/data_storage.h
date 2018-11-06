@@ -11,6 +11,8 @@
 #include "config.h"
 
 
+
+
 /**
  * Init data storage system.
  * In this case we use SQLite, so this function open a database in file

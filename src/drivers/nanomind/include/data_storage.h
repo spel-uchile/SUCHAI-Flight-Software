@@ -11,6 +11,28 @@
 #include "fm33256b.h"
 #include "spn_fl512s.h"
 #include "config.h"
+#include "globals.h"
+
+enum payload_id {
+    temp_sensors=0,
+    ads_sensors
+};
+
+struct temp_data {
+    float obc_temp_1;
+    float obc_temp_2;
+    float obc_temp_3;
+};
+
+struct ads_data {
+    float acc_x;            ///< Gyroscope acceleration value along the x axis
+    float acc_y;            ///< Gyroscope acceleration value along the y axis
+    float acc_z;            ///< Gyroscope acceleration value along the z axis
+    float mag_x;            ///< Magnetometer x axis
+    float mag_y;            ///< Magnetometer y axis
+    float mag_z;            ///< Magnetometer z axis
+};
+
 
 /**
  * This union represent a status variable stored in the FM33256B FRAM. Status
@@ -187,7 +209,7 @@ int storage_show_table(void);
  * @param payload Int. payload to store
  * @return 0 OK, -1 Error
  */
-int storage_set_payload_data(int index, int value, int payload);
+int storage_set_payload_data(int index, void * data, int payload);
 
 /**
  * Get a value from index address for specific payload
@@ -199,7 +221,14 @@ int storage_set_payload_data(int index, int value, int payload);
  * @param payload Int. payload to get value
  * @return value from address
  */
-int storage_get_payload_data(int index, int payload);
+int storage_get_payload_data(int index, void* data, int payload);
+
+/**
+ * Delete all memory sections in NOR FLASH
+ * @note: non-reentrant function, use mutex to sync access
+ * @return OK 0, Error -1
+ */
+int storage_delete_memory_sections(void);
 
 /**
  * Close the opened database
