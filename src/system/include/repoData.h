@@ -23,6 +23,12 @@
     #include "data_storage.h"
 #endif
 
+typedef union fvalue{
+    float f;
+    int32_t i;
+} fvalue_t;
+
+
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
@@ -31,6 +37,7 @@
 
 /** Copy a system @var to a status strcture @st */
 #define DAT_CPY_SYSTEM_VAR(st, var) st->var = dat_get_system_var(var)
+#define DAT_CPY_SYSTEM_VAR_F(st, var) {fvalue_t v; v.i = (float)dat_get_system_var(var); st->var = v.f;}
 /** Print the name and vale of a integer system status variable */
 #define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %d\n", #var, st->var)
 /** Print the name and vale of a float system status variable */
@@ -116,9 +123,9 @@ typedef struct __attribute__((packed)) dat_status_s {
     int32_t dat_obc_hrs_wo_reset;   ///< Hours since last reset
     int32_t dat_obc_reset_counter;  ///< Number of reset since first boot
     int32_t dat_obc_sw_wdt;         ///< Software watchdog timer counter
-    int32_t dat_obc_temp_1;         ///< Temperature value of the first sensor
-    int32_t dat_obc_temp_2;         ///< Temperature value of the second sensor
-    int32_t dat_obc_temp_3;         ///< Temperature value of the gyroscope
+    float dat_obc_temp_1;           ///< Temperature value of the first sensor
+    float dat_obc_temp_2;           ///< Temperature value of the second sensor
+    float dat_obc_temp_3;           ///< Temperature value of the gyroscope
 
     /// DEP: deployment related variables.
     int32_t dat_dep_ant_deployed;   ///< Was the antenna deployed?
