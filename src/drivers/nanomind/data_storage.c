@@ -99,7 +99,7 @@ int storage_flight_plan_reset(void)
     return 0;
 }
 
-int storage_show_table (void)
+int storage_show_table(void)
 {
     return 0;
 }
@@ -111,21 +111,16 @@ int storage_close(void)
 
 int storage_set_payload_data(int index, void* data, int payload)
 {
-//    data32_t data;
-//    data.data32 = (uint32_t)value;
-//    uint16_t len = (uint16_t)(sizeof(data));
+    uint32_t add = (uint32_t) SCH_FLASH_INIT_MEMORY;
+    int i=0;
+    for(i=0;i<payload; ++i)
+    {
 
-
-//    uint32_t addr, uint8_t *data, uint16_t le
-
-    uint32_t add = (uint32_t) SCH_FLASH_INIT_MEMORY + (uint32_t)index;
-//    int i;
-//    for(i=0;i<payload; ++i)
-//    {
-//        printf("Adress is: %u", add);
+        add += (uint16_t) SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*(i+1);
 //        add += (uint16_t) (data_map[i]*SCH_MAX_DATA_SIZE);
-//    }
-//    add += (uint16_t) (index*data_map[payload]);
+//        printf("Adress is: %u\n", add);
+    }
+    add += (uint16_t) (index*data_map[payload]);
 
 //    LOGV(tag, "Writing 0x%X", (unsigned int)data.data32);
 //    printf("Writing in addresss: %u \n", add);
@@ -133,33 +128,42 @@ int storage_set_payload_data(int index, void* data, int payload)
 //    spn_fl512s_write_data(add, (uint8_t*) data, data_map[payload]);
 //    uint8_t  dat = 4;
     printf("Writing in addresss: %u \n", add);
-    printf("Writing value %d \n", *(uint8_t*)data);
-    int ret = spn_fl512s_write_data(add, data, 1);
+//    printf("Writing value %d \n", *(uint8_t*)data);
+    int ret = spn_fl512s_write_data(add, data, data_map[payload]);
 //    printf("Writing return: %d \n", ret);
     return 0;
 }
 
 int storage_get_payload_data(int index, void* data, int payload)
 {
-//    data32_t data;
-//    uint16_t len = (uint16_t)(sizeof(uint32_t));
-//    uint16_t add = (uint16_t)(index*len);
 
-    uint32_t add= (uint32_t) SCH_FLASH_INIT_MEMORY + (uint32_t)index;
-//    int i;
-//    for(i=0;i<payload; ++i)
-//    {
+    uint32_t add = (uint32_t) SCH_FLASH_INIT_MEMORY;
+    int i=0;
+    for(i=0;i<payload; ++i)
+    {
 //        add += (uint16_t) (data_map[i]*SCH_MAX_DATA_SIZE);
-//    }
-//    add += (uint16_t) (index*data_map[payload]);
+        add += (uint16_t) SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*(i+1);
+    }
+    add += (uint16_t) (index*data_map[payload]);
 
     printf("Reading in addresss: %u \n", add);
 //    printf("Reading values of size %u \n", data_map[payload]);
 //    spn_fl512s_read_data(add, (uint8_t *) data, data_map[payload]);
-    uint8_t  dat;
-    spn_fl512s_read_data(add, &dat, 1);
-    printf("Reading value %d \n", dat);
+    spn_fl512s_read_data(add, (uint8_t *)data, data_map[payload]);
+//    printf("Reading value %d \n", *(uint8_t*)data);
 //    LOGV(tag, "Read 0x%X", (unsigned int)data.data32);
+    return 0;
+}
+
+int storage_delete_memory_sections()
+{
+    int i=0;
+    for(i=0;  i<SCH_NUMBER_OF_SECTIONS; ++i)
+    {
+        LOGI(tag, "i is  %d\n", i);
+        LOGI(tag, "deleting section in address %d\n", i*SCH_SIZE_PER_SECTION )
+        spn_fl512s_erase_block(i*SCH_SIZE_PER_SECTION);
+    }
     return 0;
 }
 

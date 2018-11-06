@@ -36,7 +36,7 @@ void taskHousekeeping(void *param)
     portTick xLastWakeTime = osTaskGetTickCount();
 
     int in = 0;
-    spn_fl512s_erase_block(0);
+    storage_delete_memory_sections();
     
     while(1)
     {
@@ -44,19 +44,25 @@ void taskHousekeeping(void *param)
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
         elapsed_sec += delay_ms/1000; //Update seconds counts
 
-        if( in < SCH_MAX_DATA_SIZE) {
-            printf("Writing value %f in index %d NOR FLASH\n", (float)in, in);
-            struct temp_data data = {(float) in, (float) in, (float) in};
-            uint8_t dat = (uint8_t) in % 200;
-            storage_set_payload_data(in, &dat, temp_sensors);
+        if( in < 1000) {
+            printf("Writing struct temp with value %f in index %d NOR FLASH\n", (float)in, in);
+            struct temp_data data_temp = {(float) in, (float) in, (float) in};
+//            uint8_t dat = (uint8_t) in % 200;
+            storage_set_payload_data(in, &data_temp, temp_sensors);
+
+            struct temp_data data_out_temp;
+            int res = storage_get_payload_data(in, &data_out_temp, temp_sensors);
+            printf("Got values for struct temp (%f, %f, %f) in index %d NOR FLASH\n", data_out_temp.obc_temp_1, data_out_temp.obc_temp_2, data_out_temp.obc_temp_3, in);
 
             osTaskDelayUntil(&xLastWakeTime, 500);
 
-            struct temp_data data2;
-            uint8_t dat2;
-            int res = storage_get_payload_data(in, &dat2, temp_sensors);
-//            printf("val of data2: %f \n", data2.obc_temp_1);
-//            printf("Got values (%f, %f, %f) in index %d NOR FLASH\n", data2.obc_temp_1, data2.obc_temp_2, data2.obc_temp_3, in);
+            int in2 = in+1;
+            struct ads_data data_ads = {(float) in2, (float) in2, (float) in2, (float) in2, (float) in2, (float) in2};
+            storage_set_payload_data(in, &data_ads, ads_sensors);
+
+            struct ads_data data_out_ads;
+            int res2 = storage_get_payload_data(in, &data_out_ads, ads_sensors);
+            printf("Got values for struct ads (%f, %f, %f, %f, %f, %f) in index %d NOR FLASH\n", data_out_ads.acc_x, data_out_ads.acc_y, data_out_ads.acc_z, data_out_ads.mag_x, data_out_ads.mag_y, data_out_ads.mag_z, in);
         }
         in++;
 

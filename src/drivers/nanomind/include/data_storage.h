@@ -224,6 +224,13 @@ int storage_set_payload_data(int index, void * data, int payload);
 int storage_get_payload_data(int index, void* data, int payload);
 
 /**
+ * Delete all memory sections in NOR FLASH
+ * @note: non-reentrant function, use mutex to sync access
+ * @return OK 0, Error -1
+ */
+int storage_delete_memory_sections(void);
+
+/**
  * Close the opened database
  *
  * @note: NOT IMPLEMENTEDs
