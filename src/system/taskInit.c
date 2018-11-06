@@ -64,6 +64,11 @@ void taskInit(void *param)
      */
     init_can(0); // Init can, default disabled
 
+    /**
+    * Init PWM driver
+    */
+    gs_pwm_init();
+
     /* Latest reset source */
     int reset_source = reset_cause_get_causes();
     log_reset_cause(reset_source);

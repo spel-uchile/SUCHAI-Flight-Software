@@ -202,6 +202,7 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
     if(sscanf(params, fmt, &channel, &duty) == nparams)
     {
         LOGI(tag, "Setting duty %d to Channel %d", duty, channel);
+        gs_pwm_enable(channel);
         gs_pwm_set_duty(channel, duty);
         return CMD_OK;
 
