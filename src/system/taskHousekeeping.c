@@ -59,8 +59,9 @@ void taskHousekeeping(void *param)
         {
             LOGD(tag, "10 sec tasks");
             //cmd_t *cmd_10s = cmd_get_str("get_mem");
-            cmd_t *cmd_10s = cmd_get_str("test");
-            cmd_add_params_var(cmd_10s, "Task housekeeping running");
+            //cmd_t *cmd_10s = cmd_get_str("test");
+            cmd_t *cmd_10s = cmd_get_str("eps_update_status");
+            //cmd_add_params_var(cmd_10s, "Task housekeeping running");
             cmd_send(cmd_10s);
         }
 
