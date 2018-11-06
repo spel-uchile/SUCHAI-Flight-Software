@@ -353,6 +353,7 @@ int com_update_status_vars(char *fmt, char *params, int nparams)
                              dat_com_mode, dat_com_bcn_period};
     int table = 0;
     param_table_t *param_i = NULL;
+    int rc;
 
     int i = 0;
     for(i=0; i<5; i++)
