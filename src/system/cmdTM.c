@@ -49,9 +49,8 @@ int tm_send_status(char *fmt, char *params, int nparams)
         // Pack status variables to a structure
         dat_status_t status;
         dat_status_to_struct(&status);
-#if LOG_LEVEL >= LOG_LEVEL_DEBUG
-        dat_print_status(&status);
-#endif
+        if(LOG_LEVEL >= LOG_LVL_DEBUG)
+            dat_print_status(&status);
 
         // The total amount of status variables must fit inside a frame
         LOGV(tag, "sizeof(data.frame) = %d", sizeof(data.frame));
