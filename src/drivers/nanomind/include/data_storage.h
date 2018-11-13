@@ -12,10 +12,12 @@
 #include "spn_fl512s.h"
 #include "config.h"
 #include "globals.h"
+#include "repoData.h"
 
 enum payload_id {
     temp_sensors=0,
-    ads_sensors
+    ads_sensors,
+    last_sensor // Dummy value
 };
 
 struct temp_data {
@@ -211,6 +213,16 @@ int storage_show_table(void);
  */
 int storage_set_payload_data(int index, void * data, int payload);
 
+
+/**
+ * Add data struct to payload table
+ *
+ * @param data Pointer to struct
+ * @param payload Int, payload to store
+ * @return 0 OK, -1 Error
+ */
+int storage_add_payload_data(void * data, int payload);
+
 /**
  * Get a value from index address for specific payload
  * in NOR FLASH
@@ -219,9 +231,20 @@ int storage_set_payload_data(int index, void * data, int payload);
  *
  * @param index Int. index address in NOR FLASH
  * @param payload Int. payload to get value
- * @return value from address
+ * @return 0 OK, -1 Error
  */
 int storage_get_payload_data(int index, void* data, int payload);
+
+/**
+ * Get recent values from for specific payload
+ * in NOR FLASH
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param payload Int. payload to get value
+ * @return OK 0, Error -1
+ */
+int storage_get_recent_payload_data(void* data, int payload);
 
 /**
  * Delete all memory sections in NOR FLASH

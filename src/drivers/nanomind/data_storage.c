@@ -112,32 +112,52 @@ int storage_close(void)
 int storage_set_payload_data(int index, void* data, int payload)
 {
     uint32_t add = (uint32_t) SCH_FLASH_INIT_MEMORY;
+
+    if(payload >= last_sensor)
+    {
+        LOGE(tag, "payload id: %d greater than maximum id: %d", payload, last_sensor);
+        return -1;
+    }
+
     int i=0;
     for(i=0;i<payload; ++i)
     {
-
         add += (uint16_t) SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*(i+1);
-//        add += (uint16_t) (data_map[i]*SCH_MAX_DATA_SIZE);
-//        printf("Adress is: %u\n", add);
     }
     add += (uint16_t) (index*data_map[payload]);
 
-//    LOGV(tag, "Writing 0x%X", (unsigned int)data.data32);
-//    printf("Writing in addresss: %u \n", add);
-//    printf("Writing values of size %u for payload %d \n", data_map[payload], payload);
-//    spn_fl512s_write_data(add, (uint8_t*) data, data_map[payload]);
-//    uint8_t  dat = 4;
-    printf("Writing in addresss: %u \n", add);
+    // FIXME: Check if address is between available values
+
+
+    LOGV(tag, "Writing in addresss: %d \n", add);
 //    printf("Writing value %d \n", *(uint8_t*)data);
     int ret = spn_fl512s_write_data(add, data, data_map[payload]);
 //    printf("Writing return: %d \n", ret);
     return 0;
 }
 
+int storage_add_payload_data(void* data, int payload)
+{
+    // FIXME: Link system index with memory index with a union or struct
+    int index = dat_get_system_var(dat_mem_temp+payload);
+    storage_set_payload_data(index, data, payload);
+    // Update address
+    // FIXME: Link system index with memory index with a union or struct
+    dat_set_system_var(dat_mem_temp+payload, index+1);
+    return index+1;
+}
+
 int storage_get_payload_data(int index, void* data, int payload)
 {
 
     uint32_t add = (uint32_t) SCH_FLASH_INIT_MEMORY;
+
+    if(payload >= last_sensor)
+    {
+        LOGE(tag, "payload id: %d greater than maximum id: %d", payload, last_sensor);
+        return -1;
+    }
+
     int i=0;
     for(i=0;i<payload; ++i)
     {
@@ -145,6 +165,7 @@ int storage_get_payload_data(int index, void* data, int payload)
         add += (uint16_t) SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*(i+1);
     }
     add += (uint16_t) (index*data_map[payload]);
+    // FIXME: Check if address is between available values
 
     printf("Reading in addresss: %u \n", add);
 //    printf("Reading values of size %u \n", data_map[payload]);
@@ -155,14 +176,29 @@ int storage_get_payload_data(int index, void* data, int payload)
     return 0;
 }
 
+int storage_get_recent_payload_data(void * data, int payload)
+{
+    int index = dat_get_system_var(dat_mem_temp+payload);
+    return storage_get_payload_data(index-1, data, payload);
+}
+
 int storage_delete_memory_sections()
 {
     int i=0;
+
+    // Deleting Memory Sections
     for(i=0;  i<SCH_NUMBER_OF_SECTIONS; ++i)
     {
-        LOGI(tag, "i is  %d\n", i);
         LOGI(tag, "deleting section in address %d\n", i*SCH_SIZE_PER_SECTION )
         spn_fl512s_erase_block(i*SCH_SIZE_PER_SECTION);
+
+    }
+
+    // Initializing memory system vars
+    for(i=0; i < last_sensor-1; ++i)
+    {
+        // FIXME: Link system index with memory index with a union or struct
+        dat_set_system_var(dat_mem_temp+i, 0);
     }
     return 0;
 }

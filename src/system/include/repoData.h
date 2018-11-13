@@ -105,6 +105,10 @@ typedef enum dat_system {
     dat_eps_cur_sys,          ///< Current out of battery [mA]
     dat_eps_temp_bat0,        ///< Battery temperature sensor
 
+    /// Memory: Current payload memory address
+    dat_mem_temp,
+    dat_mem_ads,
+
     /// Add custom status variables here
     //dat_custom              ///< Variable description
 
