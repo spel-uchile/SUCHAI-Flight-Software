@@ -147,8 +147,7 @@ void cmd_add_params_raw(cmd_t *cmd, void *params, int len)
     // Check pointers
     if(cmd != NULL && params != NULL)
     {
-        LOGW(tag, "Parameters larger than CMD_MAX_STR_PARAMS!( (%d > %d)", len,
-             SCH_CMD_MAX_STR_PARAMS);
+        LOGD(tag, "Copying %d bytes as parameters", len);
         cmd->params = (char *)malloc((size_t)len);
         memcpy(cmd->params, params, (size_t)len);
     }
