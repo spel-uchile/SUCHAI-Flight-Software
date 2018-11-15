@@ -54,8 +54,8 @@ int tm_send_status(char *fmt, char *params, int nparams)
 #endif
 
         // The total amount of status variables must fit inside a frame
-        LOGV(tag, "sizeof(data.frame) = %d", sizeof(data.frame));
-        LOGV(tag, "sizeof(data.frame.data) = %d", sizeof(data.frame.data));
+        LOGV(tag, "sizeof(data.frame) = %lu", sizeof(data.frame));
+        LOGV(tag, "sizeof(data.frame.data) = %lu", sizeof(data.frame.data));
         assert(sizeof(status) < sizeof(data.frame.data));
         memcpy(data.frame.data.data8, &status, sizeof(status));
 

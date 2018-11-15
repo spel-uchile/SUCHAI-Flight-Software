@@ -86,7 +86,6 @@ typedef enum dat_system {
     dat_com_mode,              ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
     dat_com_bcn_period,        ///< Number of seconds between beacon packets
 
-
     /// FPL: flight plant related variables
     dat_fpl_last,              ///< Last executed flight plan (unix time)
     dat_fpl_queue,             ///< Flight plan queue length
@@ -106,8 +105,8 @@ typedef enum dat_system {
     dat_eps_temp_bat0,        ///< Battery temperature sensor
 
     /// Memory: Current payload memory address
-    dat_mem_temp,
-    dat_mem_ads,
+    dat_mem_temp,             ///< Temperature data index
+    dat_mem_ads,              ///< ADS data index
 
     /// Add custom status variables here
     //dat_custom              ///< Variable description
@@ -165,6 +164,10 @@ typedef struct __attribute__((packed)) dat_status_s {
     uint32_t dat_eps_cur_sun;       ///< Current from boost converters [mA]
     uint32_t dat_eps_cur_sys;       ///< Current out of battery [mA]
     uint32_t dat_eps_temp_bat0;     ///< Battery temperature sensor
+
+    /// Memory: Current payload memory address
+    uint32_t dat_mem_temp;
+    uint32_t dat_mem_ads;
 
     /// LAST ELEMENT: DO NOT EDIT
     int32_t dat_system_last_var;    ///< Dummy element, the number of status variables

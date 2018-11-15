@@ -259,6 +259,9 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
 
+    DAT_CPY_SYSTEM_VAR(status,  dat_mem_temp);
+    DAT_CPY_SYSTEM_VAR(status, dat_mem_ads);
+
 }
 
 void dat_print_status(dat_status_t *status)
@@ -301,6 +304,9 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
+
+    DAT_PRINT_SYSTEM_VAR(status,  dat_mem_temp);
+    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ads);
 }
 
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
