@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "config.h"
-#include "data_storage.h"
 
 #if SCH_COMM_ENABLE
     #include "csp/csp.h"
