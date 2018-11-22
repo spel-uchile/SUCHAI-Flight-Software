@@ -41,6 +41,12 @@ void taskTest(void *param)
 #endif
 
     LOGI(tag, "---- Testing DRP commands ----");
+    LOGI(tag, "Test: ebf");
+    test_cmd = cmd_get_str("ebf");
+    cmd_add_params_str(test_cmd, "1010");
+    cmd_send(test_cmd);
+    osDelay(500);
+
     LOGI(tag, "Test: print_vars");
     test_cmd = cmd_get_str("print_vars");
     cmd_add_params_str(test_cmd, "");
