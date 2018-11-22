@@ -156,12 +156,12 @@ int com_send_data(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     }
 
-    uint8_t rep[1];
+    uint8_t rep[1] = {0};
     com_data_t *data_to_send = (com_data_t *)params;
 
     // Send the data buffer to node and wait 1 seg. for the confirmation
     int rc = csp_transaction(CSP_PRIO_NORM, data_to_send->node, SCH_TRX_PORT_TM,
-                             1000, &(data_to_send->frame),
+                             3000, &(data_to_send->frame),
                              sizeof(data_to_send->frame), rep, 1);
 
     if(rc > 0 && rep[0] == 200)

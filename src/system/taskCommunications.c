@@ -94,6 +94,7 @@ void taskCommunications(void *param)
                         rc = csp_sendto(CSP_PRIO_NORM, CSP_BROADCAST_ADDR,
                                         SCH_TRX_PORT_RPT, SCH_TRX_PORT_RPT,
                                         CSP_O_NONE, packet, 1000);
+                        LOGD(tag, "Repeating message to %d (rc: %d)", CSP_BROADCAST_ADDR, rc);
                         if (rc != 0)
                             csp_buffer_free(packet); // Free the packet in case of errors
                     }
@@ -171,12 +172,15 @@ static void com_receive_tm(csp_packet_t *packet)
 {
     cmd_t *cmd_parse_tm;
     com_frame_t *frame = (com_frame_t *)packet->data;
-
     LOGD(tag, "Received %d bytes", packet->length);
     LOGD(tag, "Frame: %d", frame->frame);
-    LOGD(tag, "Type : %d", frame->type);
+    LOGD(tag, "Type : %d", (frame->type));
 
-    switch(frame->type)
+    int i = 0;
+    for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
+        frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
+
+    switch((frame->type))
     {
         case TM_TYPE_STATUS:
             cmd_parse_tm = cmd_get_str("tm_parse_status");
@@ -185,5 +189,8 @@ static void com_receive_tm(csp_packet_t *packet)
             break;
         default:
             LOGW(tag, "Undefined telemetry type %d!", frame->type);
+            print_buff(packet->data, packet->length);
+            print_buff16(packet->data16, packet->length/2);
+            break;
     }
 }
