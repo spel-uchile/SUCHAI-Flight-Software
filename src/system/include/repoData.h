@@ -176,26 +176,26 @@ typedef struct __attribute__((packed)) dat_status_s {
 /**
  * Payloads structures
  */
-enum payload_id {
+typedef enum payload_id {
     temp_sensors=0,
     ads_sensors,
     last_sensor // Dummy value
-};
+} payload_id_t;
 
-struct temp_data {
+typedef struct temp_data {
     float obc_temp_1;
     float obc_temp_2;
     float obc_temp_3;
-};
+} temp_data_t;
 
-struct ads_data {
+typedef struct ads_data {
     float acc_x;            ///< Gyroscope acceleration value along the x axis
     float acc_y;            ///< Gyroscope acceleration value along the y axis
     float acc_z;            ///< Gyroscope acceleration value along the z axis
     float mag_x;            ///< Magnetometer x axis
     float mag_y;            ///< Magnetometer y axis
     float mag_z;            ///< Magnetometer z axis
-};
+} ads_data_t;
 
 /**
  * Initializes data repositories including buffers and mutexes

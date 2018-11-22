@@ -20,6 +20,7 @@
 
 #define TM_TYPE_GENERIC 0
 #define TM_TYPE_STATUS  1
+#define TM_TYPE_PAYLOAD 10
 
 /**
  * Register TM commands
@@ -48,5 +49,14 @@ int tm_send_status(char *fmt, char *params, int nparams);
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int tm_parse_status(char *fmt, char *params, int nparams);
+
+/**
+ * Send data stored as payload. TODO: complete docs
+ * @param fmt
+ * @param params
+ * @param nparams
+ * @return
+ */
+int tm_send_pay_data(char *fmt, char *params, int nparams);
 
 #endif //CMDTM_H
