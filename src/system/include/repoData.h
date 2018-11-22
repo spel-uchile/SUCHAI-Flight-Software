@@ -174,6 +174,30 @@ typedef struct __attribute__((packed)) dat_status_s {
 } dat_status_t;
 
 /**
+ * Payloads structures
+ */
+enum payload_id {
+    temp_sensors=0,
+    ads_sensors,
+    last_sensor // Dummy value
+};
+
+struct temp_data {
+    float obc_temp_1;
+    float obc_temp_2;
+    float obc_temp_3;
+};
+
+struct ads_data {
+    float acc_x;            ///< Gyroscope acceleration value along the x axis
+    float acc_y;            ///< Gyroscope acceleration value along the y axis
+    float acc_z;            ///< Gyroscope acceleration value along the z axis
+    float mag_x;            ///< Magnetometer x axis
+    float mag_y;            ///< Magnetometer y axis
+    float mag_z;            ///< Magnetometer z axis
+};
+
+/**
  * Initializes data repositories including buffers and mutexes
  */
 void dat_repo_init(void);
@@ -294,5 +318,33 @@ int dat_set_time(int new_time);
  * @return 0 OK, 1 Error
  */
 int dat_show_time(int format);
+
+/**
+ * Add data struct to payload table
+ *
+ * @param data Pointer to struct
+ * @param payload Int, payload to store
+ * @return 0 OK, -1 Error
+ */
+int dat_add_payload_sample(void* data, int payload);
+
+/**
+ * Add data struct to payload table
+ *
+ * @param data Pointer to struct
+ * @param payload Int, payload to store
+ * @param delay Int, delay from recent value
+ * @return 0 OK, -1 Error
+ */
+int dat_get_recent_payload_sample(void* data, int payload, int delay);
+
+/**
+ * Delete all memory sections in NOR FLASH
+ *
+ * @return OK 0, Error -1
+ */
+int dat_delete_memory_sections(void);
+
+
 
 #endif // DATA_REPO_H

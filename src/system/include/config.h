@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* Select one operating system */
-#define FREERTOS                                     ///< LINUX | FREERTOS
+#define FREERTOS                                    ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
@@ -52,7 +52,7 @@
 #define SCH_KISS_DEVICE         "/dev/ttyUSB0"     ///< Kiss device path
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS        1                  ///< Node address
+#define SCH_COMM_ADDRESS        1                 ///< Node address
 #define SCH_TNC_ADDRESS         9                  ///< TNC node address
 #define SCH_TRX_ADDRESS         5                  ///< TRX node address
 #define SCH_EPS_ADDRESS         2                  ///< EPS node address
@@ -70,7 +70,6 @@
 
 #define SCH_SECTIONS_PER_PAYLOAD 2 /// TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024
-#define SCH_NUMBER_OF_SECTIONS 4 //256
 #define SCH_FLASH_INIT_MEMORY 0
 
 /**

@@ -57,6 +57,9 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
             dat_set_system_var(dat_rtc_date_time, (int)time(NULL));
             // dat_set_system_var(dat_custom, default_value);
 
+            // Delete memory sections
+            dat_delete_memory_sections();
+
             return CMD_OK;
         }
         else
@@ -179,6 +182,9 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     temp_3.f = gyro_temp;
     dat_set_system_var(dat_obc_temp_3, temp_3.i);
 
+    struct temp_data data_temp = {temp_1.f, temp_2.f, temp_3.f};
+    dat_add_payload_sample(&data_temp, temp_sensors);
+
     value acc_x;
     acc_x.f = gyro_reading.gyro_x;
     dat_set_system_var(dat_ads_acc_x, acc_x.i);
@@ -203,6 +209,9 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     mag_z.f = hmc_reading.z;
     dat_set_system_var(dat_ads_mag_z, mag_z.i);
 
+    struct ads_data data_ads = {acc_x.f, acc_y.f, acc_z.f, mag_x.f, mag_y.f, mag_z.f};
+    dat_add_payload_sample(&data_ads, ads_sensors);
+
     /*dat_set_system_var(dat_obc_temp_1, sensor1/10.);
     dat_set_system_var(dat_obc_temp_2, sensor2/10.);
     dat_set_system_var(dat_obc_temp_3, gyro_temp);
@@ -218,6 +227,14 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     printf("\r\nTemp1: %.1f, Temp2 %.1f, Gyro temp: %.2f\r\n", sensor1/10., sensor2/10., gyro_temp);
     printf("Gyro x, y, z: %f, %f, %f\r\n", gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z);
     printf("Mag x, y, z: %f, %f, %f\r\n\r\n",hmc_reading.x, hmc_reading.y, hmc_reading.z);
+
+    struct temp_data data_out_temp;
+    int res = dat_get_recent_payload_sample(&data_out_temp, temp_sensors, 0);
+    printf("Got values for struct temp (%f, %f, %f) in NOR FLASH\n", data_out_temp.obc_temp_1, data_out_temp.obc_temp_2, data_out_temp.obc_temp_3);
+
+    struct ads_data data_out_ads;
+    int res2 = dat_get_recent_payload_sample(&data_out_ads, ads_sensors, 0);
+    printf("Got values for struct ads (%f, %f, %f, %f, %f, %f) in NOR FLASH\n", data_out_ads.acc_x, data_out_ads.acc_y, data_out_ads.acc_z, data_out_ads.mag_x, data_out_ads.mag_y, data_out_ads.mag_z);
 #endif
 #endif
 

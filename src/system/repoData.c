@@ -499,3 +499,41 @@ int dat_show_time(int format)
     }
 #endif
 }
+
+int dat_add_payload_sample(void* data, int payload)
+{
+    int ret;
+
+#ifdef NANOMIND
+    LOGI(tag, "adding data to payload");
+     ret = storage_add_payload_data(data, payload);
+#else
+    ret = 0;
+#endif;
+    return ret;
+}
+
+
+int dat_get_recent_payload_sample(void* data, int payload, int delay)
+{
+    int ret;
+#ifdef NANOMIND
+    ret = storage_get_recent_payload_data(data, payload, delay);
+#else
+    ret=0;
+#endif
+
+    return ret;
+}
+
+int dat_delete_memory_sections(void)
+{
+    int ret;
+#ifdef NANOMIND
+    ret = storage_delete_memory_sections();
+#else
+    ret=0;
+#endif
+
+    return ret;
+}

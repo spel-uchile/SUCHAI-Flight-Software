@@ -14,28 +14,6 @@
 #include "globals.h"
 #include "repoData.h"
 
-enum payload_id {
-    temp_sensors=0,
-    ads_sensors,
-    last_sensor // Dummy value
-};
-
-struct temp_data {
-    float obc_temp_1;
-    float obc_temp_2;
-    float obc_temp_3;
-};
-
-struct ads_data {
-    float acc_x;            ///< Gyroscope acceleration value along the x axis
-    float acc_y;            ///< Gyroscope acceleration value along the y axis
-    float acc_z;            ///< Gyroscope acceleration value along the z axis
-    float mag_x;            ///< Magnetometer x axis
-    float mag_y;            ///< Magnetometer y axis
-    float mag_z;            ///< Magnetometer z axis
-};
-
-
 /**
  * This union represent a status variable stored in the FM33256B FRAM. Status
  * variables are casted to uint32_t and wrote as 4 uint8_t values in the FRAM.
@@ -207,7 +185,7 @@ int storage_show_table(void);
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param index Int. index address in NOR FLASH
- * @param value Int. value to store in address
+ * @param data Pointer to struct
  * @param payload Int. payload to store
  * @return 0 OK, -1 Error
  */
@@ -230,6 +208,7 @@ int storage_add_payload_data(void * data, int payload);
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param index Int. index address in NOR FLASH
+ * @param data Pointer to struct
  * @param payload Int. payload to get value
  * @return 0 OK, -1 Error
  */
@@ -241,10 +220,12 @@ int storage_get_payload_data(int index, void* data, int payload);
  *
  * @note: non-reentrant function, use mutex to sync access
  *
+ * @param data Pointer to struct
  * @param payload Int. payload to get value
+ * @param delay Int, delay from recent value
  * @return OK 0, Error -1
  */
-int storage_get_recent_payload_data(void* data, int payload);
+int storage_get_recent_payload_data(void* data, int payload, int delay);
 
 /**
  * Delete all memory sections in NOR FLASH
