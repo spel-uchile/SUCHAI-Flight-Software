@@ -25,7 +25,7 @@
     #include "param/rparam_client.h"
 #endif
 
-#define COM_FRAME_MAX_LEN (SCH_BUFF_MAX_LEN - 2 * sizeof(uint16_t))
+#define COM_FRAME_MAX_LEN (200 - 2 * sizeof(uint16_t))
 
 typedef struct com_frame{
     uint16_t frame;
