@@ -1,8 +1,12 @@
 # Dependency Graph
 
+### Introduction
+This Guide assumes that you already clone the SUCHAI-Flight-Software git repository and that you are executing all the following commands from the folder in which this document reside.
+
 ### Installation.
 This document will guide you to download and use a working "Pharo Image" with all the necessary software already installed.
 
+#### Linux Installation (Ubuntu 16.04)
 Download the Pharo Image with the following command
 
 ```bash
@@ -18,6 +22,24 @@ In the image directory you can run a Pharo *.st script in the terminal
 './pharo-vm/pharo' -vm-display-null Pharo.image export_code_svg.st
 ```
 
+#### Mac Installation
+Download the Pharo Image with the following command
+
+```bash
+wget https://data.spel.cl/fs-pharo-image.tar.xz
+wget http://data.spel.cl/MAC61-x64.zip
+tar xf fs-pharo-image.tar.xz
+unzip MAC61-x64.zip
+cd fs-pharo-image
+```
+
+In the image directory you can run a Pharo *.st script in the terminal using MAC 
+
+```bash
+./Pharo.app/Contents/MacOS/Pharo -vm-display-null Pharo.image export_code_html.st
+./Pharo.app/Contents/MacOS/Pharo -vm-display-null Pharo.image export_code_svg.st
+```
+
 The first command will produce an index.html file with the dependency graph of the code in the path provided inside the script. The second command will produce the same graph but in SVG format.
 
 ### Coding Visualizations.
@@ -26,7 +48,11 @@ To export the dependency graph visualization a class called SuchaiAnalisis writt
 Open Pharo image
 
 ```bash
+# Linux executable
 ./pharo-vm/pharo Pharo.image
+
+# MAC executable
+./Pharo.app/Contents/MacOS/Pharo Pharo.image
 ```
 
 Then open a Playground screen and run the next smalltalk code
@@ -84,7 +110,7 @@ color6 := Color r: 0.89 g: 0.102 b: 0.11.
 color7 := Color r: 0.992 g: 0.749 b: 0.435.
 ```
 
-For the next step we will assign the color pallete to different modules and create interaction between blocks in the plot.
+For the next step we will assign the color palette to different modules and create interaction between blocks in the plot.
 
 ```smalltalk
 "Create a RTMondrian instance"
@@ -154,7 +180,7 @@ Run the code, the Dependency Graph Visualization should be plot next to Playgrou
 
 ### Python helper function.
 
-For easy access to differents commits a python file with helper functions have been created. The following execution shows how to create an html file from an specific path and commit.
+For easy access to different commits a python file with helper functions have been created. The following execution shows how to create an html file from an specific path and commit.
 
 ```bash
 python3 suchai_analysis.py ../../../../SUCHAI-Flight-Software/src --hash d6496a2
