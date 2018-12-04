@@ -135,14 +135,17 @@ b shape rectangle
 "Create interactions"
 b interaction showEdge
     connectToAll: #dependentModules;
-    shape: (RTLine new color: Color orange).
+    shape: (RTArrowedLine new
+        withVerticallAttachPoint;
+        color: (Color orange alpha: 0.7);
+        width: 6).
 b interaction
     highlightNeighbors: #dependentModules
     color: Color orange.
 b nodes: relevantModules.
 b shape arrowedLine
     headOffset: 0.8;
-    withShorterDistanceAttachPointWithJump;
+    withVerticallAttachPoint;
     color: (Color black alpha: 0.7);
     width: 2.
 b edges
