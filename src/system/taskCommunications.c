@@ -128,23 +128,35 @@ void taskCommunications(void *param)
 }
 
 /**
- * Parse TC frames and generates corresponding commands
+ * Parse TC frames and generates corresponding commands. A TC frame contains
+ * a list of <command> [parameter] pairs separated by ";" (semicolon). For
+ * example this is a valid TC frame:
+ *
+ *      "help;send_cmd 10 help;ping 1;print_vars"
  *
  * @param packet A csp buffer containing a null terminated string with the
- *               format <command> [parameters]
+ *               format <command> [parameters];<command> [parameters];...
  */
 static void com_receive_tc(csp_packet_t *packet)
 {
-    /* TODO: this function should receive several (cmd,args) pairs */
-    /* TODO: check com_receive_cmd implementation */
-
     // Make sure the buffer is a null terminated string
     packet->data[packet->length] = '\0';
-    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
 
-    // Send command to execution if not null
-    if(new_cmd != NULL)
-        cmd_send(new_cmd);
+    // Search for the first ";" separated command
+    char *cmd_str;
+    cmd_str = strtok((char *)(packet->data), ";");
+
+    while(cmd_str != NULL)
+    {
+        // Parse and send command for execution
+        LOGI(tag, "TC: %s", cmd_str);
+        cmd_t *new_cmd = cmd_parse_from_str(cmd_str);
+        if (new_cmd != NULL)
+            cmd_send(new_cmd);
+
+        // Search for the next ";" separated command
+        cmd_str = strtok(NULL, ";");
+    }
 }
 
 /**

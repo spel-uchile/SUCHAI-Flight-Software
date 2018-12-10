@@ -32,6 +32,7 @@ void cmd_com_init(void)
     cmd_add("ping", com_ping, "%d", 1);
     cmd_add("send_rpt", com_send_rpt, "%d %s", 2);
     cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
+    cmd_add("send_tc", com_send_tc_frame, "%d %n", 1);
     cmd_add("send_data", com_send_data, "%p", 1);
     cmd_add("com_debug", com_debug, "", 0);
 #ifdef SCH_USE_NANOCOM
@@ -145,6 +146,45 @@ int com_send_cmd(char *fmt, char *params, int nparams)
     }
 
     LOGE(tag, "Error parsing parameters!");
+    return CMD_FAIL;
+}
+
+int com_send_tc_frame(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
+    int node, next, n_args;
+    uint8_t rep[1];
+    char tc_frame[COM_FRAME_MAX_LEN];
+    memset(tc_frame, '\0', COM_FRAME_MAX_LEN);
+
+    //format: <node> <command> [parameters];...;<command> [parameters]
+    n_args = sscanf(params, fmt, &node, &next);
+    if(n_args == nparams && next > 1)
+    {
+        strncpy(tc_frame, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+        LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, tc_frame, next);
+        // Sending message to node TC port and wait for response
+        int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_TC, 1000,
+                                 (void *)tc_frame, (int)strlen(tc_frame), rep, 1);
+
+        if(rc > 0 && rep[0] == 200)
+        {
+            LOGV(tag, "TC sent successfully. (rc: %d, re: %d)", rc, rep[0]);
+            return CMD_OK;
+        }
+        else
+        {
+            LOGE(tag, "Error sending TC. (rc: %d, re: %d)", rc, rep[0]);
+            return CMD_FAIL;
+        }
+    }
+
+    LOGE(tag, "Error parsing parameters! (np: %d, n: %d)", n_args, next);
     return CMD_FAIL;
 }
 

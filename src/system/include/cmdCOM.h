@@ -82,6 +82,39 @@ int com_send_rpt(char *fmt, char *param, int nparams);
 int com_send_cmd(char *fmt, char *param, int nparams);
 
 /**
+ * Send a Telecommand (TC) frame to node. A TC frame contains several <command>
+ * [parameters] pairs separated by ";" (semicolon), for example:
+ *
+ *      "help;send_cmd 10 help;ping 1;print_vars"
+ *
+ * The list of command will be parsed and queue in TaskCommunications @seealso
+ * com_receive_tc
+ *
+ * @param fmt Str. Parameters format: "%d %n"
+ * @param param Str. Parameters as string:
+ *      "<node> <command> [parameters];<command> [parameters]".
+ *      Ex: "10 help;ping 1"
+ * @param nparams Int. Number of parameters: 1 (assumes that %n return the next
+ *                parameter pointer).
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ *
+ * @code
+ *      // Create the TC frame for node 1 with 4 commands
+ *      char *tc_frame = "1 ping 10;print_vars;send_status 10"
+ *
+ *      // Case 1: Call the command directly
+ *      com_send_data("%d %s", tc_frame, 2);
+ *
+ *      // Case 2: Call the command from repoCommand
+ *      cmd_t *send_cmd = cmd_get_str("send_tc");          // Get the command
+ *      cmd_add_params(send_cmd, tc_frame); // Add params as binary data
+ *      cmd_send(send_cmd);
+ * @endcode
+ *
+ */
+int com_send_tc_frame(char *fmt, char *params, int nparams);
+
+/**
  * Sends telemetry data using CSP. Data is received in @params as binary, packed
  * in a @com_data_t structure that contains the destination node and the data.
  * Its expect the confirmation code: 200. See the usage example.
