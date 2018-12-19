@@ -7,6 +7,7 @@
 static const char *tag = "data_storage";
 
 static sqlite3 *db = NULL;
+PGconn *conn = NULL;
 char* fp_table = "flightPlan";
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
@@ -20,6 +21,7 @@ int storage_init(const char *file)
     }
 
     // Open database
+#if SCH_STORAGE_MODE == 1
     if(sqlite3_open(file, &db) != SQLITE_OK)
     {
         LOGE(tag, "Can't open database: %s", sqlite3_errmsg(db));
@@ -30,6 +32,23 @@ int storage_init(const char *file)
         LOGD(tag, "Opened database successfully");
         return 0;
     }
+#elif SCH_STORAGE_MODE == 2
+
+    conn = PQconnectdb("user=kaminari dbname=fs_db");
+
+    if (PQstatus(conn) == CONNECTION_BAD) {
+
+        fprintf(stderr, "Connection to database failed: %s\n",
+            PQerrorMessage(conn));
+        PQfinish(conn);
+    }
+
+    int ver = PQserverVersion(conn);
+
+    printf("Server version: %d\n", ver);
+#endif
+    return 0;
+
 }
 
 int storage_table_repo_init(char* table, int drop)
@@ -38,9 +57,12 @@ int storage_table_repo_init(char* table, int drop)
     char *sql;
     int rc;
 
+#if SCH_STORAGE_MODE == 1
+
     /* Drop table if selected */
     if(drop)
     {
+
         sql = sqlite3_mprintf("DROP TABLE %s", table);
         rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
@@ -79,6 +101,37 @@ int storage_table_repo_init(char* table, int drop)
         sqlite3_free(sql);
         return 0;
     }
+#elif SCH_STORAGE_MODE == 2
+
+    if (PQstatus(conn) == CONNECTION_BAD) {
+
+        fprintf(stderr, "Connection to database failed: %s\n",
+            PQerrorMessage(conn));
+    }
+
+    if(drop)
+    {
+
+    }
+
+    LOGI(tag, "Creating postgres table");
+
+
+
+    char create_table_string[100];
+    sprintf(create_table_string, "CREATE TABLE IF NOT EXISTS %s("
+     "idx INTEGER PRIMARY KEY, "
+     "name TEXT UNIQUE, "
+     "value INT);", table);
+    LOGI(tag, "Creating postgres table");
+    LOGI(tag, "SQL command: %s", create_table_string);
+
+    PGresult *res = PQexec(conn, create_table_string);
+    PQclear(res);
+    LOGI(tag, "Finish Creating postgres table");
+
+    return 0;
+#endif
 }
 
 int storage_table_flight_plan_init(int drop)
@@ -87,6 +140,8 @@ int storage_table_flight_plan_init(int drop)
     char* err_msg;
     char* sql;
     int rc;
+
+#if SCH_STORAGE_MODE == 1
 
     /* Drop table if selected */
     if (drop)
@@ -130,10 +185,13 @@ int storage_table_flight_plan_init(int drop)
         sqlite3_free(sql);
         return 0;
     }
+#endif
+    return 0;
 }
 
 int storage_repo_get_value_idx(int index, char *table)
 {
+#if SCH_STORAGE_MODE == 1
     sqlite3_stmt* stmt = NULL;
     char *sql = sqlite3_mprintf("SELECT value FROM %s WHERE idx=\"%d\";", table, index);
 
@@ -155,6 +213,16 @@ int storage_repo_get_value_idx(int index, char *table)
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
+#elif SCH_STORAGE_MODE == 2
+
+    char get_value_query[100];
+    sprintf(get_value_query, "SELECT value FROM %s WHERE idx=\"%d\";", table, index);
+    LOGI(tag, "%s",  get_value_query);
+    PGresult *res = PQexec(conn, get_value_query);
+    LOGI(tag, "%s\n", PQgetvalue(res, 0, 0));
+    PQclear(res);
+    int value = 0;
+#endif
     return value;
 }
 
@@ -186,6 +254,8 @@ int storage_repo_get_value_str(char *name, char *table)
 
 int storage_repo_set_value_idx(int index, int value, char *table)
 {
+
+#if SCH_STORAGE_MODE == 1
     char *err_msg;
     char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO %s (idx, name, value) "
                                         "VALUES ("
@@ -211,6 +281,22 @@ int storage_repo_set_value_idx(int index, int value, char *table)
         sqlite3_free(sql);
         return 0;
     }
+
+#elif SCH_STORAGE_MODE == 2
+    char set_value_query[200];
+    sprintf(set_value_query, "INSERT INTO %s (idx, value) "
+                             "VALUES ("
+                             "%d, "
+                             "%d) "
+                             "ON CONFLICT (idx) DO UPDATE "
+                             "SET value = %d; "
+                             , table, index, value, value);
+    LOGI(tag, "%s",  set_value_query);
+    PGresult *res = PQexec(conn, set_value_query);
+    PQclear(res);
+
+#endif
+    return 0;
 }
 
 int storage_repo_set_value_str(char *name, int value, char *table)

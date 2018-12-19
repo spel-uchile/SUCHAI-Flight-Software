@@ -64,8 +64,8 @@
 #define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
-#define SCH_STORAGE_TRIPLE_WR   1    ///< Tripled writing enabled (0 | 1)
+#define SCH_STORAGE_MODE        2    ///< Status repository location. (0) RAM, (1) External SQLite, (2) External Postgres.
+#define SCH_STORAGE_TRIPLE_WR   0    ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
 /**
