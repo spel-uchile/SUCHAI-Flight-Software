@@ -193,6 +193,7 @@ int storage_table_flight_plan_init(int drop)
 
 int storage_repo_get_value_idx(int index, char *table)
 {
+    int value = -1;
 #if SCH_STORAGE_MODE == 1
     sqlite3_stmt* stmt = NULL;
     char *sql = sqlite3_mprintf("SELECT value FROM %s WHERE idx=\"%d\";", table, index);
@@ -207,7 +208,7 @@ int storage_repo_get_value_idx(int index, char *table)
 
     // fetch only one row's status
     rc = sqlite3_step(stmt);
-    int value = -1;
+    value = -1;
     if(rc == SQLITE_ROW)
         value = sqlite3_column_int(stmt, 0);
     else
@@ -223,7 +224,7 @@ int storage_repo_get_value_idx(int index, char *table)
     PGresult *res = PQexec(conn, get_value_query);
     LOGI(tag, "%s\n", PQgetvalue(res, 0, 0));
     PQclear(res);
-    int value = 0;
+    value = 0;
 #endif
     return value;
 }
