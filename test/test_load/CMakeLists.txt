@@ -34,6 +34,6 @@ include_directories(
 
 link_directories(../../src/drivers/Linux/libcsp/lib)
 
-link_libraries(-lpthread -lsqlite3 -lcsp -lzmq)
+link_libraries(-lpthread -lsqlite3 -lcsp -lzmq -lpq)
 
 add_executable(SUCHAI_Flight_Software_Test ${SOURCE_FILES})
