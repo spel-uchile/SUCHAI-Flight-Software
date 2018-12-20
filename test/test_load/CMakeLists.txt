@@ -30,6 +30,7 @@ include_directories(
         ../../src/drivers/Linux/include
         ../../src/drivers/Linux/libcsp/include
         src/system/include
+        /usr/include/postgresql
 )
 
 link_directories(../../src/drivers/Linux/libcsp/lib)

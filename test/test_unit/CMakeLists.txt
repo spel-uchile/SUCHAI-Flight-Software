@@ -23,6 +23,7 @@ include_directories(
         ../../src/drivers/Linux/include
         ../../src/drivers/Linux/libcsp/include
         ../test_cmd/src/system/include
+        /usr/include/postgresql
 )
 
 link_directories(../../src/drivers/Linux/libcsp/lib)
