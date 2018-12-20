@@ -66,6 +66,8 @@ Linux installation requires the following libraries:
 * sqlite3 (libsqlite3-dev)
 * zmq (libzmq3-dev)
 * unzip
+* postgresql
+* libpq-dev
 
 #### Clone
 Clone this repository
