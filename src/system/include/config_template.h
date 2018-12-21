@@ -70,6 +70,10 @@
 #define SCH_STORAGE_TRIPLE_WR   {{SCH_STORAGE_TRIPLE_WR}}   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 
+#define SCH_SECTIONS_PER_PAYLOAD 2 /// TODO: Make configurable per payload
+#define SCH_SIZE_PER_SECTION 256*1024
+#define SCH_FLASH_INIT_MEMORY 0
+
 /**
  * Memory settings.
  *
