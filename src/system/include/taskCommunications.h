@@ -17,6 +17,7 @@
 #include "os.h"
 #include "csp/csp.h"
 #include "csp/csp_types.h"
+#include "csp/csp_endian.h"
 
 #include "config.h"
 #include "globals.h"

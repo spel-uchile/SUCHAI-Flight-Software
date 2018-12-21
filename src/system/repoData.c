@@ -509,7 +509,7 @@ int dat_add_payload_sample(void* data, int payload)
      ret = storage_add_payload_data(data, payload);
 #else
     ret = 0;
-#endif;
+#endif
     return ret;
 }
 
