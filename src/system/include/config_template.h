@@ -36,10 +36,12 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               {{LOG_LVL}}        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define LOG_LEVEL               {{LOG_LVL}}        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define SCH_NAME                "{{NAME}}"         ///< Project code name
+#define SCH_DEVICE_ID           {{ID}}             ///< Device unique ID
+#define SCH_SW_VERSION          "{{VERSION}}"      ///< Software version
 
 /* General system settings */
-#define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
 #define SCH_COMM_ENABLE         {{SCH_EN_COMM}}    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          {{SCH_EN_FP}}      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          {{SCH_EN_HK}}      ///< TaskHousekeeping enabled (0 | 1)
@@ -59,7 +61,7 @@
 #define SCH_TRX_PORT_TM         (9)                ///< Telemetry port
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
-#define SCH_TRX_PORT_CMD        (12)               ///< Commads port (execute console commands)
+#define SCH_TRX_PORT_CMD        (12)               ///< Commands port (execute console commands)
 #define SCH_COMM_ZMQ_OUT        "{{SCH_ZMQ_OUT}}"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN         "{{SCH_ZMQ_IN}}"   ///< In socket URI
 

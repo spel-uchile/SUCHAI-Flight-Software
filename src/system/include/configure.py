@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 import argparse
+from subprocess import Popen, PIPE
+
+
+def call_git_describe(abbrev=4):
+    try:
+        p = Popen(['git', 'describe', '--abbrev=%d' % abbrev],
+                  stdout=PIPE, stderr=PIPE)
+        p.stderr.close()
+        line = p.stdout.readlines()[0]
+        return line.strip().decode("utf-8")
+    except:
+        return "0.0.0"
 
 def parse_args():
     """
@@ -8,8 +20,11 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(prog='configure.py')
     parser.add_argument('os', type=str, default="LINUX")
-    parser.add_argument('--arch', type=str, default="ESP32")
+    parser.add_argument('--arch', type=str, default="NANOMIND")
     parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
+    parser.add_argument('--name', type=str, default="SUCHAI-Test")
+    parser.add_argument('--id',   type=str, default="0")
+    parser.add_argument('--version',   type=str, default=call_git_describe())
     parser.add_argument('--sch_comm', type=str, default="1")
     parser.add_argument('--sch_fp', type=str, default="1")
     parser.add_argument('--sch_hk', type=str, default="1")
@@ -37,6 +52,9 @@ def make_config(args, ftemp="config_template.h", fconfig="config.h"):
     config = config.replace("{{OS}}", args.os)
     config = config.replace("{{ARCH}}", args.arch)
     config = config.replace("{{LOG_LVL}}", args.log_lvl)
+    config = config.replace("{{NAME}}", args.name)
+    config = config.replace("{{ID}}", args.id)
+    config = config.replace("{{VERSION}}", args.version)
     config = config.replace("{{SCH_EN_COMM}}", args.sch_comm)
     config = config.replace("{{SCH_EN_FP}}", args.sch_fp)
     config = config.replace("{{SCH_EN_HK}}", args.sch_hk)

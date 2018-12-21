@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-import argparse
 import os
-
+import argparse
 import src.system.include.configure as configure
 
 def get_parameters():
@@ -11,8 +10,11 @@ def get_parameters():
     parser = argparse.ArgumentParser(prog='compile.py')
     # config.h template parameters
     parser.add_argument('os', type=str, default="LINUX")
-    parser.add_argument('--arch', type=str, default="ESP32")
+    parser.add_argument('--arch', type=str, default="NANOMIND")
     parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
+    parser.add_argument('--name', type=str, default="SUCHAI-Test")
+    parser.add_argument('--id',   type=str, default="0")
+    parser.add_argument('--version',   type=str, default=configure.call_git_describe())
     parser.add_argument('--sch_comm', type=str, default="1")
     parser.add_argument('--sch_fp', type=str, default="1")
     parser.add_argument('--sch_hk', type=str, default="1")

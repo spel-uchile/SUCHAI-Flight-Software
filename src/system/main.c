@@ -34,7 +34,10 @@ int main(void)
 {
     /* On reset */
     on_reset();
-    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n\n");
+    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n");
+    printf("\t Version: %s\n", SCH_SW_VERSION);
+    printf("\t Device : %d (%s)\n", SCH_DEVICE_ID, SCH_NAME);
+    printf("-----------------------------------------\n\n");
 
     /* Init software subsystems */
     log_init();      // Logging system

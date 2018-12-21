@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* Select one operating system */
-#define FREERTOS                                    ///< LINUX | FREERTOS
+#define LINUX                                      ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
@@ -36,14 +36,16 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               LOG_LVL_INFO        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define SCH_NAME                "SUCHAI-FS"         ///< Project code name
+#define SCH_DEVICE_ID           0                   ///< Device unique ID
+#define SCH_SW_VERSION          "2.0.1"             ///< Software version
 
 /* General system settings */
-#define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
-#define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
-#define SCH_FP_ENABLED          0      ///< TaskFlightPlan enabled (0 | 1)
-#define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
-#define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
+#define SCH_COMM_ENABLE         1     ///< TaskCommunications enabled (0 | 1)
+#define SCH_FP_ENABLED          0     ///< TaskFlightPlan enabled (0 | 1)
+#define SCH_HK_ENABLED          0     ///< TaskHousekeeping enabled (0 | 1)
+#define SCH_TEST_ENABLED        0     ///< Set to run tests (0 | 1)
 #define SCH_WDT_PERIOD          10                 ///< CPU watchdog timer period in seconds
 #define SCH_MAX_WDT_TIMER       5                  ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
@@ -52,7 +54,7 @@
 #define SCH_KISS_DEVICE         "/dev/ttyUSB0"     ///< Kiss device path
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS        1                 ///< Node address
+#define SCH_COMM_ADDRESS        1                  ///< Node address
 #define SCH_TNC_ADDRESS         9                  ///< TNC node address
 #define SCH_TRX_ADDRESS         5                  ///< TRX node address
 #define SCH_EPS_ADDRESS         2                  ///< EPS node address
@@ -65,12 +67,8 @@
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
-#define SCH_STORAGE_TRIPLE_WR   1    ///< Tripled writing enabled (0 | 1)
+#define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-
-#define SCH_SECTIONS_PER_PAYLOAD 2 /// TODO: Make configurable per payload
-#define SCH_SIZE_PER_SECTION 256*1024
-#define SCH_FLASH_INIT_MEMORY 0
 
 /**
  * Memory settings.
@@ -96,6 +94,5 @@
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
-
 
 #endif //SUCHAI_CONFIG_H
