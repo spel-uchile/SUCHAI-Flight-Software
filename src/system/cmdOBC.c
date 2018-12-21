@@ -25,6 +25,7 @@ static const char* tag = "cmdOBC";
 
 void cmd_obc_init(void)
 {
+    cmd_add("ident", obc_ident, "", 0);
     cmd_add("debug_obc", obc_debug, "%d", 1);
     cmd_add("reset", obc_reset, "", 0);
     cmd_add("get_mem", obc_get_os_memory, "", 0);
@@ -33,6 +34,13 @@ void cmd_obc_init(void)
     cmd_add("reset_wdt", obc_reset_wdt, "", 0);
     cmd_add("system", obc_system, "%s", 1);
     cmd_add("set_pwm_duty", obc_set_pwm_duty, "%d %d", 2);
+}
+
+int obc_ident(char* fmt, char* params, int nparams)
+{
+    printf("Name: %s\nID  : %d\nVer : %s\nNode: %d\n",
+            SCH_NAME, SCH_DEVICE_ID, SCH_SW_VERSION, SCH_COMM_ADDRESS);
+    return CMD_OK;
 }
 
 int obc_debug(char *fmt, char *params, int nparams)

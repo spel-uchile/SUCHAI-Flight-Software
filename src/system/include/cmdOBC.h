@@ -46,6 +46,16 @@
 void cmd_obc_init(void);
 
 /**
+ * Print ID information such as software version, device id, name and node.
+ *
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_ident(char* fmt, char* params, int nparams);
+
+/**
  * Check if the OBC is working, usually blinking a led or printing a debug
  * message. In AVR32, NANOMIND and ESP32 blink the led indicated in the
  * parameter in LINUX just print a debug message.
