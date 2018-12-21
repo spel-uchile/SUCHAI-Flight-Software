@@ -2,8 +2,8 @@
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
  *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2018, Camilo Rojas Milla, camrojas@uchile.cl
  *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2018, Camilo Rojas Milla, camrojas@uchile.cl
  *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ time_t sec = 0;
 
 
 #if SCH_STORAGE_MODE == 0
-    #if SCH_STORAGE_TRIPLE_WR == 1
+#if SCH_STORAGE_TRIPLE_WR == 1
         int DAT_SYSTEM_VAR_BUFF[dat_system_last_var*3];
     #else
         int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
@@ -70,7 +70,7 @@ void dat_repo_init(void)
             data_base[i].periodical = 0;
         }
     }
-#else
+#elif (SCH_STORAGE_MODE == 1)
     {
         //Init storage system
         int rc;
@@ -85,6 +85,22 @@ void dat_repo_init(void)
         rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
     }
+#else
+    {
+        //Init storage system
+        int rc;
+        rc = storage_init(SCH_STORAGE_FILE);
+        assertf(rc==0, tag, "Unable to create non-volatile data repository");
+
+        //Init system repo
+        rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
+        assertf(rc==0, tag, "Unable to create system variables repository");
+
+//        //Init system flight plan table
+//        rc=storage_table_flight_plan_init(0);
+//        assertf(rc==0, tag, "Unable to create flight plan table");
+//
+    }
 #endif
 
     /* TODO: Initialize custom variables */
@@ -96,7 +112,7 @@ void dat_repo_init(void)
 
 void dat_repo_close(void)
 {
-#if SCH_STORAGE_MODE == 1
+#if SCH_STORAGE_MODE != 0
     {
         storage_close();
     }
@@ -109,12 +125,12 @@ void _dat_set_system_var(dat_system_t index, int value)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Uses internal memory
-    #if SCH_STORAGE_MODE == 0
-        DAT_SYSTEM_VAR_BUFF[index] = value;
+#if SCH_STORAGE_MODE == 0
+    DAT_SYSTEM_VAR_BUFF[index] = value;
     //Uses external memory
-    #else
-        storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
-    #endif
+#else
+    storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
+#endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
@@ -128,17 +144,17 @@ int _dat_get_system_var(dat_system_t index)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Use internal (volatile) memory
-    #if SCH_STORAGE_MODE == 0
-        value = DAT_SYSTEM_VAR_BUFF[index];
+#if SCH_STORAGE_MODE == 0
+    value = DAT_SYSTEM_VAR_BUFF[index];
     //Uses external (non-volatile) memory
-    #else
-        value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
-    #endif
+#else
+    value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
+#endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
-        return value;
+    return value;
 }
 
 void dat_set_system_var(dat_system_t index, int value)
@@ -147,22 +163,22 @@ void dat_set_system_var(dat_system_t index, int value)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Uses internal memory
-    #if SCH_STORAGE_MODE == 0
-        DAT_SYSTEM_VAR_BUFF[index] = value;
+#if SCH_STORAGE_MODE == 0
+    DAT_SYSTEM_VAR_BUFF[index] = value;
         //Uses tripled writing
         #if SCH_STORAGE_TRIPLE_WR == 1
             DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var] = value;
             DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var * 2] = value;
         #endif
     //Uses external memory
-    #else
-        storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
-        //Uses tripled writing
-        #if SCH_STORAGE_TRIPLE_WR == 1
-            storage_repo_set_value_idx(index + dat_system_last_var, value, DAT_REPO_SYSTEM);
-            storage_repo_set_value_idx(index + dat_system_last_var * 2, value, DAT_REPO_SYSTEM);
-        #endif
-    #endif
+#else
+    storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
+    //Uses tripled writing
+#if SCH_STORAGE_TRIPLE_WR == 1
+    storage_repo_set_value_idx(index + dat_system_last_var, value, DAT_REPO_SYSTEM);
+    storage_repo_set_value_idx(index + dat_system_last_var * 2, value, DAT_REPO_SYSTEM);
+#endif
+#endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
@@ -178,43 +194,43 @@ int dat_get_system_var(dat_system_t index)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Use internal (volatile) memory
-    #if SCH_STORAGE_MODE == 0
-        value_1 = DAT_SYSTEM_VAR_BUFF[index];
+#if SCH_STORAGE_MODE == 0
+    value_1 = DAT_SYSTEM_VAR_BUFF[index];
         //Uses tripled writing
         #if SCH_STORAGE_TRIPLE_WR == 1
             value_2 = DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var];
             value_3 = DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var * 2];
         #endif
     //Uses external (non-volatile) memory
-    #else
-        value_1 = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
-        //Uses tripled writing
-        #if SCH_STORAGE_TRIPLE_WR == 1
-            value_2 = storage_repo_get_value_idx(index + dat_system_last_var, DAT_REPO_SYSTEM);
-            value_3 = storage_repo_get_value_idx(index + dat_system_last_var * 2, DAT_REPO_SYSTEM);
-        #endif
-    #endif
+#else
+    value_1 = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
+    //Uses tripled writing
+#if SCH_STORAGE_TRIPLE_WR == 1
+    value_2 = storage_repo_get_value_idx(index + dat_system_last_var, DAT_REPO_SYSTEM);
+    value_3 = storage_repo_get_value_idx(index + dat_system_last_var * 2, DAT_REPO_SYSTEM);
+#endif
+#endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
-    #if SCH_STORAGE_TRIPLE_WR == 1
-        //Compare value and its copies
-        if (value_1 == value_2 || value_1 == value_3)
-        {
-            return value_1;
-        }
-        else if (value_2 == value_3)
-        {
-            return value_2;
-        }
-        else
-        {
-            LOGE(tag, "Unable to get a correct value for index %d", index);
-            return value_1;
-        }
-    #else
+#if SCH_STORAGE_TRIPLE_WR == 1
+    //Compare value and its copies
+    if (value_1 == value_2 || value_1 == value_3)
+    {
         return value_1;
-    #endif
+    }
+    else if (value_2 == value_3)
+    {
+        return value_2;
+    }
+    else
+    {
+        LOGE(tag, "Unable to get a correct value for index %d", index);
+        return value_1;
+    }
+#else
+    return value_1;
+#endif
 }
 
 void dat_status_to_struct(dat_status_t *status)
@@ -333,7 +349,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     }
     return -1;
 #else
-     return storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
+    return storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
 #endif
 }
 

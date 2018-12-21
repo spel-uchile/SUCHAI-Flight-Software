@@ -33,18 +33,19 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
-)
+        )
 
 include_directories(
         src/system/include/
         src/os/include
         src/drivers/Linux/include
         src/drivers/Linux/libcsp/include
+        /usr/include/postgresql
 )
 
 link_directories(src/drivers/Linux/libcsp/lib)
 
-link_libraries(-lpthread -lsqlite3 -lcsp -lzmq)
+link_libraries(-lpthread -lsqlite3 -lcsp -lzmq -lpq)
 
 # Use pthread_setname_np included in <features.h>
 add_definitions(-D_GNU_SOURCE)
