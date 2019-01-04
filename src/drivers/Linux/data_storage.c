@@ -33,7 +33,6 @@ int storage_init(const char *file)
         return 0;
     }
 #elif SCH_STORAGE_MODE == 2
-
     char postgres_conf_s[30];
     sprintf(postgres_conf_s, "user=%s dbname=fs_db", SCH_STORAGE_PGUSER);
     conn = PQconnectdb(postgres_conf_s);
@@ -50,7 +49,6 @@ int storage_init(const char *file)
     printf("Server version: %d\n", ver);
 #endif
     return 0;
-
 }
 
 int storage_table_repo_init(char* table, int drop)
@@ -117,8 +115,6 @@ int storage_table_repo_init(char* table, int drop)
     }
 
     LOGI(tag, "Creating postgres table");
-
-
 
     char create_table_string[100];
     sprintf(create_table_string, "CREATE TABLE IF NOT EXISTS %s("
@@ -219,12 +215,11 @@ int storage_repo_get_value_idx(int index, char *table)
 #elif SCH_STORAGE_MODE == 2
 
     char get_value_query[100];
-    sprintf(get_value_query, "SELECT value FROM %s WHERE idx=\"%d\";", table, index);
+    sprintf(get_value_query, "SELECT value FROM %s WHERE idx=%d;", table, index);
     LOGI(tag, "%s",  get_value_query);
     PGresult *res = PQexec(conn, get_value_query);
-    LOGI(tag, "%s\n", PQgetvalue(res, 0, 0));
+    value = atoi(PQgetvalue(res, 0, 0));
     PQclear(res);
-    value = 0;
 #endif
     return value;
 }
