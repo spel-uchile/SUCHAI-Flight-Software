@@ -48,6 +48,11 @@ void dat_repo_init(void)
         LOGE(tag, "Unable to create data repository mutex");
     }
 
+    if(osSemaphoreCreate(&repo_data_fp_sem) != CSP_SEMAPHORE_OK)
+    {
+        LOGE(tag, "Unable to create flight plan repository mutex");
+    }
+
     LOGD(tag, "Initializing data repositories buffers...")
     /* TODO: Setup external memories */
 #if (SCH_STORAGE_MODE == 0)
