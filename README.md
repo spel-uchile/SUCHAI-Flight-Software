@@ -6,7 +6,7 @@
 
 SUCHAI Flight software was originally developed to be used in the 
 [SUCHAI](http://spel.ing.uchile.cl/suchai.html) nanosatellite (1U 
-[Cubesat](https://en.wikipedia.org/wiki/CubeSat)). SUCHAI was launch into orbit 
+[CubeSat](https://en.wikipedia.org/wiki/CubeSat)). SUCHAI was launch into orbit 
 in June 2017 and has been working properly.
 
 The main idea was to design a highly modular software architecture to help the
@@ -60,14 +60,18 @@ Currently, it has been tested in the following OS/Architectures :
 
 #### Requirements
 Linux installation requires the following libraries:
-* (build-essentials)
+* build-essential
 * cmake
-* pthread 
+* pkg-config
+* pthread
+* cunit (libcunit-dev)
 * sqlite3 (libsqlite3-dev)
 * zmq (libzmq3-dev)
 * unzip
 * postgresql
 * libpq-dev
+* python (python 2)
+* python3
 
 #### Clone
 Clone this repository
@@ -99,7 +103,7 @@ python3 compile.py --help
 Go to the build folder ex: ```cd build_linux``` and execute
 
 ```bash
-./SUCHAI-Flight-Software
+./SUCHAI_Flight_Software
 ```
 
 #### Using ZMQ interface
