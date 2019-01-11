@@ -45,7 +45,7 @@ void dat_repo_init(void)
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
     {
-        LOGE(tag, "Unable to create data repository mutex");
+        LOGE(tag, "Unable to create system status repository mutex");
     }
 
     if(osSemaphoreCreate(&repo_data_fp_sem) != CSP_SEMAPHORE_OK)
@@ -124,6 +124,14 @@ void dat_repo_close(void)
 #endif
 }
 
+/**
+ * Function for testing triple writing.
+ *
+ * Should do the same as @c dat_set_system_var , but with only one system status repo.
+ *
+ * @param index Enum index of the field to set
+ * @param value Integer value to set the variable to
+ */
 void _dat_set_system_var(dat_system_t index, int value)
 {
     //Enter critical zone
@@ -141,6 +149,14 @@ void _dat_set_system_var(dat_system_t index, int value)
     osSemaphoreGiven(&repo_data_sem);
 }
 
+/**
+ * Function for testing triple writing.
+ *
+ * Should do the same as @c dat_get_system_var , but with only one system status repo.
+ *
+ * @param index Enum index of the field to get
+ * @return The field's value
+ */
 int _dat_get_system_var(dat_system_t index)
 {
     int value = 0;

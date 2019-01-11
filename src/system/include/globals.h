@@ -1,6 +1,7 @@
 /**
  * @file  globals.h
  * @author Carlos Gonzalez C
+ * @author Diego Ortego P
  * @date 2018
  * @copyright GNU GPL v3
  *

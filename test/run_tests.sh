@@ -46,6 +46,8 @@ python logs_comparator.py | cat >> test_cmd_comparator_log.txt
 
 # ------------------ TEST_UNIT ------------------
 
+# TODO: Agregar for loop con el test en todos los storage modes
+
 # The test log is called test_unit_log.txt
 
 # Compiles the project with the test's parameters
