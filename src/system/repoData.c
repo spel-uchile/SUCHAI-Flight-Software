@@ -70,7 +70,7 @@ void dat_repo_init(void)
             data_base[i].periodical = 0;
         }
     }
-#elif (SCH_STORAGE_MODE == 1)
+    #elif (SCH_STORAGE_MODE == 1)
     {
         //Init storage system
         int rc;
