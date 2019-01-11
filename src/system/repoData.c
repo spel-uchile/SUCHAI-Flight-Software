@@ -519,12 +519,10 @@ int dat_show_time(int format)
 int dat_add_payload_sample(void* data, int payload)
 {
     int ret;
-
-#ifdef NANOMIND
-    LOGI(tag, "adding data to payload");
-     ret = storage_add_payload_data(data, payload);
+#if defined(NANOMIND) || defined(LINUX)
+    ret = storage_add_payload_data(data, payload);
 #else
-    ret = 0;
+    ret=0;
 #endif
     return ret;
 }
@@ -533,12 +531,11 @@ int dat_add_payload_sample(void* data, int payload)
 int dat_get_recent_payload_sample(void* data, int payload, int delay)
 {
     int ret;
-#ifdef NANOMIND
+#if defined(NANOMIND) || defined(LINUX)
     ret = storage_get_recent_payload_data(data, payload, delay);
 #else
     ret=0;
 #endif
-
     return ret;
 }
 
@@ -550,6 +547,5 @@ int dat_delete_memory_sections(void)
 #else
     ret=0;
 #endif
-
     return ret;
 }

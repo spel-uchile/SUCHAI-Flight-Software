@@ -10,6 +10,21 @@ static sqlite3 *db = NULL;
 PGconn *conn = NULL;
 char* fp_table = "flightPlan";
 
+struct temp_data tempdata;
+struct ads_data adsdata;
+
+static struct {
+    char table[30];
+    uint16_t  size;
+    int sys_index;
+    char data_order[50];
+    char var_names[200];
+} data_map[last_sensor] = {
+        {"temp_data", (uint16_t) (sizeof(tempdata)), dat_mem_temp, "%f %f %f", "obc_temp_1 obc_temp_2 obc_temp_3"},
+        { "ads_data", (uint16_t) (sizeof(adsdata)), dat_mem_ads, "%f %f %f %f %f %f", "acc_x acc_y acc_z mag_x mag_y mag_z"}
+};
+
+
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
 int storage_init(const char *file)
@@ -38,9 +53,7 @@ int storage_init(const char *file)
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
-
-        fprintf(stderr, "Connection to database failed: %s\n",
-            PQerrorMessage(conn));
+        LOGE(tag, "Connection to database failed: %s\n", PQerrorMessage(conn));
         PQfinish(conn);
     }
 
@@ -114,19 +127,16 @@ int storage_table_repo_init(char* table, int drop)
 
     }
 
-    LOGI(tag, "Creating postgres table");
-
     char create_table_string[100];
     sprintf(create_table_string, "CREATE TABLE IF NOT EXISTS %s("
      "idx INTEGER PRIMARY KEY, "
      "name TEXT UNIQUE, "
      "value INT);", table);
-    LOGI(tag, "Creating postgres table");
-    LOGI(tag, "SQL command: %s", create_table_string);
-
+    LOGD(tag, "SQL command: %s", create_table_string);
+    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, create_table_string);
     PQclear(res);
-    LOGI(tag, "Finish Creating postgres table");
+    storage_table_payload_init(0);
 
     return 0;
 #endif
@@ -134,7 +144,6 @@ int storage_table_repo_init(char* table, int drop)
 
 int storage_table_flight_plan_init(int drop)
 {
-
     char* err_msg;
     char* sql;
     int rc;
@@ -187,6 +196,94 @@ int storage_table_flight_plan_init(int drop)
     return 0;
 }
 
+const char* get_sql_type(char* c_type)
+{
+
+    if(strcmp(c_type, "%f") == 0) {
+        return "REAL";
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        return "INTEGER";
+    } else {
+        return "TEXT";
+    }
+}
+
+int get_sizeof_type(char* c_type)
+{
+
+    if(strcmp(c_type, "%f") == 0) {
+        return sizeof(float);
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        return sizeof(int);
+    } else {
+        return -1;
+    }
+}
+
+int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i)
+{
+    const char s[2] = " ";
+    tok_sym[0] = strtok(order, s);
+
+    int j=0;
+    while(tok_sym[j] != NULL) {
+        j++;
+        tok_sym[j] = strtok(NULL, s);
+    }
+
+    tok_var[0] = strtok(var_names, s);
+
+    j=0;
+    while(tok_var[j] != NULL) {
+        j++;
+        tok_var[j] = strtok(NULL, s);
+    }
+    return j;
+}
+
+int storage_table_payload_init(int drop)
+{
+#if SCH_STORAGE_MODE == 2
+    if(drop)
+    {
+
+    }
+    int i = 0;
+    for(i=0; i< last_sensor; ++i)
+    {
+        char create_table[300];
+        sprintf(create_table, "CREATE TABLE IF NOT EXISTS %s(tstz TIMESTAMPTZ,", data_map[i].table);
+        char* tok_sym[10];
+        char* tok_var[10];
+        char order[100];
+        strcpy(order, data_map[i].data_order);
+        char var_names[200];
+        strcpy(var_names, data_map[i].var_names);
+        int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, i);
+
+        int j=0;
+        for(j=0; j < nparams; ++j)
+        {
+            char line[100];
+            sprintf(line, "%s %s", tok_var[j], get_sql_type(tok_sym[j]));
+            strcat(create_table, line);
+            if(j != nparams-1) {
+                strcat(create_table, ",");
+            }
+        }
+        strcat(create_table, ")");
+        LOGD(tag, "SQL command: %s", create_table);
+        // TODO: manage connection error in res
+        PGresult *res = PQexec(conn, create_table);
+        PQclear(res);
+    }
+#endif
+    return 0;
+}
+
+
 int storage_repo_get_value_idx(int index, char *table)
 {
     int value = -1;
@@ -213,10 +310,10 @@ int storage_repo_get_value_idx(int index, char *table)
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
 #elif SCH_STORAGE_MODE == 2
-
     char get_value_query[100];
     sprintf(get_value_query, "SELECT value FROM %s WHERE idx=%d;", table, index);
-    LOGI(tag, "%s",  get_value_query);
+    LOGD(tag, "%s",  get_value_query);
+    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, get_value_query);
     value = atoi(PQgetvalue(res, 0, 0));
     PQclear(res);
@@ -226,6 +323,8 @@ int storage_repo_get_value_idx(int index, char *table)
 
 int storage_repo_get_value_str(char *name, char *table)
 {
+    int value = -1;
+#if SCH_STORAGE_MODE == 1
     sqlite3_stmt* stmt = NULL;
     char *sql = sqlite3_mprintf("SELECT value FROM %s WHERE name=\"%s\";", table, name);
 
@@ -239,7 +338,6 @@ int storage_repo_get_value_str(char *name, char *table)
 
     // fetch only one row's status
     rc = sqlite3_step(stmt);
-    int value = -1;
     if(rc == SQLITE_ROW)
         value = sqlite3_column_int(stmt, 0);
     else
@@ -247,6 +345,13 @@ int storage_repo_get_value_str(char *name, char *table)
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
+#elif SCH_STORAGE_MODE == 2
+    char get_value_query[100];
+    sprintf(get_value_query, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
+    // TODO: manage connection error in res
+    PGresult *res = PQexec(conn, get_value_query);
+    value = atoi(PQgetvalue(res, 0, 0));
+#endif
     return value;
 }
 
@@ -289,7 +394,8 @@ int storage_repo_set_value_idx(int index, int value, char *table)
                              "ON CONFLICT (idx) DO UPDATE "
                              "SET value = %d; "
                              , table, index, value, value);
-    LOGI(tag, "%s",  set_value_query);
+    LOGD(tag, "%s",  set_value_query);
+    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, set_value_query);
     PQclear(res);
 
@@ -452,6 +558,109 @@ int storage_show_table (void) {
     }
     return 0;
 }
+
+
+int storage_add_payload_data(void* data, int payload)
+{
+#if SCH_STORAGE_MODE == 2
+    char* tok_sym[10];
+    char* tok_var[10];
+    char order[100];
+    strcpy(order, data_map[payload].data_order);
+    char var_names[200];
+    strcpy(var_names, data_map[payload].var_names);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
+
+    char values[500];
+    char names[500];
+    strcpy(names, "(tstz,");
+    strcpy(values, "(current_timestamp,");
+
+    int j;
+    for(j=0; j < nparams; ++j) {
+        int param_size = get_sizeof_type(tok_sym[j]);
+        char buff[param_size];
+        memcpy(buff, data+(j*param_size), param_size);
+
+        char name[20];
+        sprintf(name, " %s", tok_var[j]);
+        strcat(names, name);
+
+        char val[20];
+        // TODO: switch between data types
+        sprintf(val, " %f", *((float*)buff));
+        strcat(values, val);
+
+        if(j != nparams-1){
+            strcat(names, ",");
+            strcat(values, ",");
+        }
+//        LOGI(tag, "%f", *((float*)buff));
+    }
+
+    strcat(names, ")");
+    strcat(values, ")");
+    char insert_row[200];
+    sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
+    LOGD(tag, "%s", insert_row);
+    // TODO: manage connection error in res
+    PGresult *res = PQexec(conn, insert_row);
+    PQclear(res);
+    int ret = 0;
+#endif
+    return 0;
+}
+
+int storage_get_recent_payload_data(void * data, int payload, int delay)
+{
+#if SCH_STORAGE_MODE == 2
+    LOGV(tag, "Obtaining data of payload %d", payload);
+
+    char* tok_sym[10];
+    char* tok_var[10];
+    char order[100];
+    strcpy(order, data_map[payload].data_order);
+    char var_names[200];
+    strcpy(var_names, data_map[payload].var_names);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
+
+    char values[500];
+    char names[500];
+
+    strcpy(names, "");
+    int j;
+    for(j=0; j < nparams; ++j) {
+
+        char name[20];
+        sprintf(name, " %s", tok_var[j]);
+        strcat(names, name);
+
+        if(j != nparams-1){
+            strcat(names, ",");
+        }
+    }
+
+    char get_value[200];
+    sprintf(get_value,"SELECT %s FROM %s ORDER BY tstz DESC LIMIT 1"
+                      ,names, data_map[payload].table);
+
+
+    LOGD(tag, "%s",  get_value);
+    PGresult *res = PQexec(conn, get_value);
+    // TODO: manage connection error in res
+
+    for(j=0; j < nparams; ++j) {
+        int param_size = get_sizeof_type(tok_sym[j]);
+        // TODO: switch between data types
+        float val = atof(PQgetvalue(res, 0, j));
+        memcpy(data+(j*param_size), (char*)&val, param_size);
+    }
+
+    PQclear(res);
+#endif
+    return 0;
+}
+
 
 int storage_close(void)
 {
