@@ -261,11 +261,11 @@ void cmd_print_all(void)
 
     //Make sure no LOG functions are used in this zone
     osSemaphoreTake(&log_mutex, portMAX_DELAY);
-    printf("Index\t name\t Params\n");
+    printf("%5s %20s %s\n", "Index", "Name", "Params");
     int i;
     for(i=0; i<cmd_index; i++)
     {
-        printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
+        printf("%5d %20s %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
     osSemaphoreGiven(&log_mutex);
     //End log_mutex, can use LOG functions
