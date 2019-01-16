@@ -88,6 +88,11 @@ int drp_print_system_vars(char *fmt, char *params, int nparams)
 
 int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     int index, value;
     if(sscanf(params, fmt, &index, &value) == nparams)
     {
@@ -113,6 +118,11 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 
 int drp_update_hours_alive(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     int value;  // Value to add
     int current;  // Current value to update
 

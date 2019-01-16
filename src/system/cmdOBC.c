@@ -45,6 +45,11 @@ int obc_ident(char* fmt, char* params, int nparams)
 
 int obc_debug(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     int dbg_type;
     if(sscanf(params, fmt, &dbg_type) == nparams)
     {
@@ -141,6 +146,11 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
 
 int obc_set_time(char* fmt, char* params,int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     int time_to_set;
     if(sscanf(params, fmt, &time_to_set) == nparams){
         int rc = dat_set_time(time_to_set);
@@ -158,6 +168,11 @@ int obc_set_time(char* fmt, char* params,int nparams)
 
 int obc_show_time(char* fmt, char* params,int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     int format;
     if(sscanf(params, fmt, &format) == nparams)
     {
