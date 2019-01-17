@@ -94,12 +94,12 @@ int com_send_rpt(char *fmt, char *params, int nparams)
 
         if(rc == 0)
         {
-            LOGV(tag, "Data sent successfully. (rc: %d, re: %s)", rc, msg);
+            LOGV(tag, "Data sent to repeater successfully. (rc: %d, re: %s)", rc, msg);
             return CMD_OK;
         }
         else
         {
-            LOGE(tag, "Error sending data. (rc: %d)", rc);
+            LOGE(tag, "Error sending data to repeater. (rc: %d)", rc);
             csp_buffer_free(packet);
             return CMD_FAIL;
         }
@@ -135,12 +135,12 @@ int com_send_cmd(char *fmt, char *params, int nparams)
 
         if(rc > 0 && rep[0] == 200)
         {
-            LOGV(tag, "Data sent successfully. (rc: %d, re: %d)", rc, rep[0]);
+            LOGV(tag, "Command sent successfully. (rc: %d, re: %d)", rc, rep[0]);
             return CMD_OK;
         }
         else
         {
-            LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
+            LOGE(tag, "Error sending command. (rc: %d, re: %d)", rc, rep[0]);
             return CMD_FAIL;
         }
     }

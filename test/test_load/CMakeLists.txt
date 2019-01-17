@@ -33,6 +33,10 @@ include_directories(
         /usr/include/postgresql
 )
 
+set(GCC_COVERAGE_COMPILE_FLAGS "-D_GNU_SOURCE")
+
+add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
+
 link_directories(../../src/drivers/Linux/libcsp/lib)
 
 link_libraries(-lpthread -lsqlite3 -lcsp -lzmq -lpq)

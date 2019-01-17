@@ -45,7 +45,12 @@ void dat_repo_init(void)
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
     {
-        LOGE(tag, "Unable to create data repository mutex");
+        LOGE(tag, "Unable to create system status repository mutex");
+    }
+
+    if(osSemaphoreCreate(&repo_data_fp_sem) != CSP_SEMAPHORE_OK)
+    {
+        LOGE(tag, "Unable to create flight plan repository mutex");
     }
 
     LOGD(tag, "Initializing data repositories buffers...")
@@ -70,7 +75,7 @@ void dat_repo_init(void)
             data_base[i].periodical = 0;
         }
     }
-#elif (SCH_STORAGE_MODE == 1)
+    #elif (SCH_STORAGE_MODE == 1)
     {
         //Init storage system
         int rc;
@@ -119,6 +124,14 @@ void dat_repo_close(void)
 #endif
 }
 
+/**
+ * Function for testing triple writing.
+ *
+ * Should do the same as @c dat_set_system_var , but with only one system status repo.
+ *
+ * @param index Enum index of the field to set
+ * @param value Integer value to set the variable to
+ */
 void _dat_set_system_var(dat_system_t index, int value)
 {
     //Enter critical zone
@@ -136,6 +149,14 @@ void _dat_set_system_var(dat_system_t index, int value)
     osSemaphoreGiven(&repo_data_sem);
 }
 
+/**
+ * Function for testing triple writing.
+ *
+ * Should do the same as @c dat_get_system_var , but with only one system status repo.
+ *
+ * @param index Enum index of the field to get
+ * @return The field's value
+ */
 int _dat_get_system_var(dat_system_t index)
 {
     int value = 0;
@@ -328,6 +349,10 @@ void dat_print_status(dat_status_t *status)
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
 {
 #if SCH_STORAGE_MODE == 0
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
@@ -347,6 +372,10 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
             return 0;
         }
     }
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
     return -1;
 #else
     return storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
@@ -357,6 +386,10 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
 {
 #if SCH_STORAGE_MODE == 0
     //TODO : agregar signal de segment para responder falla
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
@@ -375,6 +408,10 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
             return 0;
         }
     }
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
     return 1;
 #else
     return storage_flight_plan_set(timetodo, command, args, executions, periodical);
@@ -384,6 +421,10 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
 int dat_del_fp(int timetodo)
 {
 #if SCH_STORAGE_MODE ==0
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
@@ -397,6 +438,10 @@ int dat_del_fp(int timetodo)
             return 0;
         }
     }
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
     return 1;
 #else
     return storage_flight_plan_erase(timetodo);
@@ -406,6 +451,10 @@ int dat_del_fp(int timetodo)
 int dat_reset_fp(void)
 {
 #if SCH_STORAGE_MODE == 0
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
     int i;
     for(i=0;i<SCH_FP_MAX_ENTRIES;i++)
     {
@@ -415,6 +464,10 @@ int dat_reset_fp(void)
         data_base[i].executions = 0;
         data_base[i].periodical = 0;
     }
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
     return 0;
 #else
     return storage_table_flight_plan_init(1);
@@ -424,6 +477,10 @@ int dat_reset_fp(void)
 int dat_show_fp (void)
 {
 #if SCH_STORAGE_MODE ==0
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
     int cont = 0;
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES; i++)
@@ -443,6 +500,9 @@ int dat_show_fp (void)
     {
         LOGI(tag, "Flight plan table empty");
     }
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
 
     return 0;
 #else
@@ -519,12 +579,10 @@ int dat_show_time(int format)
 int dat_add_payload_sample(void* data, int payload)
 {
     int ret;
-
-#ifdef NANOMIND
-    LOGI(tag, "adding data to payload");
-     ret = storage_add_payload_data(data, payload);
+#if defined(NANOMIND) || defined(LINUX)
+    ret = storage_add_payload_data(data, payload);
 #else
-    ret = 0;
+    ret=0;
 #endif
     return ret;
 }
@@ -533,12 +591,11 @@ int dat_add_payload_sample(void* data, int payload)
 int dat_get_recent_payload_sample(void* data, int payload, int delay)
 {
     int ret;
-#ifdef NANOMIND
+#if defined(NANOMIND) || defined(LINUX)
     ret = storage_get_recent_payload_data(data, payload, delay);
 #else
     ret=0;
 #endif
-
     return ret;
 }
 
@@ -550,6 +607,5 @@ int dat_delete_memory_sections(void)
 #else
     ret=0;
 #endif
-
     return ret;
 }
