@@ -31,6 +31,7 @@
     #include "dev/cpu.h"
     #include "gs_pwm.h"
     #include "gssb.h"
+    #include "pwr_switch.h"
     #include "util/error.h"
 #endif
 
@@ -323,6 +324,20 @@ int gssb_sunsensor_temp_csp(char* fmt, char* params, int nparams);
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int gssb_sunsensor_temp1_csp(char* fmt, char* params, int nparams);
+
+/**
+ * Sets the state of the inter-stage power switch.
+ * enabled 0 = disabled, 1 = enabled
+ *
+ * @param fmt str. Parameters format: "%d"
+ * @param params  str. Parameters as string. "<enabled>"
+ *  0: disabled
+ *  1: enabled
+ * @param nparams int. Number of parameters: 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int gssb_pwr(char* fmt, char* params, int nparams);
+
 #endif //NANOMIND
 
 #endif /* CMD_OBC_H */

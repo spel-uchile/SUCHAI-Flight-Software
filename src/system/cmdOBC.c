@@ -50,6 +50,7 @@ void cmd_obc_init(void)
     cmd_add("istage_get_sunsensor", gssb_sunsensor_read_csp, "", 0);
     cmd_add("istage_get_temp", gssb_sunsensor_temp_csp, "", 0);
     cmd_add("istage_get_temp1", gssb_sunsensor_temp1_csp, "", 0);
+    cmd_add("istage_pwr", gssb_pwr, "%d", 1);
 #endif
 }
 
@@ -626,5 +627,33 @@ int gssb_sunsensor_temp1_csp(char* fmt, char* params, int nparams)
     printf("Temp: %f\n", temp);
 
     return CMD_OK;
+}
+
+int gssb_pwr(char* fmt, char* params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "NULL params");
+        return CMD_FAIL;
+    }
+
+    int enabled;
+    if(sscanf(params, fmt, &enabled) == nparams)
+    {
+        if (enabled > 0)
+        {
+            pwr_switch_enable(PWR_GSSB);
+            pwr_switch_enable(PWR_GSSB2);
+        }
+        else
+        {
+            pwr_switch_disable(PWR_GSSB);
+            pwr_switch_disable(PWR_GSSB2);
+        }
+        return CMD_OK;
+    }
+
+    LOGE(tag, "Error parsing parameters");
+    return CMD_FAIL;
 }
 #endif //NANOMIND
