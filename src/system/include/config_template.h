@@ -69,7 +69,7 @@
 #define SCH_STORAGE_MODE        {{SCH_STORAGE}}    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   {{SCH_STORAGE_TRIPLE_WR}}   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-#define SCH_STORAGE_PGUSER      "postgres"
+#define SCH_STORAGE_PGUSER      "{{SCH_STORAGE_PGUSER}}"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2 /// TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024
