@@ -315,7 +315,13 @@ int storage_repo_get_value_idx(int index, char *table)
     LOGD(tag, "%s",  get_value_query);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, get_value_query);
-    value = atoi(PQgetvalue(res, 0, 0));
+    char* value_str;
+    if ((value_str = PQgetvalue(res, 0, 0)) != NULL)
+        value = atoi(value_str);
+    else
+    {
+        LOGE(tag, "The value wasn't found");
+    }
     PQclear(res);
 #endif
     return value;

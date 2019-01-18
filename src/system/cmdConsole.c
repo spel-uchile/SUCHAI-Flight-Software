@@ -35,6 +35,11 @@ void cmd_console_init(void)
  */
 int con_debug_msg(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     char msg[SCH_CMD_MAX_STR_PARAMS];
     if(sscanf(params,fmt, msg) == nparams)
     {

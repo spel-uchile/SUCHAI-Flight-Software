@@ -107,3 +107,23 @@ make
 # Runs the test, saving a log file
 rm -f ../test_bug_delay_log.txt
 ./SUCHAI_Flight_Software_Test | cat >> ../test_bug_delay_log.txt
+
+# ------------------ TEST_TM_IO ------------------
+
+# The test log is called test_tm_io_log.txt
+
+# Compiles the project with the test's parameters
+cd ${WORKSPACE}/src/system/include
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_DEBUG" --sch_comm "1" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0" --sch_node "1"
+
+# Compiles the test
+cd ${WORKSPACE}/test/test_tm_io
+rm -rf build_test
+mkdir build_test
+cd build_test
+cmake ..
+make
+
+# Runs the test, saving a log file
+rm -f ../test_tm_io_log.txt
+./SUCHAI_Flight_Software_Test | cat >> ../test_tm_io_log.txt

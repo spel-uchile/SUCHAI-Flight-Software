@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 from subprocess import Popen, PIPE
+import os
 
 
 def call_git_describe(abbrev=4):
@@ -64,6 +65,7 @@ def make_config(args, ftemp="config_template.h", fconfig="config.h"):
     config = config.replace("{{SCH_ZMQ_IN}}", args.sch_zmq_in)
     config = config.replace("{{SCH_STORAGE}}", args.sch_st_mode)
     config = config.replace("{{SCH_STORAGE_TRIPLE_WR}}", args.sch_st_triple_wr)
+    config = config.replace("{{SCH_STORAGE_PGUSER}}", os.environ['USER'])
 
     with open(fconfig, 'w') as new_config:
         new_config.write(config)

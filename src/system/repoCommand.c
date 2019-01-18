@@ -25,6 +25,7 @@ const static char *tag = "repoCmd";
 /* Global variables */
 cmd_list_t cmd_list[SCH_CMD_MAX_ENTRIES];
 int cmd_index = 0;
+char cmd_is_sorted = 1;
 
 int cmd_add(char *name, cmdFunction function, char *fparams, int nparam)
 {
@@ -45,6 +46,11 @@ int cmd_add(char *name, cmdFunction function, char *fparams, int nparam)
         osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
         {
             cmd_list[cmd_index] = cmd_new;
+            if (strcmp(name, "null") != 0 && cmd_is_sorted && cmd_index > 1)
+            {
+                if (strcmp(cmd_list[cmd_index - 1].name, cmd_list[cmd_index].name) > 0)
+                    cmd_is_sorted = 0;
+            }
             cmd_index++;
         }
         osSemaphoreGiven(&repo_cmd_sem);
@@ -253,19 +259,57 @@ void cmd_free(cmd_t *cmd)
     }
 }
 
+static void quicksort_by_name(cmd_list_t* commands, int start, int end)
+{
+    if (start >= end)
+        return;
+
+    int pivot = start;
+
+    for (int i = pivot+1; i <= end; i++)
+    {
+        if (strcmp(commands[i].name, commands[pivot].name) < 0)
+        {
+            cmd_list_t aux = commands[i];
+            for (int j = i; j > pivot; j--)
+                commands[j] = commands[j-1];
+            commands[pivot] = aux;
+            pivot++;
+        }
+    }
+
+    quicksort_by_name(commands, start, pivot);
+    quicksort_by_name(commands, pivot+1, end);
+}
+
+static void sort_cmd_list()
+{
+    if (!cmd_is_sorted)
+    {
+        LOGD(tag, "Sorting Command List");
+
+        quicksort_by_name(cmd_list, 0, cmd_index-1);
+        cmd_is_sorted = 1;
+
+        LOGD(tag, "Command List Sorted");
+    }
+}
+
 void cmd_print_all(void)
 {
 
     LOGD(tag, "Command list");
     osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
 
+    sort_cmd_list();
+
     //Make sure no LOG functions are used in this zone
     osSemaphoreTake(&log_mutex, portMAX_DELAY);
-    printf("Index\t name\t Params\n");
+    printf("%5s %20s %s\n", "Index", "Name", "Params");
     int i;
     for(i=0; i<cmd_index; i++)
     {
-        printf("%d\t %s\t %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
+        printf("%5d %20s %s\n", i, cmd_list[i].name, cmd_list[i].fmt);
     }
     osSemaphoreGiven(&log_mutex);
     //End log_mutex, can use LOG functions
