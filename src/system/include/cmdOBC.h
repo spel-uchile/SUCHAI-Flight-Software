@@ -326,18 +326,17 @@ int gssb_sunsensor_temp_csp(char* fmt, char* params, int nparams);
 int gssb_sunsensor_temp1_csp(char* fmt, char* params, int nparams);
 
 /**
- * Sets the state of the inter-stage power switch.
- * enabled 0 = disabled, 1 = enabled
+ * Sets the state of the interstage power switch to enable/disable VCC and VCC2.
+ * State 0 = disabled, 1 = enabled
  *
- * @param fmt str. Parameters format: "%d"
- * @param params  str. Parameters as string. "<enabled>"
- *  0: disabled
- *  1: enabled
- * @param nparams int. Number of parameters: 1
+ * @param fmt str. Parameters format: "%d %d"
+ * @param params  str. Parameters as string. "<vcc> <vcc2>"
+ *  vcc:  0 off, 1 on
+ *  vcc2: 0 off, 1 on
+ * @param nparams int. Number of parameters: 2
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int gssb_pwr(char* fmt, char* params, int nparams);
-
 #endif //NANOMIND
 
 #endif /* CMD_OBC_H */

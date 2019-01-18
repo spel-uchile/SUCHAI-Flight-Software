@@ -50,7 +50,7 @@ void cmd_obc_init(void)
     cmd_add("istage_get_sunsensor", gssb_sunsensor_read_csp, "", 0);
     cmd_add("istage_get_temp", gssb_sunsensor_temp_csp, "", 0);
     cmd_add("istage_get_temp1", gssb_sunsensor_temp1_csp, "", 0);
-    cmd_add("istage_pwr", gssb_pwr, "%d", 1);
+    cmd_add("istage_pwr", gssb_pwr, "%d %d", 2);
 #endif
 }
 
@@ -652,19 +652,20 @@ int gssb_pwr(char* fmt, char* params, int nparams)
         return CMD_FAIL;
     }
 
-    int enabled;
-    if(sscanf(params, fmt, &enabled) == nparams)
+    int vcc_on, vcc2_on;
+    if(sscanf(params, fmt, &vcc_on, &vcc2_on) == nparams)
     {
-        if (enabled > 0)
-        {
+        if (vcc_on > 0)
             pwr_switch_enable(PWR_GSSB);
-            pwr_switch_enable(PWR_GSSB2);
-        }
         else
-        {
             pwr_switch_disable(PWR_GSSB);
+
+        if (vcc2_on > 0)
+            pwr_switch_enable(PWR_GSSB2);
+        else
             pwr_switch_disable(PWR_GSSB2);
-        }
+
+        LOGI(tag, "Set GSSB switch state to: %d %d", vcc_on, vcc2_on);
         return CMD_OK;
     }
 
