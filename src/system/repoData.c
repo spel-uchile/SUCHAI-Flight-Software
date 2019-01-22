@@ -364,10 +364,10 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
             *periodical = data_base[i].periodical;
 
             if (data_base[i].periodical > 0)
-                dat_set_fp(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
+                dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
 
 
-            dat_del_fp(elapsed_sec);
+            dat_del_fp_async(elapsed_sec);
 
             return 0;
         }
@@ -382,14 +382,9 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
 #endif
 }
 
-int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
-{
 #if SCH_STORAGE_MODE == 0
-    //TODO : agregar signal de segment para responder falla
-
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
-
+static int dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
+{
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
@@ -409,6 +404,20 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
         }
     }
 
+    return 1;
+}
+#endif
+
+int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
+{
+#if SCH_STORAGE_MODE == 0
+    //TODO : agregar signal de segment para responder falla
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
+    int rc = dat_set_fp_async(timetodo, command, args, executions, periodical);
+
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
 
@@ -418,13 +427,9 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
 #endif
 }
 
-int dat_del_fp(int timetodo)
-{
 #if SCH_STORAGE_MODE ==0
-
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
-
+static int dat_del_fp_async(int timetodo)
+{
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
@@ -443,6 +448,22 @@ int dat_del_fp(int timetodo)
     osSemaphoreGiven(&repo_data_fp_sem);
 
     return 1;
+}
+#endif
+
+int dat_del_fp(int timetodo)
+{
+#if SCH_STORAGE_MODE ==0
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
+    int rc = dat_del_fp_async(timetodo);
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
+    return rc;
 #else
     return storage_flight_plan_erase(timetodo);
 #endif
