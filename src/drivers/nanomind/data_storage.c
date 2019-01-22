@@ -20,6 +20,8 @@ static struct {
         {(uint16_t) (sizeof(adsdata)), dat_mem_ads}
 };
 
+static data32_t* storage_addresses_payloads;
+static data32_t* storage_addresses_flight_plan;
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
@@ -30,6 +32,16 @@ int storage_init(const char *file)
 
     /* Init FLASH NOR storage */
     spn_fl512s_init((unsigned int) 0);
+
+    /* Init storage addresses */
+    int payload_tables_amount = SCH_SECTIONS_PER_PAYLOAD*last_sensor;
+    storage_addresses_payloads = malloc(payload_tables_amount*sizeof(data32_t));
+    storage_addresses_flight_plan = malloc(SCH_SECTIONS_FOR_FP*sizeof(data32_t));
+
+    for (int i = 0; i < payload_tables_amount; i++)
+        storage_addresses_payloads[i] = (uint32_t)SCH_FLASH_INIT_MEMORY + i*SCH_SIZE_PER_SECTION;
+    for (int i = 0; i < SCH_SECTIONS_FOR_FP; i++)
+        storage_addresses_flight_plan[i] = (uint32_t)SCH_FLASH_INIT_MEMORY + (payload_tables_amount+i)*SCH_SIZE_PER_SECTION;
 
     return 0;
 }
@@ -46,6 +58,7 @@ int storage_table_flight_plan_init(int drop)
 
 int storage_repo_get_value_idx(int index, char *table)
 {
+    // TODO: Check if this is necessary
     data32_t data;
     uint16_t len = (uint16_t)(sizeof(uint32_t));
     uint16_t add = (uint16_t)(index*len);
@@ -63,6 +76,7 @@ int storage_repo_get_value_str(char *name, char *table)
 
 int storage_repo_set_value_idx(int index, int value, char *table)
 {
+    // TODO: Check if this is necessary
     data32_t data;
     data.data32 = (uint32_t)value;
     uint16_t len = (uint16_t)(sizeof(data));
@@ -106,34 +120,35 @@ int storage_show_table(void)
 
 int storage_close(void)
 {
+    free(storage_addresses_payloads);
+    free(storage_addresses_flight_plan);
     return 0;
 }
 
-int storage_set_payload_data(int index, void* data, int payload)
+static int storage_set_payload_data(int index, void* data, int payload)
 {
-    uint32_t add = (uint32_t) SCH_FLASH_INIT_MEMORY;
-
     if(payload >= last_sensor)
     {
         LOGE(tag, "Payload id: %d greater than maximum id: %d", payload, last_sensor);
         return -1;
     }
 
-    int i=0;
-    for(i=0;i<payload; ++i)
-    {
-        add += (uint16_t) SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*(i+1);
-    }
-    add += (uint16_t) (index*data_map[payload].size);
+    int payloads_per_section = SCH_SIZE_PER_SECTION/data_map[payload].size;
 
-    if(add < (SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD)*payload ||
-       add >= (SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD)*(payload+1))
+    int payload_section = index/payloads_per_section;
+    int index_in_section = index%payloads_per_section;
+
+    int section_index = payload*2 + payload_section;
+
+    uint32_t add = storage_addresses_payloads[section_index] + index_in_section;
+
+    if (payload_section >= SCH_SECTIONS_PER_PAYLOAD)
     {
         LOGE(tag, "Payload address: %u is out of bounds", (unsigned int)add);
         return -1;
     }
 
-    LOGV(tag, "Writing in addresss: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
+    LOGV(tag, "Writing in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
     int ret = spn_fl512s_write_data(add, data, data_map[payload].size);
     if(ret != 0){
         return -1;
@@ -151,36 +166,35 @@ int storage_add_payload_data(void* data, int payload)
         dat_set_system_var(data_map[payload].sys_index, index+1);
         return index+1;
     } else {
+        LOGE(tag, "Couldn't set data payload %d", payload);
         return -1;
     }
 }
 
-int storage_get_payload_data(int index, void* data, int payload)
+static int storage_get_payload_data(int index, void* data, int payload)
 {
-    uint32_t add = (uint32_t) SCH_FLASH_INIT_MEMORY;
-
     if(payload >= last_sensor)
     {
         LOGE(tag, "payload id: %d greater than maximum id: %d", payload, last_sensor);
         return -1;
     }
 
-    int i=0;
-    for(i=0;i<payload; ++i)
-    {
-//        add += (uint16_t) (data_map[i]*SCH_MAX_DATA_SIZE);
-        add += (uint16_t) SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*(i+1);
-    }
-    add += (uint16_t) (index*data_map[payload].size);
+    int payloads_per_section = SCH_SIZE_PER_SECTION/data_map[payload].size;
 
-    if(add < (SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD)*payload ||
-       add >= (SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD)*(payload+1))
+    int payload_section = index/payloads_per_section;
+    int index_in_section = index%payloads_per_section;
+
+    int section_index = payload*2 + payload_section;
+
+    uint32_t add = storage_addresses_payloads[section_index] + index_in_section;
+
+    if (payload_section >= SCH_SECTIONS_PER_PAYLOAD)
     {
         LOGE(tag, "payload address: %u is out of bounds", (unsigned int)add);
         return -1;
     }
 
-    LOGV(tag, "Reading in addresss: %u \n", (unsigned int)add);
+    LOGV(tag, "Reading in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
 //    printf("Reading values of size %u \n", data_map[payload]);
 //    spn_fl512s_read_data(add, (uint8_t *) data, data_map[payload]);
     spn_fl512s_read_data(add, (uint8_t *)data, data_map[payload].size);
@@ -198,27 +212,32 @@ int storage_get_recent_payload_data(void * data, int payload, int delay)
         return storage_get_payload_data(index-1-delay, data, payload);
     }
     else {
+        LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
         return -1;
     }
 }
 
-int storage_delete_memory_sections()
+static int storage_delete_all_memory_sections()
 {
-    int i=0;
-
-    // Initializing memory system vars
-    for(i=0; i < last_sensor; ++i)
+    // Resetting memory system vars
+    for(int i = 0; i < last_sensor; ++i)
     {
         dat_set_system_var(data_map[i].sys_index, 0);
     }
 
-    // Deleting Memory Sections
-    for(i=0;  i<SCH_SECTIONS_PER_PAYLOAD*last_sensor; ++i)
+    // Deleting Payload Memory Sections
+    for(int i = 0;  i < SCH_SECTIONS_PER_PAYLOAD*last_sensor; ++i)
     {
-        LOGI(tag, "deleting section in address %d\n", i*SCH_SIZE_PER_SECTION)
-        spn_fl512s_erase_block(i*SCH_SIZE_PER_SECTION);
+        LOGI(tag, "deleting section in address %u\n", (unsigned int)storage_addresses_payloads[i]);
+        spn_fl512s_erase_block(storage_addresses_payloads[i]);
     }
 
+    // Deleting Flight Plan Memory Sections
+    for (int i = 0; i < SCH_SECTIONS_FOR_FP; i++)
+    {
+        LOGI(tag, "Deleting section in address %u\n", (unsigned int)storage_addresses_flight_plan[i]);
+        spn_fl512s_erase_block(storage_addresses_flight_plan[i]);
+    }
 
     return 0;
 }
