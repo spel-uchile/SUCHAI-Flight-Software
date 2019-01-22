@@ -20,8 +20,8 @@ static struct {
         {(uint16_t) (sizeof(adsdata)), dat_mem_ads}
 };
 
-static data32_t* storage_addresses_payloads;
-static data32_t* storage_addresses_flight_plan;
+static uint32_t* storage_addresses_payloads;
+static uint32_t* storage_addresses_flight_plan;
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
@@ -35,8 +35,8 @@ int storage_init(const char *file)
 
     /* Init storage addresses */
     int payload_tables_amount = SCH_SECTIONS_PER_PAYLOAD*last_sensor;
-    storage_addresses_payloads = malloc(payload_tables_amount*sizeof(data32_t));
-    storage_addresses_flight_plan = malloc(SCH_SECTIONS_FOR_FP*sizeof(data32_t));
+    storage_addresses_payloads = malloc(payload_tables_amount*sizeof(uint32_t));
+    storage_addresses_flight_plan = malloc(SCH_SECTIONS_FOR_FP*sizeof(uint32_t));
 
     for (int i = 0; i < payload_tables_amount; i++)
         storage_addresses_payloads[i] = (uint32_t)SCH_FLASH_INIT_MEMORY + i*SCH_SIZE_PER_SECTION;
@@ -125,7 +125,7 @@ int storage_close(void)
     return 0;
 }
 
-static int storage_set_payload_data(int index, void* data, int payload)
+int storage_set_payload_data(int index, void* data, int payload)
 {
     if(payload >= last_sensor)
     {
@@ -171,7 +171,7 @@ int storage_add_payload_data(void* data, int payload)
     }
 }
 
-static int storage_get_payload_data(int index, void* data, int payload)
+int storage_get_payload_data(int index, void* data, int payload)
 {
     if(payload >= last_sensor)
     {
