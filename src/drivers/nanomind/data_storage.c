@@ -217,7 +217,7 @@ int storage_get_recent_payload_data(void * data, int payload, int delay)
     }
 }
 
-static int storage_delete_all_memory_sections()
+int storage_delete_memory_sections()
 {
     // Resetting memory system vars
     for(int i = 0; i < last_sensor; ++i)
