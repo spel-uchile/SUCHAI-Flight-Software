@@ -293,7 +293,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     return 0;
 }
 
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** executions, int** periodical)
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical)
 {
     // Finds the table index for timetodo
     int index = flight_plan_find_index(timetodo);
@@ -317,27 +317,20 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** exe
     add += sizeof(numbers_container_t);
 
     // Malloc for command name and parameters
-    *command = malloc((numbers_container.name_len + 1)*sizeof(char));
-    *args = malloc((numbers_container.args_len + 1)*sizeof(char));
-
-    (*command)[numbers_container.name_len] = '\0';
-    (*args)[numbers_container.args_len] = '\0';
+    command[numbers_container.name_len] = '\0';
+    args[numbers_container.args_len] = '\0';
 
     // Finds the command name string and sets it
-    spn_fl512s_read_data(add, (uint8_t*)*command, numbers_container.name_len*sizeof(char));
+    spn_fl512s_read_data(add, (uint8_t*)command, numbers_container.name_len*sizeof(char));
 
     add += SCH_CMD_MAX_STR_NAME*sizeof(char);
 
     // Finds the parameters string and sets it
-    spn_fl512s_read_data(add, (uint8_t*)*args, numbers_container.args_len*sizeof(char));
-
-    // Malloc for the executions and periodical values
-    *executions = malloc(sizeof(int));
-    *periodical = malloc(sizeof(int));
+    spn_fl512s_read_data(add, (uint8_t*)args, numbers_container.args_len*sizeof(char));
 
     // Sets the executions and periodical values
-    **executions = *((int*)&(numbers_container.exec));
-    **periodical = *((int*)&(numbers_container.peri));
+    *executions = (int)numbers_container.exec;
+    *periodical = (int)numbers_container.peri;
 
     // Deletes the command from storage
     int rc;
@@ -347,9 +340,9 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** exe
         return -1;
 
     // If the command is periodical, a copy is made set to execute later
-    if (**periodical > 0)
+    if (*periodical > 0)
     {
-        rc = storage_flight_plan_set(timetodo+**periodical, *command, *args, **executions, **periodical);
+        rc = storage_flight_plan_set(timetodo+*periodical, command, args, *executions, *periodical);
 
         if (rc != 0)
             return -1;

@@ -141,7 +141,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
  * @param repeat Int. Value of times to run the command
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, int** periodical);
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* repeat, int* periodical);
 
 /**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
@@ -174,6 +174,7 @@ int storage_flight_plan_reset(void);
  */
 int storage_show_table(void);
 
+// TODO: Check why this function isn't in Linux/include/data_storage.h
 /**
  * Set or update a value in index address for specific payload
  * in NOR FLASH
