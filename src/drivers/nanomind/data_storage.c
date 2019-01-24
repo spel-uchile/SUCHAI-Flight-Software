@@ -129,11 +129,11 @@ static int flight_plan_find_index(int timetodo)
         uint32_t add = storage_addresses_flight_plan[section_index] + index_in_section*max_command_size;
 
         // Reads the entry's timetodo
-        uint32_t time;
-        spn_fl512s_read_data(add, (uint8_t*)&time, sizeof(uint32_t));
+        uint32_t found_time;
+        spn_fl512s_read_data(add, (uint8_t*)&found_time, sizeof(uint32_t));
 
         // If found, returns
-        if (time == (uint32_t)timetodo)
+        if (found_time == (uint32_t)timetodo)
             return i;
     }
 
@@ -160,7 +160,7 @@ static int flight_plan_erase_index(int index)
     uint32_t add = storage_addresses_flight_plan[section_index];
 
     // Reads the whole section
-    spn_fl512s_read_data(add, section_data, SCH_SIZE_PER_SECTION);
+    spn_fl512s_read_data(add, (uint8_t*)section_data, (size_t)SCH_SIZE_PER_SECTION);
 
     // Deletes the section
     LOGI(tag, "Deleting section in address %u", (unsigned int)add);
@@ -209,11 +209,11 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     uint32_t add = storage_addresses_flight_plan[section_index] + index_in_section*max_command_size;
 
     // Casts timetodo
-    uint32_t time = (uint32_t)timetodo;
+    uint32_t found_time = (uint32_t)timetodo;
 
     // Writes the timetodo value
     int rc;
-    rc = spn_fl512s_write_data(add, (uint8_t*)&time, sizeof(uint32_t));
+    rc = spn_fl512s_write_data(add, (uint8_t*)&found_time, sizeof(uint32_t));
 
     if (rc != 0)
     {
