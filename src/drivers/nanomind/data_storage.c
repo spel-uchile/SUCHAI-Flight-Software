@@ -218,7 +218,7 @@ static int flight_plan_erase_index(int index)
 int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical)
 {
     // Finds an index with an empty entry
-    int entries = dat_get_system_var(dat_fpl_queue)
+    int entries = dat_get_system_var(dat_fpl_queue);
     int index = entries;
 
     if (index >= SCH_FP_MAX_ENTRIES)
