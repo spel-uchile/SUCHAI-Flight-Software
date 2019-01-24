@@ -20,8 +20,17 @@ static struct {
         {(uint16_t) (sizeof(adsdata)), dat_mem_ads}
 };
 
+/**
+ * Arrays for storing the memory addresses of the flight plan and payload tables.
+ */
 static uint32_t* storage_addresses_payloads;
 static uint32_t* storage_addresses_flight_plan;
+
+typedef struct {
+    uint32_t exec, peri, name_len, args_len;
+} numbers_container_t;
+
+static max_command_size = (SCH_CMD_MAX_STR_NAME+SCH_CMD_MAX_STR_PARAMS)*sizeof(char)+sizeof(uint32_t)+sizeof(numbers_container_t);
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
@@ -93,23 +102,290 @@ int storage_repo_set_value_str(char *name, int value, char *table)
     return 0;
 }
 
+/**
+ * Function for finding the storage index of a command based on it's timetodo field.
+ *
+ * IMPORTANT: Flight plan entries are saved as consecutive binary values using the following scheme:
+ * timetodo(uint32_t) executions(uint32_t) periodical(uint32_t) name_length(uint32_t) args_length(uint32_t) name(char*SCH_CMD_MAX_STR_NAME) args(char*SCH_CMD_MAX_STR_PARAMS)
+ *
+ * The total size of each command is then stored in 'max_command_size'.
+ *
+ * @param timetodo Execution time of the command to find
+ * @return The command's index, -1 if not found or error
+ */
+static int flight_plan_find_index(int timetodo)
+{
+    // Calculates information on how the flight plan is stored
+    int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
+    int commands_amount = commands_per_section*SCH_SECTIONS_FOR_FP;
+
+    // For every index
+    for (int i = 0; i < commands_amount, i++)
+    {
+        // Translates the index into an address in memory
+        int section_index = i/commands_per_section;
+        int index_in_section = i%commands_per_section;
+
+        uint32_t add = storage_addresses_flight_plan[section] + index_in_section*max_command_size;
+
+        // Reads the entry's timetodo
+        uint32_t time;
+        int rc = spn_fl512s_read_data(add, &time, sizeof(uint32_t));
+
+        if (rc != 0)
+        {
+            LOGE(tag, "Failed attempt at reading data in storage address %u", add);
+            return -1;
+        }
+
+        // If found, returns
+        if (time == timetodo)
+            return i;
+    }
+
+    // If couldn't find the entry
+    return -1;
+}
+
+/**
+ * Function for deleting a flight plan entry on a given index.
+ *
+ * @param index Storage index of the entry
+ * @return 0 if OK, -1 if Error
+ */
+static int flight_plan_erase_index(int index)
+{
+    // Generates a buffer for the flight plan section
+    uint8_t section_data[SCH_SIZE_PER_SECTION];
+
+    // Calculates memory address of the section
+    int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
+    int section_index = index/commands_per_section;
+    int index_in_section = index%commands_per_section;
+
+    uint32_t add = storage_addresses_flight_plan[section];
+
+    // Reads the whole section
+    int rc = spn_fl512s_read_data(add, section_data, SCH_SIZE_PER_SECTION/sizeof(uint8_t));
+
+    // Deletes the section
+    LOGI(tag, "Deleting section in address %u", add);
+    rc = spn_fl512s_erase_block(add);
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at deleting data in storage address %u", add);
+        return -1;
+    }
+
+    // Rewrites all commands, except the one that was going to be erased and any that were 'null'
+    for (int i = 0; i < commands_per_section; i++)
+    {
+        int buffer_index = i*max_command_size;
+        int timetodo = *((int*)&(section_data[buffer_index]));
+
+        // If the address had a command, and it wasn't the one to erase
+        if (i != index_in_section && timetodo != 0)
+        {
+            rc = spn_fl512s_write_data(add, &(section_data[buffer_index]), max_command_size);
+        }
+
+        // Moves to the next address
+        add += max_command_size;
+    }
+
+    return 0;
+}
+
 int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical)
 {
+    // Finds an index with an empty entry
+    int index = flight_plan_find_index(0);
+
+    if (index < 0)
+    {
+        LOGE(tag, "Flight plan storage no longer has space for another command");
+        return -1;
+    }
+
+    // Calculates memory address
+    int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
+    int section_index = index/commands_per_section;
+    int index_in_section = index%commands_per_section;
+
+    uint32_t add = storage_addresses_flight_plan[section] + index_in_section*max_command_size;
+
+    // Casts timetodo
+    uint32_t time = (uint32_t)timetodo;
+
+    // Writes the timetodo value
+    int rc;
+    rc = spn_fl512s_write_data(add, &time, sizeof(uint32_t));
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at writing data in storage address %u", add);
+        return -1;
+    }
+
+    add += sizeof(uint32_t);
+
+    // Container for writing all other numeric values in one go
+    numbers_container_t numbers_container;
+
+    numbers_container.exec = executions;
+    numbers_container.peri = periodical;
+    numbers_container.name_len = strlen(command);
+    numbers_container.args_len = strlen(args);
+
+    // Writes said values
+    rc = spn_fl512s_write_data(add, &numbers_container, sizeof(numbers_container_t));
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at writing data in storage address %u", add);
+        return -1;
+    }
+
+    add += sizeof(numbers_container_t);
+
+    // Writes the command's name
+    rc = spn_fl512s_write_data(add, command, sizeof(char)*numbers_container.name_len);
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at writing data in storage address %u", add);
+        return -1;
+    }
+
+    add += sizeof(char)*SCH_CMD_MAX_STR_NAME;
+
+    // Writes the command's arguments
+    rc = spn_fl512s_write_data(add, args, sizeof(char)*numbers_container.args_len);
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at writing data in storage address %u", add);
+        return -1;
+    }
+
     return 0;
 }
 
 int storage_flight_plan_get(int timetodo, char** command, char** args, int** executions, int** periodical)
 {
+    // Finds the table index for timetodo
+    int index = flight_plan_find_index(timetodo);
+
+    if (index < 0)
+        return -1;
+
+    // Calculates memory address
+    int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
+    int section_index = i/commands_per_section;
+    int index_in_section = i%commands_per_section;
+
+    uint32_t add = storage_addresses_flight_plan[section] + index_in_section*max_command_size + sizeof(uint32_t);
+
+    // Container for reading all the numeric values in one go
+    numbers_container_t numbers_container;
+
+    // Finds the numeric values
+    int rc;
+    rc = spn_fl512s_read_data(add, &numbers_container, sizeof(struct container_t));
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at reading data in storage address %u", add);
+        return -1;
+    }
+
+    add += sizeof(struct container_t);
+
+    // Malloc for command name and parameters
+    *command = malloc((numbers_container.name_len + 1)*sizeof(char));
+    *args = malloc((numbers_container.args_len + 1)*sizeof(char));
+
+    (*command)[numbers_container.name_len] = '\0';
+    (*args)[numbers_container.args_len] = '\0';
+
+    // Finds the command name string and sets it
+    rc = spn_fl512s_read_data(add, *command, numbers_container.name_len*sizeof(char));
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at reading data in storage address %u", add);
+        return -1;
+    }
+
+    add += SCH_CMD_MAX_STR_NAME*sizeof(char);
+
+    // Finds the parameters string and sets it
+    rc = spn_fl512s_read_data(add, *args, numbers_container.args_len*sizeof(char));
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Failed attempt at reading data in storage address %u", add);
+        return -1;
+    }
+
+    // Malloc for the executions and periodical values
+    *executions = malloc(sizeof(int));
+    *periodical = malloc(sizeof(int));
+
+    // Sets the executions and periodical values
+    **executions = *((int*)&(numbers_container.exec));
+    **periodical = *((int*)&(numbers_container.peri));
+
+    // Deletes the command from storage
+    rc = flight_plan_erase_index(index);
+
+    if (rc != 0)
+        return -1;
+
+    // If the command is periodical, a copy is made set to execute later
+    rc = storage_flight_plan_set(timetodo+**periodical, *command, *args, **executions, **periodical);
+
+    if (rc != 0)
+        return -1;
+
     return 0;
 }
 
 int storage_flight_plan_erase(int timetodo)
 {
-    return 0;
+    // Finds the index to erase
+    int index = flight_plan_find_index(timetodo);
+
+    if (index < 0)
+    {
+        LOGE(tag, "Couldn't find command to erase");
+        return -1;
+    }
+
+    // Erases the entry in index
+    int rc = flight_plan_erase_index(index);
+
+    if (rc != 0)
+    {
+        LOGE(tag, "Couldn't erase command");
+    }
+
+    return rc;
 }
 
 int storage_flight_plan_reset(void)
 {
+    // Deletes all flight plan memory sections
+    for (int i = 0; i < SCH_SECTIONS_FOR_FP; i++)
+    {
+        LOGI(tag, "Deleting section in address %u\n", (unsigned int)storage_addresses_flight_plan[i]);
+        int rc = spn_fl512s_erase_block(storage_addresses_flight_plan[i]);
+        if (rc != 0)
+        {
+            LOGE(tag, "Failed attempt at deleting data in storage address %u", storage_addresses_flight_plan[i]);
+            return -1;
+        }
+    }
     return 0;
 }
 
@@ -229,14 +505,24 @@ int storage_delete_memory_sections()
     for(int i = 0;  i < SCH_SECTIONS_PER_PAYLOAD*last_sensor; ++i)
     {
         LOGI(tag, "deleting section in address %u\n", (unsigned int)storage_addresses_payloads[i]);
-        spn_fl512s_erase_block(storage_addresses_payloads[i]);
+        int rc = spn_fl512s_erase_block(storage_addresses_payloads[i]);
+        if (rc != 0)
+        {
+            LOGE(tag, "Failed attempt at deleting data in storage address %u", storage_addresses_payloads[i]);
+            return -1;
+        }
     }
 
     // Deleting Flight Plan Memory Sections
     for (int i = 0; i < SCH_SECTIONS_FOR_FP; i++)
     {
         LOGI(tag, "Deleting section in address %u\n", (unsigned int)storage_addresses_flight_plan[i]);
-        spn_fl512s_erase_block(storage_addresses_flight_plan[i]);
+        int rc = spn_fl512s_erase_block(storage_addresses_flight_plan[i]);
+        if (rc != 0)
+        {
+            LOGE(tag, "Failed attempt at deleting data in storage address %u", storage_addresses_flight_plan[i]);
+            return -1;
+        }
     }
 
     return 0;

@@ -133,7 +133,6 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
 /**
  * Get the row of a certain time and set the values in the variables committed
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param timetodo Int. time to do the action
@@ -148,7 +147,6 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
  * have the same timetodo.
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param timetodo Int. time to do the action
@@ -160,7 +158,6 @@ int storage_flight_plan_erase(int timetodo);
  * Reset the table in the opened database (@relatesalso storage_init) in the
  * form (time, command, args, repeat).
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @return 0 OK, -1 Error
@@ -171,7 +168,6 @@ int storage_flight_plan_reset(void);
  * Show the table in the opened database (@relatesalso storage_init) in the
  * form (time, command, args, repeat).
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @return 0 OK
