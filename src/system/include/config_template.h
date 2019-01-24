@@ -72,7 +72,6 @@
 #define SCH_STORAGE_PGUSER      "{{SCH_STORAGE_PGUSER}}"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
-#define SCH_SECTIONS_FOR_FP 2                      ///< Memory blocks for storing the flight plan TODO: Ensure all commands fit here
 #define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage
 #define SCH_FLASH_INIT_MEMORY 0                    ///< Initial address in flash storage
 
