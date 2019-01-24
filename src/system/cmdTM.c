@@ -40,11 +40,11 @@ static void bin_transform(char* result, unsigned char c)
     unsigned char bit_mask = (unsigned char)1;
     unsigned char number = c;
 
-    char length = sizeof(char)*8;
+    int length = sizeof(char)*8;
 
     bit_mask <<= (length-1);
 
-    for (char i = 0; i < length; i++)
+    for (int i = 0; i < length; i++)
     {
         result[i] = ((number & bit_mask) == bit_mask) ? (char)'1' : (char)'0';
         bit_mask >>= 1;
