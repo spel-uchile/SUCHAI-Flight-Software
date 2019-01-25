@@ -22,7 +22,7 @@ fi
 cd -
 
 echo "Adding directories to PATH..."
-if [ ":$PATH:" == *":$HOME/.local/bin:$HOME/.local/avr32/bin:"* ]; then
+if [[ ":$PATH:" == *":$HOME/.local/bin:$HOME/.local/avr32/bin:"* ]]; then
   echo "Path was correctly set"
 else
   echo 'export PATH="$HOME/.local/bin:$HOME/.local/avr32/bin:$PATH"' >> ~/.bashrc
