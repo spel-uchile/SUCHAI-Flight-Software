@@ -402,6 +402,58 @@ int storage_flight_plan_reset(void)
 
 int storage_show_table(void)
 {
+    int entries = dat_get_system_var(dat_fpl_queue);
+
+    if (entries == 0)
+    {
+        LOGI(tag, "Flight plan table empty");
+        return 0;
+    }
+
+    LOGI(tag, "Flight plan table");
+
+    int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
+
+    for (int index = 0; index < entries; index++)
+    {
+        // Calculates memory address
+        int section_index = index/commands_per_section;
+        int index_in_section = index%commands_per_section;
+
+        uint32_t add = storage_addresses_flight_plan[section_index] + index_in_section*max_command_size;
+
+        // Finds numeric values
+        uint32_t timetodo;
+        numbers_container_t container;
+
+        spn_fl512s_read_data(add, (uint8_t*)&timetodo, sizeof(uint32_t));
+
+        add += sizeof(uint32_t);
+
+        spn_fl512s_read_data(add, (uint8_t*)&container, sizeof(numbers_container_t));
+
+        add += sizeof(numbers_container_t);
+
+        // Finds string values
+        char command[container.name_len+1];
+        char args[container.args_len+1];
+
+        command[container.name_len] = '\0';
+        args[container.args_len] = '\0';
+
+        spn_fl512s_read_data(add, (uint8_t*)command, sizeof(char)*container.name_len);
+
+        add += SCH_CMD_MAX_STR_NAME;
+
+        spn_fl512s_read_data(add, (uint8_t*)args, sizeof(char)*container.args_len);
+
+        // Prints a row of the table
+
+        time_t timef = timetodo;
+
+        printf("%s\t%s\t%s\t%lu\n", ctime(&timef), command, args, container.peri);
+    }
+
     return 0;
 }
 
