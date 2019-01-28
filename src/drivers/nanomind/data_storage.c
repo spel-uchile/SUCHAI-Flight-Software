@@ -11,13 +11,15 @@ char* fp_table = "flightPlan";
 
 struct temp_data tempdata;
 struct ads_data adsdata;
+struct eps_data epsdata;
 
 static struct {
     uint16_t  size;
     int sys_index;
 } data_map[last_sensor] = {
         {(uint16_t) (sizeof(tempdata)), dat_mem_temp},
-        {(uint16_t) (sizeof(adsdata)), dat_mem_ads}
+        {(uint16_t) (sizeof(adsdata)), dat_mem_ads},
+        {(uint16_t) (sizeof(epsdata)), dat_mem_eps}
 };
 
 /**
@@ -487,7 +489,7 @@ int storage_set_payload_data(int index, void* data, int payload)
         return -1;
     }
 
-    LOGV(tag, "Writing in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
+    LOGI(tag, "Writing in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
     int ret = spn_fl512s_write_data(add, data, data_map[payload].size);
     if(ret != 0){
         return -1;
@@ -498,7 +500,7 @@ int storage_set_payload_data(int index, void* data, int payload)
 int storage_add_payload_data(void* data, int payload)
 {
     int index = dat_get_system_var(data_map[payload].sys_index);
-    LOGV(tag, "Adding data for payload %d in index %d", payload, index);
+    LOGI(tag, "Adding data for payload %d in index %d", payload, index);
     int ret = storage_set_payload_data(index, data, payload);
     // Update address
     if(ret==0) {

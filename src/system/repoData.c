@@ -344,6 +344,7 @@ void dat_print_status(dat_status_t *status)
 
     DAT_PRINT_SYSTEM_VAR(status,  dat_mem_temp);
     DAT_PRINT_SYSTEM_VAR(status, dat_mem_ads);
+    DAT_PRINT_SYSTEM_VAR(status, dat_mem_eps);
 }
 
 #if SCH_STORAGE_MODE == 0

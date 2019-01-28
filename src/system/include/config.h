@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* Select one operating system */
-#define LINUX                                      ///< LINUX | FREERTOS
+#define LINUX                                    ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
@@ -36,16 +36,16 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               LOG_LVL_DEBUG        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
-#define SCH_NAME                "SUCHAI-Test"         ///< Project code name
-#define SCH_DEVICE_ID           0             ///< Device unique ID
-#define SCH_SW_VERSION          "2.0.1-63-g7852"      ///< Software version
+#define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define SCH_NAME                "SUCHAI-FS"         ///< Project code name
+#define SCH_DEVICE_ID           0                   ///< Device unique ID
+#define SCH_SW_VERSION          "2.0.1"             ///< Software version
 
 /* General system settings */
-#define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
-#define SCH_FP_ENABLED          0      ///< TaskFlightPlan enabled (0 | 1)
-#define SCH_HK_ENABLED          0      ///< TaskHousekeeping enabled (0 | 1)
-#define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
+#define SCH_COMM_ENABLE         1     ///< TaskCommunications enabled (0 | 1)
+#define SCH_FP_ENABLED          0     ///< TaskFlightPlan enabled (0 | 1)
+#define SCH_HK_ENABLED          0     ///< TaskHousekeeping enabled (0 | 1)
+#define SCH_TEST_ENABLED        0     ///< Set to run tests (0 | 1)
 #define SCH_WDT_PERIOD          10                 ///< CPU watchdog timer period in seconds
 #define SCH_MAX_WDT_TIMER       5                  ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
@@ -97,7 +97,9 @@
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
 #define SCH_BUFFERS_CSP           (5)       ///< Number of available CSP buffers
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
-#define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
+#define SCH_CMD_MAX_ENTRIES       (100)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
+#define SCH_CMD_MAX_STR_NAME      (64)      ///< Limit for the length of the name of a command
+#define SCH_CMD_MAX_STR_FORMAT    (32)      ///< Limit for the length of the format field of a command
 
 #endif //SUCHAI_CONFIG_H

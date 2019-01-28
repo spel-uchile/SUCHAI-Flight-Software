@@ -140,6 +140,7 @@ typedef enum dat_system {
     /// Memory: Current payload memory addresses
     dat_mem_temp,                 ///< Temperature data
     dat_mem_ads,                  ///< ADS data
+    dat_mem_eps,                  ///< EPS data
 
     /// Add custom status variables here
     //dat_custom,                 ///< Variable description
@@ -205,6 +206,7 @@ typedef struct __attribute__((packed)) dat_status_s {
     /// Memory: Current payload memory address
     uint32_t dat_mem_temp;          ///< Temperature data
     uint32_t dat_mem_ads;           ///< ADS data
+    uint32_t dat_mem_eps;           ///< EPS data
 
     /// Add custom status variables here
     //uint32_t dat_custom;          ///< Variable description
@@ -231,6 +233,7 @@ typedef struct __attribute__((packed)) dat_status_s {
 typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     ads_sensors,            ///< Ads sensors
+    eps_sensors,            ///< Eps sensors
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -255,6 +258,21 @@ typedef struct ads_data {
     float mag_y;            ///< Magnetometer y axis
     float mag_z;            ///< Magnetometer z axis
 } ads_data_t;
+
+/**
+ * Struct for storing data collected by eps housekeeping.
+ */
+typedef struct eps_data {
+    uint16_t cursun;            ///< Current from boost converters [mA]
+    uint16_t cursys;            ///< Current out of battery [mA]
+    uint16_t vbatt;            ///< Voltage of battery [mV]
+    int16_t temp1;
+    int16_t temp2;
+    int16_t temp3;
+    int16_t temp4;
+    int16_t temp5;
+    int16_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
+} eps_data_t;
 
 /**
  * Initializes data repositories, including:
