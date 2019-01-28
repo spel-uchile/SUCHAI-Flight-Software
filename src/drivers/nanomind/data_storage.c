@@ -479,7 +479,7 @@ int storage_set_payload_data(int index, void* data, int payload)
 
     int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + payload_section;
 
-    uint32_t add = storage_addresses_payloads[payload_section] + index_in_section*data_map[payload].size;
+    uint32_t add = storage_addresses_payloads[section_index] + index_in_section*data_map[payload].size;
 
     if (payload_section >= SCH_SECTIONS_PER_PAYLOAD)
     {
