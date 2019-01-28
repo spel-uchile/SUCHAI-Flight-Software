@@ -346,6 +346,54 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR(status, dat_mem_ads);
 }
 
+#if SCH_STORAGE_MODE == 0
+static int dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
+{
+    int i;
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
+    {
+        if(data_base[i].unixtime == 0)
+        {
+            data_base[i].unixtime = timetodo;
+            data_base[i].executions = executions;
+            data_base[i].periodical = periodical;
+
+            data_base[i].cmd = malloc(sizeof(char)*50);
+            data_base[i].args = malloc(sizeof(char)*50);
+
+            strcpy(data_base[i].cmd, command);
+            strcpy(data_base[i].args,args);
+
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+static int dat_del_fp_async(int timetodo)
+{
+    int i;
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
+    {
+        if(timetodo == data_base[i].unixtime)
+        {
+            data_base[i].unixtime = 0;
+            data_base[i].executions = 0;
+            data_base[i].periodical = 0;
+            free(data_base[i].args);
+            free(data_base[i].cmd);
+            return 0;
+        }
+    }
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
+    return 1;
+}
+#endif
+
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
 {
 #if SCH_STORAGE_MODE == 0
@@ -382,32 +430,6 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
 #endif
 }
 
-#if SCH_STORAGE_MODE == 0
-static int dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
-{
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(data_base[i].unixtime == 0)
-        {
-            data_base[i].unixtime = timetodo;
-            data_base[i].executions = executions;
-            data_base[i].periodical = periodical;
-
-            data_base[i].cmd = malloc(sizeof(char)*50);
-            data_base[i].args = malloc(sizeof(char)*50);
-
-            strcpy(data_base[i].cmd, command);
-            strcpy(data_base[i].args,args);
-
-            return 0;
-        }
-    }
-
-    return 1;
-}
-#endif
-
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
 {
 #if SCH_STORAGE_MODE == 0
@@ -421,35 +443,11 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
 
-    return 1;
+    return rc;
 #else
     return storage_flight_plan_set(timetodo, command, args, executions, periodical);
 #endif
 }
-
-#if SCH_STORAGE_MODE ==0
-static int dat_del_fp_async(int timetodo)
-{
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(timetodo == data_base[i].unixtime)
-        {
-            data_base[i].unixtime = 0;
-            data_base[i].executions = 0;
-            data_base[i].periodical = 0;
-            free(data_base[i].args);
-            free(data_base[i].cmd);
-            return 0;
-        }
-    }
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
-
-    return 1;
-}
-#endif
 
 int dat_del_fp(int timetodo)
 {
