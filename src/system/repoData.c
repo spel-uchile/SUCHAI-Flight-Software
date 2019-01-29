@@ -570,7 +570,7 @@ int dat_show_time(int format)
     }
     else if(format == 1)
     {
-        printf("%d\n", (int)time_to_show);
+        printf("%u\n", (unsigned int)time_to_show);
         return 0;
     }
     else
