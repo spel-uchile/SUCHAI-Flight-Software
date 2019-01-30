@@ -411,7 +411,6 @@ time_t dat_get_time(void);
  */
 int dat_update_time(void);
 
-// TODO: Should this really do nothing in Linux? What about raspberry debian?
 /**
  * Sets the current system time to a new value.
  *

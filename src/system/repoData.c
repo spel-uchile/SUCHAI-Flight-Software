@@ -562,7 +562,9 @@ int dat_set_time(int new_time)
     clock_set_time(&timestamp);
     return 0;
 #else
-    size_t command_length = 23;
+    // TODO: This needs to be tested on a raspberry LINUX system, to see if the sudo call asks for permissions or not
+
+    size_t command_length = 28;
 
     time_t new_time_typed = (time_t)new_time;
     char* arg = ctime(&new_time_typed);
@@ -572,7 +574,7 @@ int dat_set_time(int new_time)
     char command[sizeof(char)*(command_length+arg_length+1)];
     command[command_length+arg_length] = '\0';
 
-    strncpy(command, "hwclock --set --date '", command_length-1);
+    strncpy(command, "sudo hwclock --set --date '", command_length-1);
     strncpy(command+command_length-1, arg, arg_length);
     strncpy(command+command_length+arg_length-1, "'", 1);
 
