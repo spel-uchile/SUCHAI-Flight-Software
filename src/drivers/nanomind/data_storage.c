@@ -65,7 +65,13 @@ int storage_table_repo_init(char* table, int drop)
 
 int storage_table_flight_plan_init(int drop)
 {
-    return 0;
+    int rc = 0;
+
+    // If set to drop the memory, it erases the flight plan sections
+    if (drop == 1)
+        rc = storage_flight_plan_reset();
+
+    return rc;
 }
 
 int storage_repo_get_value_idx(int index, char *table)
@@ -379,8 +385,10 @@ int storage_flight_plan_reset(void)
 {
     int entries = dat_get_system_var(dat_fpl_queue);
 
-    int fp_sections = (entries*max_command_size)/SCH_SIZE_PER_SECTION + 1;
     int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
+
+    // Amount of sections that the flight plan uses
+    int fp_sections = (entries/commands_per_section) + 1;
 
     // Deletes all flight plan memory sections
     for (int i = 0; i < fp_sections; i++)
@@ -394,10 +402,14 @@ int storage_flight_plan_reset(void)
             return -1;
         }
 
+        // An entries section gets erased
         entries -= commands_per_section;
     }
 
-    dat_set_system_var(dat_fpl_queue, entries >= 0 ? entries : 0);
+    // The entries amount can't be below zero
+    entries = (entries < 0) ? 0 : entries;
+
+    dat_set_system_var(dat_fpl_queue, entries);
 
     return 0;
 }
