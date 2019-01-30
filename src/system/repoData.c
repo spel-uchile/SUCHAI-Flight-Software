@@ -564,6 +564,10 @@ int dat_show_time(int format)
 {
 #ifdef AVR32
     time_t time_to_show = dat_get_time();
+#else
+    time_t time_to_show = time(NULL);
+#endif
+
     if(format == 0)
     {
         printf("%s\n",ctime(&time_to_show));
@@ -578,23 +582,6 @@ int dat_show_time(int format)
     {
         return 1;
     }
-#else
-    time_t time_to_show = time(NULL);
-    if(format == 0)
-    {
-        printf("%s\n",ctime(&time_to_show));
-        return 0;
-    }
-    else if(format == 1)
-    {
-        printf("%d\n", (int)time_to_show);
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
-#endif
 }
 
 int dat_add_payload_sample(void* data, int payload)
