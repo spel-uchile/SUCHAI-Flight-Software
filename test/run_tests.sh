@@ -24,7 +24,7 @@ echo ${WORKSPACE}
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "1" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "1" --sch_st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_cmd
@@ -56,7 +56,7 @@ do
 
     # Compiles the project with the test's parameters
     cd ${WORKSPACE}/src/system/include
-    python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode ${i}
+    python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode ${i}
 
     # Compiles the test
     cd ${WORKSPACE}/test/test_unit
@@ -67,7 +67,7 @@ do
     make
 
     # Runs the test, saving a log file
-    rm -f ../test_unit_log_{i}.txt
+    rm -f ../test_unit_log_${i}.txt
     ./SUCHAI_Flight_Software_Test | cat >> ../test_unit_log_${i}.txt
     echo ""
 
@@ -79,7 +79,7 @@ done
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_load
@@ -100,7 +100,7 @@ echo ""
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_bug_delay
