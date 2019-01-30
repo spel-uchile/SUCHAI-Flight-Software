@@ -250,6 +250,7 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
 
         temp_data_t data_temp;
         ads_data_t data_ads;
+        eps_data_t data_eps;
 
         switch(payload)
         {
@@ -268,7 +269,7 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
             case eps_sensors:
                 dat_get_recent_payload_sample(&data_eps, eps_sensors, 0);
                 assert(sizeof(data_eps) < sizeof(data.frame.data));
-                memcpy(data.frame.data.data8, &data_ads, sizeof(data_ads));
+                memcpy(data.frame.data.data8, &data_eps, sizeof(data_eps));
                 break;
             default:
                 break;
