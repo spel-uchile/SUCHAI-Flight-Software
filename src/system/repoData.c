@@ -552,11 +552,44 @@ int dat_update_time(void)
 
 int dat_set_time(int new_time)
 {
-#ifdef AVR32
+#if defined AVR32
     sec = (time_t)new_time;
     return 0;
-#else
+#elif defined NANOMIND
+    timestamp_t timestamp = {(uint32_t)new_time, 0};
+    clock_set_time(&timestamp);
     return 0;
+#else
+    size_t command_length = 23;
+
+    time_t new_time_typed = (time_t)new_time;
+    char* arg = ctime(&new_time_typed);
+
+    size_t arg_length = strlen(arg);
+
+    char command[sizeof(char)*(command_length+arg_length+1)];
+    command[command_length+arg_length] = '\0';
+
+    strncpy(command, "hwclock --set --date '", command_length-1);
+    strncpy(command+command_length-1, arg, arg_length);
+    strncpy(command+command_length+arg_length-1, "'", 1);
+
+    int rc = system(command);
+
+    if (rc == -1)
+    {
+        LOGE(tag, "Failed attempt at creating a child process for setting the machine clock");
+        return 1;
+    }
+    else if (rc == 127)
+    {
+        LOGE(tag, "Failed attempt at starting a shell for setting machine clock");
+        return 1;
+    }
+    else
+    {
+        return rc != 0 ? 1 : 0;
+    }
 #endif
 }
 
