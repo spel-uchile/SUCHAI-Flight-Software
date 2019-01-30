@@ -265,6 +265,11 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
                 LOGI(tag, "data_ads.acc_x %f", data_ads.acc_x)
                 memcpy(data.frame.data.data8, &data_ads, sizeof(data_ads));
                 break;
+            case eps_sensors:
+                dat_get_recent_payload_sample(&data_eps, eps_sensors, 0);
+                assert(sizeof(data_eps) < sizeof(data.frame.data));
+                memcpy(data.frame.data.data8, &data_ads, sizeof(data_ads));
+                break;
             default:
                 break;
         }
