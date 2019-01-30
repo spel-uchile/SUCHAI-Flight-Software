@@ -298,6 +298,7 @@ void dat_status_to_struct(dat_status_t *status)
 
     DAT_CPY_SYSTEM_VAR(status,  dat_mem_temp);
     DAT_CPY_SYSTEM_VAR(status, dat_mem_ads);
+    DAT_CPY_SYSTEM_VAR(status, dat_mem_eps);
 
 }
 
