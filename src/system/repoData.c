@@ -555,6 +555,8 @@ int dat_set_time(int new_time)
 #if defined AVR32
     sec = (time_t)new_time;
     return 0;
+#elif defined ESP32
+    return 0;
 #elif defined NANOMIND
     timestamp_t timestamp = {(uint32_t)new_time, 0};
     clock_set_time(&timestamp);
