@@ -32,8 +32,8 @@
 #endif
 
 #ifdef NANOMIND
-    #include "clock.h"
-    #include "timestamp.h"
+    #include "util/clock.h"
+    #include "util/timestamp.h"
 #endif
 
 /** Union for easily casting status variable types */
