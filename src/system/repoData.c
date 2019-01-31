@@ -559,11 +559,48 @@ int dat_update_time(void)
 
 int dat_set_time(int new_time)
 {
-#ifdef AVR32
+#if defined AVR32
     sec = (time_t)new_time;
     return 0;
-#else
+#elif defined ESP32
     return 0;
+#elif defined NANOMIND
+    timestamp_t timestamp = {(uint32_t)new_time, 0};
+    clock_set_time(&timestamp);
+    return 0;
+#else
+    // TODO: This needs to be tested on a raspberry LINUX system, to see if the sudo call asks for permissions or not
+
+    size_t command_length = 28;
+
+    time_t new_time_typed = (time_t)new_time;
+    char* arg = ctime(&new_time_typed);
+
+    size_t arg_length = strlen(arg);
+
+    char command[sizeof(char)*(command_length+arg_length+1)];
+    command[command_length+arg_length] = '\0';
+
+    strncpy(command, "sudo hwclock --set --date '", command_length-1);
+    strncpy(command+command_length-1, arg, arg_length);
+    strncpy(command+command_length+arg_length-1, "'", 1);
+
+    int rc = system(command);
+
+    if (rc == -1)
+    {
+        LOGE(tag, "Failed attempt at creating a child process for setting the machine clock");
+        return 1;
+    }
+    else if (rc == 127)
+    {
+        LOGE(tag, "Failed attempt at starting a shell for setting machine clock");
+        return 1;
+    }
+    else
+    {
+        return rc != 0 ? 1 : 0;
+    }
 #endif
 }
 
@@ -571,6 +608,10 @@ int dat_show_time(int format)
 {
 #ifdef AVR32
     time_t time_to_show = dat_get_time();
+#else
+    time_t time_to_show = time(NULL);
+#endif
+
     if(format == 0)
     {
         printf("%s\n",ctime(&time_to_show));
@@ -585,23 +626,6 @@ int dat_show_time(int format)
     {
         return 1;
     }
-#else
-    time_t time_to_show = time(NULL);
-    if(format == 0)
-    {
-        printf("%s\n",ctime(&time_to_show));
-        return 0;
-    }
-    else if(format == 1)
-    {
-        printf("%d\n", (int)time_to_show);
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
-#endif
 }
 
 int dat_add_payload_sample(void* data, int payload)

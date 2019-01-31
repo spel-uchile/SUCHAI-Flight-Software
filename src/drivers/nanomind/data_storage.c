@@ -6,7 +6,6 @@
 
 static const char *tag = "data_storage";
 
-static void *db = NULL;
 char* fp_table = "flightPlan";
 
 /**
@@ -20,8 +19,6 @@ typedef struct {
 } numbers_container_t;
 
 static int max_command_size = (SCH_CMD_MAX_STR_NAME+SCH_CMD_MAX_STR_PARAMS)*sizeof(char)+sizeof(uint32_t)+sizeof(numbers_container_t);
-
-static int dummy_callback(void *data, int argc, char **argv, char **names);
 
 int storage_init(const char *file)
 {
@@ -580,9 +577,4 @@ int storage_delete_memory_sections()
     int rc = storage_flight_plan_reset();
 
     return rc;
-}
-
-static int dummy_callback(void *data, int argc, char **argv, char **names)
-{
-    return 0;
 }

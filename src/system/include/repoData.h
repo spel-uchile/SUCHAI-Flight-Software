@@ -31,6 +31,11 @@
     #include "data_storage.h"
 #endif
 
+#ifdef NANOMIND
+    #include "util/clock.h"
+    #include "util/timestamp.h"
+#endif
+
 /** Union for easily casting status variable types */
 typedef union fvalue{
     float f;
@@ -424,8 +429,6 @@ int dat_update_time(void);
 
 /**
  * Sets the current system time to a new value.
- *
- * When in linux this does nothing.
  *
  * @param new_time Time value to set as system time
  * @return 0 OK, 1 Error
