@@ -47,6 +47,40 @@ first, leaving the obsolete command as trash information in the table forever.
 executes, leaving no time for `taskFlightPlan` to find the obsolete command and keeping 
 it as trash information forever as well.
 
+## Implementation Details
+
+### Flash Memory Storage in the NANOMIND architecture
+
+The flight plan is saved using the following scheme of bits:
+
+`timetodo(uint32_t)`
+`executions(uint32_t)` 
+`periodical(uint32_t)` 
+`name_length(uint32_t)` 
+`args_length(uint32_t)` 
+`name(char*SCH_CMD_MAX_STR_NAME)` 
+`args(char*SCH_CMD_MAX_STR_PARAMS)`
+
+In that order.
+
+`SCH_CMD_MAX_STR_NAME` is the maximum allowed length of a command's name and `SCH_CMD_MAX_STR_PARAMS` is the
+maximum allowed length of a parameters string.
+
+Where `timetodo` is saved on it's own, `name` and `args` are saved as concatenations of chars, and
+`executions`, `periodical`, `name_length` and `args_length` are saved copying the memory used by 
+the `struct`:
+```{c}
+typedef struct {
+    uint32_t exec, peri, name_len, args_len;
+} numbers_container_t;
+```
+And therefore respect it's bit alignment.
+
+Due to this, the byte size of a command in flash storage is given by the expression:
+```{c}
+static int max_command_size = sizeof(uint32_t)+sizeof(numbers_container_t)+sizeof(char)*(SCH_CMD_MAX_STR_NAME+SCH_CMD_MAX_STR_PARAMS);
+```
+
 ## Usage instructions
 
 #### Adding a command to the flight plan
