@@ -255,12 +255,12 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
             n_structs = index_pay;
         }
 
-        memcpy(data.frame.data.data8, (uint8_t) n_structs, sizeof(uint8_t));
+        uint8_t n_struct_8 = (uint8_t) n_structs;
+        memcpy(data.frame.data.data8, &n_struct_8, sizeof(uint8_t));
         char buff[n_structs*data_map[payload].size];
         // TODO: Change to add n_struct payload data instead of 0
         dat_get_recent_payload_sample(buff, payload, 0);
         memcpy(data.frame.data.data8+1, buff, data_map[payload].size);
-        print_buff(data.frame.data.data8, COM_FRAME_MAX_LEN);
         return com_send_data("", (char *)&data, 0);
     }
     else

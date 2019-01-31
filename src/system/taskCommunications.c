@@ -188,22 +188,32 @@ static void com_receive_tm(csp_packet_t *packet)
     LOGD(tag, "Frame: %d", frame->frame);
     LOGD(tag, "Type : %d", (frame->type));
 
+#ifdef LINUX
     int i = 0;
     for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
         frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
+#endif
 
-    switch((frame->type))
-    {
-        case TM_TYPE_STATUS:
-            cmd_parse_tm = cmd_get_str("tm_parse_status");
-            cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
-            cmd_send(cmd_parse_tm);
-            break;
-//        case TM_TYPE_PAYLOAD + temp_sensors:
-        default:
-            LOGW(tag, "Undefined telemetry type %d!", frame->type);
+    if(frame->type == TM_TYPE_STATUS){
+        cmd_parse_tm = cmd_get_str("tm_parse_status");
+        cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
+        cmd_send(cmd_parse_tm);
+    } else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor){
+        uint16_t payload = frame->type - TM_TYPE_PAYLOAD;
+        uint8_t n_struct = 0;
+        memcpy(&n_struct, packet->data + 4, sizeof(uint8_t));
+        LOGI(tag, "Received %u struct of payload %d", n_struct, payload);
+        if(payload == ads_sensors) {
+            struct ads_data data_ads;
+            memcpy(&data_ads, packet->data + 5, sizeof(data_ads));
+            LOGI(tag, "Received  ads data: %f, %f, %f", data_ads.acc_x, data_ads.acc_y, data_ads.acc_z, dat_ads_mag_x, dat_ads_mag_y,  dat_ads_mag_z);
+        } else {
             print_buff(packet->data, packet->length);
             print_buff16(packet->data16, packet->length/2);
-            break;
+        }
+    } else {
+        LOGW(tag, "Undefined telemetry type %d!", frame->type);
+        print_buff(packet->data, packet->length);
+        print_buff16(packet->data16, packet->length/2);
     }
 }
