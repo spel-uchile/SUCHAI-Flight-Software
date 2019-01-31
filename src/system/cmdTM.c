@@ -248,34 +248,19 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
         data.frame.frame = 0;
         data.frame.type = (uint16_t)(TM_TYPE_PAYLOAD + payload);
 
-        temp_data_t data_temp;
-        ads_data_t data_ads;
-        eps_data_t data_eps;
+        int n_structs = COM_FRAME_MAX_LEN / data_map[payload].size;
+        int index_pay = dat_get_system_var(data_map[payload].sys_index);
 
-        switch(payload)
-        {
-            case temp_sensors:
-                dat_get_recent_payload_sample(&data_temp, temp_sensors, 0);
-                assert(sizeof(data_temp) < sizeof(data.frame.data));
-                LOGI(tag, "data_temp.obc_temp_1: %f", data_temp.obc_temp_1)
-                memcpy(data.frame.data.data8, &data_temp, sizeof(data_temp));
-                break;
-            case ads_sensors:
-                dat_get_recent_payload_sample(&data_ads, ads_sensors, 0);
-                assert(sizeof(data_ads) < sizeof(data.frame.data));
-                LOGI(tag, "data_ads.acc_x %f", data_ads.acc_x)
-                memcpy(data.frame.data.data8, &data_ads, sizeof(data_ads));
-                break;
-            case eps_sensors:
-                dat_get_recent_payload_sample(&data_eps, eps_sensors, 0);
-                assert(sizeof(data_eps) < sizeof(data.frame.data));
-                LOGI(tag, "data_eps.vbatt %f", data_eps.vbatt)
-                memcpy(data.frame.data.data8, &data_eps, sizeof(data_eps));
-                break;
-            default:
-                break;
+        if(index_pay < n_structs) {
+            n_structs = index_pay;
         }
 
+        memcpy(data.frame.data.data8, (uint8_t) n_structs, sizeof(uint8_t));
+        char buff[n_structs*data_map[payload].size];
+        // TODO: Change to add n_struct payload data instead of 0
+        dat_get_recent_payload_sample(buff, payload, 0);
+        memcpy(data.frame.data.data8+1, buff, data_map[payload].size);
+        print_buff(data.frame.data.data8, COM_FRAME_MAX_LEN);
         return com_send_data("", (char *)&data, 0);
     }
     else
