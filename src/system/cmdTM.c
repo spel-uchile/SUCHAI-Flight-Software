@@ -242,6 +242,10 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
     //Format: <node>
     if(nparams == sscanf(params, fmt, &payload, &dest_node))
     {
+        if(payload >= last_sensor) {
+            return CMD_FAIL;
+        }
+
         com_data_t data;
         memset(&data, 0, sizeof(data));
         data.node = (uint8_t)dest_node;
