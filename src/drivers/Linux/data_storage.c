@@ -10,21 +10,6 @@ static sqlite3 *db = NULL;
 PGconn *conn = NULL;
 char* fp_table = "flightPlan";
 
-struct temp_data tempdata;
-struct ads_data adsdata;
-
-static struct {
-    char table[30];
-    uint16_t  size;
-    int sys_index;
-    char data_order[50];
-    char var_names[200];
-} data_map[last_sensor] = {
-        {"temp_data", (uint16_t) (sizeof(tempdata)), dat_mem_temp, "%f %f %f", "obc_temp_1 obc_temp_2 obc_temp_3"},
-        { "ads_data", (uint16_t) (sizeof(adsdata)), dat_mem_ads, "%f %f %f %f %f %f", "acc_x acc_y acc_z mag_x mag_y mag_z"}
-};
-
-
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
 int storage_init(const char *file)

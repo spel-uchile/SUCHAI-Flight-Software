@@ -199,6 +199,7 @@ static void com_receive_tm(csp_packet_t *packet)
             cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
             cmd_send(cmd_parse_tm);
             break;
+//        case TM_TYPE_PAYLOAD + temp_sensors:
         default:
             LOGW(tag, "Undefined telemetry type %d!", frame->type);
             print_buff(packet->data, packet->length);

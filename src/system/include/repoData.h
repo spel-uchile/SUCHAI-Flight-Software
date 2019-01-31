@@ -274,6 +274,22 @@ typedef struct eps_data {
     int16_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
 } eps_data_t;
 
+
+//struct temp_data tempdata;
+//struct ads_data adsdata;
+
+struct temp_data tempdata;
+struct ads_data adsdata;
+struct eps_data epsdata;
+
+extern struct map {
+    char table[30];
+    uint16_t  size;
+    int sys_index;
+    char data_order[50];
+    char var_names[200];
+} data_map[last_sensor];
+
 /**
  * Initializes data repositories, including:
  *      Both repo's mutexes.

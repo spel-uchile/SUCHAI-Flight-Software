@@ -269,6 +269,7 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
             case eps_sensors:
                 dat_get_recent_payload_sample(&data_eps, eps_sensors, 0);
                 assert(sizeof(data_eps) < sizeof(data.frame.data));
+                LOGI(tag, "data_eps.vbatt %f", data_eps.vbatt)
                 memcpy(data.frame.data.data8, &data_eps, sizeof(data_eps));
                 break;
             default:

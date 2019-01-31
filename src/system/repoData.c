@@ -39,6 +39,13 @@ time_t sec = 0;
     fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
+struct temp_data tempdata;
+struct ads_data adsdata;
+struct eps_data epsdata;
+
+struct map data_map[last_sensor] = {{"temp_data", (uint16_t) (sizeof(tempdata)), dat_mem_temp, "%f %f %f", "obc_temp_1 obc_temp_2 obc_temp_3"},
+                                    { "ads_data", (uint16_t) (sizeof(adsdata)), dat_mem_ads, "%f %f %f %f %f %f", "acc_x acc_y acc_z mag_x mag_y mag_z"},
+                                    { "eps_data", (uint16_t) (sizeof(epsdata)), dat_mem_eps, "%f %f %f %f %f %f", "acc_x acc_y acc_z mag_x mag_y mag_z"}};
 
 void dat_repo_init(void)
 {

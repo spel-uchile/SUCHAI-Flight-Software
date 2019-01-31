@@ -9,19 +9,6 @@ static const char *tag = "data_storage";
 static void *db = NULL;
 char* fp_table = "flightPlan";
 
-struct temp_data tempdata;
-struct ads_data adsdata;
-struct eps_data epsdata;
-
-static struct {
-    uint16_t  size;
-    int sys_index;
-} data_map[last_sensor] = {
-        {(uint16_t) (sizeof(tempdata)), dat_mem_temp},
-        {(uint16_t) (sizeof(adsdata)), dat_mem_ads},
-        {(uint16_t) (sizeof(epsdata)), dat_mem_eps}
-};
-
 /**
  * Arrays for storing the memory addresses of the flight plan and payload tables.
  */
