@@ -548,6 +548,16 @@ int storage_show_table (void) {
     return 0;
 }
 
+void get_value_string(char* ret_string, char* c_type, char* buff)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        sprintf(ret_string, " %f", *((float*)buff));
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        sprintf(ret_string, " %d", *((int*)buff));
+    }
+}
+
 
 int storage_add_payload_data(void* data, int payload)
 {
@@ -576,8 +586,7 @@ int storage_add_payload_data(void* data, int payload)
         strcat(names, name);
 
         char val[20];
-        // TODO: switch between data types
-        sprintf(val, " %f", *((float*)buff));
+        get_value_string(val, tok_sym[j], buff);
         strcat(values, val);
 
         if(j != nparams-1){

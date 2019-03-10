@@ -43,9 +43,12 @@ struct temp_data tempdata;
 struct ads_data adsdata;
 struct eps_data epsdata;
 
-struct map data_map[last_sensor] = {{"temp_data", (uint16_t) (sizeof(tempdata)), dat_mem_temp, "%f %f %f", "obc_temp_1 obc_temp_2 obc_temp_3"},
-                                    { "ads_data", (uint16_t) (sizeof(adsdata)), dat_mem_ads, "%f %f %f %f %f %f", "acc_x acc_y acc_z mag_x mag_y mag_z"},
-                                    { "eps_data", (uint16_t) (sizeof(epsdata)), dat_mem_eps, "%f %f %f %f %f %f", "acc_x acc_y acc_z mag_x mag_y mag_z"}};
+struct map data_map[last_sensor] = {
+        {"temp_data",      (uint16_t) (sizeof(tempdata)), dat_mem_temp, "%d %f %f %f", "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+        { "ads_data",      (uint16_t) (sizeof(adsdata)), dat_mem_ads, "%d %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        { "eps_data",      (uint16_t) (sizeof(epsdata)), dat_mem_eps, "%d %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        { "langmuir_data", (uint16_t) (sizeof(langmuirdata)), dat_mem_lang, "%d %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
+};
 
 void dat_repo_init(void)
 {

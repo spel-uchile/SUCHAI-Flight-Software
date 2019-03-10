@@ -146,6 +146,7 @@ typedef enum dat_system {
     dat_mem_temp,                 ///< Temperature data
     dat_mem_ads,                  ///< ADS data
     dat_mem_eps,                  ///< EPS data
+    dat_mem_lang,                 ///< Langmuir data
 
     /// Add custom status variables here
     //dat_custom,                 ///< Variable description
@@ -239,6 +240,7 @@ typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
+    lang_sensors,           ///< Langmuir probe sensors
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -247,6 +249,7 @@ typedef enum payload_id {
  * Struct for storing temperature data.
  */
 typedef struct temp_data {
+    int timestamp;
     float obc_temp_1;
     float obc_temp_2;
     float obc_temp_3;
@@ -256,6 +259,7 @@ typedef struct temp_data {
  * Struct for storing data collected by ads sensors.
  */
 typedef struct ads_data {
+    int timestamp;
     float acc_x;            ///< Gyroscope acceleration value along the x axis
     float acc_y;            ///< Gyroscope acceleration value along the y axis
     float acc_z;            ///< Gyroscope acceleration value along the z axis
@@ -268,6 +272,7 @@ typedef struct ads_data {
  * Struct for storing data collected by eps housekeeping.
  */
 typedef struct eps_data {
+    int timestamp;
     uint16_t cursun;            ///< Current from boost converters [mA]
     uint16_t cursys;            ///< Current out of battery [mA]
     uint16_t vbatt;            ///< Voltage of battery [mV]
@@ -279,13 +284,18 @@ typedef struct eps_data {
     int16_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
 } eps_data_t;
 
-
-//struct temp_data tempdata;
-//struct ads_data adsdata;
+typedef struct langmuir_data {
+    int timestamp;
+    float sweep_voltage;
+    float plasma_voltage;
+    float plasma_temperature;
+    int particles_counter;
+} langmuir_data_t;
 
 struct temp_data tempdata;
 struct ads_data adsdata;
 struct eps_data epsdata;
+struct langmuir_data langmuirdata;
 
 extern struct map {
     char table[30];

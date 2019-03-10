@@ -155,6 +155,7 @@ int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
 int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
 {
 #ifdef NANOMIND
+
     int16_t sensor1, sensor2;
     float gyro_temp;
 
@@ -192,7 +193,8 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     temp_3.f = gyro_temp;
     dat_set_system_var(dat_obc_temp_3, temp_3.i);
 
-    struct temp_data data_temp = {temp_1.f, temp_2.f, temp_3.f};
+    int curr_time =  (int)time(NULL);
+    struct temp_data data_temp = {curr_time, temp_1.f, temp_2.f, temp_3.f};
     dat_add_payload_sample(&data_temp, temp_sensors);
 
     value acc_x;
@@ -219,7 +221,8 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     mag_z.f = hmc_reading.z;
     dat_set_system_var(dat_ads_mag_z, mag_z.i);
 
-    struct ads_data data_ads = {acc_x.f, acc_y.f, acc_z.f, mag_x.f, mag_y.f, mag_z.f};
+    curr_time =  (int)time(NULL);
+    struct ads_data data_ads = {curr_time, acc_x.f, acc_y.f, acc_z.f, mag_x.f, mag_y.f, mag_z.f};
     dat_add_payload_sample(&data_ads, ads_sensors);
 
     /*dat_set_system_var(dat_obc_temp_1, sensor1/10.);
@@ -246,7 +249,24 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     int res2 = dat_get_recent_payload_sample(&data_out_ads, ads_sensors, 0);
     printf("Got values for struct ads (%f, %f, %f, %f, %f, %f) in NOR FLASH\n", data_out_ads.acc_x, data_out_ads.acc_y, data_out_ads.acc_z, data_out_ads.mag_x, data_out_ads.mag_y, data_out_ads.mag_z);
 #endif
+
+#elif defined LINUX
+
+
+    int curr_time =  (int)time(NULL);
+    LOGI(tag, "Simulating obc data in Linux \n timestamp: %d", curr_time);
+    // Simulating temp
+    float curr_time_f = (curr_time % 1000)*1.0;
+    struct temp_data data_temp = {curr_time, curr_time_f, curr_time_f+1.0, curr_time_f+2.0};
+    LOGI(tag, "Temperature data in Linux \n temp1: %f \n temp2: %f \n temp3: %f" ,
+         data_temp.obc_temp_1, data_temp.obc_temp_2, data_temp.obc_temp_3);
+    dat_add_payload_sample(&data_temp, temp_sensors);
+
+//    dat_get_system_var(dat_system_last_var)
+
+
 #endif
+
 
     return CMD_OK;
 }

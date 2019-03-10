@@ -55,8 +55,10 @@ int eps_get_hk(char *fmt, char *params, int nparams)
     {
         eps_hk_print(&hk);
 
+        int curr_time = (int)time(NULL);
         struct eps_data data_eps = {hk.cursun, hk.cursys, hk.vbatt,
                 hk.temp[0], hk.temp[1], hk.temp[2], hk.temp[3], hk.temp[4], hk.temp[5]};
+
         dat_add_payload_sample(&data_eps, eps_sensors);
 
         LOGI(tag, "WRITING EPS DATA: %u %u %u %d %d %d %d %d %d", hk.cursun, hk.cursys, hk.vbatt,
