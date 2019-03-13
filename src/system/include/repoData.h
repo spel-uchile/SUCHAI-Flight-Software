@@ -213,6 +213,7 @@ typedef struct __attribute__((packed)) dat_status_s {
     uint32_t dat_mem_temp;          ///< Temperature data
     uint32_t dat_mem_ads;           ///< ADS data
     uint32_t dat_mem_eps;           ///< EPS data
+    uint32_t dat_mem_lang;
 
     /// Add custom status variables here
     //uint32_t dat_custom;          ///< Variable description
