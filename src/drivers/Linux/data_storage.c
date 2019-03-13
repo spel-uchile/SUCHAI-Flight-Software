@@ -9,6 +9,7 @@ static const char *tag = "data_storage";
 static sqlite3 *db = NULL;
 PGconn *conn = NULL;
 char* fp_table = "flightPlan";
+char postgres_conf_s[30];
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
@@ -33,13 +34,13 @@ int storage_init(const char *file)
         return 0;
     }
 #elif SCH_STORAGE_MODE == 2
-    char postgres_conf_s[30];
     sprintf(postgres_conf_s, "user=%s dbname=fs_db", SCH_STORAGE_PGUSER);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
         LOGE(tag, "Connection to database failed: %s\n", PQerrorMessage(conn));
         PQfinish(conn);
+        return -1;
     }
 
     int ver = PQserverVersion(conn);
@@ -102,9 +103,10 @@ int storage_table_repo_init(char* table, int drop)
 #elif SCH_STORAGE_MODE == 2
 
     if (PQstatus(conn) == CONNECTION_BAD) {
-
         fprintf(stderr, "Connection to database failed: %s\n",
             PQerrorMessage(conn));
+        PQfinish(conn);
+        return -1;
     }
 
     if(drop)
@@ -120,6 +122,10 @@ int storage_table_repo_init(char* table, int drop)
     LOGD(tag, "SQL command: %s", create_table_string);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, create_table_string);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        LOGE(tag, "command CREATE failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+    }
     PQclear(res);
     storage_table_payload_init(0);
 
@@ -262,6 +268,11 @@ int storage_table_payload_init(int drop)
         LOGD(tag, "SQL command: %s", create_table);
         // TODO: manage connection error in res
         PGresult *res = PQexec(conn, create_table);
+        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+            LOGE(tag, "command CREATE PAYLOAD failed: %s", PQerrorMessage(conn));
+            PQclear(res);
+            continue;
+        }
         PQclear(res);
     }
 #endif
@@ -300,6 +311,11 @@ int storage_repo_get_value_idx(int index, char *table)
     LOGD(tag, "%s",  get_value_query);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, get_value_query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        LOGE(tag, "command storage_repo_get_value_idx failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        return -1;
+    }
     char* value_str;
     if ((value_str = PQgetvalue(res, 0, 0)) != NULL)
         value = atoi(value_str);
@@ -341,6 +357,11 @@ int storage_repo_get_value_str(char *name, char *table)
     sprintf(get_value_query, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, get_value_query);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        return -1;
+    }
     value = atoi(PQgetvalue(res, 0, 0));
 #endif
     return value;
@@ -388,6 +409,11 @@ int storage_repo_set_value_idx(int index, int value, char *table)
     LOGD(tag, "%s",  set_value_query);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, set_value_query);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        return -1;
+    }
     PQclear(res);
 
 #endif
@@ -603,6 +629,11 @@ int storage_add_payload_data(void* data, int payload)
     LOGD(tag, "%s", insert_row);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, insert_row);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        return -1;
+    }
     PQclear(res);
     int ret = 0;
 #endif
@@ -645,6 +676,11 @@ int storage_get_recent_payload_data(void * data, int payload, int delay)
 
     LOGD(tag, "%s",  get_value);
     PGresult *res = PQexec(conn, get_value);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        LOGE(tag, "command storage_get_recent_payload_data failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        return -1;
+    }
     // TODO: manage connection error in res
 
     for(j=0; j < nparams; ++j) {

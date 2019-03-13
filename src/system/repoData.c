@@ -50,6 +50,17 @@ struct map data_map[last_sensor] = {
         { "langmuir_data", (uint16_t) (sizeof(langmuirdata)), dat_mem_lang, "%d %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
 };
 
+void initialize_all_vars(){
+
+    int i =0;
+    for(i=0; i< dat_system_last_var; ++i) {
+        if(dat_get_system_var(dat_obc_reset_counter) == -1) {
+            dat_set_system_var(i, 0);
+        }
+
+    }
+}
+
 void dat_repo_init(void)
 {
     // Init repository mutex
@@ -123,6 +134,10 @@ void dat_repo_init(void)
     dat_set_system_var(dat_obc_hrs_wo_reset, 0);
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
     dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+
+#if (SCH_STORAGE_MODE == 2)
+    initialize_all_vars();
+#endif
 }
 
 void dat_repo_close(void)
