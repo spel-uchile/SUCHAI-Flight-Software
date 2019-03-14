@@ -203,12 +203,12 @@ static void com_receive_tm(csp_packet_t *packet)
         cmd_send(cmd_parse_tm);
     } else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor){
         uint16_t payload = frame->type - TM_TYPE_PAYLOAD;
-        uint8_t n_struct = 0;
-        memcpy(&n_struct, packet->data, sizeof(int));
-        LOGI(tag, "Received %u struct of payload %d", n_struct, payload);
+        int n_struct = 0;
+        memcpy(&n_struct, packet->data+4, sizeof(int));
+        LOGI(tag, "Received %d struct of payload %d", n_struct, payload);
         print_buff(packet->data, packet->length);
         print_buff16(packet->data16, packet->length/2);
-        dat_add_payload_sample(packet->data+4,payload);
+        dat_add_payload_sample(packet->data+8,payload);
 //        if(payload == ads_sensors) {
 //            struct ads_data data_ads;
 //            memcpy(&data_ads, packet->data + 5, sizeof(data_ads));
