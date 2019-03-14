@@ -252,19 +252,22 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
         data.frame.frame = 0;
         data.frame.type = (uint16_t)(TM_TYPE_PAYLOAD + payload);
 
-        int n_structs = COM_FRAME_MAX_LEN / data_map[payload].size;
+        int n_structs = (COM_FRAME_MAX_LEN-4) / data_map[payload].size;
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
 
+        LOGI(tag, "index_payload: %d", index_pay);
         if(index_pay < n_structs) {
             n_structs = index_pay;
         }
 
-        uint8_t n_struct_8 = (uint8_t) n_structs;
-        memcpy(data.frame.data.data8, &n_struct_8, sizeof(uint8_t));
+        LOGI(tag, "Sending %d structs of payload %d", (int)n_structs, (int)payload);
+
+        memcpy(data.frame.data.data32, &n_structs, sizeof(int));
         char buff[n_structs*data_map[payload].size];
         // TODO: Change to add n_struct payload data instead of 0
         dat_get_recent_payload_sample(buff, payload, 0);
-        memcpy(data.frame.data.data8+1, buff, data_map[payload].size);
+        memcpy(data.frame.data.data8+4, buff, data_map[payload].size);
+        print_buff(data.frame.data.data8, data_map[payload].size+4);
         return com_send_data("", (char *)&data, 0);
     }
     else

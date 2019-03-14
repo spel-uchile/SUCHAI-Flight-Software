@@ -221,7 +221,6 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     mag_z.f = hmc_reading.z;
     dat_set_system_var(dat_ads_mag_z, mag_z.i);
 
-    curr_time =  (int)time(NULL);
     struct ads_data data_ads = {curr_time, acc_x.f, acc_y.f, acc_z.f, mag_x.f, mag_y.f, mag_z.f};
     dat_add_payload_sample(&data_ads, ads_sensors);
 
@@ -240,14 +239,15 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
     printf("\r\nTemp1: %.1f, Temp2 %.1f, Gyro temp: %.2f\r\n", sensor1/10., sensor2/10., gyro_temp);
     printf("Gyro x, y, z: %f, %f, %f\r\n", gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z);
     printf("Mag x, y, z: %f, %f, %f\r\n\r\n",hmc_reading.x, hmc_reading.y, hmc_reading.z);
+    printf("current_time: %lu\n",curr_time);
 
     struct temp_data data_out_temp;
     int res = dat_get_recent_payload_sample(&data_out_temp, temp_sensors, 0);
-    printf("Got values for struct temp (%f, %f, %f) in NOR FLASH\n", data_out_temp.obc_temp_1, data_out_temp.obc_temp_2, data_out_temp.obc_temp_3);
+    printf("Got values for struct temp (%f, %f, %f) cur_time: %lu in NOR FLASH\n", data_out_temp.obc_temp_1, data_out_temp.obc_temp_2, data_out_temp.obc_temp_3, data_out_temp.timestamp);
 
     struct ads_data data_out_ads;
     int res2 = dat_get_recent_payload_sample(&data_out_ads, ads_sensors, 0);
-    printf("Got values for struct ads (%f, %f, %f, %f, %f, %f) in NOR FLASH\n", data_out_ads.acc_x, data_out_ads.acc_y, data_out_ads.acc_z, data_out_ads.mag_x, data_out_ads.mag_y, data_out_ads.mag_z);
+    printf("Got values for struct ads (%f, %f, %f, %f, %f, %f) cur_time: %lu in NOR FLASH\n", data_out_ads.acc_x, data_out_ads.acc_y, data_out_ads.acc_z, data_out_ads.mag_x, data_out_ads.mag_y, data_out_ads.mag_z, data_out_ads.timestamp);
 #endif
 
 #elif defined LINUX
