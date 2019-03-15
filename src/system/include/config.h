@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* Select one operating system */
-#define LINUX                                      ///< LINUX | FREERTOS
+#define LINUX                                    ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
@@ -69,7 +69,7 @@
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-#define SCH_STORAGE_PGUSER      "postgres"
+#define SCH_STORAGE_PGUSER      "spel"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2 /// TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024
@@ -97,7 +97,9 @@
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
 #define SCH_BUFFERS_CSP           (5)       ///< Number of available CSP buffers
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
-#define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
+#define SCH_CMD_MAX_ENTRIES       (100)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
+#define SCH_CMD_MAX_STR_NAME      (64)      ///< Limit for the length of the name of a command
+#define SCH_CMD_MAX_STR_FORMAT    (32)      ///< Limit for the length of the format field of a command
 
 #endif //SUCHAI_CONFIG_H

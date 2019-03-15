@@ -71,9 +71,9 @@
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 #define SCH_STORAGE_PGUSER      "{{SCH_STORAGE_PGUSER}}"
 
-#define SCH_SECTIONS_PER_PAYLOAD 2 /// TODO: Make configurable per payload
-#define SCH_SIZE_PER_SECTION 256*1024
-#define SCH_FLASH_INIT_MEMORY 0
+#define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
+#define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage
+#define SCH_FLASH_INIT_MEMORY 0                    ///< Initial address in flash storage
 
 /**
  * Memory settings.
@@ -99,5 +99,7 @@
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
+#define SCH_CMD_MAX_STR_NAME      (64)      ///< Limit for the length of the name of a command
+#define SCH_CMD_MAX_STR_FORMAT    (32)      ///< Limit for the length of the format field of a command
 
 #endif //SUCHAI_CONFIG_H

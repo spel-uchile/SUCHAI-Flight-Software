@@ -39,6 +39,27 @@ time_t sec = 0;
     fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
+struct temp_data tempdata;
+struct ads_data adsdata;
+struct eps_data epsdata;
+
+struct map data_map[last_sensor] = {
+        {"temp_data",      (uint16_t) (sizeof(tempdata)), dat_mem_temp, "%d %f %f %f", "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+        { "ads_data",      (uint16_t) (sizeof(adsdata)), dat_mem_ads, "%d %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        { "eps_data",      (uint16_t) (sizeof(epsdata)), dat_mem_eps, "%d %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        { "langmuir_data", (uint16_t) (sizeof(langmuirdata)), dat_mem_lang, "%d %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
+};
+
+void initialize_all_vars(){
+
+    int i =0;
+    for(i=0; i< dat_system_last_var; ++i) {
+        if(dat_get_system_var(dat_obc_reset_counter) == -1) {
+            dat_set_system_var(i, 0);
+        }
+
+    }
+}
 
 void dat_repo_init(void)
 {
@@ -113,6 +134,10 @@ void dat_repo_init(void)
     dat_set_system_var(dat_obc_hrs_wo_reset, 0);
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
     dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+
+#if (SCH_STORAGE_MODE == 2)
+    initialize_all_vars();
+#endif
 }
 
 void dat_repo_close(void)
@@ -296,8 +321,10 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
 
-    DAT_CPY_SYSTEM_VAR(status,  dat_mem_temp);
+    DAT_CPY_SYSTEM_VAR(status, dat_mem_temp);
     DAT_CPY_SYSTEM_VAR(status, dat_mem_ads);
+    DAT_CPY_SYSTEM_VAR(status, dat_mem_eps);
+    DAT_CPY_SYSTEM_VAR(status, dat_mem_lang);
 
 }
 
@@ -344,7 +371,57 @@ void dat_print_status(dat_status_t *status)
 
     DAT_PRINT_SYSTEM_VAR(status,  dat_mem_temp);
     DAT_PRINT_SYSTEM_VAR(status, dat_mem_ads);
+    DAT_PRINT_SYSTEM_VAR(status, dat_mem_eps);
+    DAT_PRINT_SYSTEM_VAR(status, dat_mem_lang);
 }
+
+#if SCH_STORAGE_MODE == 0
+static int dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
+{
+    int i;
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
+    {
+        if(data_base[i].unixtime == 0)
+        {
+            data_base[i].unixtime = timetodo;
+            data_base[i].executions = executions;
+            data_base[i].periodical = periodical;
+
+            data_base[i].cmd = malloc(sizeof(char)*50);
+            data_base[i].args = malloc(sizeof(char)*50);
+
+            strcpy(data_base[i].cmd, command);
+            strcpy(data_base[i].args,args);
+
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+static int dat_del_fp_async(int timetodo)
+{
+    int i;
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
+    {
+        if(timetodo == data_base[i].unixtime)
+        {
+            data_base[i].unixtime = 0;
+            data_base[i].executions = 0;
+            data_base[i].periodical = 0;
+            free(data_base[i].args);
+            free(data_base[i].cmd);
+            return 0;
+        }
+    }
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
+    return 1;
+}
+#endif
 
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
 {
@@ -364,10 +441,10 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
             *periodical = data_base[i].periodical;
 
             if (data_base[i].periodical > 0)
-                dat_set_fp(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
+                dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
 
 
-            dat_del_fp(elapsed_sec);
+            dat_del_fp_async(elapsed_sec);
 
             return 0;
         }
@@ -390,29 +467,12 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
     //Enter critical zone
     osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
 
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(data_base[i].unixtime == 0)
-        {
-            data_base[i].unixtime = timetodo;
-            data_base[i].executions = executions;
-            data_base[i].periodical = periodical;
-
-            data_base[i].cmd = malloc(sizeof(char)*50);
-            data_base[i].args = malloc(sizeof(char)*50);
-
-            strcpy(data_base[i].cmd, command);
-            strcpy(data_base[i].args,args);
-
-            return 0;
-        }
-    }
+    int rc = dat_set_fp_async(timetodo, command, args, executions, periodical);
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
 
-    return 1;
+    return rc;
 #else
     return storage_flight_plan_set(timetodo, command, args, executions, periodical);
 #endif
@@ -425,24 +485,12 @@ int dat_del_fp(int timetodo)
     //Enter critical zone
     osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
 
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(timetodo == data_base[i].unixtime)
-        {
-            data_base[i].unixtime = 0;
-            data_base[i].executions = 0;
-            data_base[i].periodical = 0;
-            free(data_base[i].args);
-            free(data_base[i].cmd);
-            return 0;
-        }
-    }
+    int rc = dat_del_fp_async(timetodo);
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
 
-    return 1;
+    return rc;
 #else
     return storage_flight_plan_erase(timetodo);
 #endif
@@ -531,11 +579,48 @@ int dat_update_time(void)
 
 int dat_set_time(int new_time)
 {
-#ifdef AVR32
+#if defined AVR32
     sec = (time_t)new_time;
     return 0;
-#else
+#elif defined ESP32
     return 0;
+#elif defined NANOMIND
+    timestamp_t timestamp = {(uint32_t)new_time, 0};
+    clock_set_time(&timestamp);
+    return 0;
+#else
+    // TODO: This needs to be tested on a raspberry LINUX system, to see if the sudo call asks for permissions or not
+
+    size_t command_length = 28;
+
+    time_t new_time_typed = (time_t)new_time;
+    char* arg = ctime(&new_time_typed);
+
+    size_t arg_length = strlen(arg);
+
+    char command[sizeof(char)*(command_length+arg_length+1)];
+    command[command_length+arg_length] = '\0';
+
+    strncpy(command, "sudo hwclock --set --date '", command_length-1);
+    strncpy(command+command_length-1, arg, arg_length);
+    strncpy(command+command_length+arg_length-1, "'", 1);
+
+    int rc = system(command);
+
+    if (rc == -1)
+    {
+        LOGE(tag, "Failed attempt at creating a child process for setting the machine clock");
+        return 1;
+    }
+    else if (rc == 127)
+    {
+        LOGE(tag, "Failed attempt at starting a shell for setting machine clock");
+        return 1;
+    }
+    else
+    {
+        return rc != 0 ? 1 : 0;
+    }
 #endif
 }
 
@@ -543,22 +628,10 @@ int dat_show_time(int format)
 {
 #ifdef AVR32
     time_t time_to_show = dat_get_time();
-    if(format == 0)
-    {
-        printf("%s\n",ctime(&time_to_show));
-        return 0;
-    }
-    else if(format == 1)
-    {
-        printf("%d\n", (int)time_to_show);
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
 #else
     time_t time_to_show = time(NULL);
+#endif
+
     if(format == 0)
     {
         printf("%s\n",ctime(&time_to_show));
@@ -566,14 +639,13 @@ int dat_show_time(int format)
     }
     else if(format == 1)
     {
-        printf("%d\n", (int)time_to_show);
+        printf("%u\n", (unsigned int)time_to_show);
         return 0;
     }
     else
     {
         return 1;
     }
-#endif
 }
 
 int dat_add_payload_sample(void* data, int payload)

@@ -24,7 +24,7 @@ echo ${WORKSPACE}
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "1" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "1" --sch_st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_cmd
@@ -46,26 +46,32 @@ python logs_comparator.py | cat >> test_cmd_comparator_log.txt
 
 # ------------------ TEST_UNIT ------------------
 
-# TODO: Agregar for loop con el test en todos los storage modes
-
 # The test log is called test_unit_log.txt
 
-# Compiles the project with the test's parameters
-cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "1"
+# Tests for all storage modes
+for i in "0" "1" "2"
+do
 
-# Compiles the test
-cd ${WORKSPACE}/test/test_unit
-rm -rf build_test
-mkdir build_test
-cd build_test
-cmake ..
-make
+    echo "Test for storage parameter ${i}"
 
-# Runs the test, saving a log file
-rm -f ../test_unit_log.txt
-./SUCHAI_Flight_Software_Test | cat >> ../test_unit_log.txt
-echo ""
+    # Compiles the project with the test's parameters
+    cd ${WORKSPACE}/src/system/include
+    python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode ${i}
+
+    # Compiles the test
+    cd ${WORKSPACE}/test/test_unit
+    rm -rf build_test
+    mkdir build_test
+    cd build_test
+    cmake ..
+    make
+
+    # Runs the test, saving a log file
+    rm -f ../test_unit_log_${i}.txt
+    ./SUCHAI_Flight_Software_Test | cat >> ../test_unit_log_${i}.txt
+    echo ""
+
+done
 
 # ------------------ TEST_LOAD ------------------
 
@@ -73,7 +79,7 @@ echo ""
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_load
@@ -94,7 +100,7 @@ echo ""
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_bug_delay

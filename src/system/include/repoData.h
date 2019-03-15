@@ -31,6 +31,11 @@
     #include "data_storage.h"
 #endif
 
+#ifdef NANOMIND
+    #include "util/clock.h"
+    #include "util/timestamp.h"
+#endif
+
 /** Union for easily casting status variable types */
 typedef union fvalue{
     float f;
@@ -54,7 +59,7 @@ typedef union fvalue{
 #define DAT_CPY_SYSTEM_VAR_F(st, var) {fvalue_t v; v.i = (float)dat_get_system_var(var); st->var = v.f;}
 
 /** Print the name and value of a integer system status variable */
-#define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %d\n", #var, st->var)
+#define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %lu\n", #var, (unsigned long)st->var)
 
 /** Print the name and vale of a float system status variable */
 #define DAT_PRINT_SYSTEM_VAR_F(st, var) printf("\t%s: %f\n", #var, st->var)
@@ -140,6 +145,8 @@ typedef enum dat_system {
     /// Memory: Current payload memory addresses
     dat_mem_temp,                 ///< Temperature data
     dat_mem_ads,                  ///< ADS data
+    dat_mem_eps,                  ///< EPS data
+    dat_mem_lang,                 ///< Langmuir data
 
     /// Add custom status variables here
     //dat_custom,                 ///< Variable description
@@ -205,6 +212,8 @@ typedef struct __attribute__((packed)) dat_status_s {
     /// Memory: Current payload memory address
     uint32_t dat_mem_temp;          ///< Temperature data
     uint32_t dat_mem_ads;           ///< ADS data
+    uint32_t dat_mem_eps;           ///< EPS data
+    uint32_t dat_mem_lang;
 
     /// Add custom status variables here
     //uint32_t dat_custom;          ///< Variable description
@@ -231,6 +240,8 @@ typedef struct __attribute__((packed)) dat_status_s {
 typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     ads_sensors,            ///< Ads sensors
+    eps_sensors,            ///< Eps sensors
+    lang_sensors,           ///< Langmuir probe sensors
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -239,6 +250,7 @@ typedef enum payload_id {
  * Struct for storing temperature data.
  */
 typedef struct temp_data {
+    int timestamp;
     float obc_temp_1;
     float obc_temp_2;
     float obc_temp_3;
@@ -248,6 +260,7 @@ typedef struct temp_data {
  * Struct for storing data collected by ads sensors.
  */
 typedef struct ads_data {
+    int timestamp;
     float acc_x;            ///< Gyroscope acceleration value along the x axis
     float acc_y;            ///< Gyroscope acceleration value along the y axis
     float acc_z;            ///< Gyroscope acceleration value along the z axis
@@ -255,6 +268,43 @@ typedef struct ads_data {
     float mag_y;            ///< Magnetometer y axis
     float mag_z;            ///< Magnetometer z axis
 } ads_data_t;
+
+/**
+ * Struct for storing data collected by eps housekeeping.
+ */
+typedef struct eps_data {
+    int timestamp;
+    uint16_t cursun;            ///< Current from boost converters [mA]
+    uint16_t cursys;            ///< Current out of battery [mA]
+    uint16_t vbatt;            ///< Voltage of battery [mV]
+    int16_t temp1;
+    int16_t temp2;
+    int16_t temp3;
+    int16_t temp4;
+    int16_t temp5;
+    int16_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
+} eps_data_t;
+
+typedef struct langmuir_data {
+    int timestamp;
+    float sweep_voltage;
+    float plasma_voltage;
+    float plasma_temperature;
+    int particles_counter;
+} langmuir_data_t;
+
+struct temp_data tempdata;
+struct ads_data adsdata;
+struct eps_data epsdata;
+struct langmuir_data langmuirdata;
+
+extern struct map {
+    char table[30];
+    uint16_t  size;
+    int sys_index;
+    char data_order[50];
+    char var_names[200];
+} data_map[last_sensor];
 
 /**
  * Initializes data repositories, including:
@@ -390,8 +440,6 @@ int dat_update_time(void);
 
 /**
  * Sets the current system time to a new value.
- *
- * When in linux this does nothing.
  *
  * @param new_time Time value to set as system time
  * @return 0 OK, 1 Error

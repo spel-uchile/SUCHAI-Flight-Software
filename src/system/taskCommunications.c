@@ -184,25 +184,41 @@ static void com_receive_tm(csp_packet_t *packet)
 {
     cmd_t *cmd_parse_tm;
     com_frame_t *frame = (com_frame_t *)packet->data;
-    LOGD(tag, "Received %d bytes", packet->length);
-    LOGD(tag, "Frame: %d", frame->frame);
-    LOGD(tag, "Type : %d", (frame->type));
 
+#ifdef LINUX
+    frame->frame = csp_ntoh16(frame->frame);
+    frame->type = csp_ntoh16(frame->type);
     int i = 0;
     for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
         frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
+#endif
 
-    switch((frame->type))
-    {
-        case TM_TYPE_STATUS:
-            cmd_parse_tm = cmd_get_str("tm_parse_status");
-            cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
-            cmd_send(cmd_parse_tm);
-            break;
-        default:
-            LOGW(tag, "Undefined telemetry type %d!", frame->type);
-            print_buff(packet->data, packet->length);
-            print_buff16(packet->data16, packet->length/2);
-            break;
+    LOGI(tag, "Received %d bytes", packet->length);
+    LOGI(tag, "Frame: %d", frame->frame);
+    LOGI(tag, "Type : %d", (frame->type));
+
+    if(frame->type == TM_TYPE_STATUS){
+        cmd_parse_tm = cmd_get_str("tm_parse_status");
+        cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
+        cmd_send(cmd_parse_tm);
+    } else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor){
+        uint16_t payload = frame->type - TM_TYPE_PAYLOAD;
+        int n_struct = 0;
+        memcpy(&n_struct, packet->data+4, sizeof(int));
+        LOGI(tag, "Received %d struct of payload %d", n_struct, payload);
+        print_buff(packet->data, packet->length);
+        print_buff16(packet->data16, packet->length/2);
+        dat_add_payload_sample(packet->data+8,payload);
+//        if(payload == ads_sensors) {
+//            struct ads_data data_ads;
+//            memcpy(&data_ads, packet->data + 5, sizeof(data_ads));
+//            LOGI(tag, "Received  ads data: %f, %f, %f", data_ads.acc_x, data_ads.acc_y, data_ads.acc_z, dat_ads_mag_x, dat_ads_mag_y,  dat_ads_mag_z);
+//        } else {
+//
+ //       }
+    } else {
+        LOGW(tag, "Undefined telemetry type %d!", frame->type);
+        print_buff(packet->data, packet->length);
+        print_buff16(packet->data16, packet->length/2);
     }
 }

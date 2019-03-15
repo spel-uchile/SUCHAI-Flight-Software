@@ -40,11 +40,11 @@ static void bin_transform(char* result, unsigned char c)
     unsigned char bit_mask = (unsigned char)1;
     unsigned char number = c;
 
-    char length = sizeof(char)*8;
+    int length = sizeof(char)*8;
 
     bit_mask <<= (length-1);
 
-    for (char i = 0; i < length; i++)
+    for (int i = 0; i < length; i++)
     {
         result[i] = ((number & bit_mask) == bit_mask) ? (char)'1' : (char)'0';
         bit_mask >>= 1;
@@ -242,33 +242,32 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
     //Format: <node>
     if(nparams == sscanf(params, fmt, &payload, &dest_node))
     {
+        if(payload >= last_sensor) {
+            return CMD_FAIL;
+        }
+
         com_data_t data;
         memset(&data, 0, sizeof(data));
         data.node = (uint8_t)dest_node;
         data.frame.frame = 0;
         data.frame.type = (uint16_t)(TM_TYPE_PAYLOAD + payload);
 
-        temp_data_t data_temp;
-        ads_data_t data_ads;
+        int n_structs = (COM_FRAME_MAX_LEN-4) / data_map[payload].size;
+        int index_pay = dat_get_system_var(data_map[payload].sys_index);
 
-        switch(payload)
-        {
-            case temp_sensors:
-                dat_get_recent_payload_sample(&data_temp, temp_sensors, 0);
-                assert(sizeof(data_temp) < sizeof(data.frame.data));
-                LOGI(tag, "data_temp.obc_temp_1: %f", data_temp.obc_temp_1)
-                memcpy(data.frame.data.data8, &data_temp, sizeof(data_temp));
-                break;
-            case ads_sensors:
-                dat_get_recent_payload_sample(&data_ads, ads_sensors, 0);
-                assert(sizeof(data_ads) < sizeof(data.frame.data));
-                LOGI(tag, "data_ads.acc_x %f", data_ads.acc_x)
-                memcpy(data.frame.data.data8, &data_ads, sizeof(data_ads));
-                break;
-            default:
-                break;
+        LOGI(tag, "index_payload: %d", index_pay);
+        if(index_pay < n_structs) {
+            n_structs = index_pay;
         }
 
+        LOGI(tag, "Sending %d structs of payload %d", (int)n_structs, (int)payload);
+
+        memcpy(data.frame.data.data32, &n_structs, sizeof(int));
+        char buff[n_structs*data_map[payload].size];
+        // TODO: Change to add n_struct payload data instead of 0
+        dat_get_recent_payload_sample(buff, payload, 0);
+        memcpy(data.frame.data.data8+4, buff, data_map[payload].size);
+        print_buff(data.frame.data.data8, data_map[payload].size+4);
         return com_send_data("", (char *)&data, 0);
     }
     else
