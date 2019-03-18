@@ -196,7 +196,7 @@ const char* get_sql_type(char* c_type)
     else if(strcmp(c_type, "%d") == 0) {
         return "INTEGER";
     } else if(strcmp(c_type, "%u") == 0) {
-        return "INTEGER";
+        return "BIGINT";
     } else {
         return "TEXT";
     }
@@ -632,7 +632,7 @@ int storage_add_payload_data(void* data, int payload)
     strcat(values, ")");
     char insert_row[200];
     sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
-    LOGD(tag, "%s", insert_row);
+    LOGI(tag, "%s", insert_row);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, insert_row);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
