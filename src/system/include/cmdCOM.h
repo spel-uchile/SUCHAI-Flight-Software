@@ -31,6 +31,7 @@
  * available for payload data, so we have do substract 2 bytes for the frame
  * number, 2 bytes fot the telemetry type and 4 bytes for the number of data
  * samples inside a frame.
+ * COM_FRAME_MAX_LEN = 200-2*2-4 = 192 bytes max
  */
 #define COM_FRAME_MAX_LEN (200 - 2*sizeof(uint16_t) - sizeof(uint32_t))
 

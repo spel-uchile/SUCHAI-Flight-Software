@@ -214,11 +214,11 @@ static void com_receive_tm(csp_packet_t *packet)
 
         //TODO: Use a command to add payloads to database
         //Save ndata payload samples to data storage
-        assert(frame->ndata*data_map[payload].size < COM_FRAME_MAX_LEN);
+        assert(frame->ndata*data_map[payload].size <= COM_FRAME_MAX_LEN);
         for(j=0; j < frame->ndata; j++)
         {
-            delay += j*data_map[payload].size; // Select next struct
-            dat_add_payload_sample(frame->data.data8+delay, payload); //Save next struct
+            delay = j*data_map[payload].size; // Select next struct
+            dat_add_payload_sample((frame->data.data8)+delay, payload); //Save next struct
         }
     }
     else
