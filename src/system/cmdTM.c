@@ -262,12 +262,11 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
         LOGI(tag, "Sending %d structs of payload %d", n_structs, (int)payload);
         data.frame.ndata = (uint32_t)n_structs;
 
-        char buff[n_structs*data_map[payload].size];
-
-        int i = 0;
+        int i;
         int mem_delay;
         uint16_t payload_size = data_map[payload].size;
         for(i=0; i < n_structs; ++i) {
+            char buff[data_map[payload].size];
             dat_get_recent_payload_sample(buff, payload, i);
             mem_delay = (i*payload_size);
             memcpy(data.frame.data.data8+mem_delay, buff, payload_size);
