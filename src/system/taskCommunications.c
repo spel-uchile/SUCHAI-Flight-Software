@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmdCOM.h>
 #include "taskCommunications.h"
 
 static const char *tag = "Communications";
@@ -186,37 +187,42 @@ static void com_receive_tm(csp_packet_t *packet)
     com_frame_t *frame = (com_frame_t *)packet->data;
 
 #ifdef LINUX
-    frame->frame = csp_ntoh16(frame->frame);
+    frame->nframe = csp_ntoh16(frame->nframe);
     frame->type = csp_ntoh16(frame->type);
+    frame->ndata = csp_ntoh32(frame->ndata);
     int i = 0;
     for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
         frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
 #endif
 
-    LOGI(tag, "Received %d bytes", packet->length);
-    LOGI(tag, "Frame: %d", frame->frame);
-    LOGI(tag, "Type : %d", (frame->type));
+    LOGI(tag, "Received: %d bytes", packet->length);
+    LOGI(tag, "Frame   : %d", frame->nframe);
+    LOGI(tag, "Type    : %d", (frame->type));
+    LOGI(tag, "Samples : %d", (frame->ndata));
 
-    if(frame->type == TM_TYPE_STATUS){
+    if(frame->type == TM_TYPE_STATUS)
+    {
         cmd_parse_tm = cmd_get_str("tm_parse_status");
         cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
         cmd_send(cmd_parse_tm);
-    } else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor){
-        uint16_t payload = frame->type - TM_TYPE_PAYLOAD;
-        int n_struct = 0;
-        memcpy(&n_struct, packet->data+4, sizeof(int));
-        LOGI(tag, "Received %d struct of payload %d", n_struct, payload);
-        print_buff(packet->data, packet->length);
+    }
+    else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor)
+    {
+        int payload = frame->type - TM_TYPE_PAYLOAD; // Payload type
         print_buff16(packet->data16, packet->length/2);
-        dat_add_payload_sample(packet->data+8,payload);
-//        if(payload == ads_sensors) {
-//            struct ads_data data_ads;
-//            memcpy(&data_ads, packet->data + 5, sizeof(data_ads));
-//            LOGI(tag, "Received  ads data: %f, %f, %f", data_ads.acc_x, data_ads.acc_y, data_ads.acc_z, dat_ads_mag_x, dat_ads_mag_y,  dat_ads_mag_z);
-//        } else {
-//
- //       }
-    } else {
+        int j, delay = 0;
+
+        //TODO: Use a command to add payloads to database
+        //Save ndata payload samples to data storage
+        assert(frame->ndata*data_map[payload].size < COM_FRAME_MAX_LEN);
+        for(j=0; j < frame->ndata; j++)
+        {
+            delay += j*data_map[payload].size; // Select next struct
+            dat_add_payload_sample(frame->data.data8+delay, payload); //Save next struct
+        }
+    }
+    else
+    {
         LOGW(tag, "Undefined telemetry type %d!", frame->type);
         print_buff(packet->data, packet->length);
         print_buff16(packet->data16, packet->length/2);

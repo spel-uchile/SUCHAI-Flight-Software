@@ -186,8 +186,9 @@ int tm_send_status(char *fmt, char *params, int nparams)
         com_data_t data;
         memset(&data, 0, sizeof(data));
         data.node = (uint8_t)dest_node;
-        data.frame.frame = 0;
+        data.frame.nframe = 0;
         data.frame.type = TM_TYPE_STATUS;
+        data.frame.ndata = 1;
 
         // Pack status variables to a structure
         dat_status_t status;
@@ -195,15 +196,13 @@ int tm_send_status(char *fmt, char *params, int nparams)
         if(LOG_LEVEL >= LOG_LVL_DEBUG) {
             LOGD(tag, "Sending system status to node %d", dest_node)
             dat_print_status(&status);
-
             print_status(&status, 'h');
-
         }
 
-        // The total amount of status variables must fit inside a frame
+        // The total amount of status variables must fit inside a nframe
         LOGD(tag, "sizeof(status) = %lu", sizeof(status));
-        LOGD(tag, "sizeof(data.frame) = %lu", sizeof(data.frame));
-        LOGD(tag, "sizeof(data.frame.data) = %lu", sizeof(data.frame.data));
+        LOGD(tag, "sizeof(data.nframe) = %lu", sizeof(data.frame));
+        LOGD(tag, "sizeof(data.nframe.data) = %lu", sizeof(data.frame.data));
         assert(sizeof(status) < sizeof(data.frame.data));
         memcpy(data.frame.data.data8, &status, sizeof(status));
 
@@ -249,10 +248,10 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
         com_data_t data;
         memset(&data, 0, sizeof(data));
         data.node = (uint8_t)dest_node;
-        data.frame.frame = 0;
+        data.frame.nframe = 0;
         data.frame.type = (uint16_t)(TM_TYPE_PAYLOAD + payload);
 
-        int n_structs = (COM_FRAME_MAX_LEN-4) / data_map[payload].size;
+        int n_structs = (COM_FRAME_MAX_LEN) / data_map[payload].size;
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
 
         LOGI(tag, "index_payload: %d", index_pay);
@@ -260,9 +259,9 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
             n_structs = index_pay;
         }
 
-        LOGI(tag, "Sending %d structs of payload %d", (int)n_structs, (int)payload);
+        LOGI(tag, "Sending %d structs of payload %d", n_structs, (int)payload);
+        data.frame.ndata = (uint32_t)n_structs;
 
-        memcpy(data.frame.data.data32, &n_structs, sizeof(int));
         char buff[n_structs*data_map[payload].size];
 
         int i = 0;
@@ -270,7 +269,7 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
         uint16_t payload_size = data_map[payload].size;
         for(i=0; i < n_structs; ++i) {
             dat_get_recent_payload_sample(buff, payload, i);
-            mem_delay = 4+(i*payload_size);
+            mem_delay = (i*payload_size);
             memcpy(data.frame.data.data8+mem_delay, buff, payload_size);
         }
         print_buff(data.frame.data.data8, payload_size*n_structs);
