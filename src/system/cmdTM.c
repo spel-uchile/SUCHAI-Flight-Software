@@ -264,10 +264,17 @@ int tm_send_pay_data(char *fmt, char *params, int nparams)
 
         memcpy(data.frame.data.data32, &n_structs, sizeof(int));
         char buff[n_structs*data_map[payload].size];
-        // TODO: Change to add n_struct payload data instead of 0
-        dat_get_recent_payload_sample(buff, payload, 0);
-        memcpy(data.frame.data.data8+4, buff, data_map[payload].size);
-        print_buff(data.frame.data.data8, data_map[payload].size+4);
+
+        int i = 0;
+        int mem_delay;
+        uint16_t payload_size = data_map[payload].size;
+        for(i=0; i < n_structs; ++i) {
+            dat_get_recent_payload_sample(buff, payload, i);
+            mem_delay = 4+(i*payload_size);
+            memcpy(data.frame.data.data8+mem_delay, buff, payload_size);
+        }
+        print_buff(data.frame.data.data8, payload_size*n_structs);
+
         return com_send_data("", (char *)&data, 0);
     }
     else

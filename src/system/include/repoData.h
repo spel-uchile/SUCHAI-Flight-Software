@@ -274,15 +274,15 @@ typedef struct ads_data {
  */
 typedef struct eps_data {
     int timestamp;
-    uint16_t cursun;            ///< Current from boost converters [mA]
-    uint16_t cursys;            ///< Current out of battery [mA]
-    uint16_t vbatt;            ///< Voltage of battery [mV]
-    int16_t temp1;
-    int16_t temp2;
-    int16_t temp3;
-    int16_t temp4;
-    int16_t temp5;
-    int16_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
+    uint32_t cursun;            ///< Current from boost converters [mA]
+    uint32_t cursys;            ///< Current out of battery [mA]
+    uint32_t vbatt;            ///< Voltage of battery [mV]
+    int32_t temp1;
+    int32_t temp2;
+    int32_t temp3;
+    int32_t temp4;
+    int32_t temp5;
+    int32_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
 } eps_data_t;
 
 typedef struct langmuir_data {
