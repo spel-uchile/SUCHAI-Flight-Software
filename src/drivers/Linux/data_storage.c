@@ -195,6 +195,8 @@ const char* get_sql_type(char* c_type)
     }
     else if(strcmp(c_type, "%d") == 0) {
         return "INTEGER";
+    } else if(strcmp(c_type, "%u") == 0) {
+        return "BIGINT";
     } else {
         return "TEXT";
     }
@@ -202,11 +204,12 @@ const char* get_sql_type(char* c_type)
 
 int get_sizeof_type(char* c_type)
 {
-
     if(strcmp(c_type, "%f") == 0) {
         return sizeof(float);
     }
     else if(strcmp(c_type, "%d") == 0) {
+        return sizeof(int);
+    } else if(strcmp(c_type, "%u") == 0) {
         return sizeof(int);
     } else {
         return -1;
@@ -582,6 +585,9 @@ void get_value_string(char* ret_string, char* c_type, char* buff)
     else if(strcmp(c_type, "%d") == 0) {
         sprintf(ret_string, " %d", *((int*)buff));
     }
+    else if(strcmp(c_type, "%u") == 0) {
+        sprintf(ret_string, " %u", *((unsigned int*)buff));
+    }
 }
 
 
@@ -626,7 +632,7 @@ int storage_add_payload_data(void* data, int payload)
     strcat(values, ")");
     char insert_row[200];
     sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
-    LOGD(tag, "%s", insert_row);
+    LOGI(tag, "%s", insert_row);
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, insert_row);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
