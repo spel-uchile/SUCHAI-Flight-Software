@@ -651,11 +651,16 @@ int dat_show_time(int format)
 int dat_add_payload_sample(void* data, int payload)
 {
     int ret;
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
 #if defined(NANOMIND) || defined(LINUX)
     ret = storage_add_payload_data(data, payload);
 #else
     ret=0;
 #endif
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
     return ret;
 }
 
@@ -663,21 +668,29 @@ int dat_add_payload_sample(void* data, int payload)
 int dat_get_recent_payload_sample(void* data, int payload, int delay)
 {
     int ret;
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 #if defined(NANOMIND) || defined(LINUX)
     ret = storage_get_recent_payload_data(data, payload, delay);
 #else
     ret=0;
 #endif
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
     return ret;
 }
 
 int dat_delete_memory_sections(void)
 {
     int ret;
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 #ifdef NANOMIND
     ret = storage_delete_memory_sections();
 #else
     ret=0;
 #endif
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
     return ret;
 }
