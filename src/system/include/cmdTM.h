@@ -51,12 +51,21 @@ int tm_send_status(char *fmt, char *params, int nparams);
 int tm_parse_status(char *fmt, char *params, int nparams);
 
 /**
- * Send data stored as payload. TODO: complete docs
+ * Send last structs data stored as payload in csp frame.
  * @param fmt
  * @param params
  * @param nparams
  * @return
  */
 int tm_send_pay_data(char *fmt, char *params, int nparams);
+
+/**
+ * Send all structs data stored as payload in multimple csp frames.
+ * @param fmt
+ * @param params
+ * @param nparams
+ * @return
+ */
+int tm_send_all_pay_data(char *fmt, char *params, int nparams);
 
 #endif //CMDTM_H

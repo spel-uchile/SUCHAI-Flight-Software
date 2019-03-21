@@ -651,27 +651,53 @@ int dat_show_time(int format)
 int dat_add_payload_sample(void* data, int payload)
 {
     int ret;
+
+    int index = dat_get_system_var(data_map[payload].sys_index);
+    LOGI(tag, "Adding data for payload %d in index %d", payload, index);
+
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
-#if defined(NANOMIND) || defined(LINUX)
+#if defined(LINUX)
     ret = storage_add_payload_data(data, payload);
+#elif defined(NANOMIND)
+    ret = storage_set_payload_data(index, data, payload);
 #else
     ret=0;
 #endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
-    return ret;
+
+    // Update address
+    if(ret==0) {
+        dat_set_system_var(data_map[payload].sys_index, index+1);
+        return index+1;
+    } else {
+        LOGE(tag, "Couldn't set data payload %d", payload);
+        return -1;
+    }
 }
 
 
 int dat_get_recent_payload_sample(void* data, int payload, int delay)
 {
     int ret;
+
+    int index = dat_get_system_var(data_map[payload].sys_index);
+    LOGV(tag, "Obtaining data of payload %d, in index %d, sys_var: %d", payload, index,data_map[payload].sys_index );
+
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-#if defined(NANOMIND) || defined(LINUX)
+#if defined(LINUX)
     ret = storage_get_recent_payload_data(data, payload, delay);
+#elif defined(NANOMIND)
+    if(index-1-delay >= 0) {
+        ret = storage_get_payload_data(index-1-delay, data, payload);
+    }
+    else {
+        LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
+        ret = -1;
+    }
 #else
     ret=0;
 #endif
@@ -683,6 +709,11 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay)
 int dat_delete_memory_sections(void)
 {
     int ret;
+    // Resetting memory system vars
+    for(int i = 0; i < last_sensor; ++i)
+    {
+        dat_set_system_var(data_map[i].sys_index, 0);
+    }
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 #ifdef NANOMIND
@@ -692,5 +723,7 @@ int dat_delete_memory_sections(void)
 #endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
+
+    storage_flight_plan_reset();
     return ret;
 }

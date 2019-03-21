@@ -493,20 +493,20 @@ int storage_set_payload_data(int index, void* data, int payload)
     return 0;
 }
 
-int storage_add_payload_data(void* data, int payload)
-{
-    int index = dat_get_system_var(data_map[payload].sys_index);
-    LOGI(tag, "Adding data for payload %d in index %d", payload, index);
-    int ret = storage_set_payload_data(index, data, payload);
-    // Update address
-    if(ret==0) {
-        dat_set_system_var(data_map[payload].sys_index, index+1);
-        return index+1;
-    } else {
-        LOGE(tag, "Couldn't set data payload %d", payload);
-        return -1;
-    }
-}
+//int storage_add_payload_data(void* data, int payload, int lastindex)
+//{
+//    int index = dat_get_system_var(data_map[payload].sys_index);
+//    LOGI(tag, "Adding data for payload %d in index %d", payload, index);
+//    int ret = storage_set_payload_data(index, data, payload);
+//    // Update address
+//    if(ret==0) {
+//        dat_set_system_var(data_map[payload].sys_index, index+1);
+//        return index+1;
+//    } else {
+//        LOGE(tag, "Couldn't set data payload %d", payload);
+//        return -1;
+//    }
+//}
 
 int storage_get_payload_data(int index, void* data, int payload)
 {
@@ -540,28 +540,22 @@ int storage_get_payload_data(int index, void* data, int payload)
     return 0;
 }
 
-int storage_get_recent_payload_data(void * data, int payload, int delay)
-{
-    int index = dat_get_system_var(data_map[payload].sys_index);
-    LOGV(tag, "Obtaining data of payload %d, in index %d, sys_var: %d", payload, index,data_map[payload].sys_index );
-
-    if(index-1-delay >= 0) {
-        return storage_get_payload_data(index-1-delay, data, payload);
-    }
-    else {
-        LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
-        return -1;
-    }
-}
+//int storage_get_recent_payload_data(void * data, int payload, int delay)
+//{
+//    int index = dat_get_system_var(data_map[payload].sys_index);
+//    LOGV(tag, "Obtaining data of payload %d, in index %d, sys_var: %d", payload, index,data_map[payload].sys_index );
+//
+//    if(index-1-delay >= 0) {
+//        return storage_get_payload_data(index-1-delay, data, payload);
+//    }
+//    else {
+//        LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
+//        return -1;
+//    }
+//}
 
 int storage_delete_memory_sections()
 {
-    // Resetting memory system vars
-    for(int i = 0; i < last_sensor; ++i)
-    {
-        dat_set_system_var(data_map[i].sys_index, 0);
-    }
-
     // Deleting Payload Memory Sections
     for(int i = 0;  i < SCH_SECTIONS_PER_PAYLOAD*last_sensor; ++i)
     {
@@ -573,8 +567,5 @@ int storage_delete_memory_sections()
             return -1;
         }
     }
-
-    int rc = storage_flight_plan_reset();
-
-    return rc;
+    return 0;
 }

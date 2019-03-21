@@ -26,10 +26,11 @@
 #include "config.h"
 #include "globals.h"
 #include "utils.h"
+#include "data_storage.h"
 
-#if SCH_STORAGE_MODE
-    #include "data_storage.h"
-#endif
+//#if SCH_STORAGE_MODE
+//
+//#endif
 
 #ifdef NANOMIND
     #include "util/clock.h"
