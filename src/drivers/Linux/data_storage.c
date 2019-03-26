@@ -249,9 +249,9 @@ int storage_table_payload_init(int drop)
     {
         char create_table[300];
         sprintf(create_table, "CREATE TABLE IF NOT EXISTS %s(tstz TIMESTAMPTZ,", data_map[i].table);
-        char* tok_sym[10];
-        char* tok_var[10];
-        char order[100];
+        char* tok_sym[30];
+        char* tok_var[30];
+        char order[50];
         strcpy(order, data_map[i].data_order);
         char var_names[200];
         strcpy(var_names, data_map[i].var_names);
@@ -594,9 +594,9 @@ void get_value_string(char* ret_string, char* c_type, char* buff)
 int storage_add_payload_data(void* data, int payload)
 {
 #if SCH_STORAGE_MODE == 2
-    char* tok_sym[10];
-    char* tok_var[10];
-    char order[100];
+    char* tok_sym[30];
+    char* tok_var[30];
+    char order[50];
     strcpy(order, data_map[payload].data_order);
     char var_names[200];
     strcpy(var_names, data_map[payload].var_names);
@@ -625,7 +625,6 @@ int storage_add_payload_data(void* data, int payload)
             strcat(names, ",");
             strcat(values, ",");
         }
-//        LOGI(tag, "%f", *((float*)buff));
     }
 
     strcat(names, ")");
@@ -651,9 +650,9 @@ int storage_get_recent_payload_data(void * data, int payload, int delay)
 #if SCH_STORAGE_MODE == 2
     LOGV(tag, "Obtaining data of payload %d", payload);
 
-    char* tok_sym[10];
-    char* tok_var[10];
-    char order[100];
+    char* tok_sym[30];
+    char* tok_var[30];
+    char order[50];
     strcpy(order, data_map[payload].data_order);
     char var_names[200];
     strcpy(var_names, data_map[payload].var_names);

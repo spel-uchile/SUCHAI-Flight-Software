@@ -193,7 +193,7 @@ int storage_set_payload_data(int index, void * data, int payload);
  * @param payload Int, payload to store
  * @return 0 OK, -1 Error
  */
-int storage_add_payload_data(void * data, int payload);
+//int storage_add_payload_data(void * data, int payload, int lastindex);
 
 // TODO: Check why this function isn't in Linux/include/data_storage.h
 /**
@@ -220,7 +220,7 @@ int storage_get_payload_data(int index, void* data, int payload);
  * @param delay Int, delay from recent value
  * @return OK 0, Error -1
  */
-int storage_get_recent_payload_data(void* data, int payload, int delay);
+//int storage_get_recent_payload_data(void* data, int payload, int delay);
 
 /**
  * Delete all memory sections in NOR FLASH
