@@ -224,6 +224,8 @@ int gssb_istage_get_settings(char* fmt, char* params, int nparams);
  *	switch_polarity: Release sense switch polarity
  *	reboot_deploy_cnt: Wait this number of reboots before deploy in armed auto mode [#]
  *
+ *	A reset is required to apply the settings
+ *
  * @param fmt str. Parameters format: "%d &d %d %d %d %d %d"
  * @param params  str. Parameters as string.
  *      "<knife_on_time> <increment> <deploy_delay>
@@ -231,6 +233,9 @@ int gssb_istage_get_settings(char* fmt, char* params, int nparams);
  *       <reboot_deploy_cnt>"
  * @param nparams int. Number of parameters: 7
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @code
+ *      istage_set_config 1500 500 2000 4 1 0 2
+ * @endcode
  */
 int gssb_istage_settings(char *fmt, char *params, int nparams);
 

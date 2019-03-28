@@ -297,8 +297,16 @@ int gssb_select_dev(char *fmt, char *params, int nparams)
     int address;
     if(sscanf(params, fmt, &address) == nparams)
     {
-        gssb_select_device(GSSB_I2C_DEV, address);
-        return CMD_OK;
+        // Set current i2c address of the driver
+        if(address > 0)
+        {
+            gssb_select_device(GSSB_I2C_DEV, address);
+        }
+
+        LOGI(tag, "Current GSSB I2C device: %d, address: %#x (%d)",
+                gssb_current_i2c_dev(),
+                gssb_current_i2c_addr(),
+                gssb_current_i2c_addr())
     }
 
     return CMD_FAIL;
@@ -313,12 +321,13 @@ int gssb_set_addr(char *fmt, char *params, int nparams)
         rc = gssb_set_i2c_addr(new_address);
         if(rc)
         {
-            gssb_commit_i2c_addr();
-            LOGD(tag, "Address set to 0x%X", new_address);
-            return CMD_OK;
+            rc = gssb_commit_i2c_addr();
+            if(rc)
+            {
+                LOGD(tag, "Address set to 0x%X", new_address);
+                return CMD_OK;
+            }
         }
-        else
-            return CMD_FAIL;
     }
 
     return CMD_FAIL;
