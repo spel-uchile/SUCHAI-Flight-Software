@@ -7,8 +7,9 @@
  * @author Tamara Gutierrez R
  * @author Matias Ramirez M
  * @author Ignacio Ibanez A
+ * @author Diego Ortego P
  *
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header contains system wide settings to customize different submodules
@@ -28,6 +29,10 @@
 /* Select the correct architecture */
 #ifdef FREERTOS
     #define {{ARCH}}                                ///< ESP32 | AVR32 | NANOMIND
+#endif
+
+#ifdef LINUX
+    #define SCH_RESEND_TM_NODE  11  ///< If defined, resend TM packets to CosmosRB node
 #endif
 
 #ifdef NANOMIND
