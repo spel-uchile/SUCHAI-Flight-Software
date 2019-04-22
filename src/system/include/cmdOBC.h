@@ -41,7 +41,7 @@
 #endif
 
 #include "repoCommand.h"
-#include "os.h"
+#include "os/os.h"
 
 /**
  * Register on board computer related (OBC) commands
