@@ -401,9 +401,9 @@ int gssb_istage_settings(char *fmt, char *params, int nparams)
             &rep_time_s, &switch_polarity, &reboot_deploy_cnt) == nparams)
     {
         /* Check settings range */
-        if ((std_time > 65535) || (std_time < 0))
+        if ((std_time > 8000) || (std_time < 0))
         {
-            LOGE(tag, "Knife on time of %d out of range [0 - 65535]", nparams);
+            LOGE(tag, "Knife on time of %d out of range [0 - 8000]", nparams);
             return CMD_FAIL;
         }
         else
