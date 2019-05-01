@@ -14,7 +14,7 @@
 
 #include "stdlib.h"
 
-#include "os.h"
+#include "os/os.h"
 #include "csp/csp.h"
 #include "csp/csp_types.h"
 #include "csp/csp_endian.h"

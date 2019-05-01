@@ -18,7 +18,7 @@
 #include <assert.h>
 
 #include "config.h"
-#include "os.h"
+#include "os/os.h"
 #include "osSemphr.h"
 
 /**

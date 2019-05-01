@@ -10,10 +10,6 @@ cd esp-idf
 git submodule update --init
 cd ..
 
-echo "Fixing FreeRTOS includes..."
-sed -i "s/COMPONENT_ADD_INCLUDEDIRS := include/COMPONENT_ADD_INCLUDEDIRS := include include\/freertos/g" esp-idf/components/freertos/component.mk
-
-
 echo "Moving files to corrects directions"
 cp component-main.mk ../../../src/system/component.mk
 cp component-freertos.mk ../../../src/os/FreeRTOS/component.mk

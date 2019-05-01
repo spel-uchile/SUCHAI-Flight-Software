@@ -723,7 +723,8 @@ int dat_delete_memory_sections(void)
 #endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
-
+#if SCH_FP_ENABLED
     storage_flight_plan_reset();
+#endif
     return ret;
 }
