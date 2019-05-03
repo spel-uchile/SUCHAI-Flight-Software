@@ -144,8 +144,8 @@ void twi_init(void) {
     };
     gpio_enable_module(TWIM_GPIO_MAP2, sizeof(TWIM_GPIO_MAP2) / sizeof(TWIM_GPIO_MAP2[0]));
 
-    /* Init I2C2 controller with addr 5 and 100 kHz clock */
-    i2c_init_master(2, 5, 100);
+    /* Init I2C2 controller with addr 1 and 100 kHz clock */
+    i2c_init_master(2, 1, 100);
 
     /* I2C0 initialized with LibCSP in TaskInit
      * Ex: csp_i2c_init(node, handle, speed_khz);

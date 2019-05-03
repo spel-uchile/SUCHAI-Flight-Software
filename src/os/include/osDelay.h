@@ -12,7 +12,7 @@
 #ifndef _OS_DELAY_H_
 #define _OS_DELAY_H_
 
-#include "os.h"
+#include "os/os.h"
 #include "time.h"
 #include "stdint.h"
 

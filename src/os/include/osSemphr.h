@@ -10,7 +10,7 @@
 #define _OS_SEMPHR_H_
 
 #include "config.h"
-#include "os.h"
+#include "os/os.h"
 
 #ifdef LINUX
 	#include <pthread.h>

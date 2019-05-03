@@ -40,8 +40,12 @@
     #include "driver/gpio.h"
 #endif
 
+#define GSSB_ARMED_NONE 0
+#define GSSB_ARMED_AUTO 1
+#define GSSB_ARMED_MANUAL 2
+
 #include "repoCommand.h"
-#include "os.h"
+#include "os/os.h"
 
 /**
  * Register on board computer related (OBC) commands
@@ -164,7 +168,8 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams);
 
 
 
-/* This commands are related to inter-stage panels and only available for the
+/**
+ * This commands are related to inter-stage panels and only available for the
  * Nanomind A3200 with inter-stage panels using the GSSB interface and drivers.
  */
 #ifdef NANOMIND
@@ -172,11 +177,11 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams);
  * Set GSSB node to talk
  *
  * @param fmt str. Parameters format: "%d"
- * @param params  str. Parameters as string <node>,
+ * @param params  str. Parameters as string <device i2c address>,
  * @param nparams int. Number of parameters: 1
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_set_gssb_node(char* fmt, char* params, int nparams);
+int gssb_select_dev(char *fmt, char *params, int nparams);
 
 /**
  * Set GSSB I2C addresss
@@ -186,7 +191,7 @@ int gssb_set_gssb_node(char* fmt, char* params, int nparams);
  * @param nparams int. Number of parameters: 1
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_set_addr_csp(char* fmt, char* params, int nparams);
+int gssb_set_addr(char *fmt, char *params, int nparams);
 
 /**
  * Get CSP debug information
@@ -196,7 +201,7 @@ int gssb_set_addr_csp(char* fmt, char* params, int nparams);
  * @param nparams int. Number of parameters: 0
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_gssb_ident_csp(char* fmt, char* params, int nparams);
+int gssb_ident(char *fmt, char *params, int nparams);
 
 /**
  * Get current inter-stage panels settings
@@ -211,23 +216,28 @@ int gssb_istage_get_settings(char* fmt, char* params, int nparams);
 /**
  * Set inter-stage panels settings. The settings are the following:
  *
- * 	std_time_ms: Burn time for first burn [ms]
- *	increment_ms: How much to increment burn time for each retry [ms]
- *	short_cnt_down: The burn process will run once after this cntr runs out [s]
- *	max_repeat:	Max number of retries
- *	rep_time_s:	Time between retries [s]
+ * 	knife_on_time: Burn time for first burn [ms]
+ *	increment: How much to increment burn time for each retry [ms]
+ *	deploy_delay: The burn process will run once after this cntr runs out [s]
+ *	max_repeats:	Max number of retries [#]
+ *	repeat_delay:	Time between retries [s]
  *	switch_polarity: Release sense switch polarity
- *	reboot_deploy_cnt:
+ *	reboot_deploy_cnt: Wait this number of reboots before deploy in armed auto mode [#]
+ *
+ *	A reset is required to apply the settings
  *
  * @param fmt str. Parameters format: "%d &d %d %d %d %d %d"
  * @param params  str. Parameters as string.
- *      "<std_time_ms> <increment_ms> <short_cnt_down>
- *       <max_repeat> <rep_time_s> <switch_polarity>
+ *      "<knife_on_time> <increment> <deploy_delay>
+ *       <max_repeats> <repeat_delay> <switch_polarity>
  *       <reboot_deploy_cnt>"
  * @param nparams int. Number of parameters: 7
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @code
+ *      istage_set_config 1500 500 2000 4 1 0 2
+ * @endcode
  */
-int gssb_istage_settings_csp(char* fmt, char* params, int nparams);
+int gssb_istage_settings(char *fmt, char *params, int nparams);
 
 /**
  * Reboot current inter-stage panel
@@ -237,7 +247,7 @@ int gssb_istage_settings_csp(char* fmt, char* params, int nparams);
  * @param nparams int. Number of parameters: 0
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_istage_reboot_csp(char* fmt, char* params, int nparams);
+int gssb_istage_reboot(char *fmt, char *params, int nparams);
 
 /**
  * Sends antenna deploy command to inter-stage panel
@@ -247,7 +257,17 @@ int gssb_istage_reboot_csp(char* fmt, char* params, int nparams);
  * @param nparams int. Number of parameters: 0
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_istage_deploy_csp(char* fmt, char* params, int nparams);
+int gssb_istage_deploy(char *fmt, char *params, int nparams);
+
+/**
+ * Unlock inter-stage panel settings
+ *
+ * @param fmt str. Parameters format: ""
+ * @param params  str. Parameters as string. Not used. ""
+ * @param nparams int. Number of parameters: 0
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int gssb_unlock(char *fmt, char *params, int nparams);
 
 /**
  * Sends arm command to interstage, 1 for auto deploy and 0 for not armed
@@ -259,21 +279,7 @@ int gssb_istage_deploy_csp(char* fmt, char* params, int nparams);
  * @param nparams int. Number of parameters: 1
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_istage_arm_csp(char* fmt, char* params, int nparams);
-
-/**
- * Sets the state of the interstage. Use this command to set the interstage in
- * the armed manual state before it is possible to use the deploy command.
- * State 0 = Not armed, 1 = armed manual
- *
- * @param fmt str. Parameters format: "%d"
- * @param params  str. Parameters as string. "<state>"
- *  0: not armed
- *  1: armed manual
- * @param nparams int. Number of parameters: 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int gssb_istage_state_csp(char* fmt, char* params, int nparams);
+int gssb_istage_arm(char *fmt, char *params, int nparams);
 
 /**
  * Read panel voltage (coarse sun sensor) and temperature
@@ -283,7 +289,7 @@ int gssb_istage_state_csp(char* fmt, char* params, int nparams);
  * @param nparams int. Number of parameters: 0
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_istage_sensors_csp(char* fmt, char* params, int nparams);
+int gssb_istage_sensors(char *fmt, char *params, int nparams);
 
 /**
  * Request interstage status
@@ -293,37 +299,7 @@ int gssb_istage_sensors_csp(char* fmt, char* params, int nparams);
  * @param nparams int. Number of parameters: 0
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_istage_status_csp(char* fmt, char* params, int nparams);
-
-/**
- * Read sun sensor values
- *
- * @param fmt str. Parameters format: ""
- * @param params  str. Parameters as string. Not used. ""
- * @param nparams int. Number of parameters: 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int gssb_sunsensor_read_csp(char* fmt, char* params, int nparams);
-
-/**
- * Read sun sensor temperature
- *
- * @param fmt str. Parameters format: ""
- * @param params  str. Parameters as string. Not used. ""
- * @param nparams int. Number of parameters: 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int gssb_sunsensor_temp_csp(char* fmt, char* params, int nparams);
-
-/**
- * Read sun sensor temperature 1
- *
- * @param fmt str. Parameters format: ""
- * @param params  str. Parameters as string. Not used. ""
- * @param nparams int. Number of parameters: 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int gssb_sunsensor_temp1_csp(char* fmt, char* params, int nparams);
+int gssb_istage_status(char *fmt, char *params, int nparams);
 
 /**
  * Sets the state of the interstage power switch to enable/disable VCC and VCC2.

@@ -47,7 +47,7 @@ def configure(ctx):
     ctx.env.append_unique('LINKFLAGS_NANOMIND', ['-mpart='+ctx.options.part, '-Wl,-Map,nanomind.map', '-Wl,--gc-sections', '--rodata-writable', '-Wl,--direct-data'])
 
     # Add files
-    ctx.env.append_unique('FILES_NANOMIND',     ['src/system/*.c', 'src/os/FreeRTOS/*.c', 'src/drivers/nanomind/*.c', 'src/drivers/nanomind/gs-drivers/nanopower2.c', 'src/drivers/nanomind/gs-drivers/gssb_client.c'])
+    ctx.env.append_unique('FILES_NANOMIND',     ['src/system/*.c', 'src/os/FreeRTOS/*.c', 'src/drivers/nanomind/*.c', 'src/drivers/nanomind/gs-drivers/nanopower2.c', 'src/drivers/nanomind/gs-drivers/gssb.c'])
     ctx.env.PART = ctx.options.part.upper()
 
     # Linker script

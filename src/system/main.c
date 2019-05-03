@@ -80,7 +80,7 @@ int main(void)
 }
 
 #ifdef FREERTOS
-#ifndef NANOMIND
+#if  !defined(NANOMIND) && !defined(ESP32)
 /**
  * Task idle handle function. Performs operations inside the idle task
  * configUSE_IDLE_HOOK must be set to 1

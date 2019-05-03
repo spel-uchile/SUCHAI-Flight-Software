@@ -62,7 +62,7 @@
 #include "osScheduler.h"
 #include "osQueue.h"
 #include "osSemphr.h"
-#include "os.h"
+#include "os/os.h"
 
 /* system includes */
 #include "globals.h"
