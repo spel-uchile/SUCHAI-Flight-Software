@@ -225,7 +225,7 @@ static void com_receive_tm(csp_packet_t *packet)
         print_buff16(packet->data16, packet->length/2);
         int j, delay = 0;
 
-        //TODO: Use a command to add payloads to database
+        //FIXME: Use a command to add payloads to database
         //Save ndata payload samples to data storage
         assert(frame->ndata*data_map[payload].size <= COM_FRAME_MAX_LEN);
         for(j=0; j < frame->ndata; j++)

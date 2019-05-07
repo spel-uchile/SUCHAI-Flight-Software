@@ -33,6 +33,10 @@
     #include "gssb.h"
     #include "pwr_switch.h"
     #include "util/error.h"
+    #include <conf_a3200.h>
+    #include <lm70.h>
+    #include <mpu3300.h>
+    #include <hmc5843.h>
 #endif
 
 #ifdef ESP32
@@ -129,7 +133,7 @@ int obc_set_time(char* fmt, char* params,int nparams);
  * @param nparams Int. Number of parameters 1
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int obc_show_time(char* fmt, char* params,int nparams);
+int obc_get_time(char *fmt, char *params, int nparams);
 
 /**
  * Execute a shell command by calling system(). No check are performed over the
@@ -166,7 +170,16 @@ int test_fp(char* fmt, char* params,int nparams);
  */
 int obc_set_pwm_duty(char* fmt, char* params, int nparams);
 
-
+/**
+ * Read OBC sensors, print the results and save the values to status repository.
+ * For Nanomind A3200 reads the temperature, gyroscope and magnetometer on board.
+ *
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_get_sensors(char *fmt, char *params, int nparams);
 
 /**
  * This commands are related to inter-stage panels and only available for the

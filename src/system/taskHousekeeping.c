@@ -42,7 +42,7 @@ void taskHousekeeping(void *param)
         elapsed_sec += delay_ms/1000; //Update seconds counts
 
         // Debug command
-        cmd_t *cmd_dbg = cmd_get_str("debug_obc");
+        cmd_t *cmd_dbg = cmd_get_str("obc_debug");
         cmd_add_params_var(cmd_dbg, 0);
         cmd_send(cmd_dbg);
 
@@ -50,7 +50,7 @@ void taskHousekeeping(void *param)
 
         if((elapsed_sec % 2) == 0)
         {
-            cmd_t *cmd_2s = cmd_get_str("sample_obc_sensors");
+            cmd_t *cmd_2s = cmd_get_str("obc_get_sensors");
             cmd_send(cmd_2s);
         }
 
@@ -58,7 +58,7 @@ void taskHousekeeping(void *param)
         if((elapsed_sec % _10sec_check) == 0)
         {
             LOGD(tag, "10 sec tasks");
-            //cmd_t *cmd_10s = cmd_get_str("get_mem");
+            //cmd_t *cmd_10s = cmd_get_str("obc_get_mem");
             cmd_t *cmd_10s = cmd_get_str("test");
             cmd_add_params_var(cmd_10s, "Task housekeeping running");
             cmd_send(cmd_10s);
@@ -68,7 +68,7 @@ void taskHousekeeping(void *param)
         if((elapsed_sec % _10min_check) == 0)
         {
             LOGD(tag, "10 min tasks");
-            cmd_t *cmd_10m = cmd_get_str("get_mem");
+            cmd_t *cmd_10m = cmd_get_str("obc_get_mem");
             cmd_add_params_var(cmd_10m, 0);
             cmd_send(cmd_10m);
         }
@@ -77,7 +77,7 @@ void taskHousekeeping(void *param)
         if((elapsed_sec % _1hour_check) == 0)
         {
             LOGD(tag, "1 hour check");
-            cmd_t *cmd_1h = cmd_get_str("update_hours_alive");
+            cmd_t *cmd_1h = cmd_get_str("drp_add_hrs_alive");
             cmd_add_params_var(cmd_1h, 1); // Add 1hr
             cmd_send(cmd_1h);
         }

@@ -28,13 +28,13 @@ static const char *tag = "cmdDRP";
  */
 void cmd_drp_init(void)
 {
-    cmd_add("ebf", drp_execute_before_flight, "%d", 1);
-    cmd_add("print_vars", drp_print_system_vars, "", 0);
-    cmd_add("update_sys_var", drp_update_sys_var_idx, "%d %d", 2);
-    cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
-    cmd_add("clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
-    cmd_add("sample_obc_sensors", drp_sample_obc_sensors, "", 0);
-    cmd_add("test_system_vars", drp_test_system_vars, "", 0);
+    cmd_add("drp_ebf", drp_execute_before_flight, "%d", 1);
+    cmd_add("drp_get_vars", drp_print_system_vars, "", 0);
+    cmd_add("drp_set_var", drp_update_sys_var_idx, "%d %d", 2);
+    cmd_add("drp_add_hrs_alive", drp_update_hours_alive, "%d", 1);
+    cmd_add("drp_clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
+    cmd_add("drp_test_system_vars", drp_test_system_vars, "", 0);
+    cmd_add("drp_set_deployed", drp_set_deployed, "%d", 1);
 }
 
 int drp_execute_before_flight(char *fmt, char *params, int nparams)
@@ -53,6 +53,7 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
             {
                 dat_set_system_var(var, 0);
             }
+
             // Set all status variables default values
             dat_set_system_var(dat_rtc_date_time, (int)time(NULL));
             // dat_set_system_var(dat_custom, default_value);
@@ -149,125 +150,6 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
 int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
 {
     dat_set_system_var(dat_obc_sw_wdt, 0);
-    return CMD_OK;
-}
-
-int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
-{
-#ifdef NANOMIND
-
-    int16_t sensor1, sensor2;
-    float gyro_temp;
-
-    mpu3300_gyro_t gyro_reading;
-    hmc5843_data_t hmc_reading;
-
-    /* Read board temperature sensors */
-    sensor1 = lm70_read_temp(1);
-    sensor2 = lm70_read_temp(2);
-
-    /* Read gyroscope temperature and rate */
-    mpu3300_read_temp(&gyro_temp);
-    mpu3300_read_gyro(&gyro_reading);
-
-    /* Read magnetometer */
-    hmc5843_read_single(&hmc_reading);
-
-    /* Set sensors status variables */
-    // TODO: Fix type of ADS variables. Currently saving floats as ints.
-
-    /*typedef union sensors_value{
-        float f;
-        int32_t i;
-    } value;*/
-
-    value temp_1;
-    temp_1.f = (float)(sensor1/10.0);
-    dat_set_system_var(dat_obc_temp_1, temp_1.i);
-
-    value temp_2;
-    temp_2.f = (float)(sensor2/10.0);
-    dat_set_system_var(dat_obc_temp_2, temp_2.i);
-
-    value temp_3;
-    temp_3.f = gyro_temp;
-    dat_set_system_var(dat_obc_temp_3, temp_3.i);
-
-    int curr_time =  (int)time(NULL);
-    struct temp_data data_temp = {curr_time, temp_1.f, temp_2.f, temp_3.f};
-    dat_add_payload_sample(&data_temp, temp_sensors);
-
-    value acc_x;
-    acc_x.f = gyro_reading.gyro_x;
-    dat_set_system_var(dat_ads_acc_x, acc_x.i);
-
-    value acc_y;
-    acc_y.f = gyro_reading.gyro_y;
-    dat_set_system_var(dat_ads_acc_y, acc_y.i);
-
-    value acc_z;
-    acc_z.f = gyro_reading.gyro_z;
-    dat_set_system_var(dat_ads_acc_z, acc_z.i);
-
-    value mag_x;
-    mag_x.f = hmc_reading.x;
-    dat_set_system_var(dat_ads_mag_x, mag_x.i);
-
-    value mag_y;
-    mag_y.f = hmc_reading.y;
-    dat_set_system_var(dat_ads_mag_y, mag_y.i);
-
-    value mag_z;
-    mag_z.f = hmc_reading.z;
-    dat_set_system_var(dat_ads_mag_z, mag_z.i);
-
-    struct ads_data data_ads = {curr_time, acc_x.f, acc_y.f, acc_z.f, mag_x.f, mag_y.f, mag_z.f};
-    dat_add_payload_sample(&data_ads, ads_sensors);
-
-    /*dat_set_system_var(dat_obc_temp_1, sensor1/10.);
-    dat_set_system_var(dat_obc_temp_2, sensor2/10.);
-    dat_set_system_var(dat_obc_temp_3, gyro_temp);
-    dat_set_system_var(dat_ads_acc_x, gyro_reading.gyro_x);
-    dat_set_system_var(dat_ads_acc_y, gyro_reading.gyro_y);
-    dat_set_system_var(dat_ads_acc_z, gyro_reading.gyro_z);
-    dat_set_system_var(dat_ads_mag_x, hmc_reading.x);
-    dat_set_system_var(dat_ads_mag_y, hmc_reading.y);
-    dat_set_system_var(dat_ads_mag_z, hmc_reading.z);*/
-
-    /* Print readings */
-#if LOG_LEVEL >= LOG_LVL_INFO
-    printf("\r\nTemp1: %.1f, Temp2 %.1f, Gyro temp: %.2f\r\n", sensor1/10., sensor2/10., gyro_temp);
-    printf("Gyro x, y, z: %f, %f, %f\r\n", gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z);
-    printf("Mag x, y, z: %f, %f, %f\r\n\r\n",hmc_reading.x, hmc_reading.y, hmc_reading.z);
-    printf("current_time: %lu\n",curr_time);
-
-    struct temp_data data_out_temp;
-    int res = dat_get_recent_payload_sample(&data_out_temp, temp_sensors, 0);
-    printf("Got values for struct temp (%f, %f, %f) cur_time: %lu in NOR FLASH\n", data_out_temp.obc_temp_1, data_out_temp.obc_temp_2, data_out_temp.obc_temp_3, data_out_temp.timestamp);
-
-    struct ads_data data_out_ads;
-    int res2 = dat_get_recent_payload_sample(&data_out_ads, ads_sensors, 0);
-    printf("Got values for struct ads (%f, %f, %f, %f, %f, %f) cur_time: %lu in NOR FLASH\n", data_out_ads.acc_x, data_out_ads.acc_y, data_out_ads.acc_z, data_out_ads.mag_x, data_out_ads.mag_y, data_out_ads.mag_z, data_out_ads.timestamp);
-#endif
-
-#elif defined LINUX
-
-
-    int curr_time =  (int)time(NULL);
-    LOGI(tag, "Simulating obc data in Linux \n timestamp: %d", curr_time);
-    // Simulating temp
-    float curr_time_f = (curr_time % 1000)*1.0;
-    struct temp_data data_temp = {curr_time, curr_time_f, curr_time_f+1.0, curr_time_f+2.0};
-    LOGI(tag, "Temperature data in Linux \n temp1: %f \n temp2: %f \n temp3: %f" ,
-         data_temp.obc_temp_1, data_temp.obc_temp_2, data_temp.obc_temp_3);
-    dat_add_payload_sample(&data_temp, temp_sensors);
-
-//    dat_get_system_var(dat_system_last_var)
-
-
-#endif
-
-
     return CMD_OK;
 }
 

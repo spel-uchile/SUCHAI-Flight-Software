@@ -23,10 +23,10 @@ static const char *tag = "cmdTM";
 
 void cmd_tm_init(void)
 {
-    cmd_add("send_status", tm_send_status, "%d", 1);
     cmd_add("tm_parse_status", tm_parse_status, "", 0);
-    cmd_add("send_payload", tm_send_pay_data, "%u %u", 2);
-    cmd_add("send_all_payload", tm_send_all_pay_data, "%u %u", 2);
+    cmd_add("tm_send_status", tm_send_status, "%d", 1);
+    cmd_add("tm_send_payload", tm_send_all_pay_data, "%u %u", 2);
+    cmd_add("tm_send_payload_last", tm_send_pay_data, "%u %u", 2);
 }
 
 int tm_send_status(char *fmt, char *params, int nparams)

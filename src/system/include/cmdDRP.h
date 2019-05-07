@@ -17,12 +17,12 @@
 #include "repoData.h"
 #include "repoCommand.h"
 
-#ifdef NANOMIND
-    #include <conf_a3200.h>
-    #include <lm70.h>
-    #include <mpu3300.h>
-    #include <hmc5843.h>
-#endif
+//#ifdef NANOMIND
+//    #include <conf_a3200.h>
+//    #include <lm70.h>
+//    #include <mpu3300.h>
+//    #include <hmc5843.h>
+//#endif
 
 #define SCH_DRP_MAGIC (1010)    ///< Magic number to execute critical commands
 
@@ -95,17 +95,6 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams);
 int drp_clear_gnd_wdt(char *fmt, char *params, int nparams);
 
 /**
- * Read OBC sensors, print the results and save the values to status repository.
- * For Nanomind A3200 reads the temperature, gyroscope and magnetometer on board.
- *
- * @param fmt Str. Parameters format ""
- * @param params Str. Parameters as string ""
- * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int drp_sample_obc_sensors(char *fmt, char *params, int nparams);
-
-/**
  * Tests the data repository functioning, sets a value for every system status
  * variable and reads it back, comparing it with the set value.
  * @param fmt Str. Parameters format ""
@@ -114,5 +103,20 @@ int drp_sample_obc_sensors(char *fmt, char *params, int nparams);
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int drp_test_system_vars(char *fmt, char *params, int nparams);
+
+/**
+ * Set the variable `dat_dep_deployed` to a given value. This variable is used
+ * to determine if the satellite was deployed. If not, then the satellite
+ * must execute deployment routines. If deployed, deployment routines are
+ * skipped and the satellite is working nominally. Setting this variable to
+ * zero can cause the satellite to re-execute initialization activities (e.g.
+ * al settings to default values) after a reset.
+ *
+ * @param fmt Str. Parameters format "%d"
+ * @param params Str. Parameters as string "<deployed>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int drp_set_deployed(char *fmt, char *params, int nparams);
 
 #endif /* CMD_DRP_H */

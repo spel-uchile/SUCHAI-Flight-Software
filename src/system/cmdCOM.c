@@ -29,11 +29,11 @@ static void _com_config_find(char *param_name, int *table, param_table_t **param
 
 void cmd_com_init(void)
 {
-    cmd_add("ping", com_ping, "%d", 1);
-    cmd_add("send_rpt", com_send_rpt, "%d %s", 2);
-    cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
-    cmd_add("send_tc", com_send_tc_frame, "%d %n", 1);
-    cmd_add("send_data", com_send_data, "%p", 1);
+    cmd_add("com_ping", com_ping, "%d", 1);
+    cmd_add("com_send_rpt", com_send_rpt, "%d %s", 2);
+    cmd_add("com_send_cmd", com_send_cmd, "%d %n", 1);
+    cmd_add("com_send_tc", com_send_tc_frame, "%d %n", 1);
+    cmd_add("com_send_data", com_send_data, "%p", 1);
     cmd_add("com_debug", com_debug, "", 0);
 #ifdef SCH_USE_NANOCOM
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
