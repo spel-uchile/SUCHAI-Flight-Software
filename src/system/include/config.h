@@ -7,8 +7,9 @@
  * @author Tamara Gutierrez R
  * @author Matias Ramirez M
  * @author Ignacio Ibanez A
+ * @author Diego Ortego P
  *
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header contains system wide settings to customize different submodules
@@ -30,6 +31,10 @@
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
 #endif
 
+#ifdef LINUX
+    #define SCH_RESEND_TM_NODE  11  ///< If defined, resend TM packets to CosmosRB node
+#endif
+
 #ifdef NANOMIND
     #define SCH_USE_NANOPOWER
     #define SCH_USE_NANOCOM
@@ -47,14 +52,14 @@
 #define SCH_HK_ENABLED          0     ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0     ///< Set to run tests (0 | 1)
 #define SCH_WDT_PERIOD          10                 ///< CPU watchdog timer period in seconds
-#define SCH_MAX_WDT_TIMER       5                  ///< Seconds to send wdt_reset command
+#define SCH_MAX_WDT_TIMER       500000             ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
 #define SCH_UART_BAUDRATE       (576000)           ///< UART baud rate for serial console
 #define SCH_KISS_UART_BAUDRATE  (500000)           ///< UART baud rate for kiss communication
 #define SCH_KISS_DEVICE         "/dev/ttyUSB0"     ///< Kiss device path
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS        1                  ///< Node address
+#define SCH_COMM_ADDRESS        10                  ///< Node address
 #define SCH_TNC_ADDRESS         9                  ///< TNC node address
 #define SCH_TRX_ADDRESS         5                  ///< TRX node address
 #define SCH_EPS_ADDRESS         2                  ///< EPS node address
@@ -66,7 +71,7 @@
 #define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_MODE        2    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 #define SCH_STORAGE_PGUSER      "spel"
@@ -92,12 +97,12 @@
 #define SCH_TASK_FPL_STACK        (5*256)   ///< Flight plan task stack size in words
 #define SCH_TASK_CON_STACK        (5*256)   ///< Console task stack size in words
 #define SCH_TASK_HKP_STACK        (5*256)   ///< Housekeeping task stack size in words
-#define SCH_TASK_CSP_STACK        (5*256)     ///< CSP route task stack size in words
+#define SCH_TASK_CSP_STACK        (5*256)   ///< CSP route task stack size in words
 
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
 #define SCH_BUFFERS_CSP           (5)       ///< Number of available CSP buffers
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
-#define SCH_CMD_MAX_ENTRIES       (100)      ///< Max number of commands in the repository
+#define SCH_CMD_MAX_ENTRIES       (100)     ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
 #define SCH_CMD_MAX_STR_NAME      (64)      ///< Limit for the length of the name of a command
 #define SCH_CMD_MAX_STR_FORMAT    (32)      ///< Limit for the length of the format field of a command

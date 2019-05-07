@@ -52,19 +52,19 @@ int tm_parse_status(char *fmt, char *params, int nparams);
 
 /**
  * Send last structs data stored as payload in csp frame.
- * @param fmt
- * @param params
- * @param nparams
- * @return
+ * @param fmt "%u %u"
+ * @param params "<payload> <destination node>"
+ * @param nparams 2
+ * @return CMD_OK or CMD_FAIL
  */
 int tm_send_pay_data(char *fmt, char *params, int nparams);
 
 /**
  * Send all structs data stored as payload in multimple csp frames.
- * @param fmt
- * @param params
- * @param nparams
- * @return
+ * @param fmt "%u %u"
+ * @param params "<payload> <destination node>"
+ * @param nparams 2
+ * @return CMD_OK or CMD_FAIL
  */
 int tm_send_all_pay_data(char *fmt, char *params, int nparams);
 
