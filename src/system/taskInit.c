@@ -75,6 +75,17 @@ void taskInit(void *param)
     dat_set_system_var(dat_obc_last_reset, reset_source);
 #endif
 
+    LOGD(tag, "Initialization commands ...");
+    // Init LibCSP system
+    init_communications();
+    // Execute deployment activities if first boot
+    int first_boot = dat_get_system_var(dat_dep_deployed) > 0 ? 0 : 1;
+    if(first_boot)
+    {
+        LOGI(tag, "\tFirst boot! Execute init routines");
+        init_routines();
+    }
+
     LOGD(tag, "Creating client tasks ...");
     int t_ok;
     int n_threads = 4;
@@ -89,7 +100,6 @@ void taskInit(void *param)
     if(t_ok != 0) LOGE(tag, "Task housekeeping not created!");
 #endif
 #if SCH_COMM_ENABLE
-    init_communications();
     t_ok = osCreateTask(taskCommunications, "comm", SCH_TASK_COM_STACK, NULL, 2, &(thread_id[2]));
     if(t_ok != 0) LOGE(tag, "Task communications not created!");
 #endif
@@ -196,4 +206,89 @@ void init_communications(void)
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
 #endif //SCH_COMM_ENABLE
+}
+
+void init_routines(void)
+{
+    LOGD(tag, "\tAntenna deployment...")
+    //Update antenna deployment status
+    cmd_t *cmd_dep;
+    cmd_dep = cmd_get_str("istage_update_status");
+    cmd_send(cmd_dep);
+
+    //Try to deploy antennas if necessary
+    //      istage 1. On: 2s, off: 1s, rep: 5
+    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_add_params_var(cmd_dep, 16, 2, 1, 5);
+    cmd_send(cmd_dep);
+    //      istage 2. On: 2s, off: 1s, rep: 5
+    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_add_params_var(cmd_dep, 17, 2, 1, 5);
+    cmd_send(cmd_dep);
+    //      istage 3. On: 2s, off: 1s, rep: 5
+    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_add_params_var(cmd_dep, 18, 2, 1, 5);
+    cmd_send(cmd_dep);
+    //      istage 4. On: 2s, off: 1s, rep: 5
+    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_add_params_var(cmd_dep, 19, 2, 1, 5);
+    cmd_send(cmd_dep);
+
+    //Update antenna deployment status
+    cmd_dep = cmd_get_str("istage_update_status");
+    cmd_send(cmd_dep);
+
+
+    LOGD(tag, "\t Init TRX...");
+    cmd_t *trx_cmd;
+    // Set TX_INHIBIT to implement silent time
+    trx_cmd = cmd_get_str("com_set_config");
+    cmd_add_params_var(trx_cmd, "tx_inhibit", TOSTRING(SCH_TX_INHIBIT));
+    cmd_send(trx_cmd);
+    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_get_str("com_get_config");
+        cmd_add_params_str(trx_cmd, "tx_inhibit");
+        cmd_send(trx_cmd);
+    }
+    // Set TX_PWR
+    trx_cmd = cmd_get_str("com_set_config");
+    cmd_add_params_var(trx_cmd, "tx_pwr", TOSTRING(SCH_TX_PWR));
+    cmd_send(trx_cmd);
+    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_get_str("com_get_config");
+        cmd_add_params_str(trx_cmd, "tx_pwr");
+        cmd_send(trx_cmd);
+    }
+    // Set TX_BEACON_PERIOD
+    trx_cmd = cmd_get_str("com_set_config");
+    cmd_add_params_var(trx_cmd, "bcn_interval", TOSTRING(SCH_TX_BCN_PERIOD));
+    cmd_send(trx_cmd);
+    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_get_str("com_get_config");
+        cmd_add_params_str(trx_cmd, "bcn_interval");
+        cmd_send(trx_cmd);
+    }
+    // Set TRX Freq
+    trx_cmd = cmd_get_str("com_set_config");
+    cmd_add_params_var(trx_cmd, "freq", TOSTRING(SCH_TX_FREQ));
+    cmd_send(trx_cmd);
+    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_get_str("com_get_config");
+        cmd_add_params_str(trx_cmd, "freq");
+        cmd_send(trx_cmd);
+    }
+    // Set TRX Baud
+    trx_cmd = cmd_get_str("com_set_config");
+    cmd_add_params_var(trx_cmd, "baud", TOSTRING(SCH_TX_BAUD));
+    cmd_send(trx_cmd);
+    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_get_str("com_get_config");
+        cmd_add_params_str(trx_cmd, "baud");
+        cmd_send(trx_cmd);
+    }
 }

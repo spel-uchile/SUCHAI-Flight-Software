@@ -108,6 +108,7 @@ typedef enum dat_system {
     dat_obc_temp_3,               ///< Temperature value of the gyroscope
 
     /// DEP: Deployment related variables.
+    dat_dep_deployed,             ///< Was the satellite deployed?
     dat_dep_ant_deployed,         ///< Was the antenna deployed?
     dat_dep_date_time,            ///< Antenna deployment unix time
 
@@ -158,7 +159,8 @@ typedef enum dat_system {
 /**
  * Struct storing all system status variables.
  *
- * After adding a new field, a new enum constant of the same name must be added to dat_system_t above.
+ * After adding a new field, a new enum constant of the same name must be added
+ * to dat_system_t above.
  *
  * @see dat_system_t
  */
@@ -175,6 +177,7 @@ typedef struct __attribute__((packed)) dat_status_s {
     float dat_obc_temp_3;           ///< Temperature value of the gyroscope
 
     /// DEP: deployment related variables.
+    int32_t dat_dep_deployed;       ///< Was the satellite deployed?
     int32_t dat_dep_ant_deployed;   ///< Was the antenna deployed?
     int32_t dat_dep_date_time;      ///< Antenna deployment unix time
 

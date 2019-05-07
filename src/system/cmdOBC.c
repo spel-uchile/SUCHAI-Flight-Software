@@ -49,6 +49,8 @@ void cmd_obc_init(void)
     cmd_add("istage_set_arm", gssb_istage_arm, "%d", 1);
     cmd_add("istage_get_sensors", gssb_istage_sensors, "", 0);
     cmd_add("istage_get_status", gssb_istage_status, "", 0);
+    cmd_add("istage_update_status", gssb_istage_update_status, "", 0);
+    cmd_add("istage_antenna_release", gssb_istage_antenna_release, "%d %d %d %d", 4);
 #endif
 }
 
@@ -714,6 +716,81 @@ int gssb_istage_status(char *fmt, char *params, int nparams)
     printf("Reboot deploy cnt:\t\t\t %"PRIu8"\r\n", cnt.reboot_dep_cnt);
 
     return CMD_OK;
+}
+
+int gssb_istage_update_status(char *fmt, char *params, int nparams)
+{
+    char istage_addr[4] = {0x10, 0x11, 0x12, 0x13};
+    int deploy_status, rel_status, i = 0;
+
+    for(i=0; i < 4; i++)
+    {
+        gssb_select_dev(GSSB_I2C_DEV, istage_addr[i]);
+        rel_status = gssb_get_release_status();
+        deploy_status += rel_status;
+        LOGD(tag, "Interstage selected: %d at %#x. Released: %d",
+                gssb_get_uuid(), istage_addr[i], rel_status);
+    }
+
+    if(deploy_status >= 0)
+    {
+        LOGI(tag, "Antennas release status: %d", deploy_status);
+        dat_set_system_var(dat_dep_ant_deployed, deploy_status);
+        return CMD_OK;
+    }
+    else
+        return CMD_FAIL;
+}
+
+int gssb_istage_antenna_release(char *fmt, char *params, int nparams)
+{
+    int addr, knife_on, knife_off, repeats = 0;
+
+    if(params == NULL)
+    {
+        LOGE(tag, "Null params");
+        return CMD_ERROR;
+    }
+
+    int rc = 1;
+    gssb_set1_t set1;
+
+    if(sscanf(params, fmt, &addr, &knife_on, &knife_off, &repeats) == nparams)
+    {
+        // Fill parameters
+        set1.knife_on_time = knife_on;
+        set1.increment = 0;
+        set1.deploy_delay = 0;
+        set1.max_repeats = repeats;
+        set1.repeat_delay = knife_off;
+
+        // Select device
+        rc = gssb_select_device(GSSB_I2C_DEV, (uint8_t)addr);
+        LOGD(tag, "istage selected: %d (rc: %d)", addr, rc);
+
+        // Set parameters
+        gssb_unlock_settings(1);  // Unlock settings
+        rc = gssb_set_burn_settings1(&set1);  // Send settings
+        osDelay(500);
+        gssb_reboot();  //  Reboot and wait to apply settings
+        osDelay(500);
+        LOGD(tag, "istage on: %d. Off: %d. Rep: %d. (rc: %d)",
+                knife_on, knife_off, repeats, rc);
+
+        // Deploy manual
+        rc &= gssb_istage_arm("%d", "0", 1); // Set arm to NONE and reboot
+        osDelay(500);
+        rc &= gssb_istage_arm("%d", "2", 1); // Set arm to MANUAL
+        rc &=gssb_manual_deploy();  // Deploy
+        LOGI(tag, "istage %#x deploying! (rc: %d)", addr, rc);
+
+        return rc > 0 ? CMD_OK: CMD_FAIL;
+    }
+    else
+    {
+        LOGE(tag, "Error parsing params");
+        return CMD_ERROR;
+    }
 }
 
 #endif //NANOMIND

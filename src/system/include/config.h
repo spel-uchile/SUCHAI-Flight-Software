@@ -69,6 +69,11 @@
 #define SCH_TRX_PORT_CMD        (12)               ///< Commands port (execute console commands)
 #define SCH_COMM_ZMQ_OUT        "tcp://127.0.0.1:8001"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
+#define SCH_TX_INHIBIT          10                  /// Default silent time in seconds [0, 1800 (30min)]
+#define SCH_TX_PWR              0                  /// Default TX power [0|1|2|3]
+#define SCH_TX_BCN_PERIOD       60                 /// Default beacon period in seconds
+#define SCH_TX_FREQ             437250000          /// Default TRX freq in Hz
+#define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        2    ///< Status repository location. (0) RAM, (1) Single external.

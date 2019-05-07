@@ -176,3 +176,18 @@ int drp_test_system_vars(char *fmt, char *params, int nparams)
 
     return return_value;
 }
+
+int drp_set_deployed(char *fmt, char *params, int nparams)
+{
+    int deployed;
+    if(sscanf(params, fmt, &deployed) == nparams)
+    {
+        dat_set_system_var(dat_dep_deployed, deployed);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGE(tag, "Error parsing params");
+        return CMD_ERROR;
+    }
+}

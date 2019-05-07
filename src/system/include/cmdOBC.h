@@ -186,6 +186,20 @@ int obc_get_sensors(char *fmt, char *params, int nparams);
  * Nanomind A3200 with inter-stage panels using the GSSB interface and drivers.
  */
 #ifdef NANOMIND
+
+/**
+ * Sets the state of the interstage power switch to enable/disable VCC and VCC2.
+ * State 0 = disabled, 1 = enabled
+ *
+ * @param fmt str. Parameters format: "%d %d"
+ * @param params  str. Parameters as string. "<vcc> <vcc2>"
+ *  vcc:  0 off, 1 on
+ *  vcc2: 0 off, 1 on
+ * @param nparams int. Number of parameters: 2
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int gssb_pwr(char* fmt, char* params, int nparams);
+
 /**
  * Set GSSB node to talk
  *
@@ -315,17 +329,36 @@ int gssb_istage_sensors(char *fmt, char *params, int nparams);
 int gssb_istage_status(char *fmt, char *params, int nparams);
 
 /**
- * Sets the state of the interstage power switch to enable/disable VCC and VCC2.
- * State 0 = disabled, 1 = enabled
+ * Update deployment related status variables:
+ *  dat_dep_ant_deployed: antennas release status
  *
- * @param fmt str. Parameters format: "%d %d"
- * @param params  str. Parameters as string. "<vcc> <vcc2>"
- *  vcc:  0 off, 1 on
- *  vcc2: 0 off, 1 on
- * @param nparams int. Number of parameters: 2
+ * @param fmt str. Parameters format: ""
+ * @param params  str. Parameters as string. Not used. ""
+ * @param nparams int. Number of parameters: 0
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
-int gssb_pwr(char* fmt, char* params, int nparams);
+int gssb_istage_update_status(char *fmt, char *params, int nparams);
+
+/**
+ * Select an interstage panel, set burn parameters and send deploy command.
+ * Parameters:
+ *  - addr: device address (16, 17, 18, 19)
+ *  - knife_on: burn time in seconds [0, 8]
+ *  - knife_off: rest time in seconds [0, 10]
+ *  - repeats: number of repeats [0, 10]
+ *
+ *  Example
+ *  - console: istage_release 16 2 1 5
+ *  - command: gssb_istage_antenna_release("%d %d %d %d", "16 2 1 5", 4)
+ *
+ *
+ * @param fmt str. Parameters format: "%d %d %d %d"
+ * @param params  str. Parameters as string "<addr> <knife_on> <knife_off> <repeats>
+ * @param nparams int. Number of parameters: 4
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int gssb_istage_antenna_release(char *fmt, char *params, int nparams);
+
 #endif //NANOMIND
 
 #endif /* CMD_OBC_H */

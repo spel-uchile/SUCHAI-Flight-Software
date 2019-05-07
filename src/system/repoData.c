@@ -292,8 +292,9 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_2);        ///< Temperature value of the second sensor
     DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_3);        ///< Temperature value of the gyroscope
 
+    DAT_CPY_SYSTEM_VAR(status, dat_dep_deployed);      ///< Was the satellite deployed?
     DAT_CPY_SYSTEM_VAR(status, dat_dep_ant_deployed);  ///< Was the antenna deployed?
-    DAT_CPY_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix
+    DAT_CPY_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix time
 
     DAT_CPY_SYSTEM_VAR(status, dat_rtc_date_time);     /// RTC current unix time
 
@@ -340,8 +341,9 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_2);      ///< Temperature value of the second sensor
     DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_3);      ///< Temperature value of the gyroscope
 
+    DAT_PRINT_SYSTEM_VAR(status, dat_dep_deployed);      ///< Was the satellite deployed?
     DAT_PRINT_SYSTEM_VAR(status, dat_dep_ant_deployed);  ///< Was the antenna deployed?
-    DAT_PRINT_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix
+    DAT_PRINT_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix time
 
     DAT_PRINT_SYSTEM_VAR(status, dat_rtc_date_time);     /// RTC current unix time
 
