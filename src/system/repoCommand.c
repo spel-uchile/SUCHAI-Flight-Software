@@ -179,17 +179,20 @@ void cmd_add_params_str(cmd_t *cmd, char *params)
 
 void cmd_add_params_var(cmd_t *cmd, ...)
 {
-    va_list args;
-    va_start(args, cmd);
+    if(cmd != NULL)
+    {
+        va_list args;
+        va_start(args, cmd);
 
-    //Parsing arguments to string
-    char str_params[SCH_CMD_MAX_STR_PARAMS];
-    vsprintf(str_params, cmd->fmt, args);
+        //Parsing arguments to string
+        char str_params[SCH_CMD_MAX_STR_PARAMS];
+        vsprintf(str_params, cmd->fmt, args);
 
-    va_end(args);
+        va_end(args);
 
-    //Fill parameters as string
-    cmd_add_params_str(cmd, str_params);
+        //Fill parameters as string
+        cmd_add_params_str(cmd, str_params);
+    }
 }
 
 cmd_t *cmd_parse_from_str(char *buff)
