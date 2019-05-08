@@ -35,51 +35,23 @@ void taskHousekeeping(void *param)
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
-    while(1)
-    {
+    while(1) {
 
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
-        elapsed_sec += delay_ms/1000; //Update seconds counts
-
-        // Debug command
-        cmd_t *cmd_dbg = cmd_get_str("obc_debug");
-        cmd_add_params_var(cmd_dbg, 0);
-        cmd_send(cmd_dbg);
+        elapsed_sec += delay_ms / 1000; //Update seconds counts
 
         dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
 
-        if((elapsed_sec % 2) == 0)
-        {
-            cmd_t *cmd_2s = cmd_get_str("obc_get_sensors");
-            cmd_send(cmd_2s);
+        if ((elapsed_sec % 60) == 0) {
+            if ((elapsed_sec % 120) == 0) {
+                cmd_t *cmd_get_eps = cmd_get_str("eps_get_hk");
+                cmd_send(cmd_get_eps);
+            } else {
+                cmd_t *cmd_get_obc = cmd_get_str("obc_get_sensors");
+                cmd_send(cmd_get_obc)
         }
 
-        /* 10 seconds actions */
-        if((elapsed_sec % _10sec_check) == 0)
-        {
-            LOGD(tag, "10 sec tasks");
-            //cmd_t *cmd_10s = cmd_get_str("obc_get_mem");
-            cmd_t *cmd_10s = cmd_get_str("test");
-            cmd_add_params_var(cmd_10s, "Task housekeeping running");
-            cmd_send(cmd_10s);
         }
 
-        /* 10 minutes actions */
-        if((elapsed_sec % _10min_check) == 0)
-        {
-            LOGD(tag, "10 min tasks");
-            cmd_t *cmd_10m = cmd_get_str("obc_get_mem");
-            cmd_add_params_var(cmd_10m, 0);
-            cmd_send(cmd_10m);
-        }
-
-        /* 1 hours actions */
-        if((elapsed_sec % _1hour_check) == 0)
-        {
-            LOGD(tag, "1 hour check");
-            cmd_t *cmd_1h = cmd_get_str("drp_add_hrs_alive");
-            cmd_add_params_var(cmd_1h, 1); // Add 1hr
-            cmd_send(cmd_1h);
-        }
     }
 }
