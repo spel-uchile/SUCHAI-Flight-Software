@@ -725,7 +725,7 @@ int gssb_istage_update_status(char *fmt, char *params, int nparams)
 
     for(i=0; i < 4; i++)
     {
-        gssb_select_dev(GSSB_I2C_DEV, istage_addr[i]);
+        gssb_select_device(GSSB_I2C_DEV, istage_addr[i]);
         rel_status = gssb_get_release_status();
         deploy_status += rel_status;
         LOGD(tag, "Interstage selected: %d at %#x. Released: %d",
