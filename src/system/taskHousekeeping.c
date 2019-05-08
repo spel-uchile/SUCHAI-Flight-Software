@@ -28,30 +28,60 @@ void taskHousekeeping(void *param)
 
     portTick delay_ms    = 1000;            //Task period in [ms]
 
-    unsigned int elapsed_sec = 0;           // Seconds counter
-    unsigned int _10sec_check = 10;     //10[s] condition
-    unsigned int _10min_check = 10*60;  //10[m] condition
-    unsigned int _1hour_check = 60*60;  //01[h] condition
+    unsigned int elapsed_sec = 1;           // Seconds counter
+    unsigned int _10sec_check = 10;         //10[s] condition
+    unsigned int _01min_check = 1*60;       //05[m] condition
+    unsigned int _05min_check = 5*60;       //05[m] condition
+    unsigned int _1hour_check = 60*60;      //01[h] condition
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
-    while(1) {
-
+    while(1)
+    {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
         elapsed_sec += delay_ms / 1000; //Update seconds counts
 
+        /* 1 second actions */
         dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
+        //  Debug command
+        cmd_t *cmd_dbg = cmd_get_str("obc_debug");
+        cmd_add_params_var(cmd_dbg, 0);
+        cmd_send(cmd_dbg);
 
-        if ((elapsed_sec % 60) == 0) {
-            if ((elapsed_sec % 120) == 0) {
+        /* 1 minute actions */
+        // Update status vars
+        if ((elapsed_sec % _01min_check) == 0)
+        {
+            cmd_t *cmd_update;
+            cmd_update = cmd_get_str("eps_update_status");
+            cmd_send(cmd_update);
+            cmd_update = cmd_get_str("obc_update_status");
+            cmd_send(cmd_update);
+        }
+
+        /* 5 minutes actions */
+        //  Sample OBC payloads
+        if ((elapsed_sec % _05min_check) == 0)
+        {
+            if ((elapsed_sec % _05min_check*2) == 0)
+            {
                 cmd_t *cmd_get_eps = cmd_get_str("eps_get_hk");
                 cmd_send(cmd_get_eps);
-            } else {
+            }
+            else
+            {
                 cmd_t *cmd_get_obc = cmd_get_str("obc_get_sensors");
                 cmd_send(cmd_get_obc)
+            }
         }
 
+        /* 1 hours actions */
+        if((elapsed_sec % _1hour_check) == 0)
+        {
+            LOGD(tag, "1 hour check");
+            cmd_t *cmd_1h = cmd_get_str("drp_add_hrs_alive");
+            cmd_add_params_var(cmd_1h, 1); // Add 1hr
+            cmd_send(cmd_1h);
         }
-
     }
 }
