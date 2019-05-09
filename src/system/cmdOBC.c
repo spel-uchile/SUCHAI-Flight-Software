@@ -741,14 +741,16 @@ int gssb_istage_status(char *fmt, char *params, int nparams)
 int gssb_istage_update_status(char *fmt, char *params, int nparams)
 {
     char istage_addr[4] = {0x10, 0x11, 0x12, 0x13};
-    int deploy_status, rel_status, i = 0;
+    int deploy_status = 0;
+    int rel_status = 0;
+    int i = 0;
 
     for(i=0; i < 4; i++)
     {
         gssb_select_device(GSSB_I2C_DEV, istage_addr[i]);
         rel_status = gssb_get_release_status();
         deploy_status += rel_status;
-        LOGD(tag, "Interstage selected: %d at %#x. Released: %d",
+        LOGI(tag, "Interstage selected: %d at %#x. Released: %d",
                 gssb_get_uuid(), istage_addr[i], rel_status);
     }
 

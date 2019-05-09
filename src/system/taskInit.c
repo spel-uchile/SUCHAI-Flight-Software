@@ -211,8 +211,12 @@ void init_communications(void)
 void init_routines(void)
 {
     LOGD(tag, "\tAntenna deployment...")
-    //Update antenna deployment status
+    //Turn on gssb and update antenna deployment status
     cmd_t *cmd_dep;
+    cmd_dep = cmd_get_str("istage_pwr");
+    cmd_add_params_str(cmd_dep, "1 0");
+    cmd_send(cmd_dep);
+
     cmd_dep = cmd_get_str("istage_update_status");
     cmd_send(cmd_dep);
 
