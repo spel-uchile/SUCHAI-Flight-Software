@@ -41,7 +41,7 @@
  *
  * @param cmd *cmd_type, pointer to command
  */
-#define cmd_send(cmd) osQueueSend(dispatcher_queue, &cmd, portMAX_DELAY);
+#define cmd_send(cmd) if(cmd != NULL){osQueueSend(dispatcher_queue, &cmd, portMAX_DELAY);}
 
 /* Command definitions */
 /**

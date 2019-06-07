@@ -18,7 +18,7 @@
 #include <assert.h>
 
 #include "config.h"
-#include "os.h"
+#include "os/os.h"
 #include "osSemphr.h"
 
 /**
@@ -67,5 +67,13 @@ static inline int log_init(void)
 #define clean_errno() (errno == 0 ? "None" : strerror(errno))
 #define log_error(T, M, ...) LOGE(T, "(%s:%d: errno: %s) " M, __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)
 #define assertf(A, T, M, ...) if(!(A)) {log_error(T, M, ##__VA_ARGS__); assert(A); }
+
+/// Debug buffer content
+#define print_buff(buf, size) {int i; printf("["); for(i=0; i<size; i++) printf("0x%02X, ", buf[i]); printf("]\n");}
+#define print_buff16(buf16, size) {int i; printf("["); for(i=0; i<size; i++) printf("0x%04X, ", buf16[i]); printf("]\n");}
+
+/// Defines to string
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 #endif //UTILS_H

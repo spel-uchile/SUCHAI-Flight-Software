@@ -34,7 +34,7 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
-        src/system/cmdSubSys.c src/system/include/cmdSubSys.h)
+        )
 
 include_directories(
         src/system/include/

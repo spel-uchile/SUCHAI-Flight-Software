@@ -10,6 +10,7 @@
 #include <sqlite3.h>
 #include <libpq-fe.h>
 #include "config.h"
+#include "repoData.h"
 
 
 /**
@@ -47,6 +48,19 @@ int storage_table_repo_init(char *table, int drop);
  * @return 0 OK, -1 Error
  */
 int storage_table_flight_plan_init(int drop);
+
+/**
+ * Create new table in the opened database (@relatesalso storage_init)
+ * for a payload. If the table exists do nothing. If drop is set to
+ * 1 then drop an existing table and then creates an empty one.
+ *
+ * @note: NOT IMPLEMENTED
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param drop Int. Set to 1 to drop the existing table before create one
+ * @return 0 OK, -1 Error
+ */
+int storage_table_payload_init(int drop);
 
 /**
  * Get an INT (integer) value from table by index
@@ -150,6 +164,27 @@ int storage_flight_plan_reset(void);
  * @return 0 OK
  */
 int storage_show_table(void);
+
+/**
+ * Add data struct to payload table
+ *
+ * @param data Pointer to struct
+ * @param payload Int, payload to store
+ * @return 0 OK, -1 Error
+ */
+int storage_add_payload_data(void * data, int payload);
+
+/**
+ * Get recent values from for specific payload
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param data Pointer to struct
+ * @param payload Int. payload to get value
+ * @param delay Int, delay from recent value
+ * @return OK 0, Error -1
+ */
+int storage_get_recent_payload_data(void* data, int payload, int delay);
 
 /**
  * Close the opened database

@@ -7,8 +7,9 @@
  * @author Tamara Gutierrez R
  * @author Matias Ramirez M
  * @author Ignacio Ibanez A
+ * @author Diego Ortego P
  *
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header contains system wide settings to customize different submodules
@@ -30,16 +31,22 @@
     #define {{ARCH}}                                ///< ESP32 | AVR32 | NANOMIND
 #endif
 
+#ifdef LINUX
+    #define SCH_RESEND_TM_NODE  11  ///< If defined, resend TM packets to CosmosRB node
+#endif
+
 #ifdef NANOMIND
     #define SCH_USE_NANOPOWER
     #define SCH_USE_NANOCOM
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               {{LOG_LVL}}        ///<  LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define LOG_LEVEL               {{LOG_LVL}}        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define SCH_NAME                "{{NAME}}"         ///< Project code name
+#define SCH_DEVICE_ID           {{ID}}             ///< Device unique ID
+#define SCH_SW_VERSION          "{{VERSION}}"      ///< Software version
 
 /* General system settings */
-#define SCH_BUFF_MAX_LEN        (256)              ///< General buffers max length (bytes)
 #define SCH_COMM_ENABLE         {{SCH_EN_COMM}}    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          {{SCH_EN_FP}}      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          {{SCH_EN_HK}}      ///< TaskHousekeeping enabled (0 | 1)
@@ -59,14 +66,24 @@
 #define SCH_TRX_PORT_TM         (9)                ///< Telemetry port
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
-#define SCH_TRX_PORT_CMD        (12)               ///< Commads port (execute console commands)
+#define SCH_TRX_PORT_CMD        (12)               ///< Commands port (execute console commands)
 #define SCH_COMM_ZMQ_OUT        "{{SCH_ZMQ_OUT}}"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN         "{{SCH_ZMQ_IN}}"   ///< In socket URI
+#define SCH_TX_INHIBIT          10                 /// Default silent time in seconds [0, 1800 (30min)]
+#define SCH_TX_PWR              0                  /// Default TX power [0|1|2|3]
+#define SCH_TX_BCN_PERIOD       60                 /// Default beacon period in seconds
+#define SCH_TX_FREQ             437250000          /// Default TRX freq in Hz
+#define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        {{SCH_STORAGE}}    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   {{SCH_STORAGE_TRIPLE_WR}}   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
+#define SCH_STORAGE_PGUSER      "{{SCH_STORAGE_PGUSER}}"
+
+#define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
+#define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage
+#define SCH_FLASH_INIT_MEMORY 0                    ///< Initial address in flash storage
 
 /**
  * Memory settings.
@@ -92,5 +109,7 @@
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES       (50)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (64)      ///< Limit for the parameters length
+#define SCH_CMD_MAX_STR_NAME      (64)      ///< Limit for the length of the name of a command
+#define SCH_CMD_MAX_STR_FORMAT    (32)      ///< Limit for the length of the format field of a command
 
 #endif //SUCHAI_CONFIG_H

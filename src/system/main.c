@@ -34,7 +34,10 @@ int main(void)
 {
     /* On reset */
     on_reset();
-    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n\n");
+    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n");
+    printf("\t Version: %s\n", SCH_SW_VERSION);
+    printf("\t Device : %d (%s)\n", SCH_DEVICE_ID, SCH_NAME);
+    printf("-----------------------------------------\n\n");
 
     /* Init software subsystems */
     log_init();      // Logging system
@@ -78,7 +81,7 @@ int main(void)
 }
 
 #ifdef FREERTOS
-#ifndef NANOMIND
+#if  !defined(NANOMIND) && !defined(ESP32)
 /**
  * Task idle handle function. Performs operations inside the idle task
  * configUSE_IDLE_HOOK must be set to 1

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmdCOM.h>
 #include "cmdCOM.h"
 
 static const char *tag = "cmdCOM";
@@ -28,15 +29,17 @@ static void _com_config_find(char *param_name, int *table, param_table_t **param
 
 void cmd_com_init(void)
 {
-    cmd_add("ping", com_ping, "%d", 1);
-    cmd_add("send_rpt", com_send_rpt, "%d %s", 2);
-    cmd_add("send_cmd", com_send_cmd, "%d %n", 1);
-    cmd_add("send_data", com_send_data, "%p", 1);
+    cmd_add("com_ping", com_ping, "%d", 1);
+    cmd_add("com_send_rpt", com_send_rpt, "%d %s", 2);
+    cmd_add("com_send_cmd", com_send_cmd, "%d %n", 1);
+    cmd_add("com_send_tc", com_send_tc_frame, "%d %n", 1);
+    cmd_add("com_send_data", com_send_data, "%p", 1);
     cmd_add("com_debug", com_debug, "", 0);
 #ifdef SCH_USE_NANOCOM
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%s", 1);
     cmd_add("com_set_config", com_set_config, "%s %s", 2);
+    cmd_add("com_update_status", com_set_config, "", 2);
 #endif
 }
 
@@ -91,12 +94,12 @@ int com_send_rpt(char *fmt, char *params, int nparams)
 
         if(rc == 0)
         {
-            LOGV(tag, "Data sent successfully. (rc: %d, re: %s)", rc, msg);
+            LOGV(tag, "Data sent to repeater successfully. (rc: %d, re: %s)", rc, msg);
             return CMD_OK;
         }
         else
         {
-            LOGE(tag, "Error sending data. (rc: %d)", rc);
+            LOGE(tag, "Error sending data to repeater. (rc: %d)", rc);
             csp_buffer_free(packet);
             return CMD_FAIL;
         }
@@ -132,17 +135,56 @@ int com_send_cmd(char *fmt, char *params, int nparams)
 
         if(rc > 0 && rep[0] == 200)
         {
-            LOGV(tag, "Data sent successfully. (rc: %d, re: %d)", rc, rep[0]);
+            LOGV(tag, "Command sent successfully. (rc: %d, re: %d)", rc, rep[0]);
             return CMD_OK;
         }
         else
         {
-            LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
+            LOGE(tag, "Error sending command. (rc: %d, re: %d)", rc, rep[0]);
             return CMD_FAIL;
         }
     }
 
     LOGE(tag, "Error parsing parameters!");
+    return CMD_FAIL;
+}
+
+int com_send_tc_frame(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
+    int node, next, n_args;
+    uint8_t rep[1];
+    char tc_frame[COM_FRAME_MAX_LEN];
+    memset(tc_frame, '\0', COM_FRAME_MAX_LEN);
+
+    //format: <node> <command> [parameters];...;<command> [parameters]
+    n_args = sscanf(params, fmt, &node, &next);
+    if(n_args == nparams && next > 1)
+    {
+        strncpy(tc_frame, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+        LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, tc_frame, next);
+        // Sending message to node TC port and wait for response
+        int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_TC, 1000,
+                                 (void *)tc_frame, (int)strlen(tc_frame), rep, 1);
+
+        if(rc > 0 && rep[0] == 200)
+        {
+            LOGV(tag, "TC sent successfully. (rc: %d, re: %d)", rc, rep[0]);
+            return CMD_OK;
+        }
+        else
+        {
+            LOGE(tag, "Error sending TC. (rc: %d, re: %d)", rc, rep[0]);
+            return CMD_FAIL;
+        }
+    }
+
+    LOGE(tag, "Error parsing parameters! (np: %d, n: %d)", n_args, next);
     return CMD_FAIL;
 }
 
@@ -154,12 +196,12 @@ int com_send_data(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     }
 
-    uint8_t rep[1];
+    uint8_t rep[1] = {0};
     com_data_t *data_to_send = (com_data_t *)params;
 
     // Send the data buffer to node and wait 1 seg. for the confirmation
     int rc = csp_transaction(CSP_PRIO_NORM, data_to_send->node, SCH_TRX_PORT_TM,
-                             1000, (uint8_t *)&data_to_send->frame,
+                             1000, &(data_to_send->frame),
                              sizeof(data_to_send->frame), rep, 1);
 
     if(rc > 0 && rep[0] == 200)
@@ -342,6 +384,48 @@ int com_set_config(char *fmt, char *params, int nparams)
             return CMD_FAIL;
         }
     }
+}
+
+int com_update_status_vars(char *fmt, char *params, int nparams)
+{
+    char *names[5] = {"freq", "tx_pwr", "baud", "mode", "bcn_interval"};
+    dat_system_t vars[5] = {dat_com_freq, dat_com_tx_pwr, dat_com_bcn_period,
+                             dat_com_mode, dat_com_bcn_period};
+    int table = 0;
+    param_table_t *param_i = NULL;
+    int rc;
+
+    int i = 0;
+    for(i=0; i<5; i++)
+    {
+        // Find the given parameter by name and get the size, index, type and
+        // table; param_i is set to NULL if the parameter is not found.
+        _com_config_find(names[i], &table, &param_i);
+
+        // Warning if the parameter name was not found
+        assert(param_i != NULL);
+
+        // Actually get the parameter value
+        void *out = malloc(param_i->size);
+        rc = rparam_get_single(out, param_i->addr, param_i->type, param_i->size,
+                               table, SCH_TRX_ADDRESS, AX100_PORT_RPARAM, 1000);
+
+        // Process the answer, save value to status variables
+        if(rc > 0)
+        {
+            if(param_i->size == sizeof(int))
+                dat_set_system_var(vars[i], *((int *)out));
+            else if(param_i->size == sizeof(uint8_t))
+                dat_set_system_var(vars[i], *((uint8_t *)out));
+            else
+                LOGE(tag, "Error casting status variable");
+
+            LOGI(tag, "Param %s (table %d) %d", param_i->name, table, dat_get_system_var(vars[i]));
+            free(out);
+        }
+    }
+
+    return CMD_OK;
 }
 
 

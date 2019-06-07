@@ -4,7 +4,6 @@
 #
 
 PROJECT_NAME:=suchai
-SRCDIRS:=$(shell pwd)/src/system
-EXTRA_COMPONENT_DIRS:=$(shell pwd)/src/os $(shell pwd)/src/drivers/esp32/sch_components
+EXTRA_COMPONENT_DIRS:=$(shell pwd)/src/os $(shell pwd)/src/drivers/esp32/sch_components $(shell pwd)/src/system
 
 include $(IDF_PATH)/make/project.mk

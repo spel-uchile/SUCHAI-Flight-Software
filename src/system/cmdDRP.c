@@ -28,17 +28,20 @@ static const char *tag = "cmdDRP";
  */
 void cmd_drp_init(void)
 {
-    cmd_add("ebf", drp_execute_before_flight, "%d", 1);
-    cmd_add("print_vars", drp_print_system_vars, "", 0);
-    cmd_add("update_sys_var", drp_update_sys_var_idx, "%d %d", 2);
-    cmd_add("update_hours_alive", drp_update_hours_alive, "%d", 1);
-    cmd_add("clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
-    cmd_add("sample_obc_sensors", drp_sample_obc_sensors, "", 0);
-    cmd_add("test_system_vars", drp_test_system_vars, "", 0);
+    cmd_add("drp_ebf", drp_execute_before_flight, "%d", 1);
+    cmd_add("drp_get_vars", drp_print_system_vars, "", 0);
+    cmd_add("drp_set_var", drp_update_sys_var_idx, "%d %d", 2);
+    cmd_add("drp_add_hrs_alive", drp_update_hours_alive, "%d", 1);
+    cmd_add("drp_clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
+    cmd_add("drp_test_system_vars", drp_test_system_vars, "", 0);
+    cmd_add("drp_set_deployed", drp_set_deployed, "%d", 1);
 }
 
 int drp_execute_before_flight(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+        return CMD_ERROR;
+
     int magic;
     if(nparams == sscanf(params, fmt, &magic))
     {
@@ -50,9 +53,13 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
             {
                 dat_set_system_var(var, 0);
             }
+
             // Set all status variables default values
             dat_set_system_var(dat_rtc_date_time, (int)time(NULL));
             // dat_set_system_var(dat_custom, default_value);
+
+            // Delete memory sections
+            dat_delete_memory_sections();
 
             return CMD_OK;
         }
@@ -73,46 +80,20 @@ int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
 
-    printf("system variables repository\n");
-    printf("index\t value\n");
-
-    /*typedef union sensors_value{
-        float f;
-        int32_t i;
-    } value;*/
-
-    int var_index;
-    value var_read;
-
-    for (var_index = 0; var_index < dat_obc_temp_1; var_index++)
-    {
-        int var = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d\n", var_index, var);
-    }
-
-    for (var_index = dat_obc_temp_1; var_index < dat_dep_ant_deployed; var_index++)
-    {
-        var_read.i = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d | %f\n", var_index, var_read.i, var_read.f);
-    }
-
-    for (var_index = dat_dep_ant_deployed; var_index < dat_ads_acc_x; var_index++)
-    {
-        int var = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d\n", var_index, var);
-    }
-
-    for (var_index = dat_ads_acc_x; var_index < dat_system_last_var; var_index++)
-    {
-        var_read.i = dat_get_system_var((dat_system_t)var_index);
-        printf("%d\t %d | %f\n", var_index, var_read.i, var_read.f);
-    }
+    dat_status_t status;
+    dat_status_to_struct(&status);
+    dat_print_status(&status);
 
     return CMD_OK;
 }
 
 int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     int index, value;
     if(sscanf(params, fmt, &index, &value) == nparams)
     {
@@ -138,6 +119,11 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 
 int drp_update_hours_alive(char *fmt, char *params, int nparams)
 {
+    if(params == NULL)
+    {
+        LOGE(tag, "Parameter null");
+        return CMD_FAIL;
+    }
     int value;  // Value to add
     int current;  // Current value to update
 
@@ -167,91 +153,6 @@ int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
-int drp_sample_obc_sensors(char *fmt, char *params, int nparams)
-{
-#ifdef NANOMIND
-    int16_t sensor1, sensor2;
-    float gyro_temp;
-
-    mpu3300_gyro_t gyro_reading;
-    hmc5843_data_t hmc_reading;
-
-    /* Read board temperature sensors */
-    sensor1 = lm70_read_temp(1);
-    sensor2 = lm70_read_temp(2);
-
-    /* Read gyroscope temperature and rate */
-    mpu3300_read_temp(&gyro_temp);
-    mpu3300_read_gyro(&gyro_reading);
-
-    /* Read magnetometer */
-    hmc5843_read_single(&hmc_reading);
-
-    /* Set sensors status variables */
-    // TODO: Fix type of ADS variables. Currently saving floats as ints.
-
-    /*typedef union sensors_value{
-        float f;
-        int32_t i;
-    } value;*/
-
-    value temp_1;
-    temp_1.f = (float)(sensor1/10.0);
-    dat_set_system_var(dat_obc_temp_1, temp_1.i);
-
-    value temp_2;
-    temp_2.f = (float)(sensor2/10.0);
-    dat_set_system_var(dat_obc_temp_2, temp_2.i);
-
-    value temp_3;
-    temp_3.f = gyro_temp;
-    dat_set_system_var(dat_obc_temp_3, temp_3.i);
-
-    value acc_x;
-    acc_x.f = gyro_reading.gyro_x;
-    dat_set_system_var(dat_ads_acc_x, acc_x.i);
-
-    value acc_y;
-    acc_y.f = gyro_reading.gyro_y;
-    dat_set_system_var(dat_ads_acc_y, acc_y.i);
-
-    value acc_z;
-    acc_z.f = gyro_reading.gyro_z;
-    dat_set_system_var(dat_ads_acc_z, acc_z.i);
-
-    value mag_x;
-    mag_x.f = hmc_reading.x;
-    dat_set_system_var(dat_ads_mag_x, mag_x.i);
-
-    value mag_y;
-    mag_y.f = hmc_reading.y;
-    dat_set_system_var(dat_ads_mag_y, mag_y.i);
-
-    value mag_z;
-    mag_z.f = hmc_reading.z;
-    dat_set_system_var(dat_ads_mag_z, mag_z.i);
-
-    /*dat_set_system_var(dat_obc_temp_1, sensor1/10.);
-    dat_set_system_var(dat_obc_temp_2, sensor2/10.);
-    dat_set_system_var(dat_obc_temp_3, gyro_temp);
-    dat_set_system_var(dat_ads_acc_x, gyro_reading.gyro_x);
-    dat_set_system_var(dat_ads_acc_y, gyro_reading.gyro_y);
-    dat_set_system_var(dat_ads_acc_z, gyro_reading.gyro_z);
-    dat_set_system_var(dat_ads_mag_x, hmc_reading.x);
-    dat_set_system_var(dat_ads_mag_y, hmc_reading.y);
-    dat_set_system_var(dat_ads_mag_z, hmc_reading.z);*/
-
-    /* Print readings */
-#if LOG_LEVEL >= LOG_LVL_INFO
-    printf("\r\nTemp1: %.1f, Temp2 %.1f, Gyro temp: %.2f\r\n", sensor1/10., sensor2/10., gyro_temp);
-    printf("Gyro x, y, z: %f, %f, %f\r\n", gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z);
-    printf("Mag x, y, z: %f, %f, %f\r\n\r\n",hmc_reading.x, hmc_reading.y, hmc_reading.z);
-#endif
-#endif
-
-    return CMD_OK;
-}
-
 int drp_test_system_vars(char *fmt, char *params, int nparams)
 {
     int var_index;
@@ -274,4 +175,19 @@ int drp_test_system_vars(char *fmt, char *params, int nparams)
     }
 
     return return_value;
+}
+
+int drp_set_deployed(char *fmt, char *params, int nparams)
+{
+    int deployed;
+    if(sscanf(params, fmt, &deployed) == nparams)
+    {
+        dat_set_system_var(dat_dep_deployed, deployed);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGE(tag, "Error parsing params");
+        return CMD_ERROR;
+    }
 }

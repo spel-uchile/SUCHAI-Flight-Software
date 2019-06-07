@@ -49,7 +49,6 @@ CSRCS = \
        $(PROJ_ROOT)/system/taskExecuter.c                 \
        $(PROJ_ROOT)/system/taskFlightPlan.c               \
        $(PROJ_ROOT)/system/taskHousekeeping.c             \
-       $(PROJ_ROOT)/system/taskCommunications.c           \
        $(PROJ_ROOT)/util/hexdump.c                        \
        $(PROJ_ROOT)/util/memcheck.c                       \
        $(PROJ_ROOT)/util/init.c                           \

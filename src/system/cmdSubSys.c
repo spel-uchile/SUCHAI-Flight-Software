@@ -76,7 +76,7 @@ int send_iridium_data(char *fmt, char *params, int nparams) {
 
     com_data_t data;
     data.node = (uint8_t)6;
-    data.frame.frame = 0;
+//    data.frame.frame = 0;
     data.frame.type = 1;
     memset(data.frame.data.data8, 0, sizeof(data.frame.data.data8));
 
@@ -84,7 +84,7 @@ int send_iridium_data(char *fmt, char *params, int nparams) {
     
     sprintf(msg, "%s %0.5f %0.5f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f %d %d %s", gps_data_[0].timestamp,gps_data_[0].latitude,gps_data_[0].longitude,gps_data_[0].height,gps_data_[0].velocity_x,gps_data_[0].velocity_y,gps_data_[0].satellites_number,gps_data_[0].mode, prs_data_[0].pressure, prs_data_[0].temperature, prs_data_[0].height, dpl_data_[0].lineal_actuator, dpl_data_[0].servo_motor, "EOF");
     memcpy(data.frame.data.data8, (char *)&msg, strlen(msg));
-    printf("msg=%d\n", strlen(msg));
+    printf("msg=%lu\n", strlen(msg));
     return com_send_data(NULL, (char *)&data, 0);
 }
 

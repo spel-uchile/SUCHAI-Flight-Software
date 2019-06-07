@@ -11,9 +11,11 @@
 #include "fm33256b.h"
 #include "spn_fl512s.h"
 #include "config.h"
+#include "globals.h"
+#include "repoData.h"
 
 /**
- * This union represent a status variable stored in the FM33256B FRAM. Status
+ * This union represents a status variable stored in the FM33256B FRAM. Status
  * variables are casted to uint32_t and wrote as 4 uint8_t values in the FRAM.
  * One status variable index is mapped to 4 addresses in the FRAM.
  */
@@ -53,7 +55,6 @@ int storage_table_repo_init(char *table, int drop);
  * form (time, command, args, repeat). If the table exists do nothing. If drop is set to
  * 1 then drop an existing table and then creates an empty one.
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param drop Int. Set to 1 to drop the existing table before create one
@@ -67,6 +68,7 @@ int storage_table_flight_plan_init(int drop);
  * integer returned as int. The @index is mapped to @index*4 inside FM33256B
  * FRAM
  *
+ * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param index Int. Value index
@@ -92,6 +94,7 @@ int storage_repo_get_value_str(char *name, char *table);
  * data is stored as uint8_t values, so we cast @value to a uint32_t integer and
  * write 4 uint8_t values. The @index is mapped to @index*4 inside FM33256B FRAM
  *
+ * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param index Int. Variable index
@@ -115,9 +118,8 @@ int storage_repo_set_value_idx(int index, int value, char *table);
 int storage_repo_set_value_str(char *name, int value, char *table);
 
 /**
- * Set or update the row of a certain time
+ * Add a new entry to the end of the flight plan table, set to execute at a certain time.
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param timetodo Int. time to do the action
@@ -129,9 +131,8 @@ int storage_repo_set_value_str(char *name, int value, char *table);
 int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, int periodical);
 
 /**
- * Get the row of a certain time and set the values in the variables committed
+ * Get the first entry in the flight plan table that's set to execute at the given time.
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param timetodo Int. time to do the action
@@ -140,13 +141,11 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
  * @param repeat Int. Value of times to run the command
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_get(int timetodo, char** command, char** args, int** repeat, int** periodical);
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* repeat, int* periodical);
 
 /**
- * Erase the row in the table in the opened database (@relatesalso storage_init) that
- * have the same timetodo.
+ * Erase the first entry in the flight plan table that's set to execute at the given time.
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param timetodo Int. time to do the action
@@ -155,10 +154,8 @@ int storage_flight_plan_get(int timetodo, char** command, char** args, int** rep
 int storage_flight_plan_erase(int timetodo);
 
 /**
- * Reset the table in the opened database (@relatesalso storage_init) in the
- * form (time, command, args, repeat).
+ * Reset the flight plan table.
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @return 0 OK, -1 Error
@@ -166,16 +163,16 @@ int storage_flight_plan_erase(int timetodo);
 int storage_flight_plan_reset(void);
 
 /**
- * Show the table in the opened database (@relatesalso storage_init) in the
+ * Show the flight plan table, printing all values in the
  * form (time, command, args, repeat).
  *
- * @note: NOT IMPLEMENTED
  * @note: non-reentrant function, use mutex to sync access
  *
  * @return 0 OK
  */
 int storage_show_table(void);
 
+// TODO: Check why this function isn't in Linux/include/data_storage.h
 /**
  * Set or update a value in index address for specific payload
  * in NOR FLASH
@@ -183,12 +180,22 @@ int storage_show_table(void);
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param index Int. index address in NOR FLASH
- * @param value Int. value to store in address
+ * @param data Pointer to struct
  * @param payload Int. payload to store
  * @return 0 OK, -1 Error
  */
-int storage_set_payload_data(int index, int value, int payload);
+int storage_set_payload_data(int index, void * data, int payload);
 
+/**
+ * Add data struct to payload table
+ *
+ * @param data Pointer to struct
+ * @param payload Int, payload to store
+ * @return 0 OK, -1 Error
+ */
+//int storage_add_payload_data(void * data, int payload, int lastindex);
+
+// TODO: Check why this function isn't in Linux/include/data_storage.h
 /**
  * Get a value from index address for specific payload
  * in NOR FLASH
@@ -196,15 +203,38 @@ int storage_set_payload_data(int index, int value, int payload);
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param index Int. index address in NOR FLASH
+ * @param data Pointer to struct
  * @param payload Int. payload to get value
- * @return value from address
+ * @return 0 OK, -1 Error
  */
-int storage_get_payload_data(int index, int payload);
+int storage_get_payload_data(int index, void* data, int payload);
 
 /**
- * Close the opened database
+ * Get recent values from for specific payload
+ * in NOR FLASH
  *
- * @note: NOT IMPLEMENTEDs
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param data Pointer to struct
+ * @param payload Int. payload to get value
+ * @param delay Int, delay from recent value
+ * @return OK 0, Error -1
+ */
+//int storage_get_recent_payload_data(void* data, int payload, int delay);
+
+/**
+ * Delete all memory sections in NOR FLASH
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ * @return OK 0, Error -1
+ */
+int storage_delete_memory_sections(void);
+
+/**
+ * Close the opened database.
+ *
+ * Free all dynamic variables related to storage.
+ *
  * @note: non-reentrant function, use mutex to sync access
  *
  * @return 0 OK, -1 Error

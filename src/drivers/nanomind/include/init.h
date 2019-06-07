@@ -15,7 +15,7 @@
 
 #include <gpio.h>
 #include <sysclk.h>
-#include <os.h>
+#include <os/os.h>
 
 #include <wdt.h>
 #include <spi.h>

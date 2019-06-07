@@ -65,7 +65,7 @@ void taskHousekeeping(void *param)
     int balloons = dat_get_system_var(dat_balloon_deploys); // balloons available
 
     portTick xLastWakeTime = osTaskGetTickCount();
-    //printf("----- TICK %u %u\n", xLastWakeTime, *(&xLastWakeTime));
+    
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); // Suspend task
@@ -77,7 +77,7 @@ void taskHousekeeping(void *param)
         if (elapsed_sec == 1 || elapsed_sec == 2 || elapsed_sec == 3 || elapsed_sec == 4 ) {
             cmd_t *cmd_open_la = cmd_get_str("open_dpl_la");
             cmd_send(cmd_open_la);
-            
+
             cmd_t *cmd_send_iridium_msg1 = cmd_get_str("send_iridium_msg1");
             cmd_send(cmd_send_iridium_msg1);
         }
