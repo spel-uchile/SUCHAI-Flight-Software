@@ -246,17 +246,17 @@ int storage_table_deploy_init(char* table, int drop);
  */
 int storage_table_generic_init(char* table, char* init_sql, int drop);
 
-typedef struct gps_data {
-    char timestamp[25];
-    float latitude;
-    float longitude;
-    float height;
-    float velocity_x;
-    float velocity_y;
-    int satellites_number;
-    int mode;
-    int phase;
-} gps_data;
+//typedef struct gps_data {
+//    char timestamp[25];
+//    float latitude;
+//    float longitude;
+//    float height;
+//    float velocity_x;
+//    float velocity_y;
+//    int satellites_number;
+//    int mode;
+//    int phase;
+//} gps_data;
 
 /**
  * Set a gps data frame
@@ -268,7 +268,7 @@ typedef struct gps_data {
  *
  * @return 0 OK, -1 Error
  */
-int storage_table_gps_set(const char* table, gps_data* data);
+int storage_table_gps_set(const char* table, void* data);
 
 /**
  * Get n gps data frames
@@ -281,7 +281,7 @@ int storage_table_gps_set(const char* table, gps_data* data);
  *
  * @return 0 OK, -1 Error
  */
-int storage_table_gps_get(const char* table, gps_data data[], int n);
+int storage_table_gps_get(const char* table, void* data, int n);
 
 typedef struct prs_data {
     float pressure;

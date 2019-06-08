@@ -20,7 +20,7 @@ void cmd_subsys_init(void) {
 }
 
 int get_gps_data(char *fmt, char *params, int nparams) {
-    char* param="5 get_gps_data";
+    char* param="15 get_gps_data";
     com_send_rpt("%d %s", param, 2);
     LOGD(tag, "Getting data!");
     return CMD_OK;
@@ -66,7 +66,7 @@ int close_dpl_sm(char *fmt, char *params, int nparams) {
 
 int send_iridium_data(char *fmt, char *params, int nparams) {
     char* param="6 ";
-    gps_data gps_data_[1];
+    gps_data_t gps_data_[1];
     prs_data prs_data_[1];
     dpl_data dpl_data_[1];
     //cmd_t *cmd_send_iridium = cmd_get_str("send_rpt");
@@ -82,7 +82,7 @@ int send_iridium_data(char *fmt, char *params, int nparams) {
 
     char msg[COM_FRAME_MAX_LEN];
     
-    sprintf(msg, "%s %0.5f %0.5f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f %d %d %s", gps_data_[0].timestamp,gps_data_[0].latitude,gps_data_[0].longitude,gps_data_[0].height,gps_data_[0].velocity_x,gps_data_[0].velocity_y,gps_data_[0].satellites_number,gps_data_[0].mode, prs_data_[0].pressure, prs_data_[0].temperature, prs_data_[0].height, dpl_data_[0].lineal_actuator, dpl_data_[0].servo_motor, "EOF");
+    sprintf(msg, "%u %0.5f %0.5f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f %d %d %s", gps_data_[0].timestamp,gps_data_[0].latitude,gps_data_[0].longitude,gps_data_[0].height,gps_data_[0].velocity_x,gps_data_[0].velocity_y,gps_data_[0].satellites_number,gps_data_[0].mode, prs_data_[0].pressure, prs_data_[0].temperature, prs_data_[0].height, dpl_data_[0].lineal_actuator, dpl_data_[0].servo_motor, "EOF");
     memcpy(data.frame.data.data8, (char *)&msg, strlen(msg));
     printf("msg=%lu\n", strlen(msg));
     return com_send_data(NULL, (char *)&data, 0);

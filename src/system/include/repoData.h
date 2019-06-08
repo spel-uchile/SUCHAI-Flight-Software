@@ -153,6 +153,7 @@ typedef enum dat_system {
     dat_mem_ads,                  ///< ADS data
     dat_mem_eps,                  ///< EPS data
     dat_mem_lang,                 ///< Langmuir data
+    dat_mem_gps,                  ///< GPS data
 
     /// Add custom status variables here
     dat_balloon_phase,          ///< Balloon phase (0: (A0) base, 1: (A) ascend, 2: (B) equilibrium, 3: (B1) deploy1, 4: (B2) deploy2, 5: (C) descend, 6: (C1) landing).
@@ -253,6 +254,7 @@ typedef enum payload_id {
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
     lang_sensors,           ///< Langmuir probe sensors
+    gps_sensors,
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -304,10 +306,31 @@ typedef struct langmuir_data {
     int particles_counter;
 } langmuir_data_t;
 
+typedef struct gps_data {
+    int timestamp;
+    float latitude;
+    float longitude;
+    float height;
+    float velocity_x;
+    float velocity_y;
+    int satellites_number;
+    int mode;
+} gps_data_t;
+
+//typedef struct prs_data {
+//    int timestamp;
+//    float pressure;
+//    float temperature;
+//    float height;
+//} prs_data_t;
+
+
 struct temp_data tempdata;
 struct ads_data adsdata;
 struct eps_data epsdata;
 struct langmuir_data langmuirdata;
+struct gps_data gpsdata;
+//struct prs_data prsdata;
 
 extern struct map {
     char table[30];

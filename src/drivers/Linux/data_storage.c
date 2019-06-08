@@ -814,78 +814,80 @@ int storage_table_generic_init(char* table, char* init_sql, int drop)
     }
 }
 
-int storage_table_gps_set(const char* table, gps_data* data)
+int storage_table_gps_set(const char* table, void* data)
 {
-    char *err_msg;
-    int rc;
+//    char *err_msg;
+//    int rc;
+//
+//    char *sql = sqlite3_mprintf(
+//            "INSERT OR REPLACE INTO %s "
+//                    "(date_time, timestamp, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode, phase)\n "
+//                    "VALUES (datetime(\"now\"), \"%s\", %f, %f, %f, %f, %f, %d, %d, %d);",
+//            table, data->timestamp, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode, data->phase);
+//
+//    rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+//
+//    if (rc != SQLITE_OK)
+//    {
+//        LOGE(tag, "SQL error: %s", err_msg);
+//        sqlite3_free(err_msg);
+//        sqlite3_free(sql);
+//        return -1;
+//    }
+//    else
+//    {
+//        LOGI(tag, "Inserted  gps data");
+//        sqlite3_free(err_msg);
+//        sqlite3_free(sql);
+//        return 0;
+//    }
 
-    char *sql = sqlite3_mprintf(
-            "INSERT OR REPLACE INTO %s "
-                    "(date_time, timestamp, latitude, longitude, height, velocity_x, velocity_y, satellites_number, mode, phase)\n "
-                    "VALUES (datetime(\"now\"), \"%s\", %f, %f, %f, %f, %f, %d, %d, %d);",
-            table, data->timestamp, data->latitude, data->longitude, data->height, data->velocity_x, data->velocity_y, data->satellites_number, data->mode, data->phase);
-
-    rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
-
-    if (rc != SQLITE_OK)
-    {
-        LOGE(tag, "SQL error: %s", err_msg);
-        sqlite3_free(err_msg);
-        sqlite3_free(sql);
-        return -1;
-    }
-    else
-    {
-        LOGI(tag, "Inserted  gps data");
-        sqlite3_free(err_msg);
-        sqlite3_free(sql);
-        return 0;
-    }
+    return 0;
 }
 
-int storage_table_gps_get(const char* table, gps_data data[], int n)
+int storage_table_gps_get(const char* table, void* data, int n)
 {
-    char **results;
-    char *err_msg;
-
-    char *sql = sqlite3_mprintf("SELECT * FROM %s ORDER BY idx DESC LIMIT %d", table, n);
-
-    int row;
-    int col;
-
-    // execute statement
-    sqlite3_get_table(db, sql, &results, &row, &col, &err_msg);
-
-    if(row==0 || col==0)
-    {
-        LOGI(tag, "GPS table empty");
-        return 0;
-    }
-    else
-    {
-        LOGI(tag, "GPS table")
-        int i;
-        for (i = 0; i < (col*row)+col; i++)
-        {
-            printf("%s\t", results[i]);
-            if ((i + 1) % col == 0)
-                printf("\n");
-        }
-
-        for (i = 0; i < row; i++)
-        {
-            // maybe memcpy?
-            strcpy(data[i].timestamp, results[(i*col)+col+2]);
-            data[i].latitude =  atof(results[(i*col)+col+3]);
-            data[i].longitude = atof(results[(i*col)+col+4]);
-            data[i].height = atof(results[(i*col)+col+5]);
-            data[i].velocity_x = atof(results[(i*col)+col+6]);
-            data[i].velocity_y = atof(results[(i*col)+col+7]);
-            data[i].satellites_number = atoi(results[(i*col)+col+8]);
-            data[i].mode = atoi(results[(i*col)+col+9]);
-            data[i].phase = atoi(results[(i*col)+col+10]);
-        }
-    }
+//    char **results;
+//    char *err_msg;
+//
+//    char *sql = sqlite3_mprintf("SELECT * FROM %s ORDER BY idx DESC LIMIT %d", table, n);
+//
+//    int row;
+//    int col;
+//
+//    // execute statement
+//    sqlite3_get_table(db, sql, &results, &row, &col, &err_msg);
+//
+//    if(row==0 || col==0)
+//    {
+//        LOGI(tag, "GPS table empty");
+//        return 0;
+//    }
+//    else
+//    {
+//        LOGI(tag, "GPS table")
+//        int i;
+//        for (i = 0; i < (col*row)+col; i++)
+//        {
+//            printf("%s\t", results[i]);
+//            if ((i + 1) % col == 0)
+//                printf("\n");
+//        }
+//
+//        for (i = 0; i < row; i++)
+//        {
+//            // maybe memcpy?
+//            strcpy(data[i].timestamp, results[(i*col)+col+2]);
+//            data[i].latitude =  atof(results[(i*col)+col+3]);
+//            data[i].longitude = atof(results[(i*col)+col+4]);
+//            data[i].height = atof(results[(i*col)+col+5]);
+//            data[i].velocity_x = atof(results[(i*col)+col+6]);
+//            data[i].velocity_y = atof(results[(i*col)+col+7]);
+//            data[i].satellites_number = atoi(results[(i*col)+col+8]);
+//            data[i].mode = atoi(results[(i*col)+col+9]);
+//            data[i].phase = atoi(results[(i*col)+col+10]);
+//        }
+//    }
     return 0;
 }
 
