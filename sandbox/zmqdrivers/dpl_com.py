@@ -24,9 +24,9 @@ import time
 import re
 import argparse
 import json
+import struct
 
 from threading import Thread
-from gpiozero import *
 from time import sleep
 
 sys.path.append('../')
@@ -47,20 +47,20 @@ CLOSE_SA = "close_dpl_sm"
 GET_DATA = "get_dpl_data"
 
 class DplComInterface:
-    def __init__(self):
+    def __init__(self, sim):
         #Linear Actuator Activation Pins
-        self.enable_lineal = LED(20)
-        self.ln_sgnl1 = LED(16)
-        self.ln_sgnl2 = LED(7)
+        self.enable_lineal = LED(20) if not sim else None
+        self.ln_sgnl1 = LED(16) if not sim else None
+        self.ln_sgnl2 = LED(7) if not sim else None
         #Linear Actuator Validation Pin
-        self.mag_int1 = Button(4)
+        self.mag_int1 = Button(4) if not sim else None
         #Servo Activation Pins
-        self.en_sr_so = LED(24)
-        self.srvo_sgnl = LED(23)
+        self.en_sr_so = LED(24) if not sim else None
+        self.srvo_sgnl = LED(23) if not sim else None
         #Servo PWM
-        self.servo = Servo(18, initial_value=0, min_pulse_width=.544/1000, max_pulse_width=1.6/1000, frame_width=20./1000, pin_factory=None)
+        self.servo = Servo(18, initial_value=0, min_pulse_width=.544/1000, max_pulse_width=1.6/1000, frame_width=20./1000, pin_factory=None) if not sim else None
         #Servo magnet
-        self.mag_int2 = Button(17)
+        self.mag_int2 = Button(17) if not sim else None
         #states
         self.lineal_state = 0   #0:cerrado/extendido, 1:abierto/retraido
         self.servo_state = 0    #0:meaning1, 1:meaning2
@@ -71,44 +71,49 @@ class DplComInterface:
         self.prompt = "[node({}) port({})] <message>: "
 
     def start(self):
-        self.enable_lineal.off()
-        self.ln_sgnl1.off()
-        self.ln_sgnl2.off()
+        if self.servo is not None:
+            self.enable_lineal.off()
+            self.ln_sgnl1.off()
+            self.ln_sgnl2.off()
 
-        self.en_sr_so.off()
-        self.srvo_sgnl.off()
+            self.en_sr_so.off()
+            self.srvo_sgnl.off()
         return True
 
     def state(self):
-        self.lineal_state = self.mag_int1.is_pressed
-        self.servo_state = self.mag_int2.is_pressed
+        self.lineal_state = self.mag_int1.is_pressed if self.servo is not None else 0
+        self.servo_state = self.mag_int2.is_pressed if self.servo is not None else 0
 
     def open_lineal(self):
-        self.enable_lineal.on()
-        self.ln_sgnl1.on()
-        sleep(1)
+        if self.servo is not None:
+            self.enable_lineal.on()
+            self.ln_sgnl1.on()
+            sleep(1)
         return True
 
     def close_lineal(self):
-        self.enable_lineal.on()
-        self.ln_sgnl2.on()
-        sleep(1)
+        if self.servo is not None:
+            self.enable_lineal.on()
+            self.ln_sgnl2.on()
+            sleep(1)
         return True
 
     def servo_0(self):
-        self.en_sr_so.on()
-        self.srvo_sgnl.on()
-        sleep(1)
-        self.servo.min()
-        sleep(3)
+        if self.servo is not None:
+            self.en_sr_so.on()
+            self.srvo_sgnl.on()
+            sleep(1)
+            self.servo.min()
+            sleep(3)
         return True
 
     def servo_180(self):
-        self.en_sr_so.on()
-        self.srvo_sgnl.on()
-        sleep(1)
-        self.servo.max()
-        sleep(3)
+        if self.servo is not None:
+            self.en_sr_so.on()
+            self.srvo_sgnl.on()
+            sleep(1)
+            self.servo.max()
+            sleep(3)
         return True
 
     def execute(self, cmd):
@@ -174,9 +179,22 @@ class DplComInterface:
                 hdr_b = re.findall("........",hdr)[::-1]
                 # print("con:", hdr_b, ["{:02x}".format(int(i, 2)) for i in hdr_b])
                 hdr = bytearray([int(i,2) for i in hdr_b])
+
                 # join data
-                data_ = " ".join([str(int(self.lineal_state)), str(int(self.servo_state))])
-                msg = bytearray([int(self.node_dest),]) + hdr + bytearray(data_, "ascii")
+
+                # join data
+                n_frame = 0
+                # BMP Telemetry Type
+                fr_type = 16
+                n_samples = 1
+                data_ = bytearray(struct.pack('hhi', n_frame, fr_type, n_samples))
+                data_ = data_ + \
+                        struct.pack('III', int(time.time()), self.lineal_state, self.servo_state)
+
+                msg = bytearray([int(self.node_dest),]) + hdr + data_
+
+                # data_ = " ".join([str(int(self.lineal_state)), str(int(self.servo_state))])
+                # msg = bytearray([int(self.node_dest),]) + hdr + bytearray(data_, "ascii")
                 # send data to OBC node
                 try:
                     pub.send(msg)
@@ -198,14 +216,17 @@ def get_parameters():
     parser.add_argument("-o", "--out_port", default="8002", help="Hub Output port")
     parser.add_argument("--nmon", action="store_false", help="Disable monitor task")
     parser.add_argument("--ncon", action="store_false", help="Disable console task")
+    parser.add_argument("--sim", action="store_true", help="Make available simulation of dlp")
 
     return parser.parse_args()
 
 if __name__ == '__main__':
     # Get arguments
     args = get_parameters()
+    if not args.sim:
+        from gpiozero import *
 
-    dpl_com = DplComInterface()
+    dpl_com = DplComInterface(sim=args.sim)
 
     tasks = []
 

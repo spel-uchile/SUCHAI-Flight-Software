@@ -314,10 +314,10 @@ int storage_table_prs_set(const char* table, void* data);
  */
 int storage_table_prs_get(const char* table, void* data, int n);
 
-typedef struct dpl_data {
-    int lineal_actuator;
-    int servo_motor;
-} dpl_data;
+//typedef struct dpl_data {
+//    int lineal_actuator;
+//    int servo_motor;
+//} dpl_data;
 
 /**
  * Set a deploy data frame
@@ -329,7 +329,7 @@ typedef struct dpl_data {
  *
  * @return 0 OK, -1 Error
  */
-int storage_table_dpl_set(const char* table, dpl_data* data);
+int storage_table_dpl_set(const char* table, void* data);
 
 /**
  * Get n dpl data frames
@@ -342,6 +342,6 @@ int storage_table_dpl_set(const char* table, dpl_data* data);
  *
  * @return 0 OK, -1 Error
  */
-int storage_table_dpl_get(const char* table, dpl_data data[], int n);
+int storage_table_dpl_get(const char* table, void *data, int n);
 
 #endif //SCH_PERSISTENT_H

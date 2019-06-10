@@ -150,11 +150,12 @@ typedef enum dat_system {
 
     /// Memory: Current payload memory addresses
     dat_mem_temp,                 ///< Temperature data
-    dat_mem_ads,                  ///< ADS data
-    dat_mem_eps,                  ///< EPS data
-    dat_mem_lang,                 ///< Langmuir data
-    dat_mem_gps,                  ///< GPS data
-    dat_mem_prs,                  ///< PRS data
+    dat_mem_ads,                  ///< ADS data index
+    dat_mem_eps,                  ///< EPS data index
+    dat_mem_lang,                 ///< Langmuir data index
+    dat_mem_gps,                  ///< GPS data index
+    dat_mem_prs,                  ///< PRS data index
+    dat_mem_dpl,                  ///< DPL data index
 
     /// Add custom status variables here
     dat_balloon_phase,          ///< Balloon phase (0: (A0) base, 1: (A) ascend, 2: (B) equilibrium, 3: (B1) deploy1, 4: (B2) deploy2, 5: (C) descend, 6: (C1) landing).
@@ -255,8 +256,9 @@ typedef enum payload_id {
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
     lang_sensors,           ///< Langmuir probe sensors
-    gps_sensors,
-    prs_sensors,
+    gps_sensors,            ///< GPS sensors
+    prs_sensors,            ///< PRS sensors
+    dpl_sensors,            ///< DPL sensors
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -325,6 +327,11 @@ typedef struct prs_data {
     float temperature;
     float height;
 } prs_data_t;
+
+typedef struct dpl_data {
+    int lineal_actuator;
+    int servo_motor;
+} dpl_data_t;
 
 
 struct temp_data tempdata;

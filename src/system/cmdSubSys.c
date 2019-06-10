@@ -27,7 +27,7 @@ int get_gps_data(char *fmt, char *params, int nparams) {
 }
 
 int get_dpl_data(char *fmt, char *params, int nparams) {
-    char* param="2 get_dpl_data";
+    char* param="12 get_dpl_data";
     com_send_rpt("%d %s", param, 2);
     LOGD(tag, "Getting data!");
     return CMD_OK;
@@ -41,25 +41,25 @@ int get_prs_data(char *fmt, char *params, int nparams) {
 }
 
 int open_dpl_la(char *fmt, char *params, int nparams) {
-    char* param="2 open_dpl_la";
+    char* param="12 open_dpl_la";
     com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
 
 int close_dpl_la(char *fmt, char *params, int nparams) {
-    char* param="2 close_dpl_la";
+    char* param="12 close_dpl_la";
     com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
 
 int open_dpl_sm(char *fmt, char *params, int nparams) {
-    char* param="2 open_dpl_sm";
+    char* param="12 open_dpl_sm";
     com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
 
 int close_dpl_sm(char *fmt, char *params, int nparams) {
-    char* param="2 close_dpl_sm";
+    char* param="12 close_dpl_sm";
     com_send_rpt("%d %s", param, 2);
     return CMD_OK;
 }
@@ -68,7 +68,7 @@ int send_iridium_data(char *fmt, char *params, int nparams) {
     char* param="6 ";
     gps_data_t gps_data_[1];
     prs_data_t prs_data_[1];
-    dpl_data dpl_data_[1];
+    dpl_data_t dpl_data_[1];
     //cmd_t *cmd_send_iridium = cmd_get_str("send_rpt");
     storage_table_gps_get(DAT_GPS_TABLE, gps_data_, 1);
     storage_table_prs_get(DAT_PRS_TABLE, prs_data_, 1);
