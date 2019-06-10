@@ -283,11 +283,11 @@ int storage_table_gps_set(const char* table, void* data);
  */
 int storage_table_gps_get(const char* table, void* data, int n);
 
-typedef struct prs_data {
-    float pressure;
-    float temperature;
-    float height;
-} prs_data;
+//typedef struct prs_data {
+//    float pressure;
+//    float temperature;
+//    float height;
+//} prs_data;
 
 /**
  * Set a pressure data frame
@@ -299,7 +299,7 @@ typedef struct prs_data {
  *
  * @return 0 OK, -1 Error
  */
-int storage_table_prs_set(const char* table, prs_data* data);
+int storage_table_prs_set(const char* table, void* data);
 
 /**
  * Get n prs data frames
@@ -312,7 +312,7 @@ int storage_table_prs_set(const char* table, prs_data* data);
  *
  * @return 0 OK, -1 Error
  */
-int storage_table_prs_get(const char* table, prs_data data[], int n);
+int storage_table_prs_get(const char* table, void* data, int n);
 
 typedef struct dpl_data {
     int lineal_actuator;

@@ -34,7 +34,7 @@ int get_dpl_data(char *fmt, char *params, int nparams) {
 }
 
 int get_prs_data(char *fmt, char *params, int nparams) {
-    char* param="4 get_prs_data";
+    char* param="14 get_prs_data";
     com_send_rpt("%d %s", param, 2);
     LOGD(tag, "Getting data!");
     return CMD_OK;
@@ -67,7 +67,7 @@ int close_dpl_sm(char *fmt, char *params, int nparams) {
 int send_iridium_data(char *fmt, char *params, int nparams) {
     char* param="6 ";
     gps_data_t gps_data_[1];
-    prs_data prs_data_[1];
+    prs_data_t prs_data_[1];
     dpl_data dpl_data_[1];
     //cmd_t *cmd_send_iridium = cmd_get_str("send_rpt");
     storage_table_gps_get(DAT_GPS_TABLE, gps_data_, 1);

@@ -83,7 +83,7 @@ class GpsComInterface:
         while True:
             self.latitude = self.check_nan(self.gps_handler.fix.latitude, 1.0) if handler_exist else 1.0
             self.longitude = self.check_nan(self.gps_handler.fix.longitude, 2.0) if handler_exist else 2.0
-            self.time_utc = self.gps_handler.utc if handler_exist else 9
+            self.time_utc = self.gps_handler.utc if handler_exist else int(time.time())
             self.fix_time = self.check_nan(self.gps_handler.fix.time, 3) if handler_exist else 3
             self.altitude = self.check_nan(self.gps_handler.fix.altitude, 4.0) if handler_exist else 4.0
             self.speed_horizontal = self.check_nan(self.gps_handler.fix.speed, 5.0) if handler_exist else 5.0

@@ -891,71 +891,73 @@ int storage_table_gps_get(const char* table, void* data, int n)
     return 0;
 }
 
-int storage_table_prs_set(const char* table, prs_data* data)
+int storage_table_prs_set(const char* table, void* data)
 {
-    char *err_msg;
-    int rc;
+//    char *err_msg;
+//    int rc;
+//
+//    char *sql = sqlite3_mprintf(
+//            "INSERT OR REPLACE INTO %s "
+//                    "(date_time, pressure, temperature, height)\n "
+//                    "VALUES (datetime(\"now\"), %f, %f, %f);",
+//            table, data->pressure, data->temperature, data->height);
+//
+//    rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+//
+//    if (rc != SQLITE_OK)
+//    {
+//        LOGE(tag, "SQL error: %s", err_msg);
+//        sqlite3_free(err_msg);
+//        sqlite3_free(sql);
+//        return -1;
+//    }
+//    else
+//    {
+//        LOGI(tag, "Inserted  prs data");
+//        sqlite3_free(err_msg);
+//        sqlite3_free(sql);
+//        return 0;
+//    }
 
-    char *sql = sqlite3_mprintf(
-            "INSERT OR REPLACE INTO %s "
-                    "(date_time, pressure, temperature, height)\n "
-                    "VALUES (datetime(\"now\"), %f, %f, %f);",
-            table, data->pressure, data->temperature, data->height);
-
-    rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
-
-    if (rc != SQLITE_OK)
-    {
-        LOGE(tag, "SQL error: %s", err_msg);
-        sqlite3_free(err_msg);
-        sqlite3_free(sql);
-        return -1;
-    }
-    else
-    {
-        LOGI(tag, "Inserted  prs data");
-        sqlite3_free(err_msg);
-        sqlite3_free(sql);
-        return 0;
-    }
+    return 0;
 }
 
-int storage_table_prs_get(const char* table, prs_data data[], int n)
+int storage_table_prs_get(const char* table, void* data, int n)
 {
-    char **results;
-    char *err_msg;
-
-    char *sql = sqlite3_mprintf("SELECT * FROM %s ORDER BY idx DESC LIMIT %d", table, n);
-
-    int row;
-    int col;
-
-    // execute statement
-    sqlite3_get_table(db, sql, &results, &row, &col, &err_msg);
-
-    if(row==0 || col==0)
-    {
-        LOGI(tag, "PRS table empty");
-        return 0;
-    }
-    else
-    {
-        LOGI(tag, "PRS table")
-        int i;
-        for (i = 0; i < (col*row)+col; i++)
-        {
-            printf("%s\t", results[i]);
-            if ((i + 1) % col == 0)
-                printf("\n");
-        }
-
-        for (i = 0; i < row; i++)
-        {
-            data[i].pressure =  atof(results[(i*col)+col+2]);
-            data[i].temperature = atof(results[(i*col)+col+3]);
-            data[i].height = atof(results[(i*col)+col+4]);
-        }
-    }
+//    char **results;
+//    char *err_msg;
+//
+//    char *sql = sqlite3_mprintf("SELECT * FROM %s ORDER BY idx DESC LIMIT %d", table, n);
+//
+//    int row;
+//    int col;
+//
+//    // execute statement
+//    sqlite3_get_table(db, sql, &results, &row, &col, &err_msg);
+//
+//    if(row==0 || col==0)
+//    {
+//        LOGI(tag, "PRS table empty");
+//        return 0;
+//    }
+//    else
+//    {
+//        LOGI(tag, "PRS table")
+//        int i;
+//        for (i = 0; i < (col*row)+col; i++)
+//        {
+//            printf("%s\t", results[i]);
+//            if ((i + 1) % col == 0)
+//                printf("\n");
+//        }
+//
+//        for (i = 0; i < row; i++)
+//        {
+//            data[i].pressure =  atof(results[(i*col)+col+2]);
+//            data[i].temperature = atof(results[(i*col)+col+3]);
+//            data[i].height = atof(results[(i*col)+col+4]);
+//        }
+//    }
     return 0;
 }
 

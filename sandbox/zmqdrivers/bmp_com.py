@@ -22,11 +22,10 @@ import time
 import re
 import argparse
 import json
+import struct
 
 from threading import Thread
 from time import sleep
-
-import Adafruit_BMP.BMP085 as BMP085
 
 #sys.path.append('../')
 #print(sys.path)
@@ -44,9 +43,10 @@ CSP_PORT_APPS = data["ports"]["telemetry"]
 GET_DATA = "get_prs_data"
 
 class BmpComInterface:
-    def __init__(self):
+    def __init__(self, sim):
         # sensor arguments
-        self.sensor_bmp = BMP085.BMP085()
+        self.sensor_bmp = BMP085.BMP085() if not sim else None
+        self.timestamp = 0
         self.temperature = 0        #float
         self.pressure = 0           #float
         self.altitude = 0           #float
@@ -58,9 +58,11 @@ class BmpComInterface:
 
     def update_data(self):
         while True:
-            self.temperature = self.sensor_bmp.read_temperature()
-            self.pressure = self.sensor_bmp.read_pressure()
-            self.altitude = self.sensor_bmp.read_altitude()
+            bmp_exist = self.sensor_bmp is not None
+            self.timestamp = int(time.time())
+            self.temperature = self.sensor_bmp.read_temperature() if bmp_exist else 1.0
+            self.pressure = self.sensor_bmp.read_pressure() if bmp_exist else 2.0
+            self.altitude = self.sensor_bmp.read_altitude() if bmp_exist else 3.0
             time.sleep(0.25)
 
     def console(self, ip="localhost", in_port_tcp=8002, out_port_tcp=8001):
@@ -106,9 +108,17 @@ class BmpComInterface:
                 hdr_b = re.findall("........",hdr)[::-1]
                 # print("con:", hdr_b, ["{:02x}".format(int(i, 2)) for i in hdr_b])
                 hdr = bytearray([int(i,2) for i in hdr_b])
+
                 # join data
-                data_ = " ".join([str(self.pressure), str(self.temperature), str(self.altitude)])
-                msg = bytearray([int(self.node_dest),]) + hdr + bytearray(data_, "ascii")
+                n_frame = 0
+                # BMP Telemetry Type
+                fr_type = 15
+                n_samples = 1
+                data_ = bytearray(struct.pack('hhi', n_frame, fr_type, n_samples))
+                data_ = data_ + \
+                    struct.pack('Ifff', self.timestamp, self.pressure, self.temperature, self.altitude)
+
+                msg = bytearray([int(self.node_dest),]) + hdr + data_
                 # send data to OBC node
                 try:
                     pub.send(msg)
@@ -127,6 +137,7 @@ def get_parameters():
     parser.add_argument("-o", "--out_port", default="8002", help="Hub Output port")
     parser.add_argument("--nmon", action="store_false", help="Disable monitor task")
     parser.add_argument("--ncon", action="store_false", help="Disable console task")
+    parser.add_argument("--sim", action="store_true", help="Make simulation available for bmp driver")
 
     return parser.parse_args()
 
@@ -134,7 +145,10 @@ if __name__ == '__main__':
     # Get arguments
     args = get_parameters()
 
-    bmp = BmpComInterface()
+    if not args.sim:
+        import Adafruit_BMP.BMP085 as BMP085
+
+    bmp = BmpComInterface(sim=args.sim)
 
     tasks = []
 
