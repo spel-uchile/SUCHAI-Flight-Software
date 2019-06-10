@@ -66,26 +66,30 @@ int close_dpl_sm(char *fmt, char *params, int nparams) {
 
 int send_iridium_data(char *fmt, char *params, int nparams) {
     char* param="6 ";
-    gps_data_t gps_data_[1];
-    prs_data_t prs_data_[1];
-    dpl_data_t dpl_data_[1];
+    gps_data_t gps_data_;
+    prs_data_t prs_data_;
+    dpl_data_t dpl_data_;
+
     //cmd_t *cmd_send_iridium = cmd_get_str("send_rpt");
-    storage_table_gps_get(DAT_GPS_TABLE, gps_data_, 1);
-    storage_table_prs_get(DAT_PRS_TABLE, prs_data_, 1);
-    storage_table_dpl_get(DAT_DPL_TABLE, dpl_data_, 1);
+    storage_get_recent_payload_data( &gps_data_, gps_sensors, 1);
+    storage_get_recent_payload_data( &prs_data_, prs_sensors, 1);
+    storage_get_recent_payload_data( &dpl_data_, dpl_sensors, 1);
+    LOGI(tag, "Obtaining gps_data, time:%u,  lat:%f,  lon:%f, alt:%f, vel_x:%f, vel_y:%f, sat_num:%d, mode:%d", gps_data_.timestamp ,gps_data_.latitude, gps_data_.longitude, gps_data_.height, gps_data_.velocity_x, gps_data_.velocity_y, gps_data_.satellites_number, gps_data_.mode);
+    LOGI(tag, "Obtaining prs_data, time:%u,  prs:%f,  temp:%f, alt:%f", prs_data_.timestamp ,prs_data_.pressure, prs_data_.temperature, prs_data_.height)
+    LOGI(tag, "Obtaining dpl_data, time:%u,  lin_act:%d,  serv_mot:%d", dpl_data_.timestamp ,dpl_data_.lineal_actuator, dpl_data_.servo_motor);
 
-    com_data_t data;
-    data.node = (uint8_t)6;
-//    data.frame.frame = 0;
-    data.frame.type = 1;
-    memset(data.frame.data.data8, 0, sizeof(data.frame.data.data8));
-
-    char msg[COM_FRAME_MAX_LEN];
-    
-    sprintf(msg, "%u %0.5f %0.5f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f %d %d %s", gps_data_[0].timestamp,gps_data_[0].latitude,gps_data_[0].longitude,gps_data_[0].height,gps_data_[0].velocity_x,gps_data_[0].velocity_y,gps_data_[0].satellites_number,gps_data_[0].mode, prs_data_[0].pressure, prs_data_[0].temperature, prs_data_[0].height, dpl_data_[0].lineal_actuator, dpl_data_[0].servo_motor, "EOF");
-    memcpy(data.frame.data.data8, (char *)&msg, strlen(msg));
-    printf("msg=%lu\n", strlen(msg));
-    return com_send_data(NULL, (char *)&data, 0);
+//    com_data_t data;
+//    data.node = (uint8_t)6;
+////    data.frame.frame = 0;
+//    data.frame.type = 1;
+//    memset(data.frame.data.data8, 0, sizeof(data.frame.data.data8));
+//
+//    char msg[COM_FRAME_MAX_LEN];
+//
+//    sprintf(msg, "%u %0.5f %0.5f %0.3f %0.3f %0.3f %d %d %0.3f %0.3f %0.3f %d %d %s", gps_data_[0].timestamp,gps_data_[0].latitude,gps_data_[0].longitude,gps_data_[0].height,gps_data_[0].velocity_x,gps_data_[0].velocity_y,gps_data_[0].satellites_number,gps_data_[0].mode, prs_data_[0].pressure, prs_data_[0].temperature, prs_data_[0].height, dpl_data_[0].lineal_actuator, dpl_data_[0].servo_motor, "EOF");
+//    memcpy(data.frame.data.data8, (char *)&msg, strlen(msg));
+//    printf("msg=%lu\n", strlen(msg));
+//    return com_send_data(NULL, (char *)&data, 0);
 }
 
 int send_iridium_msg1(char *fmt, char *params, int nparams) {

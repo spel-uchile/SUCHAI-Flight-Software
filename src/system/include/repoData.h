@@ -329,6 +329,7 @@ typedef struct prs_data {
 } prs_data_t;
 
 typedef struct dpl_data {
+    int timestamp;
     int lineal_actuator;
     int servo_motor;
 } dpl_data_t;

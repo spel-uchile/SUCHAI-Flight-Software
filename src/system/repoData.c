@@ -109,19 +109,6 @@ void dat_repo_init(void)
         //Init system flight plan table
         rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
-
-        //Mission specific initialization data
-        //Init gps data table subsystem
-        rc=storage_table_gps_init(DAT_GPS_TABLE, 0);
-        assertf(rc==0, tag, "Unable to create gps table");
-
-        //Init pressure data table subsystem
-        rc=storage_table_pressure_init(DAT_PRS_TABLE, 0);
-        assertf(rc==0, tag, "Unable to create gps table");
-
-        //Init deploy data table subsystem
-        rc=storage_table_deploy_init(DAT_DPL_TABLE, 0);
-        assertf(rc==0, tag, "Unable to create gps table");
     }
 #else
     {
@@ -133,23 +120,6 @@ void dat_repo_init(void)
         //Init system repo
         rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
         assertf(rc==0, tag, "Unable to create system variables repository");
-
-//        //Init system flight plan table
-//        rc=storage_table_flight_plan_init(0);
-//        assertf(rc==0, tag, "Unable to create flight plan table");
-//
-//        //Mission specific initialization data
-//        //Init gps data table subsystem
-//        rc=storage_table_gps_init(DAT_GPS_TABLE, 0);
-//        assertf(rc==0, tag, "Unable to create gps table");
-//
-//        //Init pressure data table subsystem
-//        rc=storage_table_pressure_init(DAT_PRS_TABLE, 0);
-//        assertf(rc==0, tag, "Unable to create gps table");
-//
-//        //Init deploy data table subsystem
-//        rc=storage_table_deploy_init(DAT_DPL_TABLE, 0);
-//        assertf(rc==0, tag, "Unable to create gps table");
     }
 #endif
 
