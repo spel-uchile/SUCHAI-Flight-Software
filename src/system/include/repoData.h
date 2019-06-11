@@ -335,13 +335,6 @@ typedef struct dpl_data {
 } dpl_data_t;
 
 
-struct temp_data tempdata;
-struct ads_data adsdata;
-struct eps_data epsdata;
-struct langmuir_data langmuirdata;
-struct gps_data gpsdata;
-struct prs_data prsdata;
-
 extern struct map {
     char table[30];
     uint16_t  size;
