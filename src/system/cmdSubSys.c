@@ -71,9 +71,9 @@ int send_iridium_data(char *fmt, char *params, int nparams) {
     dpl_data_t dpl_data_;
 
     //cmd_t *cmd_send_iridium = cmd_get_str("send_rpt");
-    storage_get_recent_payload_data( &gps_data_, gps_sensors, 1);
-    storage_get_recent_payload_data( &prs_data_, prs_sensors, 1);
-    storage_get_recent_payload_data( &dpl_data_, dpl_sensors, 1);
+    dat_get_recent_payload_sample(&gps_data_, gps_sensors, 1);
+    dat_get_recent_payload_sample(&prs_data_, prs_sensors, 1);
+    dat_get_recent_payload_sample(&prs_data_, dpl_sensors, 1);
     LOGI(tag, "Obtaining gps_data, time:%u,  lat:%f,  lon:%f, alt:%f, vel_x:%f, vel_y:%f, sat_num:%d, mode:%d", gps_data_.timestamp ,gps_data_.latitude, gps_data_.longitude, gps_data_.height, gps_data_.velocity_x, gps_data_.velocity_y, gps_data_.satellites_number, gps_data_.mode);
     LOGI(tag, "Obtaining prs_data, time:%u,  prs:%f,  temp:%f, alt:%f", prs_data_.timestamp ,prs_data_.pressure, prs_data_.temperature, prs_data_.height)
     LOGI(tag, "Obtaining dpl_data, time:%u,  lin_act:%d,  serv_mot:%d", dpl_data_.timestamp ,dpl_data_.lineal_actuator, dpl_data_.servo_motor);
