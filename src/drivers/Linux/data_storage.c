@@ -98,8 +98,11 @@ int storage_table_repo_init(char* table, int drop)
     {
         LOGD(tag, "Table %s created successfully", table);
         sqlite3_free(sql);
-        return 0;
     }
+
+    storage_table_payload_init(0);
+    return 0;
+
 #elif SCH_STORAGE_MODE == 2
 
     if (PQstatus(conn) == CONNECTION_BAD) {
@@ -174,6 +177,7 @@ int storage_table_flight_plan_init(int drop)
     if (rc != SQLITE_OK )
     {
         LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", fp_table, err_msg, sql);
+        sqlite3_free(err_msg);
         sqlite3_free(sql);
         return -1;
     }
@@ -239,11 +243,13 @@ int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_n
 
 int storage_table_payload_init(int drop)
 {
-#if SCH_STORAGE_MODE == 2
+
+#if SCH_STORAGE_MODE > 0
     if(drop)
     {
 
     }
+
     int i = 0;
     for(i=0; i< last_sensor; ++i)
     {
@@ -269,6 +275,22 @@ int storage_table_payload_init(int drop)
         }
         strcat(create_table, ")");
         LOGD(tag, "SQL command: %s", create_table);
+
+#if SCH_STORAGE_MODE ==1
+        char* err_msg;
+        int rc;
+        rc = sqlite3_exec(db, create_table, 0, 0, &err_msg);
+
+        if (rc != SQLITE_OK )
+        {
+            LOGE(tag, "Failed to crate table %s. Error: %s. SQL: %s", data_map[i].table, err_msg, create_table);
+            sqlite3_free(err_msg);
+        }
+        else
+        {
+            LOGD(tag, "Table %s created successfully", data_map[i].table);
+        }
+#elif SCH_STORAGE_MODE==2
         // TODO: manage connection error in res
         PGresult *res = PQexec(conn, create_table);
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -277,6 +299,7 @@ int storage_table_payload_init(int drop)
             continue;
         }
         PQclear(res);
+#endif
     }
 #endif
     return 0;
@@ -351,7 +374,7 @@ int storage_repo_get_value_str(char *name, char *table)
     if(rc == SQLITE_ROW)
         value = sqlite3_column_int(stmt, 0);
     else
-    LOGE(tag, "Some error encountered (rc=%d)", rc);
+        LOGE(tag, "Some error encountered (rc=%d)", rc);
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
@@ -418,7 +441,6 @@ int storage_repo_set_value_idx(int index, int value, char *table)
         return -1;
     }
     PQclear(res);
-
 #endif
     return 0;
 }
@@ -593,7 +615,7 @@ void get_value_string(char* ret_string, char* c_type, char* buff)
 
 int storage_add_payload_data(void* data, int payload)
 {
-#if SCH_STORAGE_MODE == 2
+#if SCH_STORAGE_MODE > 0
     char* tok_sym[30];
     char* tok_var[30];
     char order[50];
@@ -631,7 +653,20 @@ int storage_add_payload_data(void* data, int payload)
     strcat(values, ")");
     char insert_row[200];
     sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
-    LOGI(tag, "%s", insert_row);
+    LOGD(tag, "%s", insert_row);
+
+#if SCH_STORAGE_MODE == 1
+    char* err_msg;
+    int rc;
+    rc = sqlite3_exec(db, insert_row, 0, 0, &err_msg);
+
+    if (rc != SQLITE_OK )
+    {
+        LOGE(tag, "Failed to add value to table %s. Error: %s. SQL: %s", data_map[payload].table, err_msg, insert_row);
+        sqlite3_free(err_msg);
+        return -1;
+    }
+#elif SCH_STORAGE_MODE == 2
     // TODO: manage connection error in res
     PGresult *res = PQexec(conn, insert_row);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
@@ -640,16 +675,55 @@ int storage_add_payload_data(void* data, int payload)
         return -1;
     }
     PQclear(res);
-    int ret = 0;
+#endif
 #endif
     return 0;
 }
 
+void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        float val;
+        val =(float) sqlite3_column_double(stmt, j);
+        memcpy(buff, &val, sizeof(float));
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        int val;
+        val = sqlite3_column_int(stmt, j);
+        memcpy(buff, &val, sizeof(int));
+    }
+    else if(strcmp(c_type, "%u") == 0) {
+        unsigned int val;
+        val = (unsigned int) sqlite3_column_int(stmt, j);
+        memcpy(buff, &val, sizeof(unsigned int));
+    }
+}
+
+void get_psql_value(char* c_type, void* buff, PGresult *res, int j)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        float val;
+        val =(float) atof(PQgetvalue(res, 0, j));
+        memcpy(buff, &val, sizeof(float));
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        int val;
+        val =  atoi(PQgetvalue(res, 0, j));
+        memcpy(buff, &val, sizeof(int));
+    }
+    else if(strcmp(c_type, "%u") == 0) {
+        unsigned int val;
+        // TODO: Change to  strtoul()
+        val = (unsigned int) atol(PQgetvalue(res, 0, j));
+        memcpy(buff, &val, sizeof(unsigned int));
+    }
+}
+
+
 int storage_get_recent_payload_data(void * data, int payload, int delay)
 {
-#if SCH_STORAGE_MODE == 2
-    LOGV(tag, "Obtaining data of payload %d", payload);
 
+#if SCH_STORAGE_MODE > 0
     char* tok_sym[30];
     char* tok_var[30];
     char order[50];
@@ -676,10 +750,40 @@ int storage_get_recent_payload_data(void * data, int payload, int delay)
 
     char get_value[200];
     sprintf(get_value,"SELECT %s FROM %s ORDER BY tstz DESC LIMIT 1"
-                      ,names, data_map[payload].table);
-
-
+            ,names, data_map[payload].table);
     LOGD(tag, "%s",  get_value);
+
+#if SCH_STORAGE_MODE == 1
+    char* err_msg;
+    int rc;
+    sqlite3_stmt* stmt = NULL;
+
+    // execute statement
+    rc = sqlite3_prepare_v2(db, get_value, -1, &stmt, 0);
+    if(rc != SQLITE_OK)
+    {
+        LOGE(tag, "Selecting data from DB Failed (rc=%d)", rc);
+        return -1;
+    }
+
+    // fetch only one row's status
+    rc = sqlite3_step(stmt);
+    int val;
+    if(rc == SQLITE_ROW) {
+        for(j=0; j < nparams; ++j) {
+            int param_size = get_sizeof_type(tok_sym[j]);
+            get_sqlite_value(tok_sym[j], &val, stmt, j);
+            // TODO: sum data pointer with accumulative param sizes
+            memcpy(data+(j*4), &val, param_size);
+        }
+    }
+    else {
+        LOGE(tag, "Some error encountered (rc=%d)", rc);
+    }
+
+    sqlite3_finalize(stmt);
+
+#elif SCH_STORAGE_MODE == 2
     PGresult *res = PQexec(conn, get_value);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command storage_get_recent_payload_data failed: %s", PQerrorMessage(conn));
@@ -688,14 +792,15 @@ int storage_get_recent_payload_data(void * data, int payload, int delay)
     }
     // TODO: manage connection error in res
 
+    int val;
     for(j=0; j < nparams; ++j) {
         int param_size = get_sizeof_type(tok_sym[j]);
-        // TODO: switch between data types
-        float val = atof(PQgetvalue(res, 0, j));
-        memcpy(data+(j*param_size), (char*)&val, param_size);
+        get_psql_value(tok_sym[j], &val, res, j);
+        // TODO: sum data pointer with accumulative param sizes
+        memcpy(data+(j*4), &val, param_size);
     }
-
     PQclear(res);
+#endif
 #endif
     return 0;
 }

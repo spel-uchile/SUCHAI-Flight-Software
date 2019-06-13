@@ -76,7 +76,7 @@
 #define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        2    ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external sqlite, (2) postgres.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 #define SCH_STORAGE_PGUSER      "spel"

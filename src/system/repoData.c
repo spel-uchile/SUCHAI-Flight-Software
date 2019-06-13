@@ -39,15 +39,11 @@ time_t sec = 0;
     fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
-//struct temp_data tempdata;
-//struct ads_data adsdata;
-//struct eps_data epsdata;
-
 struct map data_map[last_sensor] = {
-        {"temp_data",      (uint16_t) (sizeof(tempdata)), dat_mem_temp, "%u %f %f %f", "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
-        { "ads_data",      (uint16_t) (sizeof(adsdata)), dat_mem_ads, "%u %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
-        { "eps_data",      (uint16_t) (sizeof(epsdata)), dat_mem_eps, "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
-        { "langmuir_data", (uint16_t) (sizeof(langmuirdata)), dat_mem_lang, "%u %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
+        {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_mem_temp, "%u %f %f %f", "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+        { "ads_data",      (uint16_t) (sizeof(ads_data_t)), dat_mem_ads, "%u %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        { "eps_data",      (uint16_t) (sizeof(eps_data_t)), dat_mem_eps, "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
+        { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_mem_lang, "%u %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
 };
 
 void initialize_all_vars(){
@@ -96,7 +92,7 @@ void dat_repo_init(void)
             data_base[i].periodical = 0;
         }
     }
-    #elif (SCH_STORAGE_MODE == 1)
+#elif (SCH_STORAGE_MODE == 1)
     {
         //Init storage system
         int rc;
@@ -111,7 +107,7 @@ void dat_repo_init(void)
         rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
     }
-#else
+#elif (SCH_STORAGE_MODE == 2)
     {
         //Init storage system
         int rc;

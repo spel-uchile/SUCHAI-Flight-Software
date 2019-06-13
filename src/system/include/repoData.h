@@ -296,10 +296,6 @@ typedef struct langmuir_data {
     int particles_counter;
 } langmuir_data_t;
 
-struct temp_data tempdata;
-struct ads_data adsdata;
-struct eps_data epsdata;
-struct langmuir_data langmuirdata;
 
 extern struct map {
     char table[30];

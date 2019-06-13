@@ -1,0 +1,14 @@
+{
+"nodes":{
+	"obc":1,
+	"dpl":12,
+	"bmp":14,
+	"gps":15,
+	"ird":6,
+	"imet":7,
+	"sstv":8
+	},
+"ports":{
+	"telemetry":9
+	}
+}
