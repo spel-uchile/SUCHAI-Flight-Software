@@ -166,25 +166,30 @@ int storage_flight_plan_reset(void);
 int storage_show_table(void);
 
 /**
- * Add data struct to payload table
- *
- * @param data Pointer to struct
- * @param payload Int, payload to store
- * @return 0 OK, -1 Error
- */
-int storage_add_payload_data(void * data, int payload);
-
-/**
- * Get recent values from for specific payload
+ * Set a value for specific payload with index value
+ * in database
  *
  * @note: non-reentrant function, use mutex to sync access
  *
+ * @param index Int. index address
+ * @param data Pointer to struct
+ * @param payload Int. payload to store
+ * @return 0 OK, -1 Error
+ */
+int storage_set_payload_data(int index, void * data, int payload);
+
+/**
+ * Get a value for specific payload with index value
+ * in database
+ *
+ * @note: non-reentrant function, use mutex to sync access
+ *
+ * @param index Int. index address
  * @param data Pointer to struct
  * @param payload Int. payload to get value
- * @param delay Int, delay from recent value
- * @return OK 0, Error -1
+ * @return 0 OK, -1 Error
  */
-int storage_get_recent_payload_data(void* data, int payload, int delay);
+int storage_get_payload_data(int index, void* data, int payload);
 
 /**
  * Close the opened database

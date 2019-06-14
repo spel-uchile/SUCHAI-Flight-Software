@@ -46,14 +46,12 @@ struct map data_map[last_sensor] = {
         { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_mem_lang, "%u %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
 };
 
-void initialize_all_vars(){
-
+void initialize_payload_vars(){
     int i =0;
-    for(i=0; i< dat_system_last_var; ++i) {
-        if(dat_get_system_var(dat_obc_reset_counter) == -1) {
-            dat_set_system_var(i, 0);
+    for(i=0; i< last_sensor; ++i) {
+        if(dat_get_system_var(data_map[i].sys_index) == -1) {
+            dat_set_system_var(data_map[i].sys_index, 0);
         }
-
     }
 }
 
@@ -103,6 +101,10 @@ void dat_repo_init(void)
         rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
         assertf(rc==0, tag, "Unable to create system variables repository");
 
+        //Init payloads repo
+        rc = storage_table_payload_init(0);
+        assertf(rc==0, tag, "Unable to create payload repo");
+
         //Init system flight plan table
         rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
@@ -127,12 +129,13 @@ void dat_repo_init(void)
 
     /* TODO: Initialize custom variables */
     LOGD(tag, "Initializing system variables values...")
+//    dat_set_system_var(dat_obc_hrs_alive, 0);
     dat_set_system_var(dat_obc_hrs_wo_reset, 0);
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
     dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
 
-#if (SCH_STORAGE_MODE == 2)
-    initialize_all_vars();
+#if (SCH_STORAGE_MODE > 0)
+    initialize_payload_vars();
 #endif
 }
 
@@ -656,9 +659,7 @@ int dat_add_payload_sample(void* data, int payload)
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
-#if defined(LINUX)
-    ret = storage_add_payload_data(data, payload);
-#elif defined(NANOMIND)
+#if defined(LINUX) || defined(NANOMIND)
     ret = storage_set_payload_data(index, data, payload);
 #else
     ret=0;
@@ -686,9 +687,7 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay)
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-#if defined(LINUX)
-    ret = storage_get_recent_payload_data(data, payload, delay);
-#elif defined(NANOMIND)
+#if defined(LINUX) || defined(NANOMIND)
     if(index-1-delay >= 0) {
         ret = storage_get_payload_data(index-1-delay, data, payload);
     }
