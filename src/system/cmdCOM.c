@@ -226,7 +226,7 @@ int com_debug(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
-#ifdef SCH_USE_NANOCOM
+#if 1//def SCH_USE_NANOCOM
 int com_reset_wdt(char *fmt, char *params, int nparams)
 {
 
@@ -461,7 +461,31 @@ void _com_config_help(void)
 void _com_config_find(char *param_name, int *table, param_table_t **param)
 {
     int i = 0;
+    int table_tmp = -1;
     *param = NULL;
+
+    char *token;
+    token = strtok(param_name, "-");
+
+    // ej: tx-freq
+    if(strcmp(token, "tx") == 0)
+    {
+        table_tmp = AX100_PARAM_TX(0);
+        param_name = strtok(NULL, "-");
+    }
+    // ej: rx-freq
+    else if(strcmp(token, "rx") == 0)
+    {
+        table_tmp = AX100_PARAM_RX;
+        param_name = strtok(NULL, "-");
+    }
+    // ej: tx_pwr or baud
+    else
+    {
+        param_name = token;
+        table_tmp = -1;
+    }
+
 
     // Find the given parameter name in the AX100 CONFIG table
     for(i=0; i < ax100_config_count; i++)
@@ -476,17 +500,33 @@ void _com_config_find(char *param_name, int *table, param_table_t **param)
         }
     }
 
+    // Find the given parameter name in the AX100 RX table
+    if(*param == NULL)
+    {
+        for(i = 0; i < ax100_config_rx_count; i++)
+        {
+            printf("(rx) %d, %s\n", i, ax100_rx_config[i].name);
+            if(strcmp(param_name, ax100_rx_config[i].name) == 0)
+            {
+                printf("%d, %s\n", i, ax100_rx_config[i].name);
+                *param = &(ax100_rx_config[i]);
+                *table = table_tmp != -1 ? table_tmp : AX100_PARAM_RX;
+                return;
+            }
+        }
+    }
+
     // Find the given parameter name in the AX100 TX table
     if(*param == NULL)
     {
         for(i = 0; i < ax100_config_tx_count; i++)
         {
-            printf("%d, %s\n", i, ax100_tx_config[i].name);
+            printf("(tx) %d, %s\n", i, ax100_tx_config[i].name);
             if(strcmp(param_name, ax100_tx_config[i].name) == 0)
             {
                 printf("%d, %s\n", i, ax100_tx_config[i].name);
                 *param = &(ax100_tx_config[i]);
-                *table = AX100_PARAM_TX(0);
+                *table = table_tmp != -1 ? table_tmp : AX100_PARAM_TX(0);
                 return;
             }
         }
