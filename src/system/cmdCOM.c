@@ -21,6 +21,7 @@
 #include "cmdCOM.h"
 
 static const char *tag = "cmdCOM";
+static char trx_node = SCH_TRX_ADDRESS;
 
 #ifdef SCH_USE_NANOCOM
 static void _com_config_help(void);
@@ -35,6 +36,8 @@ void cmd_com_init(void)
     cmd_add("com_send_tc", com_send_tc_frame, "%d %n", 1);
     cmd_add("com_send_data", com_send_data, "%p", 1);
     cmd_add("com_debug", com_debug, "", 0);
+    cmd_add("com_set_node", com_set_node, "%d", 1);
+    cmd_add("com_get_node", com_get_node, "", 0);
 #ifdef SCH_USE_NANOCOM
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%s", 1);
@@ -226,24 +229,50 @@ int com_debug(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
+int com_set_node(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "Null arguments!");
+        return CMD_ERROR;
+    }
+
+    int node;
+    if(sscanf(params, fmt, &node) == nparams)
+    {
+        trx_node = node;
+        LOGI(tag, "TRX node set to %d", node);
+        return CMD_OK;
+    }
+    return CMD_FAIL;
+}
+
+int com_get_node(char *fmt, char *params, int nparams)
+{
+    printf("TRX Node: %d\n", trx_node);
+    return CMD_OK;
+}
+
 #ifdef SCH_USE_NANOCOM
 int com_reset_wdt(char *fmt, char *params, int nparams)
 {
 
     int rc, node, n_args = 0;
 
-    // If no params received, try to reset the default SCH_TRX_ADDRESS node
+    // If no params received, try to reset the default trx_node node
     if(params == NULL)
-        node = SCH_TRX_ADDRESS;
-
-    //format: <node>
-    n_args = sscanf(params, fmt, &node);
-    // If no params received, try to reset the default SCH_TRX_ADDRESS node
-    if(n_args != nparams)
-        node = SCH_TRX_ADDRESS;
+        node = trx_node;
+    else
+    {
+        //format: <node>
+        n_args = sscanf(params, fmt, &node);
+        // If no params received, try to reset the current trx_node
+        if(n_args != nparams)
+            node = trx_node;
+    }
 
     // Send and empty message to GNDWDT_RESET (9) port
-//    rc = csp_transaction(CSP_PRIO_CRITICAL, SCH_TRX_ADDRESS, AX100_PORT_GNDWDT_RESET, 1000, NULL, 0 NULL, 0);
+    rc = csp_transaction(CSP_PRIO_CRITICAL, node, AX100_PORT_GNDWDT_RESET, 1000, NULL, 0, NULL, 0);
 
     if(rc > 0)
     {
@@ -303,7 +332,7 @@ int com_get_config(char *fmt, char *params, int nparams)
         // Actually get the parameter value
         void *out = malloc(param_i->size);
         rc = rparam_get_single(out, param_i->addr, param_i->type, param_i->size,
-                table, SCH_TRX_ADDRESS, AX100_PORT_RPARAM, 1000);
+                table, trx_node, AX100_PORT_RPARAM, 1000);
 
         // Process the answer
         if(rc > 0)
@@ -366,7 +395,7 @@ int com_set_config(char *fmt, char *params, int nparams)
         void *out = malloc(param_i->size);
         param_from_string(param_i, value, out);
         rc = rparam_set_single(out, param_i->addr, param_i->type, param_i->size,
-                               table, SCH_TRX_ADDRESS, AX100_PORT_RPARAM, 1000);
+                               table, trx_node, AX100_PORT_RPARAM, 1000);
 
         // Process the answer
         if(rc > 0)
@@ -408,7 +437,7 @@ int com_update_status_vars(char *fmt, char *params, int nparams)
         // Actually get the parameter value
         void *out = malloc(param_i->size);
         rc = rparam_get_single(out, param_i->addr, param_i->type, param_i->size,
-                               table, SCH_TRX_ADDRESS, AX100_PORT_RPARAM, 1000);
+                               table, trx_node, AX100_PORT_RPARAM, 1000);
 
         // Process the answer, save value to status variables
         if(rc > 0)
@@ -461,18 +490,58 @@ void _com_config_help(void)
 void _com_config_find(char *param_name, int *table, param_table_t **param)
 {
     int i = 0;
+    int table_tmp = -1;
     *param = NULL;
+
+    char *token;
+    token = strtok(param_name, "-");
+
+    // ej: tx-freq
+    if(strcmp(token, "tx") == 0)
+    {
+        table_tmp = AX100_PARAM_TX(0);
+        param_name = strtok(NULL, "-");
+    }
+    // ej: rx-freq
+    else if(strcmp(token, "rx") == 0)
+    {
+        table_tmp = AX100_PARAM_RX;
+        param_name = strtok(NULL, "-");
+    }
+    // ej: tx_pwr or baud
+    else
+    {
+        param_name = token;
+        table_tmp = -1;
+    }
+
 
     // Find the given parameter name in the AX100 CONFIG table
     for(i=0; i < ax100_config_count; i++)
     {
-        printf("%d, %s\n", i, ax100_config[i].name);
+        //printf("%d, %s\n", i, ax100_config[i].name);
         if(strcmp(param_name, ax100_config[i].name) == 0)
         {
-            printf("%d, %s\n", i, ax100_config[i].name);
             *param = &(ax100_config[i]);
             *table = AX100_PARAM_RUNNING;
+            printf("%d, %d, %s\n", i, *table, ax100_config[i].name);
             return;
+        }
+    }
+
+    // Find the given parameter name in the AX100 RX table
+    if(*param == NULL)
+    {
+        for(i = 0; i < ax100_config_rx_count; i++)
+        {
+            // printf("(rx) %d, %s\n", i, ax100_rx_config[i].name);
+            if(strcmp(param_name, ax100_rx_config[i].name) == 0)
+            {
+                *param = &(ax100_rx_config[i]);
+                *table = table_tmp != -1 ? table_tmp : AX100_PARAM_RX;
+                printf("%d, %d, %s\n", i, *table, ax100_rx_config[i].name);
+                return;
+            }
         }
     }
 
@@ -481,12 +550,12 @@ void _com_config_find(char *param_name, int *table, param_table_t **param)
     {
         for(i = 0; i < ax100_config_tx_count; i++)
         {
-            printf("%d, %s\n", i, ax100_tx_config[i].name);
+            // printf("(tx) %d, %s\n", i, ax100_tx_config[i].name);
             if(strcmp(param_name, ax100_tx_config[i].name) == 0)
             {
-                printf("%d, %s\n", i, ax100_tx_config[i].name);
                 *param = &(ax100_tx_config[i]);
-                *table = AX100_PARAM_TX(0);
+                *table = table_tmp != -1 ? table_tmp : AX100_PARAM_TX(0);
+                printf("%d, %d, %s\n", i, *table, ax100_rx_config[i].name);
                 return;
             }
         }
