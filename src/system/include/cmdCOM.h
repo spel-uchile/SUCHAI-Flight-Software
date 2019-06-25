@@ -170,6 +170,25 @@ int com_send_data(char *fmt, char *params, int nparams);
 int com_debug(char *fmt, char *params, int nparams);
 
 /**
+ * Set module global variable trx_node. Future command calls will use this node
+ *
+ * @param fmt Str. Parameters format: "%d"
+ * @param params Str. Parameters: <node>, the TRX node number
+ * @param nparams Str. Number of parameters: 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ */
+int com_set_node(char *fmt, char *params, int nparams);
+
+/**
+ * Show current trx_node setting. @see com_set_node
+ * @param fmt Not used
+ * @param params Not used
+ * @param nparams Not used
+ * @return CMD_OK
+ */
+int com_get_node(char *fmt, char *params, int nparams);
+
+/**
  * Reset the TRX GND Watchdog timer at @node node by sending a CSP command to the
  * AX100_PORT_GNDWDT_RESET (9) port. This command targets the AX100 TRX.
  * If the <node> param is given, then the message is send to that node, if no
