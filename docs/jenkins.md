@@ -46,3 +46,10 @@ _#some commands here_ \
 _"""_ \
 _}_
 ```
+
+### Debugging build errors
+
+The code is executed in the following working path:
+
+    ~/workspace/SUCHAI-Flight-Software-pipeline
+

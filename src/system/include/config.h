@@ -67,8 +67,8 @@
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
 #define SCH_TRX_PORT_CMD        (12)               ///< Commands port (execute console commands)
-#define SCH_COMM_ZMQ_OUT        "tcp://127.0.0.1:8001"  ///< Out socket URI
-#define SCH_COMM_ZMQ_IN         "tcp://127.0.0.1:8002"   ///< In socket URI
+#define SCH_COMM_ZMQ_IN        "tcp://127.0.0.1:8001"  ///< Out socket URI
+#define SCH_COMM_ZMQ_OUT       "tcp://127.0.0.1:8002"   ///< In socket URI
 #define SCH_TX_INHIBIT          10                  /// Default silent time in seconds [0, 1800 (30min)]
 #define SCH_TX_PWR              0                  /// Default TX power [0|1|2|3]
 #define SCH_TX_BCN_PERIOD       60                 /// Default beacon period in seconds
@@ -79,7 +79,7 @@
 #define SCH_STORAGE_MODE        2    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-#define SCH_STORAGE_PGUSER      "spel"
+#define SCH_STORAGE_PGUSER      "carlos"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2 /// TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024
