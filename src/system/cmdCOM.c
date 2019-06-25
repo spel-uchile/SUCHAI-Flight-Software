@@ -490,12 +490,12 @@ void _com_config_find(char *param_name, int *table, param_table_t **param)
     // Find the given parameter name in the AX100 CONFIG table
     for(i=0; i < ax100_config_count; i++)
     {
-        printf("%d, %s\n", i, ax100_config[i].name);
+        //printf("%d, %s\n", i, ax100_config[i].name);
         if(strcmp(param_name, ax100_config[i].name) == 0)
         {
-            printf("%d, %s\n", i, ax100_config[i].name);
             *param = &(ax100_config[i]);
             *table = AX100_PARAM_RUNNING;
+            printf("%d, %d, %s\n", i, *table, ax100_config[i].name);
             return;
         }
     }
@@ -505,12 +505,12 @@ void _com_config_find(char *param_name, int *table, param_table_t **param)
     {
         for(i = 0; i < ax100_config_rx_count; i++)
         {
-            printf("(rx) %d, %s\n", i, ax100_rx_config[i].name);
+            // printf("(rx) %d, %s\n", i, ax100_rx_config[i].name);
             if(strcmp(param_name, ax100_rx_config[i].name) == 0)
             {
-                printf("%d, %s\n", i, ax100_rx_config[i].name);
                 *param = &(ax100_rx_config[i]);
                 *table = table_tmp != -1 ? table_tmp : AX100_PARAM_RX;
+                printf("%d, %d, %s\n", i, *table, ax100_rx_config[i].name);
                 return;
             }
         }
@@ -521,12 +521,12 @@ void _com_config_find(char *param_name, int *table, param_table_t **param)
     {
         for(i = 0; i < ax100_config_tx_count; i++)
         {
-            printf("(tx) %d, %s\n", i, ax100_tx_config[i].name);
+            // printf("(tx) %d, %s\n", i, ax100_tx_config[i].name);
             if(strcmp(param_name, ax100_tx_config[i].name) == 0)
             {
-                printf("%d, %s\n", i, ax100_tx_config[i].name);
                 *param = &(ax100_tx_config[i]);
                 *table = table_tmp != -1 ? table_tmp : AX100_PARAM_TX(0);
+                printf("%d, %d, %s\n", i, *table, ax100_rx_config[i].name);
                 return;
             }
         }
