@@ -40,7 +40,7 @@
  * such as the frame number, the telemetry type and the nubmer of data samples
  * inside a frame.
  */
-typedef struct com_frame{
+typedef struct __attribute__((__packed__)) com_frame{
     uint16_t nframe;         ///< Frame number
     uint16_t type;          ///< Telemetry type
     uint32_t ndata;         ///< Number of data samples (structs) in the frame
@@ -58,7 +58,7 @@ typedef struct com_frame{
 /**
  * Parameter to com_send_data. Stores the destination node and binary data.
  */
-typedef struct com_data{
+typedef struct __attribute__((__packed__)) com_data{
     uint8_t node;                       ///< destination node
     com_frame_t frame;
 }com_data_t;
