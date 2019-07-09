@@ -9,10 +9,10 @@
 # Meant to be executed by the 'database_setup.sh' script
 #
 # Authors: Diego Ortego P
-#
+#          Camilo Rojas
 
 # Checks if arguments were passed
-if [[ $# -ne 1 ]]; then
+if [ $# -ne 1 ]; then
     echo $0: usage: myscript name
     # If no arguments were passed
     exit 1
@@ -43,4 +43,4 @@ if psql -t -c '\l' | cut -d \| -f 1 | grep -qw "$postgresql_user"; then
 else
     echo "- Creating postgresql database '$postgresql_user'..."
     createdb "$postgresql_user"
-fi
+
