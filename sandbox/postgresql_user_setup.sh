@@ -43,4 +43,6 @@ if psql -t -c '\l' | cut -d \| -f 1 | grep -qw "$postgresql_user"; then
 else
     echo "- Creating postgresql database '$postgresql_user'..."
     createdb "$postgresql_user"
+fi
 
+exit 0
