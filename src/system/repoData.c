@@ -91,7 +91,7 @@ void dat_repo_init(void)
             data_base[i].periodical = 0;
         }
     }
-#elif (SCH_STORAGE_MODE == 1)
+#elif (SCH_STORAGE_MODE > 0)
     {
         //Init storage system
         int rc;
@@ -109,22 +109,6 @@ void dat_repo_init(void)
         //Init system flight plan table
         rc=storage_table_flight_plan_init(0);
         assertf(rc==0, tag, "Unable to create flight plan table");
-    }
-#elif (SCH_STORAGE_MODE == 2)
-    {
-        //Init storage system
-        int rc;
-        rc = storage_init(SCH_STORAGE_FILE);
-        assertf(rc==0, tag, "Unable to create non-volatile data repository");
-
-        //Init system repo
-        rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
-        assertf(rc==0, tag, "Unable to create system variables repository");
-
-//        //Init system flight plan table
-//        rc=storage_table_flight_plan_init(0);
-//        assertf(rc==0, tag, "Unable to create flight plan table");
-//
     }
 #endif
 
