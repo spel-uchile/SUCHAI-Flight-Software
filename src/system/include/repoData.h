@@ -264,7 +264,7 @@ typedef enum payload_id {
 /**
  * Struct for storing temperature data.
  */
-typedef struct temp_data {
+typedef struct __attribute__((__packed__)) temp_data {
     int timestamp;
     float obc_temp_1;
     float obc_temp_2;
@@ -274,7 +274,7 @@ typedef struct temp_data {
 /**
  * Struct for storing data collected by ads sensors.
  */
-typedef struct ads_data {
+typedef struct __attribute__((__packed__)) ads_data {
     int timestamp;
     float acc_x;            ///< Gyroscope acceleration value along the x axis
     float acc_y;            ///< Gyroscope acceleration value along the y axis
@@ -287,7 +287,7 @@ typedef struct ads_data {
 /**
  * Struct for storing data collected by eps housekeeping.
  */
-typedef struct eps_data {
+typedef struct __attribute__((__packed__)) eps_data {
     int timestamp;
     uint32_t cursun;            ///< Current from boost converters [mA]
     uint32_t cursys;            ///< Current out of battery [mA]
@@ -300,7 +300,8 @@ typedef struct eps_data {
     int32_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
 } eps_data_t;
 
-typedef struct langmuir_data {
+/* FIXME: Docummentation required */
+typedef struct __attribute__((__packed__)) langmuir_data {
     int timestamp;
     float sweep_voltage;
     float plasma_voltage;
@@ -308,8 +309,8 @@ typedef struct langmuir_data {
     int particles_counter;
 } langmuir_data_t;
 
-
-extern struct map {
+/* FIXME: Docummentation required */
+extern struct __attribute__((__packed__)) map {
     char table[30];
     uint16_t  size;
     uint32_t sys_index;
