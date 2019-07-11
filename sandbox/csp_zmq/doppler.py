@@ -1,7 +1,7 @@
 import argparse
 import socket
 import re
-from zmqnode import CspZmqNode, threaded
+from zmqnode import CspZmqNode, CspHeader, threaded
 
 
 class DopplerNode(CspZmqNode):
@@ -20,6 +20,7 @@ class DopplerNode(CspZmqNode):
         re_main = re.compile(r"F +(\d+)\n")
         re_sub = re.compile(r"I +(\d+)\n")
         resp_ok = b"RPRT 0\n"
+        csp_header = CspHeader(self.node, self.radio_node, 22, 10)
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((self.predict_ip, int(self.predict_port)))
@@ -41,12 +42,12 @@ class DopplerNode(CspZmqNode):
                     self.f_main = re_main.findall(data.decode('ascii'))[0]
                     print("DN:", self.f_main)
                     conn.sendall(resp_ok)
-                    self.send_message("com_set_config rx-freq {}".format(self.f_main), self.radio_node, 12)
+                    self.send_message("com_set_config rx-freq {}".format(self.f_main), csp_header)
                 elif b'I' in data:
                     self.f_sub = re_sub.findall(data.decode('ascii'))[0]
                     print("UP:", self.f_sub)
                     conn.sendall(resp_ok)
-                    self.send_message("com_set_config tx-freq {}".format(self.f_sub), self.radio_node, 12)
+                    self.send_message("com_set_config tx-freq {}".format(self.f_sub), csp_header)
                 elif b'f' in data:
                     resp = "{}\n".format(self.f_main).encode('ascii')
                     conn.sendall(resp)

@@ -1,16 +1,8 @@
-import re
 import zmq
 import argparse
+from random import randint
 from zmqnode import CspZmqNode
-from threading import Thread
-
-
-def threaded(fn):
-    def wrapper(*args, **kwargs):
-        thread = Thread(target=fn, args=args, kwargs=kwargs)
-        thread.start()
-        return thread
-    return wrapper
+from zmqnode import threaded
 
 
 class CspZmqHub(CspZmqNode):
@@ -32,7 +24,7 @@ class CspZmqHub(CspZmqNode):
         self.out_port_hub = out_port
         self.in_port_hub = in_port
 
-    def read_message(self, message):
+    def read_message(self, message, header=None):
         print(message)
 
     @threaded
@@ -41,7 +33,7 @@ class CspZmqHub(CspZmqNode):
         try:
             while self._run:
                 dest, port, msg = input(prompt).split(" ", 2)
-                self.send_message(msg, int(dest), int(port))
+                self.send_message(msg, int(dest))
         except Exception:
             pass
         print("Console stopped!")
