@@ -9,27 +9,35 @@ SUCHAI Flight software was originally developed to be used in the
 [CubeSat](https://en.wikipedia.org/wiki/CubeSat)). SUCHAI was launch into orbit 
 in June 2017 and has been working properly.
 
-The main idea was to design a highly modular software architecture to help the
+The main idea was to design a highly modular and extensible flight software architecture to help the
 development of CubeSats projects that are composed by large and heterogeneous 
-teams and that are built incrementally.
+teams. Provides a ready-to-use nanosatellite flight software, a flexible way to add/remove functionalities or paylodads, and supports an incremental development.
 
 The software architecture is based on the command processor design pattern. Developers
-can extend the functionalities adding new commands to the system (with low 
+can extend the functionalities by adding new commands to the system (with low 
 impact in the whole software) or adding new clients that can request any of the available
 commands depending on their custom control strategy. Commands and control modules 
 can be added or removed with zero impact in the software main functionalities.
 Once a command is implemented, it can be used in the software itself and also
-as a ground station telecommand.
+as a telecommand.
 
-Visit http://spel.ing.uchile.cl to get latest news about SUCHAI project
-Visit http://www.freertos.org/ to get FreeRTOS source code and documentation
-More: http://tesis.uchile.cl/handle/2250/115307
+Current implementation uses the [LibCSP](https://github.com/libcsp/libcsp) to communicate subsytems and the ground station. Linux port can use the LibCSP with [ZMQ](http://zeromq.org/) interface.
+
+Visit http://spel.ing.uchile.cl to get latest news about SUCHAI project.
+Visit http://www.freertos.org/ to get FreeRTOS source code and documentation.
+Visit https://github.com/libcsp/libcsp to get the latest version of the LibCSP.
+
+More: 
+- Paper (en, open access): https://ieeexplore.ieee.org/document/8758807
+- Bachelor thesis (es): http://tesis.uchile.cl/handle/2250/115307
 
 ## Key features
 
-* Designed for medium-range microcontrollers, such as Microchip PIC24 and ATMEL AV32.
-* Highly extensible and modular command processor architecture
-* Ported to FreeRTOS and Linux 
+* Highly extensible and modular command processor architecture.
+* Ported to FreeRTOS and Linux.
+* Designed for medium-range microcontrollers such as ATMEL AVR32, Espressif ESP32.
+* Ported and tested on Raspberry PI.
+* Can be used as Flight Software, Ground Station Software or general purpose embedded system firmware.
 * Flight inheritance: SUCHAI I (Jun 2017)
 
 ## Build status
@@ -46,11 +54,11 @@ More: http://tesis.uchile.cl/handle/2250/115307
 
 SUCHAI flight software was designed to run in multiple embedded architectures 
 using FreeRTOS. It was also ported to Linux to facilitate the development and debugging. 
-Currently, it has been tested in the following OS/Architectures :
+Currently, it has been tested in the following OS/Architectures:
 
-* ArchLinux x86_64
+* Ubuntu 18.04 x86_64
 * Manjaro x86_64
-* Ubuntu 16.04 x86_64
+* ArchLinux x86_64
 * Debian Stretch RPi 3 (armv7l)
 * FreeRTOS ESP32
 * FreeRTOS AVR32 UC3 (avr32uc3)
@@ -139,6 +147,32 @@ may have limited or under development support):
 - Esspressif ESP32: ```python3 compile.py FREERTOS --arch ESP32 --sch_com 0```
 
 Please refer to the documentation for more details
+
+## How to cite
+
+Plain text
+```
+C. E. Gonzalez, C. J. Rojas, A. Bergel and M. A. Diaz, "An architecture-tracking approach to evaluate a modular and extensible flight software for CubeSat nanosatellites," in IEEE Access.
+doi: 10.1109/ACCESS.2019.2927931
+keywords: {cubesat;embedded software;flight software;nanosatellites;software architecture;software quality;software visualization;open source},
+URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8758807&isnumber=6514899
+```
+
+Bibtex
+```bibtex
+@article{gonzalez2019, 
+author={C. E. {Gonzalez} and C. J. {Rojas} and A. {Bergel} and M. A. {Diaz}}, 
+journal={IEEE Access}, 
+title={An architecture-tracking approach to evaluate a modular and extensible flight software for CubeSat nanosatellites}, 
+year={2019}, 
+volume={}, 
+number={}, 
+pages={1-1}, 
+keywords={cubesat;embedded software;flight software;nanosatellites;software architecture;software quality;software visualization;open source}, 
+doi={10.1109/ACCESS.2019.2927931}, 
+ISSN={2169-3536}, 
+month={},}
+```
 
 ## Contact
 
