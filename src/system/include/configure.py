@@ -31,8 +31,8 @@ def parse_args():
     parser.add_argument('--sch_hk', type=str, default="1")
     parser.add_argument('--sch_test', type=str, default="0")
     parser.add_argument('--sch_node', type=str, default="1")
-    parser.add_argument('--sch_zmq_out', type=str, default="tcp://127.0.0.1:8001")
-    parser.add_argument('--sch_zmq_in', type=str, default="tcp://127.0.0.1:8002")
+    parser.add_argument('--sch_zmq_in', type=str, default="tcp://127.0.0.1:8001")
+    parser.add_argument('--sch_zmq_out', type=str, default="tcp://127.0.0.1:8002")
     parser.add_argument('--sch_st_mode', type=str, default="1")
     parser.add_argument('--sch_st_triple_wr', type=str, default="1")
 

@@ -20,14 +20,18 @@ def get_parameters():
     parser.add_argument('--sch_hk', type=str, default="1")
     parser.add_argument('--sch_test', type=str, default="0")
     parser.add_argument('--sch_node', type=str, default="1")
-    parser.add_argument('--sch_zmq_out', type=str, default="tcp://127.0.0.1:8002")
     parser.add_argument('--sch_zmq_in', type=str, default="tcp://127.0.0.1:8001")
+    parser.add_argument('--sch_zmq_out', type=str, default="tcp://127.0.0.1:8002")
     parser.add_argument('--sch_st_mode', type=str, default="1")
     parser.add_argument('--sch_st_triple_wr', type=str, default="1")
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
     # Force clean
     parser.add_argument('--clean', action="store_true", help="Clean befero build")
+    # Program
+    parser.add_argument('--program', action="store_true", help="Compile and program")
+    # Skip config
+    parser.add_argument('--no-config', action="store_true", help="Skip configure, do not generate a new config.h")
 
     return parser.parse_args()
 
@@ -35,11 +39,13 @@ if __name__ == "__main__":
     # Parse parameters
     args = get_parameters()
 
-    # Generate config file
     cwd_root = os.getcwd()
-    configure.make_config(args,
-                          'src/system/include/config_template.h',
-                          'src/system/include/config.h')
+
+    # Generate config file
+    if not args.no_config:
+        configure.make_config(args,
+                              'src/system/include/config_template.h',
+                              'src/system/include/config.h')
 
     result = 0
 
@@ -81,6 +87,8 @@ if __name__ == "__main__":
                 result = os.system('sh install.sh')
             if args.clean:
                 result = os.system('sh build.sh clean')
+            if args.program:
+                result = os.system('sh build.sh program')
             else:
                 result = os.system('sh build.sh')
 
