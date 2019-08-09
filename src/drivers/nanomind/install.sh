@@ -1,32 +1,36 @@
 #!/bin/sh
 
-echo "Downloading toolchain..."
-wget -N data.spel.cl/gs-avr32-toolchain-3.4.2.tar.gz
-tar -xzf gs-avr32-toolchain-3.4.2.tar.gz
+TOOLS=${1:-0}  # Install toolchain, default false
 
-echo "Installing toolchain..."
-cd gs-avr32-toolchain-3.4.2/
-if [ ! -d "$HOME/.local" ]; then
-    mkdir ~/.local
-fi
-if [ ! -d "$HOME/.local/avr32" ]; then
-    mkdir ~/.local/avr32
-fi
-if [ ! -d "$HOME/.local/bin" ]; then
-    mkdir ~/.local/bin
-fi
-if [ ! -d "$HOME/.local/bin" ]; then
-    mkdir ~/.local/share
-fi
-./install-avr32.sh
-cd -
+if TOOLS; then
+  echo "Downloading toolchain..."
+  wget -N data.spel.cl/gs-avr32-toolchain-3.4.2.tar.gz
+  tar -xzf gs-avr32-toolchain-3.4.2.tar.gz
 
-echo "Adding directories to PATH..."
-if echo ":$PATH:" | grep -q ":$HOME/.local/bin:$HOME/.local/avr32/bin:"; then
-  echo "Path was correctly set"
-else
-  echo 'export PATH="$HOME/.local/bin:$HOME/.local/avr32/bin:$PATH"' >> ~/.bashrc
-  source ~/.bashrc
+  echo "Installing toolchain..."
+  cd gs-avr32-toolchain-3.4.2/
+  if [ ! -d "$HOME/.local" ]; then
+      mkdir ~/.local
+  fi
+  if [ ! -d "$HOME/.local/avr32" ]; then
+      mkdir ~/.local/avr32
+  fi
+  if [ ! -d "$HOME/.local/bin" ]; then
+      mkdir ~/.local/bin
+  fi
+  if [ ! -d "$HOME/.local/bin" ]; then
+      mkdir ~/.local/share
+  fi
+  ./install-avr32.sh
+  cd -
+
+  echo "Adding directories to PATH..."
+  if echo ":$PATH:" | grep -q ":$HOME/.local/bin:$HOME/.local/avr32/bin:"; then
+    echo "Path was correctly set"
+  else
+    echo 'export PATH="$HOME/.local/bin:$HOME/.local/avr32/bin:$PATH"' >> ~/.bashrc
+    source ~/.bashrc
+  fi
 fi
 
 echo "Checking avr32-gcc Version..."

@@ -30,6 +30,7 @@ def get_parameters():
     parser.add_argument('--clean', action="store_true", help="Clean befero build")
     # Program
     parser.add_argument('--program', action="store_true", help="Compile and program")
+    parser.add_argument('--console', type=int, default=4, help="Console to use. 2=Nanomind-USB-SERIAL, 4=FFP-USB")
     # Skip config
     parser.add_argument('--no-config', action="store_true", help="Skip configure, do not generate a new config.h")
 
@@ -88,7 +89,7 @@ if __name__ == "__main__":
             if args.clean:
                 result = os.system('sh build.sh clean')
             if args.program:
-                result = os.system('sh build.sh program')
+                result = os.system('sh build.sh program'+ ' ' + str(args.console))
             else:
                 result = os.system('sh build.sh')
 
