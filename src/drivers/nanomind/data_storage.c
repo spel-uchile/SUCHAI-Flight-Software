@@ -540,3 +540,9 @@ int storage_delete_memory_sections()
     }
     return 0;
 }
+
+int storage_table_payload_init(int drop)
+{
+    // FIXME: IMPLEMENT
+    return 0;
+}

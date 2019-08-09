@@ -241,7 +241,12 @@ int storage_delete_memory_sections(void);
  */
 int storage_close(void);
 
-
+/**
+ * FIXME: IMPLEMENT
+ * @param drop
+ * @return
+ */
+int storage_table_payload_init(int drop);
 
 
 
