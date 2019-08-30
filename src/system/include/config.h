@@ -25,7 +25,7 @@
 #include <string.h>
 
 /* Select one operating system */
-#define FREERTOS                                      ///< LINUX | FREERTOS
+#define LINUX                                      ///< LINUX | FREERTOS
 /* Select the correct architecture */
 #ifdef FREERTOS
     #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
@@ -38,24 +38,24 @@
 #ifdef NANOMIND
     #define SCH_USE_NANOPOWER
     #define SCH_USE_NANOCOM
-    //#define SCH_USE_GSSB
+    #define SCH_USE_GSSB
 #endif
 
 /* System debug configurations */
 #define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
-#define SCH_NAME                "SUCHAI-Test"         ///< Project code name
+#define SCH_NAME                "SUCHAI-DEV"         ///< Project code name
 #define SCH_DEVICE_ID           0                   ///< Device unique ID
-#define SCH_SW_VERSION          "2.0.4-59-gda12"      ///< Software version
+#define SCH_SW_VERSION          "2.0.4-dev"      ///< Software version
 
 /* General system settings */
 #define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          1      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
-#define SCH_WDT_PERIOD          10                 ///< CPU watchdog timer period in seconds
-#define SCH_MAX_WDT_TIMER       5                  ///< Seconds to send wdt_reset command
+#define SCH_WDT_PERIOD          120                 ///< CPU watchdog timer period in seconds
+#define SCH_MAX_WDT_TIMER       60                  ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
-#define SCH_UART_BAUDRATE       (576000)           ///< UART baud rate for serial console
+#define SCH_UART_BAUDRATE       (500000)           ///< UART baud rate for serial console
 #define SCH_KISS_UART_BAUDRATE  (500000)           ///< UART baud rate for kiss communication
 #define SCH_KISS_DEVICE         "/dev/ttyUSB0"     ///< Kiss device path
 
@@ -80,7 +80,7 @@
 #define SCH_STORAGE_MODE        0    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-#define SCH_STORAGE_PGUSER      "carlos"
+#define SCH_STORAGE_PGUSER      "spel"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage
