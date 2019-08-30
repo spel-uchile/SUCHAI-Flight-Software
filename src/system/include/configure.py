@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument('os', type=str, default="LINUX")
     parser.add_argument('--arch', type=str, default="NANOMIND")
     parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
-    parser.add_argument('--name', type=str, default="SUCHAI-Test")
+    parser.add_argument('--name', type=str, default="SUCHAI-DEV")
     parser.add_argument('--id',   type=str, default="0")
     parser.add_argument('--version',   type=str, default=call_git_describe())
     parser.add_argument('--comm', type=str, default="1")

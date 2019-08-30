@@ -49,3 +49,6 @@ src/drivers/Linux/libcsp/libcsp
 
 # docs
 docs/html/
+
+# Custom
+src/system/include/config.h
