@@ -3,6 +3,7 @@
 //
 
 #include "data_storage.h"
+#include "suchai-drivers-obc/lib/libthirdparty/include/gs/thirdparty/fram/fm33256b.h"
 
 static const char *tag = "data_storage";
 
@@ -22,11 +23,30 @@ static int max_command_size = (SCH_CMD_MAX_STR_NAME+SCH_CMD_MAX_STR_PARAMS)*size
 
 int storage_init(const char *file)
 {
-    /* Init RTC storage */
-    fm33256b_init();
+    /* Init FRAM storage */
+    /* FIXME: Not necessary, already performed in init.c */
+    const gs_fm33256b_config_t fram = {.spi_slave = GS_A3200_SPI_SLAVE_FRAM};
+    int error = (int)gs_fm33256b_init(0, &fram);
+    if (error)
+        return -1;
 
     /* Init FLASH NOR storage */
-    spn_fl512s_init((unsigned int) 0);
+    /* FIXME: Not necessary, already performed in init.c */
+    /* Turn on power */
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_SD);
+    /* Initialize spansion chip. Requires that the SPI device has been initialized */
+    const spn_fl512s_config_t config = {
+            .bps = 8000000,
+            .cs_part_0 = SPN_FL512S_CS0,
+            .cs_part_1 = SPN_FL512S_CS1,
+            .spi_slave_part_0 = GS_A3200_SPI_SLAVE_SPN_FL512_0,
+            .spi_slave_part_1 = GS_A3200_SPI_SLAVE_SPN_FL512_1,
+            .spi_handle = 1,
+    };
+
+    error = (int)spn_fl512s_init(&config);
+    if (error)
+        return -1;
 
     /* Init storage addresses */
     int payload_tables_amount = SCH_SECTIONS_PER_PAYLOAD*last_sensor;
@@ -65,7 +85,7 @@ int storage_repo_get_value_idx(int index, char *table)
     uint16_t len = (uint16_t)(sizeof(uint32_t));
     uint16_t add = (uint16_t)(index*len);
 
-    fm33256b_read_data(add, data.data8_p, len);
+    gs_fm33256b_fram_read(0, add, data.data8_p, len);
 
     LOGV(tag, "Read 0x%X", (unsigned int)data.data32);
     return (int)(data.data32);
@@ -85,7 +105,7 @@ int storage_repo_set_value_idx(int index, int value, char *table)
     uint16_t add = (uint16_t)(index*len);
 
     LOGV(tag, "Writing 0x%X", (unsigned int)data.data32);
-    fm33256b_write_data(add, data.data8_p, len);
+    gs_fm33256b_fram_write(0, add, data.data8_p, len);
 
     return 0;
 }

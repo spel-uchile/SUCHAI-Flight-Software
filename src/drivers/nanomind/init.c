@@ -168,6 +168,24 @@ gs_error_t sch_a3200_init_fram(void)
     return sch_init_rtc();
 }
 
+gs_error_t sch_a3200_init_flash(void)
+{
+    /* Turn on power */
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_SD);
+    /* Initialize spansion chip. Requires that the SPI device has been initialized */
+    const spn_fl512s_config_t config = {
+            .bps = 8000000,
+            .cs_part_0 = SPN_FL512S_CS0,
+            .cs_part_1 = SPN_FL512S_CS1,
+            .spi_slave_part_0 = GS_A3200_SPI_SLAVE_SPN_FL512_0,
+            .spi_slave_part_1 = GS_A3200_SPI_SLAVE_SPN_FL512_1,
+            .spi_handle = 1,
+    };
+    int error = (int)spn_fl512s_init(&config);
+    if (error)
+        return -1;
+}
+
 void sch_bsp_init_task(void * param)
 {
     /* SPI1 device drivers */
@@ -175,6 +193,9 @@ void sch_bsp_init_task(void * param)
 
     /* Init temperature sensors */
     gs_a3200_lm71_init();
+
+    /* Init FLASH (fl512s) */
+    sch_a3200_init_flash();
 
     /* Init FRAM and RTC (FM33256B chip) */
     sch_a3200_init_fram();
