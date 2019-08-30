@@ -23,6 +23,7 @@
 #include "globals.h"
 
 #include "repoCommand.h"
+#include "cmdTM.h"
 
 void taskCommunications(void *param);
 

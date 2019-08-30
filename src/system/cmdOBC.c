@@ -34,12 +34,14 @@ void cmd_obc_init(void)
     cmd_add("obc_reset_wdt", obc_reset_wdt, "", 0);
     cmd_add("obc_system", obc_system, "%s", 1);
     cmd_add("obc_set_pwm_duty", obc_set_pwm_duty, "%d %d", 2);
+    cmd_add("obc_set_pwm_freq", obc_set_pwm_freq, "%d %f", 2);
+    cmd_add("obc_pwm_pwr", obc_pwm_pwr, "%d", 1);
     cmd_add("obc_get_sensors", obc_get_sensors, "", 0);
     cmd_add("obc_update_status", obc_update_status, "", 0);
 
-#ifdef NANOMIND
-    cmd_add("istage_pwr", gssb_pwr, "%d %d", 2);
+#if 0
     cmd_add("istage_select", gssb_select_dev, "%d", 1);
+    cmd_add("istage_pwr", gssb_pwr, "%d %d", 2);
     cmd_add("istage_set_addr", gssb_set_addr, "%d", 1);
     cmd_add("istage_ident", gssb_ident, "", 0);
     cmd_add("istage_get_config", gssb_istage_get_settings, "", 0);
@@ -83,8 +85,8 @@ int obc_debug(char *fmt, char *params, int nparams)
             }
         #endif
         #ifdef NANOMIND
-            if(dbg_type <= LED_A)
-                led_toggle((led_names_t)dbg_type);
+            if(dbg_type <= GS_A3200_LED_A)
+                gs_a3200_led_toggle((gs_a3200_led_t)dbg_type);
         #endif
         #ifdef ESP32
             static int level = 0;
@@ -244,8 +246,8 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
     if(sscanf(params, fmt, &channel, &duty) == nparams)
     {
         LOGI(tag, "Setting duty %d to Channel %d", duty, channel);
-        gs_pwm_enable(channel);
-        gs_pwm_set_duty(channel, duty);
+        gs_a3200_pwm_enable(channel);
+        gs_a3200_pwm_set_duty(channel, duty);
         return CMD_OK;
 
     }
@@ -255,7 +257,53 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
         return CMD_FAIL;
     }
 #else
-    LOGW(tag, "Command not suported!");
+    LOGW(tag, "Command not supported!");
+    return CMD_FAIL;
+#endif
+}
+
+int obc_set_pwm_freq(char* fmt, char* params, int nparams)
+{
+#ifdef NANOMIND
+    int channel;
+    float freq;
+    
+    if(sscanf(params, fmt, &channel, &freq) != nparams)
+        return CMD_ERROR;
+    
+    /* The pwm cant handle frequencies above 433 Hz or below 0.1 Hz */
+    if(channel > 2 || channel < 0 || freq > 433.0 || freq < 0.1)
+    {
+        LOGW(tag, "Parameters out of range: 0 <= channel <= 2 (%d), \
+             0.1 <= freq <= 433.0 (%.4f)", channel, freq);
+        return CMD_ERROR;
+    }
+    
+    float actual_freq = gs_a3200_pwm_set_freq(channel, freq);
+    LOGI(tag, "PWM %d Freq set to: %.4f", channel, actual_freq);
+    return CMD_OK;
+#endif
+}
+
+int obc_pwm_pwr(char *fmt, char *params, int nparams)
+{
+#ifdef NANOMIND
+    int enable;
+    if(params == NULL)
+        return CMD_ERROR;
+    
+    if(sscanf(params, fmt, &enable) != nparams)
+        return CMD_ERROR;
+    
+    /* Turn on/off power channel */
+    LOGI(tag, "PWM enabled: %d", enable>0 ? 1:0);
+    if(enable > 0)
+        gs_a3200_pwr_switch_enable(GS_A3200_PWR_PWM);
+    else
+        gs_a3200_pwr_switch_disable(GS_A3200_PWR_PWM);
+    return CMD_OK;
+#else
+    LOGW(tag, "Command not supported!");
     return CMD_FAIL;
 #endif
 }
@@ -266,20 +314,21 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
 
     int16_t sensor1, sensor2;
     float gyro_temp;
+    int result;
 
-    mpu3300_gyro_t gyro_reading;
-    hmc5843_data_t hmc_reading;
+    gs_mpu3300_gyro_t gyro_reading;
+    gs_hmc5843_data_t hmc_reading;
 
     /* Read board temperature sensors */
-    sensor1 = lm70_read_temp(1);
-    sensor2 = lm70_read_temp(2);
+    result = gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_0, 100, &sensor1); //sensor1 = lm70_read_temp(1);
+    result = gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_1, 100, &sensor2); //sensor2 = lm70_read_temp(2);
 
     /* Read gyroscope temperature and rate */
-    mpu3300_read_temp(&gyro_temp);
-    mpu3300_read_gyro(&gyro_reading);
+    gs_mpu3300_read_temp(&gyro_temp);
+    gs_mpu3300_read_gyro(&gyro_reading);
 
     /* Read magnetometer */
-    hmc5843_read_single(&hmc_reading);
+    gs_hmc5843_read_single(&hmc_reading);
 
     /* Get sample time */
     int curr_time =  (int)time(NULL);
@@ -331,20 +380,21 @@ int obc_update_status(char *fmt, char *params, int nparams)
 #ifdef NANOMIND
     int16_t sensor1, sensor2;
     float gyro_temp;
+    int result;
 
-    mpu3300_gyro_t gyro_reading;
-    hmc5843_data_t hmc_reading;
+    gs_mpu3300_gyro_t gyro_reading;
+    gs_hmc5843_data_t hmc_reading;
 
     /* Read board temperature sensors */
-    sensor1 = lm70_read_temp(1);
-    sensor2 = lm70_read_temp(2);
+    result = gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_0, 100, &sensor1); //sensor1 = lm70_read_temp(1);
+    result = gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_1, 100, &sensor2); //sensor2 = lm70_read_temp(2);
 
     /* Read gyroscope temperature and rate */
-    mpu3300_read_temp(&gyro_temp);
-    mpu3300_read_gyro(&gyro_reading);
+    gs_mpu3300_read_temp(&gyro_temp);
+    gs_mpu3300_read_gyro(&gyro_reading);
 
     /* Read magnetometer */
-    hmc5843_read_single(&hmc_reading);
+    gs_hmc5843_read_single(&hmc_reading);
 
     /* Set sensors status variables (fix type) */
     value temp_1;
@@ -393,11 +443,11 @@ int obc_update_status(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
+#if 0
 /**
- * This commands are related to inter-stage panels and only available for the
+ * These commands are related to inter-stage panels and only available for the
  * Nanomind A3200 with inter-stage panels using the GSSB interface and drivers.
  */
-#ifdef NANOMIND
 #define GSSB_I2C_DEV 2
 
 int gssb_pwr(char* fmt, char* params, int nparams)

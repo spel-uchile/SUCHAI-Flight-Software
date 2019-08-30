@@ -17,20 +17,24 @@
 #include "globals.h"
 
 /* Add files with commands */
+#if SCH_TEST_ENABLED
+    #include "cmdTestCommand.h"
+#endif
 #include "cmdOBC.h"
 #include "cmdDRP.h"
 #include "cmdConsole.h"
-#include "cmdEPS.h"
-
 #if SCH_FP_ENABLED
     #include "cmdFP.h"
+#endif
+#ifdef SCH_USE_NANOPOWER
+    #include "cmdEPS.h"
 #endif
 #if SCH_COMM_ENABLE
     #include "cmdCOM.h"
     #include "cmdTM.h"
 #endif
-#if SCH_TEST_ENABLED
-    #include "cmdTestCommand.h"
+#ifdef SCH_USE_GSSB
+    #include "cmdGSSB.h"
 #endif
 
 /* Macros */
@@ -54,6 +58,8 @@
  *  Defines the prototype of a command
  */
 typedef int (*cmdFunction)(char *fmt, char *params, int nparams);
+
+#define IF_PARSE_PARAMS(...) if(sscanf(params, fmt, ##__VA_ARGS) == nparams)
 
 /**
  * Structure to store a command sent to

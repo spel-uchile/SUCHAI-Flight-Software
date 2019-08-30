@@ -1,264 +1,279 @@
-/*                                 SUCHAI
- *                      NANOSATELLITE FLIGHT SOFTWARE
- *
- *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/* Copyright (c) 2013-2018 GomSpace A/S. All rights reserved. */
 
 #include "init.h"
 
-static const char *tag = "on_reset";
+#ifndef __linux
+/* This is a required to enable CPP linking */
+// void *__dso_handle __attribute__((used)) = 0;
+#endif
 
-void init_spi1(void) {
-    /* Setting up the GPIO map for SPI on the board */
-    gpio_map_t spi_piomap = {
-            {AVR32_SPI1_SCK_0_1_PIN, AVR32_SPI1_SCK_0_1_FUNCTION},
-            {AVR32_SPI1_MOSI_0_1_PIN, AVR32_SPI1_MOSI_0_1_FUNCTION},
-            {AVR32_SPI1_MOSI_0_2_PIN, AVR32_SPI1_MOSI_0_2_FUNCTION},
-            {AVR32_SPI1_MISO_0_1_PIN, AVR32_SPI1_MISO_0_1_FUNCTION},
-            {AVR32_SPI1_NPCS_2_2_PIN, AVR32_SPI1_NPCS_2_2_FUNCTION},
-            {AVR32_SPI1_NPCS_3_2_PIN, AVR32_SPI1_NPCS_3_2_FUNCTION},
-            {AVR32_SPI1_NPCS_0_PIN, AVR32_SPI1_NPCS_0_FUNCTION},
-            {AVR32_SPI1_NPCS_1_2_PIN, AVR32_SPI1_NPCS_1_2_FUNCTION},
+const gs_a3200_hooks_t * gs_a3200_hooks;
+
+void sch_a3200_init_spi0(bool decode)
+{
+    const gpio_map_t map = {
+        {AVR32_SPI0_MOSI_2_PIN, AVR32_SPI0_MOSI_2_FUNCTION},
+        {AVR32_SPI0_MISO_2_PIN, AVR32_SPI0_MISO_2_FUNCTION},
+        {AVR32_SPI0_SCK_2_PIN, AVR32_SPI0_SCK_2_FUNCTION},
+        {AVR32_SPI0_NPCS_0_2_PIN, AVR32_SPI0_NPCS_0_2_FUNCTION},
+        {AVR32_SPI0_NPCS_1_2_PIN, AVR32_SPI0_NPCS_1_2_FUNCTION},
+        {AVR32_SPI0_NPCS_2_2_PIN, AVR32_SPI0_NPCS_2_2_FUNCTION},
     };
-    gpio_enable_module(spi_piomap, 8);
+    gpio_enable_module(map, GS_ARRAY_SIZE(map));
 
-    /* Setup of SPI controller one */
-    sysclk_enable_pba_module(SYSCLK_SPI1);
-    spi_reset(&AVR32_SPI1);
-    spi_set_master_mode(&AVR32_SPI1);
-    spi_disable_modfault(&AVR32_SPI1);
-    spi_disable_loopback(&AVR32_SPI1);
-    spi_set_chipselect(&AVR32_SPI1, (1 << AVR32_SPI_MR_PCS_SIZE) - 1);
-    spi_disable_variable_chipselect(&AVR32_SPI1);
-    spi_disable_chipselect_decoding(&AVR32_SPI1);
-    spi_enable(&AVR32_SPI1);
+    gs_spi_init_device(0, decode);
 }
 
-void init_can(int enable_can) {
+void sch_a3200_init_spi1(void)
+{
+    const gpio_map_t map = {
+        {AVR32_SPI1_SCK_0_1_PIN, AVR32_SPI1_SCK_0_1_FUNCTION},
+        {AVR32_SPI1_MOSI_0_1_PIN, AVR32_SPI1_MOSI_0_1_FUNCTION},
+        {AVR32_SPI1_MOSI_0_2_PIN, AVR32_SPI1_MOSI_0_2_FUNCTION},
+        {AVR32_SPI1_MISO_0_1_PIN, AVR32_SPI1_MISO_0_1_FUNCTION},
+        {AVR32_SPI1_NPCS_2_2_PIN, AVR32_SPI1_NPCS_2_2_FUNCTION},
+        {AVR32_SPI1_NPCS_3_2_PIN, AVR32_SPI1_NPCS_3_2_FUNCTION},
+        {AVR32_SPI1_NPCS_0_PIN, AVR32_SPI1_NPCS_0_FUNCTION},
+        {AVR32_SPI1_NPCS_1_2_PIN, AVR32_SPI1_NPCS_1_2_FUNCTION},
+    };
+    gpio_enable_module(map, GS_ARRAY_SIZE(map));
 
+    gs_spi_init_device(1, false);
+}
+
+void sch_a3200_init_twi0(gs_avr32_i2c_mode_t mode, uint8_t addr, uint32_t bps)
+{
+    const gpio_map_t map = {
+        {AVR32_TWIMS0_TWCK_0_0_PIN, AVR32_TWIMS0_TWCK_0_0_FUNCTION},
+        {AVR32_TWIMS0_TWD_0_0_PIN, AVR32_TWIMS0_TWD_0_0_FUNCTION}
+    };
+    gpio_configure_pin(AVR32_TWIMS0_TWCK_0_0_PIN, GPIO_DRIVE_HIGH);
+    gpio_configure_pin(AVR32_TWIMS0_TWD_0_0_PIN, GPIO_DRIVE_HIGH);
+    gpio_enable_module(map, GS_ARRAY_SIZE(map));
+
+    gs_avr_i2c_init(0, mode, addr, bps);
+}
+
+void sch_a3200_init_twi2(void)
+{
+    const gpio_map_t map = {
+        {AVR32_TWIMS2_TWCK_0_0_PIN, AVR32_TWIMS2_TWCK_0_0_FUNCTION},
+        {AVR32_TWIMS2_TWD_0_0_PIN, AVR32_TWIMS2_TWD_0_0_FUNCTION}
+    };
+    gpio_enable_module(map, GS_ARRAY_SIZE(map));
+
+    /* Init twi master controller 2 with addr 1 and 150 kHz clock */
+    gs_avr_i2c_init(2, GS_AVR_I2C_MASTER, 1, 150000);
+}
+
+void sch_a3200_init_can(bool enable)
+{
     /* Setup the generic clock for CAN */
-    scif_gc_setup(AVR32_SCIF_GCLK_CANIF, SCIF_GCCTRL_OSC0, AVR32_SCIF_GC_NO_DIV_CLOCK, 0);
-    if (enable_can) {
+    scif_gc_setup(AVR32_SCIF_GCLK_CANIF,
+                  SCIF_GCCTRL_OSC0,
+                  AVR32_SCIF_GC_NO_DIV_CLOCK,
+                  0);
+    if (enable) {
         /* Enable the generic clock */
         scif_gc_enable(AVR32_SCIF_GCLK_CANIF);
 
         /* Setup GPIO map for CAN connection in stack */
-        static const gpio_map_t CAN_GPIO_MAP = {
-                {AVR32_CANIF_RXLINE_0_0_PIN, AVR32_CANIF_RXLINE_0_0_FUNCTION},
-                {AVR32_CANIF_TXLINE_0_0_PIN, AVR32_CANIF_TXLINE_0_0_FUNCTION}
+        const gpio_map_t map = {
+            {AVR32_CANIF_RXLINE_0_0_PIN, AVR32_CANIF_RXLINE_0_0_FUNCTION},
+            {AVR32_CANIF_TXLINE_0_0_PIN, AVR32_CANIF_TXLINE_0_0_FUNCTION}
         };
-        /* Assign GPIO to CAN */
-        gpio_enable_module(CAN_GPIO_MAP, sizeof(CAN_GPIO_MAP) / sizeof(CAN_GPIO_MAP[0]));
+        gpio_enable_module(map, GS_ARRAY_SIZE(map));
 
         /* Initialize PA15 (CANMODE) GPIO, must be pulled low to enable CAN Transceiver TI SN65HVD230 */
         gpio_configure_pin(AVR32_PIN_PA15, GPIO_DIR_OUTPUT | GPIO_INIT_LOW);
     } else {
         /* Stop the generic clock */
         scif_stop_gclk(AVR32_SCIF_GCLK_CANIF);
-        /* Ensure can output is low to disable/power down transceiver */
+        /* Ensure can output is high to disable/power down transceiver */
         gpio_configure_pin(AVR32_PIN_PA15, (GPIO_DIR_OUTPUT | GPIO_INIT_HIGH));
     }
 }
 
-void init_rtc(void) {
-    /* Setup RTC */
-    uint8_t cmd[] = {FM33_WRPC, 0x18, 0x3D};
-    fm33256b_write(cmd, 3);
+gs_error_t sch_a3200_uart_init(uint8_t uart, bool enable, uint32_t bps)
+{
+    if (uart == 1) {
+        /* UART 1 (FSI connector / GPS) */
+        const gpio_map_t map = {
+            {AVR32_USART1_RXD_PIN, AVR32_USART1_RXD_FUNCTION},
+            {AVR32_USART1_TXD_PIN, AVR32_USART1_TXD_FUNCTION},
+        };
+        gpio_enable_module(map, GS_ARRAY_SIZE(map));
+    } else if (uart == 2) {
+    	/* UART 2 (DEBUG connector) */
+        const gpio_map_t map = {
+            {AVR32_USART2_RXD_1_PIN, AVR32_USART2_RXD_1_FUNCTION},
+            {AVR32_USART2_TXD_1_PIN, AVR32_USART2_TXD_1_FUNCTION},
+    	};
+    	gpio_enable_module(map, GS_ARRAY_SIZE(map));
+    } else if (uart == 4) {
+    	/* UART 4 (FSI connector) */
+    	const gpio_map_t map = {
+            {AVR32_USART4_RXD_PIN, AVR32_USART4_RXD_FUNCTION},
+            {AVR32_USART4_TXD_PIN, AVR32_USART4_TXD_FUNCTION},
+    	};
+    	gpio_enable_module(map, GS_ARRAY_SIZE(map));
+    } else {
+        return GS_ERROR_HANDLE;
+    }
 
-    /* RTC */
-    fm33256b_clock_resume();
+    gs_uart_config_t uart_config;
+    gs_uart_get_default_config(&uart_config);
+    uart_config.tx_queue_size = 0; // direct write
+    uart_config.comm.bps = bps;
 
+    gs_error_t error = gs_uart_init(uart, &uart_config);
+    if (error) {
+        log_error("Failed to initialize UART: %u, bps: %"PRIu32" - gs_uart_init() return: %s ",
+                  uart, bps, gs_error_string(error));
+    }
+    return error;
+}
+
+static gs_error_t sch_init_rtc(void)
+{
     /* 32kHz Crystal setup */
     osc_enable(OSC_ID_OSC32);
+
+    return gs_rtc_register(&gs_fm33256b_rtc_driver, NULL);
 }
 
-/**
- * Log reset cause
- * @param reset reset cause
- */
-void log_reset_cause(int reset) {
-    switch (reset) {
-        case RESET_CAUSE_WDT:
-            LOGI(tag, "Reset cause: Watchdog timeout (%d)", reset);
-            break;
-        case RESET_CAUSE_SOFT:
-            LOGI(tag, "Reset cause: Software reset (%d)", reset);
-            break;
-        case RESET_CAUSE_SLEEP:
-            LOGI(tag, "Reset cause: Wake from Shutdown sleep mode (%d)", reset);
-            break;
-        case RESET_CAUSE_EXTRST:
-            LOGI(tag, "Reset cause: External reset (%d)", reset);
-            break;
-        case RESET_CAUSE_CPU_ERROR:
-            LOGI(tag, "Reset cause: CPU Error (%d)", reset);
-            break;
-        case RESET_CAUSE_BOD_CPU:
-            LOGI(tag, "Reset cause: Brown-out detected on CPU power domain (%d)", reset);
-            break;
-        case RESET_CAUSE_POR:
-            LOGI(tag, "Reset cause: Power-on-reset (%d)", reset);
-            break;
-        case RESET_CAUSE_JTAG:
-            LOGI(tag, "Reset cause: JTAG (%d)", reset);
-            break;
-        case RESET_CAUSE_OCD:
-            LOGI(tag, "Reset cause: On-chip debug system (%d)", reset);
-            break;
-        case RESET_CAUSE_BOD_IO:
-            LOGI(tag, "Reset cause: Brown-out detected on I/O power domain (%d)", reset);
-            break;
-        default:
-            LOGI(tag, "Reset cause: Undefined! (%d)", reset);
+gs_error_t sch_a3200_init_fram(void)
+{
+    const gs_spi_chip_t spi = {.handle = 1,
+                               .baudrate = 8000000,
+                               .bits = 8,
+                               .chipselect = FM33256_SPI_CS,
+                               .spi_mode = 0,
+                               .stay_act = 1,
+                               .trans_delay = 5};
+    const gs_fm33256b_config_t fram = {.spi_slave = GS_A3200_SPI_SLAVE_FRAM};
+
+    gs_error_t error = gs_spi_asf_master_configure_slave(fram.spi_slave, &spi);
+    if (error) {
+        log_error("Failed configuring SPI for FRAM (FM33256B), error: %s", gs_error_string(error));
+        return error;
     }
+
+    error = gs_fm33256b_init(0, &fram);
+    if (error) {
+        log_error("Failed initializing FRAM (FM33256B), error: %s", gs_error_string(error));
+        return error;
+    }
+
+    return sch_init_rtc();
 }
 
-/**
- * Init I2C for OBC and PC104 stack
- */
-void twi_init(void) {
-    /* I2C2 Pins for OBC sensors */
-    const gpio_map_t TWIM_GPIO_MAP = {
-            {AVR32_TWIMS2_TWCK_0_0_PIN, AVR32_TWIMS2_TWCK_0_0_FUNCTION},
-            {AVR32_TWIMS2_TWD_0_0_PIN, AVR32_TWIMS2_TWD_0_0_FUNCTION}
-    };
-    gpio_enable_module(TWIM_GPIO_MAP, sizeof(TWIM_GPIO_MAP) / sizeof(TWIM_GPIO_MAP[0]));
+void sch_bsp_init_task(void * param)
+{
+    /* SPI1 device drivers */
+    sch_a3200_init_spi1();
 
-    /* I2C0 Pins for PC104 connector*/
-    const gpio_map_t TWIM_GPIO_MAP2 = {
-            {AVR32_TWIMS0_TWCK_0_0_PIN, AVR32_TWIMS0_TWCK_0_0_FUNCTION},
-            {AVR32_TWIMS0_TWD_0_0_PIN, AVR32_TWIMS0_TWD_0_0_FUNCTION}
-    };
-    gpio_enable_module(TWIM_GPIO_MAP2, sizeof(TWIM_GPIO_MAP2) / sizeof(TWIM_GPIO_MAP2[0]));
+    /* Init temperature sensors */
+    gs_a3200_lm71_init();
 
-    /* Init I2C2 controller with addr 1 and 100 kHz clock */
-    i2c_init_master(2, 1, 100);
+    /* Init FRAM and RTC (FM33256B chip) */
+    sch_a3200_init_fram();
 
-    /* I2C0 initialized with LibCSP in TaskInit
-     * Ex: csp_i2c_init(node, handle, speed_khz);
-     */
+    /* SPI0 device driver - has to be called after param init */
+    if (GS_A3200_BOARD_REVISION >= 3) {
+        sch_a3200_init_spi0(false);
+    }
+
+//     sch_a3200_uart_init(2, true, GS_UART_DEFAULT_BPS);
+//     sch_a3200_uart_init(4, true, GS_UART_DEFAULT_BPS);
+
+    /* Log latest boot- and reset-cause. */
+    gs_sys_log_causes(NULL, NULL, NULL);
+    gs_sys_clear_reset_cause();
+
+    /* Init I2C controller for gyroscope, magnetometer and GSSB devices */
+    sch_a3200_init_twi2();
+
+    /* Setup ADC channels for current measurements */
+    gs_a3200_adc_channels_init();
+    
+    /* Init PWM */
+    gs_a3200_pwm_init();
+
+//     GS_A3200_CALL_HOOK(init_complete);
+
+//     gs_thread_exit(NULL);
 }
 
-/**
- * Test SDRAM or SRAM. Reserves with malloc a buffer is size @size words (in the
- * AVR21 words are 4 bytes), print the reserved memory pointer address and run a
- * test over the memory. The this write and reads a pattern value in the RAM and
- * checks the patterns matches.
- *
- * @param size Int. Size of the allocated buffer in words (aka. 4 bytes)
- * @param do_free Int. If 1 the frees the buffer, else do not.
- */
-void test_sdram(int size, int do_free) {
-    int *data = (int *)malloc(size*sizeof(int));
-    if(data == NULL){
-        printf("---- malloc failed! ----\n\n");
-    }
-    else{
-        printf("data @ %p\n", data);
-    }
-
-
-    printf("Writing to SDRAM...\r\n");
-
-    for(int * p = data; p < (int *) data+size; p++) {
-        *p = (uintptr_t) p;
-    }
-
-    printf("Reading from SDRAM...\r\n");
-
-    for(int * p = data; p < (int *) data+size; p++) {
-        if ((uintptr_t) p != (uintptr_t) *p) {
-            printf("SDRAM ERROR!\r\n");
-            return;
-        }
-    }
-
-    printf("SDRAM OK\r\n");
-
-    if(do_free)
-        free(data);
-
-}
-
+//gs_error_t gs_a3200_init(void)
 void on_reset(void)
 {
-    /* Init LED */
-    led_init();
-    led_on(LED_CPUOK);
-    led_off(LED_A);
-
-    /* Reset watchdog */
+    /* Reset & start watchdog - Will be re-initialized by SWWD when started later on */
     wdt_disable();
     wdt_clear();
     wdt_opt_t wdtopt = { .us_timeout_period = SCH_WDT_PERIOD*1000000 };
     wdt_enable(&wdtopt);
 
+    /* Resetting/Clearing all interrupts, so they are disabled when booting a RAM image -
+       It is also disabled in swload, but having it here will allow a RAM image to disable it regardless 
+       if the SW in flash does */
+#ifndef __linux
+    gs_sys_avr32_reset_all_interrupt_settings();
+#endif
+
     /* Initialize interrupt handling.
-     * This function call is needed, when using libasf startup.S file */
+       This function call is needed, when using libasf startup.S file */
     INTC_init_interrupts();
 
     /* Init CLK */
     sysclk_init();
 
     /* Init pwr channels */
-    pwr_switch_init();
+    gs_a3200_pwr_switch_init();
 
-    /* At this point we only power the interstages.
-     * MLX and finesunsensors are powered on in init task */
-    pwr_switch_disable(PWR_GSSB);
-    pwr_switch_disable(PWR_GSSB2);
+    if (!GS_A3200_RAM_IMAGE) {
+        /* Init SDRAM, do this before malloc is called - It is configured already when booting from RAM */
+        sdramc_init(sysclk_get_cpu_hz());
+    }
 
-    /* Init SDRAM, do this before malloc is called */
-    sdramc_init(sysclk_get_cpu_hz());
-
-    /**
-     * Set heap address to the external SDRAM, so malloc calls will use the
-     * 32MB external SDRAM. Otherwise only the 68kB internal SRAM are available
-     * @warning Do not touch this lines. See Gomspace framework docs and AVR32
-     * application notes on SDRAM and Linker Scripts usages for further details.
-     */
-#if 1
+    /* We have to trust that the SDRAM is working by now */
     extern void *heap_start, *heap_end;
-	heap_start = (void *) 0xD0000000 + 0x100000;
-	heap_end = (void *) 0xD0000000 + 0x2000000 - 1000;
-#endif
+    heap_start = GS_TYPES_UINT2PTR(0xD0000000 + 0x100000);
+    heap_end = GS_TYPES_UINT2PTR(0xD0000000 + 0x2000000 - 1000);
 
-    /* Init USART for debugging */
+    if (GS_A3200_SDK) {
+        /* Start software watchdog, which takes care of the hardware watchdog */
+        gs_a3200_sdk_watchdog_init();
+
+        /* Init LED */
+        gs_a3200_led_init();
+        gs_a3200_led_on(GS_A3200_LED_CPU_OK);
+    }
+    
+
+    sch_a3200_uart_init(2, true, SCH_UART_BAUDRATE);
+    sch_a3200_uart_init(4, true, SCH_UART_BAUDRATE);
+
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
-    static const gpio_map_t USART_GPIO_MAP = {
-            {USART_RXD_PIN, USART_RXD_FUNCTION},
-            {USART_TXD_PIN, USART_TXD_FUNCTION},
-    };
-    gpio_enable_module(USART_GPIO_MAP, sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
-    usart_init(USART_CONSOLE, sysclk_get_peripheral_bus_hz(USART), SCH_UART_BAUDRATE);
-    usart_stdio_id = USART_CONSOLE;
-
-    /**
-     * Test the external SDRAM. If working properly we are able to reserve this
-     * large amount of memory and will use and address higher than 0xD0000000.
-     * Otherwise, the internal SRAM is not big enough then malloc will raise an
-     * error and the device will be reset.
-     */
-#if 0
-    test_sdram(100000, 1);
-#endif
-
-    /* Finish on reset, both led on */
-    led_on(LED_CPUOK);
-    led_on(LED_A);
+    //return GS_OK;
 }
+
+// void gs_a3200_run(const gs_a3200_hooks_t * hooks)
+// {
+//     gs_a3200_hooks = hooks;
+// 
+//     /* Start init task at highest priority */
+//     gs_thread_create("INIT",
+//                      (GS_A3200_SDK) ? gs_a3200_sdk_init_task : sch_bsp_init_task,
+//                      NULL, GS_A3200_DEFAULT_STACK_SIZE, GS_THREAD_PRIORITY_CRITICAL, 0, NULL);
+// 
+//     /* Start the scheduler. */
+//     vTaskStartScheduler();
+// 
+//     /* Will only get here if there was insufficient memory to create the idle task. */
+//     for (;;) {
+//         gs_sys_reset(GS_SYS_RESET_NO_MEM);
+//     }
+// }

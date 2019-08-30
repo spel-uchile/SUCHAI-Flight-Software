@@ -34,45 +34,46 @@ static const char *tag = "taskInit";
 void taskInit(void *param)
 {
 #ifdef NANOMIND
-    /**
-     * Setting SPI devices
-     */
-    init_spi1();
-    /* Init temperature sensors */
-    lm70_init();
-    /* Init spansion chip */
-    spn_fl512s_init((unsigned int) 0);  // Creates a lock
-    /* Init RTC and FRAM chip */
-    fm33256b_init();  // Creates a lock
-    init_rtc();
-
-    /**
-     * Setting I2C devices
-     */
-    twi_init();
-    /* Init gyroscope */
-    mpu3300_init(MPU3300_BW_5, MPU3300_FSR_225);
-    /* Init magnetometer */
-    hmc5843_init();
-    /* Setup ADC channels for current measurements */
-    adc_channels_init();  // Creates a lock
-    /* Setup motherboard switches */
-    //mb_switch_init();
-
-    /**
-     * Init CAN devices
-     */
-    init_can(0); // Init can, default disabled
-
-    /**
-    * Init PWM driver
-    */
-    gs_pwm_init();
-
-    /* Latest reset source */
-    int reset_source = reset_cause_get_causes();
-    log_reset_cause(reset_source);
-    dat_set_system_var(dat_obc_last_reset, reset_source);
+//     /**
+//      * Setting SPI devices
+//      */
+//     init_spi1();
+//     /* Init temperature sensors */
+//     lm70_init();
+//     /* Init spansion chip */
+//     spn_fl512s_init((unsigned int) 0);  // Creates a lock
+//     /* Init RTC and FRAM chip */
+//     fm33256b_init();  // Creates a lock
+//     init_rtc();
+// 
+//     /**
+//      * Setting I2C devices
+//      */
+//     twi_init();
+//     /* Init gyroscope */
+//     mpu3300_init(MPU3300_BW_5, MPU3300_FSR_225);
+//     /* Init magnetometer */
+//     hmc5843_init();
+//     /* Setup ADC channels for current measurements */
+//     adc_channels_init();  // Creates a lock
+//     /* Setup motherboard switches */
+//     //mb_switch_init();
+// 
+//     /**
+//      * Init CAN devices
+//      */
+//     init_can(0); // Init can, default disabled
+// 
+//     /**
+//     * Init PWM driver
+//     */
+//     gs_pwm_init();
+// 
+//     /* Latest reset source */
+//     int reset_source = reset_cause_get_causes();
+//     log_reset_cause(reset_source);
+//     dat_set_system_var(dat_obc_last_reset, reset_source);
+    sch_bsp_init_task(NULL);
 #endif
 
     LOGD(tag, "Initialization commands ...");
@@ -139,29 +140,29 @@ void init_communications(void)
     }
 
     /* Init buffer system */
-    csp_conf_t sch_csp_conf;
-    //csp_conf_get_defaults(&sch_csp_conf);
-    sch_csp_conf.address = SCH_COMM_ADDRESS;
-    sch_csp_conf.conn_max = 10;
-    sch_csp_conf.conn_queue_length = 10;
-    sch_csp_conf.conn_dfl_so = CSP_O_NONE;
-    sch_csp_conf.fifo_length = 25;
-    sch_csp_conf.port_max_bind = 24;
-    sch_csp_conf.rdp_max_window = 20;
+//    csp_conf_t sch_csp_conf;
+//    csp_conf_get_defaults(&sch_csp_conf);
+//    sch_csp_conf.address = SCH_COMM_ADDRESS;
+//    sch_csp_conf.hostname = "SUCHAI"
+//    sch_csp_conf.conn_max = 10;
+//    sch_csp_conf.conn_queue_length = 10;
+//    sch_csp_conf.conn_dfl_so = CSP_O_NONE;
+//    sch_csp_conf.fifo_length = 25;
+//    sch_csp_conf.port_max_bind = 24;
+//    sch_csp_conf.rdp_max_window = 20;
 
     int t_ok;
-    t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
-    if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
-    //csp_set_hostname("SUCHAI-OBC");
-    csp_init(&sch_csp_conf); // Init CSP with address MY_ADDRESS
+//    t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
+//    if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
+//    csp_set_hostname("SUCHAI-OBC");
+    csp_init(SCH_COMM_ADDRESS); // Init CSP with address MY_ADDRESS
 
     /**
      * Set interfaces and routes
      *  Platform dependent
      */
 #ifdef LINUX
-    //csp_set_model("LINUX");
-
+    #ifndef SIMULATED
     struct usart_conf conf;
     conf.device = SCH_KISS_DEVICE;
     conf.baudrate = SCH_KISS_UART_BAUDRATE;
@@ -172,12 +173,14 @@ void init_communications(void)
     /* Setup callback from USART RX to KISS RS */
     usart_set_callback(my_usart_rx);
     csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
-    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_kiss, CSP_NODE_MAC);
     csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
+    #endif
 
     /* Set ZMQ interface */
-    csp_zmqhub_init_w_endpoints(255, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
+    static csp_iface_t csp_if_zmqhub;
+    csp_zmqhub_init_w_endpoints(SCH_COMM_ADDRESS, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
+    csp_rtable_set(8, 2, &csp_if_zmqhub, SCH_TRX_ADDRESS);
 #endif //LINUX
 
 #ifdef NANOMIND

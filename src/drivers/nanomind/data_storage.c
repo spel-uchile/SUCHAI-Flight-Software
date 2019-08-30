@@ -124,7 +124,7 @@ static int flight_plan_find_index(int timetodo)
 
         // Reads the entry's timetodo
         uint32_t found_time;
-        spn_fl512s_read_data(add, (uint8_t*)&found_time, sizeof(uint32_t));
+        spn_fl512s_read_data(0, add, (uint8_t*)&found_time, sizeof(uint32_t));
 
         // If found, returns
         if (found_time == (uint32_t)timetodo)
@@ -162,11 +162,11 @@ static int flight_plan_erase_index(int index)
     uint32_t add = storage_addresses_flight_plan[section_index];
 
     // Reads the whole section
-    spn_fl512s_read_data(add, (uint8_t*)section_data, (uint16_t)entries*max_command_size);
+    spn_fl512s_read_data(0, add, (uint8_t*)section_data, (uint16_t)entries*max_command_size);
 
     // Deletes the section
     LOGI(tag, "Deleting section in address %u", (unsigned int)add);
-    int rc = spn_fl512s_erase_block(add);
+    int rc = spn_fl512s_erase_block(0, add);
     if (rc != 0)
     {
         LOGE(tag, "Failed attempt at deleting data in storage address %u", (unsigned int)add);
@@ -186,7 +186,7 @@ static int flight_plan_erase_index(int index)
         if (i != index_in_section && timetodo != 0)
         {
             // Writes
-            rc = spn_fl512s_write_data(add, &(section_data[buffer_index]), max_command_size);
+            rc = spn_fl512s_write_data(0, add, &(section_data[buffer_index]), max_command_size);
 
             if (rc != 0)
             {
@@ -231,7 +231,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
 
     // Writes the timetodo value
     int rc;
-    rc = spn_fl512s_write_data(add, (uint8_t*)&found_time, sizeof(uint32_t));
+    rc = spn_fl512s_write_data(0, add, (uint8_t*)&found_time, sizeof(uint32_t));
 
     if (rc != 0)
     {
@@ -250,7 +250,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     numbers_container.args_len = strlen(args);
 
     // Writes said values
-    rc = spn_fl512s_write_data(add, (uint8_t*)&numbers_container, sizeof(numbers_container_t));
+    rc = spn_fl512s_write_data(0, add, (uint8_t*)&numbers_container, sizeof(numbers_container_t));
 
     if (rc != 0)
     {
@@ -261,7 +261,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     add += sizeof(numbers_container_t);
 
     // Writes the command's name
-    rc = spn_fl512s_write_data(add, (uint8_t*)command, sizeof(char)*numbers_container.name_len);
+    rc = spn_fl512s_write_data(0, add, (uint8_t*)command, sizeof(char)*numbers_container.name_len);
 
     if (rc != 0)
     {
@@ -272,7 +272,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     add += sizeof(char)*SCH_CMD_MAX_STR_NAME;
 
     // Writes the command's arguments
-    rc = spn_fl512s_write_data(add, (uint8_t*)args, sizeof(char)*numbers_container.args_len);
+    rc = spn_fl512s_write_data(0, add, (uint8_t*)args, sizeof(char)*numbers_container.args_len);
 
     if (rc != 0)
     {
@@ -304,7 +304,7 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
     numbers_container_t numbers_container;
 
     // Finds the numeric values
-    spn_fl512s_read_data(add, (uint8_t*)&numbers_container, sizeof(numbers_container_t));
+    spn_fl512s_read_data(0, add, (uint8_t*)&numbers_container, sizeof(numbers_container_t));
 
     add += sizeof(numbers_container_t);
 
@@ -313,12 +313,12 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
     args[numbers_container.args_len] = '\0';
 
     // Finds the command name string and sets it
-    spn_fl512s_read_data(add, (uint8_t*)command, numbers_container.name_len*sizeof(char));
+    spn_fl512s_read_data(0, add, (uint8_t*)command, numbers_container.name_len*sizeof(char));
 
     add += SCH_CMD_MAX_STR_NAME*sizeof(char);
 
     // Finds the parameters string and sets it
-    spn_fl512s_read_data(add, (uint8_t*)args, numbers_container.args_len*sizeof(char));
+    spn_fl512s_read_data(0, add, (uint8_t*)args, numbers_container.args_len*sizeof(char));
 
     // Sets the executions and periodical values
     *executions = (int)numbers_container.exec;
@@ -378,7 +378,7 @@ int storage_flight_plan_reset(void)
     for (int i = 0; i < fp_sections; i++)
     {
         LOGI(tag, "Deleting section in address %u\n", (unsigned int)storage_addresses_flight_plan[i]);
-        int rc = spn_fl512s_erase_block(storage_addresses_flight_plan[i]);
+        int rc = spn_fl512s_erase_block(0, storage_addresses_flight_plan[i]);
         if (rc != 0)
         {
             LOGE(tag, "Failed attempt at deleting data in storage address %u", (unsigned int)storage_addresses_flight_plan[i]);
@@ -424,11 +424,11 @@ int storage_show_table(void)
         uint32_t timetodo;
         numbers_container_t container;
 
-        spn_fl512s_read_data(add, (uint8_t*)&timetodo, sizeof(uint32_t));
+        spn_fl512s_read_data(0, add, (uint8_t*)&timetodo, sizeof(uint32_t));
 
         add += sizeof(uint32_t);
 
-        spn_fl512s_read_data(add, (uint8_t*)&container, sizeof(numbers_container_t));
+        spn_fl512s_read_data(0, add, (uint8_t*)&container, sizeof(numbers_container_t));
 
         add += sizeof(numbers_container_t);
 
@@ -439,11 +439,11 @@ int storage_show_table(void)
         command[container.name_len] = '\0';
         args[container.args_len] = '\0';
 
-        spn_fl512s_read_data(add, (uint8_t*)command, sizeof(char)*container.name_len);
+        spn_fl512s_read_data(0, add, (uint8_t*)command, sizeof(char)*container.name_len);
 
         add += SCH_CMD_MAX_STR_NAME;
 
-        spn_fl512s_read_data(add, (uint8_t*)args, sizeof(char)*container.args_len);
+        spn_fl512s_read_data(0, add, (uint8_t*)args, sizeof(char)*container.args_len);
 
         // Prints a row of the table
 
@@ -486,7 +486,7 @@ int storage_set_payload_data(int index, void* data, int payload)
     }
 
     LOGI(tag, "Writing in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
-    int ret = spn_fl512s_write_data(add, data, data_map[payload].size);
+    int ret = spn_fl512s_write_data(0, add, data, data_map[payload].size);
     if(ret != 0){
         return -1;
     }
@@ -519,7 +519,7 @@ int storage_get_payload_data(int index, void* data, int payload)
     LOGV(tag, "Reading in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
 //    printf("Reading values of size %u \n", data_map[payload]);
 //    spn_fl512s_read_data(add, (uint8_t *) data, data_map[payload]);
-    spn_fl512s_read_data(add, (uint8_t *)data, data_map[payload].size);
+    spn_fl512s_read_data(0, add, (uint8_t *)data, data_map[payload].size);
 //    printf("Reading value %d \n", *(uint8_t*)data);
 //    LOGV(tag, "Read 0x%X", (unsigned int)data.data32);
     return 0;
@@ -531,7 +531,7 @@ int storage_delete_memory_sections()
     for(int i = 0;  i < SCH_SECTIONS_PER_PAYLOAD*last_sensor; ++i)
     {
         LOGI(tag, "deleting section in address %u\n", (unsigned int)storage_addresses_payloads[i]);
-        int rc = spn_fl512s_erase_block(storage_addresses_payloads[i]);
+        int rc = spn_fl512s_erase_block(0, storage_addresses_payloads[i]);
         if (rc != 0)
         {
             LOGE(tag, "Failed attempt at deleting data in storage address %u", (unsigned int)storage_addresses_payloads[i]);

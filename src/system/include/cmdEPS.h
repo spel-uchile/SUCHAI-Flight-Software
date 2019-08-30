@@ -14,8 +14,9 @@
 #include "utils.h"
 
 #ifdef SCH_USE_NANOPOWER
-    #include "nanopower2.h"
-    #include "bpx.h"
+    #include "drivers.h"
+    //#include "nanopower2.h"
+    //#include "bpx.h"
 #endif
 
 #include "repoCommand.h"

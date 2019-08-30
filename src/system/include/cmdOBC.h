@@ -25,18 +25,19 @@
 #endif
 
 #ifdef NANOMIND
-    #include "compiler.h"
-    #include "led.h"
-    #include "wdt.h"
-    #include "dev/cpu.h"
-    #include "gs_pwm.h"
-    #include "gssb.h"
-    #include "pwr_switch.h"
-    #include "util/error.h"
-    #include <conf_a3200.h>
-    #include <lm70.h>
-    #include <mpu3300.h>
-    #include <hmc5843.h>
+    #include "drivers.h"
+//     #include "compiler.h"
+//     #include "led.h"*
+//     #include "wdt.h"
+//     #include "dev/cpu.h"
+//     #include "gs_pwm.h"**
+//     #include "gssb.h"
+//     #include "pwr_switch.h"*
+//     #include "util/error.h"*
+//     #include <conf_a3200.h>
+//     #include <lm70.h>**
+//     #include <mpu3300.h>*
+//     #include <hmc5843.h>*
 #endif
 
 #ifdef ESP32
@@ -159,16 +160,42 @@ int obc_system(char* fmt, char* params, int nparams);
 int test_fp(char* fmt, char* params,int nparams);
 
 /**
- * Change duty cycle of pwm in channel
- * params, so use this command carefully. @see man system
+ * Change <duty> cycle of pwm <channel>, so use this command carefully.
  * @warning only available in Nanomind
- *
+ * <duty> as percentage: 0-100, 10% ~ 1.0V RMS and 90% ~ 3.0V RMS
+ * <channel> 0:X, 1:Y, 2:Z
+ * 
  * @param fmt str. Parameters format: "%d %d"
- * @param params  str. Parameters as string <int> <int>,
+ * @param params  str. Parameters as string <channel> <duty>,
  * @param nparams int. Number of parameters: 2
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int obc_set_pwm_duty(char* fmt, char* params, int nparams);
+
+/**
+ * Change pwm <channel> freq to <freq>, so use this command carefully.
+ * @warning only available in Nanomind
+ * <freq> as hz: 0.1-433.0 Hz
+ * <channel> 0:X, 1:Y, 2:Z
+ * 
+ * @param fmt str. Parameters format: "%d %f"
+ * @param params  str. Parameters as string <channel> <freq>,
+ * @param nparams int. Number of parameters: 2
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_set_pwm_freq(char* fmt, char* params, int nparams);
+
+/**
+ * Set PWM Switch on/off
+ * @warning only available in Nanomind
+ * <enable> 1:on, 0:off (>0:on, <=0: off)
+ * 
+ * @param fmt str. Parameters format: "%d"
+ * @param params  str. Parameters as string <enable>,
+ * @param nparams int. Number of parameters: 2
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_pwm_pwr(char *fmt, char *params, int nparams);
 
 /**
  * Read OBC sensors and save values as Temperatures and ADCS payloads data.
@@ -193,11 +220,10 @@ int obc_get_sensors(char *fmt, char *params, int nparams);
 int obc_update_status(char *fmt, char *params, int nparams);
 
 /**
- * This commands are related to inter-stage panels and only available for the
+ * These commands are related to inter-stage panels and only available for the
  * Nanomind A3200 with inter-stage panels using the GSSB interface and drivers.
  */
-#ifdef NANOMIND
-
+#if 0
 /**
  * Sets the state of the interstage power switch to enable/disable VCC and VCC2.
  * State 0 = disabled, 1 = enabled

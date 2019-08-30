@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo "Downloading libcsp v1.5.dev"
+echo "Downloading libcsp v1.5"
 if [ ! -d "./libcsp" ]; then
     git clone https://github.com/libcsp/libcsp
     cd libcsp

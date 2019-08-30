@@ -16,14 +16,13 @@
 
 #include "config.h"
 
-#include "csp/csp.h"
+#include "drivers.h"
 #include "repoCommand.h"
 
-#ifdef SCH_USE_NANOCOM
-    #include "ax100_param.h"
-    #include "ax100_param_radio.h"
-    #include "param/rparam_client.h"
-#endif
+//#ifdef SCH_USE_NANOCOM
+
+    //#include "param/rparam_client.h"
+//#endif
 
 /**
  * Fixed size of one CSP frame is 200. A frame contains not only data but also

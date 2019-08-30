@@ -38,22 +38,23 @@
 #endif
 
 #ifdef NANOMIND
-    #include <conf_a3200.h>
-
-    #include <sysclk.h>
-    #include <wdt.h>
-    #include <gpio.h>
-    #include <sdramc.h>
-    #include <reset_cause.h>
-
-    #include <dev/usart.h>
-    #include <dev/i2c.h>
-    #include <dev/cpu.h>
-
-    #include <fm33256b.h>
-
-    #include <led.h>
-    #include <pwr_switch.h>
+#include "drivers.h"
+//     #include <conf_a3200.h>
+// 
+//     #include <sysclk.h>
+//     #include <wdt.h>
+//     #include <gpio.h>
+//     #include <sdramc.h>
+//     #include <reset_cause.h>
+// 
+//     #include <dev/usart.h>
+//     #include <dev/i2c.h>
+//     #include <dev/cpu.h>
+// 
+//     #include <fm33256b.h>
+// 
+//     #include <led.h>
+//     #include <pwr_switch.h>
 #endif
 
 

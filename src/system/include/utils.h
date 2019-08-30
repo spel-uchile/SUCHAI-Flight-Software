@@ -65,8 +65,8 @@ static inline int log_init(void)
 
 /// Assert functions
 #define clean_errno() (errno == 0 ? "None" : strerror(errno))
-#define log_error(T, M, ...) LOGE(T, "(%s:%d: errno: %s) " M, __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)
-#define assertf(A, T, M, ...) if(!(A)) {log_error(T, M, ##__VA_ARGS__); assert(A); }
+#define _log_error(T, M, ...) LOGE(T, "(%s:%d: errno: %s) " M, __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)
+#define assertf(A, T, M, ...) if(!(A)) {_log_error(T, M, ##__VA_ARGS__); assert(A); }
 
 /// Debug buffer content
 #define print_buff(buf, size) {int i; printf("["); for(i=0; i<size; i++) printf("0x%02X, ", buf[i]); printf("]\n");}

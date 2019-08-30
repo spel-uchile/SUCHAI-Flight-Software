@@ -340,6 +340,10 @@ int cmd_repo_init(void)
 #endif
     cmd_obc_init();
     cmd_drp_init();
+    cmd_console_init();
+#if SCH_FP_ENABLED
+    cmd_fp_init();
+#endif
 #ifdef SCH_USE_NANOPOWER
     cmd_eps_init();
 #endif
@@ -347,9 +351,8 @@ int cmd_repo_init(void)
     cmd_com_init();
     cmd_tm_init();
 #endif
-    cmd_console_init();
-#if SCH_FP_ENABLED
-    cmd_fp_init();
+#ifdef SCH_USE_GSSB
+    cmd_gssb_init();
 #endif
 
     int n_cmd;
@@ -376,6 +379,8 @@ void cmd_repo_close(void)
         free(cmd_list[i].name);
         free(cmd_list[i].fmt);
     }
+
+    cmd_index = 0;
 }
 
 int cmd_null(char *fparams, char *params, int nparam)

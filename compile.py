@@ -10,7 +10,7 @@ def get_parameters():
     parser = argparse.ArgumentParser(prog='compile.py')
     # config.h template parameters
     parser.add_argument('os', type=str, default="LINUX")
-    parser.add_argument('--arch', type=str, default="NANOMIND")
+    parser.add_argument('arch', type=str, default="NANOMIND")
     parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
     parser.add_argument('--name', type=str, default="SUCHAI-Test")
     parser.add_argument('--id',   type=str, default="0")
@@ -27,7 +27,7 @@ def get_parameters():
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
     # Force clean
-    parser.add_argument('--clean', action="store_true", help="Clean befero build")
+    parser.add_argument('--clean', action="store_true", help="Clean before build")
     # Program
     parser.add_argument('--program', action="store_true", help="Compile and program")
     parser.add_argument('--console', type=int, default=4, help="Console to use. 2=Nanomind-USB-SERIAL, 4=FFP-USB")

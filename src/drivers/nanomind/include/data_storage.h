@@ -7,9 +7,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include "drivers.h"
 #include "utils.h"
-#include "fm33256b.h"
-#include "spn_fl512s.h"
 #include "config.h"
 #include "globals.h"
 #include "repoData.h"

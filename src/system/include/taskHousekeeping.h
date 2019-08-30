@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include "config.h"
 
+//FIXME: Task should not depend on drivers
 #if SCH_COMM_ENABLE
     #include "csp/csp.h"
 #endif
@@ -23,8 +24,9 @@
     #include "init.h"
 #endif
 #ifdef NANOMIND
-    #include "led.h"
-    #include "wdt.h"
+    #include "drivers.h"
+//     #include "led.h"
+//     #include "wdt.h"
 #endif
 
 #include "globals.h"
