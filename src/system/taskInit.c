@@ -114,9 +114,9 @@ void init_communications(void)
 //    sch_csp_conf.rdp_max_window = 20;
 
     int t_ok;
-//    t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
-//    if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
-//    csp_set_hostname("SUCHAI-OBC");
+    t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
+    if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
+    csp_set_hostname(SCH_NAME);
     csp_init(SCH_COMM_ADDRESS); // Init CSP with address MY_ADDRESS
 
     /**

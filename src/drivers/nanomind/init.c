@@ -326,7 +326,7 @@ void on_reset(void)
 
     /**
      * Test the external SDRAM. If working properly we are able to reserve this
-     * large amount of memory and will use and address higher than 0xD0000000.
+     * large amount of memory and will use an address higher than 0xD0000000.
      * Otherwise, the internal SRAM is not big enough then malloc will raise an
      * error and the device will be reset.
      */
