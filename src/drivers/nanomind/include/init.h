@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "drivers.h"
+#include "repoData.h"
 
 void sch_a3200_init_spi0(bool decode);
 void sch_a3200_init_spi1(void);
@@ -13,7 +14,8 @@ gs_error_t sch_a3200_uart_init(uint8_t uart, bool enable, uint32_t bps);
 static gs_error_t sch_init_rtc(void);
 gs_error_t sch_a3200_init_fram(void);
 gs_error_t sch_a3200_init_flash(void);
-void sch_bsp_init_task(void * param);
+void test_sdram(int size, int do_free);
+void on_init_task(void * param);
 void on_reset(void);
 
 #endif

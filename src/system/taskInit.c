@@ -34,46 +34,7 @@ static const char *tag = "taskInit";
 void taskInit(void *param)
 {
 #ifdef NANOMIND
-//     /**
-//      * Setting SPI devices
-//      */
-//     init_spi1();
-//     /* Init temperature sensors */
-//     lm70_init();
-//     /* Init spansion chip */
-//     spn_fl512s_init((unsigned int) 0);  // Creates a lock
-//     /* Init RTC and FRAM chip */
-//     fm33256b_init();  // Creates a lock
-//     init_rtc();
-// 
-//     /**
-//      * Setting I2C devices
-//      */
-//     twi_init();
-//     /* Init gyroscope */
-//     mpu3300_init(MPU3300_BW_5, MPU3300_FSR_225);
-//     /* Init magnetometer */
-//     hmc5843_init();
-//     /* Setup ADC channels for current measurements */
-//     adc_channels_init();  // Creates a lock
-//     /* Setup motherboard switches */
-//     //mb_switch_init();
-// 
-//     /**
-//      * Init CAN devices
-//      */
-//     init_can(0); // Init can, default disabled
-// 
-//     /**
-//     * Init PWM driver
-//     */
-//     gs_pwm_init();
-// 
-//     /* Latest reset source */
-//     int reset_source = reset_cause_get_causes();
-//     log_reset_cause(reset_source);
-//     dat_set_system_var(dat_obc_last_reset, reset_source);
-    sch_bsp_init_task(NULL);
+    on_init_task(NULL);
 #endif
 
     LOGD(tag, "Initialization commands ...");
@@ -81,12 +42,13 @@ void taskInit(void *param)
     init_communications();
     // Execute deployment activities if first boot
     int first_boot = dat_get_system_var(dat_dep_deployed) > 0 ? 0 : 1;
+#if 0
     if(first_boot)
     {
         LOGI(tag, "\tFirst boot! Execute init routines");
         init_routines();
     }
-
+#endif
     LOGD(tag, "Creating client tasks ...");
     int t_ok;
     int n_threads = 4;

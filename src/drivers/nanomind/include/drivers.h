@@ -8,7 +8,6 @@
 #include <scif_uc3c.h>
 
 // A3200 Drivers
-#include <gs/a3200/a3200.h>
 #include <gs/a3200/led.h>
 #include <gs/a3200/lm71.h>
 #include <gs/a3200/hmc5843.h>

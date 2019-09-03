@@ -7,8 +7,6 @@
 // void *__dso_handle __attribute__((used)) = 0;
 #endif
 
-const gs_a3200_hooks_t * gs_a3200_hooks;
-
 void sch_a3200_init_spi0(bool decode)
 {
     const gpio_map_t map = {
@@ -138,7 +136,6 @@ static gs_error_t sch_init_rtc(void)
 {
     /* 32kHz Crystal setup */
     osc_enable(OSC_ID_OSC32);
-
     return gs_rtc_register(&gs_fm33256b_rtc_driver, NULL);
 }
 
@@ -186,49 +183,98 @@ gs_error_t sch_a3200_init_flash(void)
         return -1;
 }
 
-void sch_bsp_init_task(void * param)
+void on_init_task(void * param)
 {
+    /**
+     * Setting SPI devices
+     */
     /* SPI1 device drivers */
     sch_a3200_init_spi1();
-
     /* Init temperature sensors */
     gs_a3200_lm71_init();
-
     /* Init FLASH (fl512s) */
     sch_a3200_init_flash();
-
     /* Init FRAM and RTC (FM33256B chip) */
     sch_a3200_init_fram();
-
     /* SPI0 device driver - has to be called after param init */
-    if (GS_A3200_BOARD_REVISION >= 3) {
-        sch_a3200_init_spi0(false);
-    }
+    sch_a3200_init_spi0(false);
 
-//     sch_a3200_uart_init(2, true, GS_UART_DEFAULT_BPS);
-//     sch_a3200_uart_init(4, true, GS_UART_DEFAULT_BPS);
-
-    /* Log latest boot- and reset-cause. */
-    gs_sys_log_causes(NULL, NULL, NULL);
-    gs_sys_clear_reset_cause();
-
+    /**
+     * Setting I2C devices
+     */
     /* Init I2C controller for gyroscope, magnetometer and GSSB devices */
     sch_a3200_init_twi2();
+    /* Init gyroscope */
+    gs_mpu3300_init(GS_MPU3300_BW_5, GS_MPU3300_FSR_225);
+    /* Init magnetometer */
+    gs_hmc5843_init();
 
+
+    /**
+     * Init ADC and PWM driver
+     */
     /* Setup ADC channels for current measurements */
     gs_a3200_adc_channels_init();
-    
-    /* Init PWM */
+    /* Init PWM but still disable PWM switch*/
     gs_a3200_pwm_init();
+    gs_a3200_pwr_switch_disable(GS_A3200_PWR_PWM);
 
-//     GS_A3200_CALL_HOOK(init_complete);
-
-//     gs_thread_exit(NULL);
+    /**
+     * Log reset cause
+     */
+    /* Log latest boot- and reset-cause. */
+    gs_sys_reset_cause_t reset_cause;
+    gs_sys_log_causes(NULL, &reset_cause, NULL);
+    gs_sys_clear_reset_cause();
+    dat_set_system_var(dat_obc_last_reset, (int)reset_cause);
 }
 
-//gs_error_t gs_a3200_init(void)
+/**
+ * Test SDRAM or SRAM. Reserves with malloc a buffer is size @size words (in the
+ * AVR21 words are 4 bytes), print the reserved memory pointer address and run a
+ * test over the memory. The this write and reads a pattern value in the RAM and
+ * checks the patterns matches.
+ *
+ * @param size Int. Size of the allocated buffer in words (aka. 4 bytes)
+ * @param do_free Int. If 1 the frees the buffer, else do not.
+ */
+void test_sdram(int size, int do_free) {
+    int *data = (int *)malloc(size*sizeof(int));
+    if(data == NULL){
+        printf("---- malloc failed! ----\n\n");
+    }
+    else{
+        printf("data @ %p\n", data);
+    }
+
+
+    printf("Writing to SDRAM...\r\n");
+
+    for(int * p = data; p < (int *) data+size; p++) {
+        *p = (uintptr_t) p;
+    }
+
+    printf("Reading from SDRAM...\r\n");
+
+    for(int * p = data; p < (int *) data+size; p++) {
+        if ((uintptr_t) p != (uintptr_t) *p) {
+            printf("SDRAM ERROR!\r\n");
+            return;
+        }
+    }
+
+    printf("SDRAM OK\r\n");
+
+    if(do_free)
+        free(data);
+}
+
 void on_reset(void)
 {
+    gs_a3200_led_init();
+    gs_a3200_led_on(GS_A3200_LED_CPU_OK);
+    gs_a3200_led_off(GS_A3200_LED_A);
+
     /* Reset & start watchdog - Will be re-initialized by SWWD when started later on */
     wdt_disable();
     wdt_clear();
@@ -238,9 +284,7 @@ void on_reset(void)
     /* Resetting/Clearing all interrupts, so they are disabled when booting a RAM image -
        It is also disabled in swload, but having it here will allow a RAM image to disable it regardless 
        if the SW in flash does */
-#ifndef __linux
     gs_sys_avr32_reset_all_interrupt_settings();
-#endif
 
     /* Initialize interrupt handling.
        This function call is needed, when using libasf startup.S file */
@@ -251,50 +295,46 @@ void on_reset(void)
 
     /* Init pwr channels */
     gs_a3200_pwr_switch_init();
+    /* Disable all pwr switches */
+    gs_a3200_pwr_switch_disable(GS_A3200_PWR_GSSB);
+    gs_a3200_pwr_switch_disable(GS_A3200_PWR_GSSB2);
+    gs_a3200_pwr_switch_disable(GS_A3200_PWR_PWM);
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_SD);
 
-    if (!GS_A3200_RAM_IMAGE) {
-        /* Init SDRAM, do this before malloc is called - It is configured already when booting from RAM */
-        sdramc_init(sysclk_get_cpu_hz());
-    }
+    /* Init SDRAM, do this before malloc is called - It is configured already when booting from RAM */
+    sdramc_init(sysclk_get_cpu_hz());
 
-    /* We have to trust that the SDRAM is working by now */
+    /**
+     * Set heap address to the external SDRAM, so malloc calls will use the
+     * 32MB external SDRAM. Otherwise only the 68kB internal SRAM are available
+     * @warning Do not touch this lines. See Gomspace framework docs and AVR32
+     * application notes on SDRAM and Linker Scripts usages for further details.
+     */
+#if 1
     extern void *heap_start, *heap_end;
-    heap_start = GS_TYPES_UINT2PTR(0xD0000000 + 0x100000);
-    heap_end = GS_TYPES_UINT2PTR(0xD0000000 + 0x2000000 - 1000);
-
-    if (GS_A3200_SDK) {
-        /* Start software watchdog, which takes care of the hardware watchdog */
-        gs_a3200_sdk_watchdog_init();
-
-        /* Init LED */
-        gs_a3200_led_init();
-        gs_a3200_led_on(GS_A3200_LED_CPU_OK);
-    }
-    
+    heap_start = (void *)(0xD0000000 + 0x100000);
+    heap_end = (void *)(0xD0000000 + 0x2000000 - 1000);
+#endif
 
     sch_a3200_uart_init(2, true, SCH_UART_BAUDRATE);
     sch_a3200_uart_init(4, true, SCH_UART_BAUDRATE);
 
+    /* Enable USART for printf, scanf */
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
-    //return GS_OK;
-}
 
-// void gs_a3200_run(const gs_a3200_hooks_t * hooks)
-// {
-//     gs_a3200_hooks = hooks;
-// 
-//     /* Start init task at highest priority */
-//     gs_thread_create("INIT",
-//                      (GS_A3200_SDK) ? gs_a3200_sdk_init_task : sch_bsp_init_task,
-//                      NULL, GS_A3200_DEFAULT_STACK_SIZE, GS_THREAD_PRIORITY_CRITICAL, 0, NULL);
-// 
-//     /* Start the scheduler. */
-//     vTaskStartScheduler();
-// 
-//     /* Will only get here if there was insufficient memory to create the idle task. */
-//     for (;;) {
-//         gs_sys_reset(GS_SYS_RESET_NO_MEM);
-//     }
-// }
+    /**
+     * Test the external SDRAM. If working properly we are able to reserve this
+     * large amount of memory and will use and address higher than 0xD0000000.
+     * Otherwise, the internal SRAM is not big enough then malloc will raise an
+     * error and the device will be reset.
+     */
+#if 0
+    test_sdram(100000, 1);
+#endif
+
+    /* Finish on reset, both led on */
+    gs_a3200_led_on(GS_A3200_LED_CPU_OK);
+    gs_a3200_led_on(GS_A3200_LED_A);
+}
