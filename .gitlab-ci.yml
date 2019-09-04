@@ -9,6 +9,7 @@ create_vis:
   stage: create_vis
   script:
     - echo "Creating Visualizations"
+    - whoiam
   only:
     - master
 
