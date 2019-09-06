@@ -3,6 +3,7 @@ import os
 import argparse
 import src.system.include.configure as configure
 
+
 def get_parameters():
     """
     Parse script arguments
@@ -12,7 +13,7 @@ def get_parameters():
     parser.add_argument('os', type=str, default="LINUX")
     parser.add_argument('arch', type=str, default="NANOMIND")
     parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
-    parser.add_argument('--name', type=str, default="SUCHAI-Test")
+    parser.add_argument('--name', type=str, default="SUCHAI-DEV")
     parser.add_argument('--id',   type=str, default="0")
     parser.add_argument('--version',   type=str, default=configure.call_git_describe())
     parser.add_argument('--comm', type=str, default="1")
@@ -35,6 +36,7 @@ def get_parameters():
     parser.add_argument('--no-config', action="store_true", help="Skip configure, do not generate a new config.h")
 
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     # Parse parameters
@@ -64,7 +66,7 @@ if __name__ == "__main__":
         os.system('cmake ..')
         result = os.system('make')
 
-    else: #args.os = FREERTOS
+    else:  # args.os = FREERTOS
         if args.arch == "ESP32":
             if args.drivers:
                 os.chdir('src/drivers/esp32')
@@ -89,7 +91,7 @@ if __name__ == "__main__":
             elif args.clean:
                 result = os.system('sh build.sh clean')
             elif args.program:
-                result = os.system('sh build.sh program'+ ' ' + str(args.console))
+                result = os.system('sh build.sh program' + ' ' + str(args.console))
             else:
                 result = os.system('sh build.sh')
 
