@@ -7,6 +7,8 @@
 // void *__dso_handle __attribute__((used)) = 0;
 #endif
 
+static const char *tag = "init";
+
 void sch_a3200_init_spi0(bool decode)
 {
     const gpio_map_t map = {
@@ -185,6 +187,7 @@ gs_error_t sch_a3200_init_flash(void)
 
 void on_init_task(void * param)
 {
+    gs_error_t rc;
     /**
      * Setting SPI devices
      */
@@ -193,9 +196,11 @@ void on_init_task(void * param)
     /* Init temperature sensors */
     gs_a3200_lm71_init();
     /* Init FLASH (fl512s) */
-    sch_a3200_init_flash();
+    rc = sch_a3200_init_flash();
+    if(rc!=0) LOGE(tag, "FLASH not initialized!");
     /* Init FRAM and RTC (FM33256B chip) */
-    sch_a3200_init_fram();
+    rc = sch_a3200_init_fram();
+    if(rc!=0) LOGE(tag, "FRAM not initialized!");
     /* SPI0 device driver - has to be called after param init */
     sch_a3200_init_spi0(false);
 
