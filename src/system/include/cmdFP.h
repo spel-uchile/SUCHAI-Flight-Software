@@ -29,14 +29,30 @@ void cmd_fp_init(void);
 /**
  * Set a command to be added in the flight plan
  *
- * Each argument for the command must be separated by a comma ',' character instead os a space ' ' character.
+ * Each argument for the command must be separated by a comma ',' character
+ * instead os a space ' ' character.
  *
  * @param fmt Str. Parameters format "%d %d %d %d %d %d %s %s %d %d"
- * @param params Str. Parameters as string "<day> <month> <year> <hour> <min> <sec> <command> <args> <executions> <periodical>"
+ * @param params Str. Parameters as string
+ *  "<day> <month> <year> <hour> <min> <sec> <command> <args> <executions> <periodical>"
  * @param nparams Int. Number of parameters 10
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int fp_set(char *fmt, char *params, int nparams);
+
+/**
+ * Set a command to be added in the flight plan
+ *
+ * Each argument for the command must be separated by a comma ',' character
+ * instead os a space ' ' character.
+ *
+ * @param fmt Str. Parameters format "%d %s %s %d %d"
+ * @param params Str. Parameters as string
+ *  "<unixtime> <command> <args> <executions> <periodical>"
+ * @param nparams Int. Number of parameters 5
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int fp_set_unix(char *fmt, char *params, int nparams);
 
 /**
  * Delete a command in the flight plan by the execution time

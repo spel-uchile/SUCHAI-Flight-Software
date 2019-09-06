@@ -371,7 +371,7 @@ void dat_print_status(dat_status_t *status)
 }
 
 #if SCH_STORAGE_MODE == 0
-static int dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
+static int _dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
 {
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
@@ -394,8 +394,59 @@ static int dat_set_fp_async(int timetodo, char* command, char* args, int executi
 
     return 1;
 }
+#endif
 
-static int dat_del_fp_async(int timetodo)
+int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
+{
+
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    //Enter critical zone
+#if SCH_STORAGE_MODE == 0
+    //TODO : agregar signal de segment para responder falla
+    int rc = _dat_set_fp_async(timetodo, command, args, executions, periodical);
+#else
+    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical);
+#endif
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+    return rc;
+}
+
+int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
+{
+    int rc;
+    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    //Enter critical zone
+#if SCH_STORAGE_MODE == 0
+    int i;
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
+    {
+        if(elapsed_sec == data_base[i].unixtime)
+        {
+            strcpy(command, data_base[i].cmd);
+            strcpy(args,data_base[i].args);
+            *executions = data_base[i].executions;
+            *periodical = data_base[i].periodical;
+
+            if (data_base[i].periodical > 0)
+                _dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
+
+            _dat_del_fp_async(elapsed_sec);
+            rc = 0;
+            break;
+        }
+    }
+#else
+    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
+#endif
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_fp_sem);
+
+    return rc;
+}
+
+#if SCH_STORAGE_MODE ==0
+static int _dat_del_fp_async(int timetodo)
 {
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
@@ -410,94 +461,32 @@ static int dat_del_fp_async(int timetodo)
             return 0;
         }
     }
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
-
     return 1;
 }
 #endif
 
-int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
-{
-#if SCH_STORAGE_MODE == 0
-
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
-
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(elapsed_sec == data_base[i].unixtime)
-        {
-            strcpy(command, data_base[i].cmd);
-            strcpy(args,data_base[i].args);
-            *executions = data_base[i].executions;
-            *periodical = data_base[i].periodical;
-
-            if (data_base[i].periodical > 0)
-                dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
-
-
-            dat_del_fp_async(elapsed_sec);
-
-            return 0;
-        }
-    }
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
-
-    return -1;
-#else
-    return storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
-#endif
-}
-
-int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
-{
-#if SCH_STORAGE_MODE == 0
-    //TODO : agregar signal de segment para responder falla
-
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
-
-    int rc = dat_set_fp_async(timetodo, command, args, executions, periodical);
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
-
-    return rc;
-#else
-    return storage_flight_plan_set(timetodo, command, args, executions, periodical);
-#endif
-}
-
 int dat_del_fp(int timetodo)
 {
-#if SCH_STORAGE_MODE ==0
 
-    //Enter critical zone
     osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
-
-    int rc = dat_del_fp_async(timetodo);
-
+    //Enter critical zone
+#if SCH_STORAGE_MODE ==0
+    int rc = _dat_del_fp_async(timetodo);
+#else
+    int rc = storage_flight_plan_erase(timetodo);
+#endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
 
     return rc;
-#else
-    return storage_flight_plan_erase(timetodo);
-#endif
 }
 
 int dat_reset_fp(void)
 {
-#if SCH_STORAGE_MODE == 0
-
-    //Enter critical zone
+    int rc;
     osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
-
+    //Enter critical zone
+#if SCH_STORAGE_MODE == 0
     int i;
     for(i=0;i<SCH_FP_MAX_ENTRIES;i++)
     {
@@ -507,23 +496,21 @@ int dat_reset_fp(void)
         data_base[i].executions = 0;
         data_base[i].periodical = 0;
     }
-
+    rc = 0;
+#else
+    rc = storage_table_flight_plan_init(1);
+#endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
-
-    return 0;
-#else
-    return storage_table_flight_plan_init(1);
-#endif
+    return rc;
 }
 
 int dat_show_fp (void)
 {
-#if SCH_STORAGE_MODE ==0
-
-    //Enter critical zone
+    int rc;
     osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
-
+    //Enter critical zone
+#if SCH_STORAGE_MODE ==0
     int cont = 0;
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES; i++)
@@ -543,14 +530,13 @@ int dat_show_fp (void)
     {
         LOGI(tag, "Flight plan table empty");
     }
-
+    rc = 0;
+#else
+    rc = storage_show_table();
+#endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
-
-    return 0;
-#else
-    return storage_show_table();
-#endif
+    return rc;
 }
 
 time_t dat_get_time(void)

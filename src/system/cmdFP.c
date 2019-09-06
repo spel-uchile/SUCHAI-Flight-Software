@@ -24,6 +24,7 @@ static const char* tag = "cmdFlightPlan";
 void cmd_fp_init(void)
 {
     cmd_add("fp_set_cmd", fp_set, "%d %d %d %d %d %d %s %s %d %d", 10);
+    cmd_add("fp_set_cmd_unix", fp_set_unix, "%d %s %s %d %d", 5);
     cmd_add("fp_del_cmd", fp_delete, "%d %d %d %d %d %d", 6);
     cmd_add("fp_show", fp_show, "", 0);
     cmd_add("fp_reset", fp_reset,"", 0);
@@ -52,6 +53,29 @@ int fp_set(char *fmt, char *params, int nparams)
         unixtime = mktime(&str_time);
 
         int rc = dat_set_fp((int)unixtime, command, args, executions, periodical);
+
+        if (rc == 0)
+            return CMD_OK;
+        else
+            return CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
+}
+
+int fp_set_unix(char *fmt, char *params, int nparams)
+{
+    int unixtime;
+    int executions,periodical;
+    char command[SCH_CMD_MAX_STR_PARAMS];
+    char args[SCH_CMD_MAX_STR_PARAMS];
+
+    if(sscanf(params, fmt, &unixtime, &command, &args, &executions, &periodical) == nparams)
+    {
+        int rc = dat_set_fp(unixtime, command, args, executions, periodical);
 
         if (rc == 0)
             return CMD_OK;
