@@ -30,35 +30,35 @@ create_vis:
     - rm \$svg_file
     - echo http://data.spel.cl/viz_svg\${svg_file#"."}
   only:
-    - master
+    - cicd_test
 
 build_linux:
   stage: build_linux
   script:
     - echo "Building in Linux"
   only:
-    - master
+    - cicd_test
     
 build_esp:
   stage: build_esp
   script:
     - echo "Building in esp32"
   only:
-    - master
+    - cicd_test
     
 build_nanomind:
   stage: build_nanomind
   script:
     - echo "Building in nanomind"
   only:
-    - master
+    - cicd_test
 
 test_linux:
   stage: test_linux
   script:
     - echo "Testing in Linux"
   only:
-    - master
+    - cicd_test
 
 
 
