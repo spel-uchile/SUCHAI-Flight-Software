@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-echo "Downloading libcsp v1.5"
+echo "Downloading Gomspace-libcsp v1.5"
 if [ ! -d "./libcsp" ]; then
-    git clone https://github.com/libcsp/libcsp
+    git clone https://github.com/GomSpace/libcsp.git
     cd libcsp
     git checkout release-1.5
-    mv wscript wscript.old
+    #mv wscript wscript.old
     cd -
-    cp wscript libcsp/wscript
+    #cp wscript libcsp/wscript
 fi
 
 cd libcsp
