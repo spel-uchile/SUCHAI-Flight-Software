@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ ! -d suchai-docker" ]; then
+if [ ! -d "suchai-docker" ]; then
     git clone https://github.com/spel-uchile/suchai-docker.git
 else
     cd suchai-docker
