@@ -1,3 +1,4 @@
+
 stages:
   - create_vis
   - build_linux
@@ -10,6 +11,24 @@ create_vis:
   script:
     - echo "Creating Visualizations"
     - whoiam
+    - pwd
+    - last_commit_="git log -1 --pretty=%h"
+    - last_commit=`\$last_commit_`
+    - cd $HOME/Analyse/SUCHAI-Flight-Software
+    - git pull origin master
+    - cd ../Analyse
+    - python3 suchai_analysis.py ../SUCHAI-Flight-Software --hash \$last_commit --svg 1
+    - commit_file_="find . -maxdepth 1 -name "*\$last_commit.html" -print"
+    - commit_file=`\$commit_file_`
+    - svg_file_="find . -maxdepth 1 -name "*\$last_commit.svg" -print"
+    - svg_file=`\$svg_file_`
+    - cp -f \$commit_file /home/ubuntu/SpelDataServer/public/viz_html/
+    - rm \$commit_file
+    - echo http://data.spel.cl/viz_html\${commit_file#"."}
+    - cp -f \$svg_file /home/ubuntu/SpelDataServer/public/viz_svg/
+    - cp -f \$svg_file /home/ubuntu/SpelDataServer/public/viz_svg/last.svg
+    - rm \$svg_file
+    - echo http://data.spel.cl/viz_svg\${svg_file#"."}
   only:
     - master
 
