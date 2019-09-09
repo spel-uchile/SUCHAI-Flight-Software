@@ -10,7 +10,7 @@ create_vis:
   stage: create_vis
   script:
     - echo "Creating Visualizations"
-    - whoiam
+    - whoami
     - pwd
     - last_commit_="git log -1 --pretty=%h"
     - last_commit=`\$last_commit_`
