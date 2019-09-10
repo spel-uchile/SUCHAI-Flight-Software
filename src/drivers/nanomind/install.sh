@@ -29,7 +29,14 @@ fi
 
 echo "Linking BUS drivers into SDK"
 cd suchai-drivers-obc/lib/
-for f in ../../suchai-drivers-bus/lib/*; do ln -s -f $f; done
+# Link all bus libraries
+# for f in ../../suchai-drivers-bus/lib/*; do ln -s -f $f; done
+# Link only used bus libraries
+ln -s -f ../../suchai-drivers-bus/lib/libgssb_client
+ln -s -f ../../suchai-drivers-bus/lib/libparam_client
+ln -s -f ../../suchai-drivers-bus/lib/nanocom-ax_client
+ln -s -f ../../suchai-drivers-bus/lib/nanopower-bpx_client
+ln -s -f ../../suchai-drivers-bus/lib/nanopower_client
 cd -
 
 echo "Preparing build tools"
