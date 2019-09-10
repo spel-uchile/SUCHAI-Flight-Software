@@ -102,17 +102,6 @@ void init_communications(void)
     }
 
     /* Init buffer system */
-//    csp_conf_t sch_csp_conf;
-//    csp_conf_get_defaults(&sch_csp_conf);
-//    sch_csp_conf.address = SCH_COMM_ADDRESS;
-//    sch_csp_conf.hostname = "SUCHAI"
-//    sch_csp_conf.conn_max = 10;
-//    sch_csp_conf.conn_queue_length = 10;
-//    sch_csp_conf.conn_dfl_so = CSP_O_NONE;
-//    sch_csp_conf.fifo_length = 25;
-//    sch_csp_conf.port_max_bind = 24;
-//    sch_csp_conf.rdp_max_window = 20;
-
     int t_ok;
     t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
     if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
@@ -166,9 +155,9 @@ void init_communications(void)
     t_ok = csp_route_start_task(SCH_TASK_CSP_STACK, 1);
     if(t_ok != 0) LOGE(tag, "Task router not created!");
 
-    LOGD(tag, "Route table");
+    LOGI(tag, "Route table");
     csp_route_print_table();
-    LOGD(tag, "Interfaces");
+    LOGI(tag, "Interfaces");
     csp_route_print_interfaces();
 #endif //SCH_COMM_ENABLE
 }
