@@ -1,6 +1,12 @@
-//
-// Created by matias on 22-03-18.
-//
+/**
+ * @file init.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @author Matias Ramirez M - nicoram.mt@gmail.com
+ * @date 2019
+ * @copyright GNU GPL v3
+ *
+ * Initialization functions
+ */
 
 #ifndef SUCHAI_FLIGHT_SOFTWARE_INITI_H
 #define SUCHAI_FLIGHT_SOFTWARE_INITI_H
