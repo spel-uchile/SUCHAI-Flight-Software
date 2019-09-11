@@ -1,8 +1,8 @@
 /**
  * @file  taskConsole.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @author Carlos Gonzalez C - carlgonz@ug.uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This task implements a client that works as a serial console.

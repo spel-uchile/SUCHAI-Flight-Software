@@ -2,7 +2,7 @@
  * @file  taskInit.h
  * @author Matias Ramirez  - nicoram.mt@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This task implements a listener, that sends commands at periodical times.

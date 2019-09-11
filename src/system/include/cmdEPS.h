@@ -1,7 +1,7 @@
 /**
  * @file  cmdEPS.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU Public License.
  *
  * This header contains commands related with the EPS subsystem

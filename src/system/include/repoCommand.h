@@ -2,7 +2,7 @@
  * @file  repoCommand.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header have definitions related to command repository
