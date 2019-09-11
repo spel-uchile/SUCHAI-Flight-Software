@@ -394,6 +394,24 @@ static int _dat_set_fp_async(int timetodo, char* command, char* args, int execut
 
     return 1;
 }
+
+static int _dat_del_fp_async(int timetodo)
+{
+    int i;
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
+    {
+        if(timetodo == data_base[i].unixtime)
+        {
+            data_base[i].unixtime = 0;
+            data_base[i].executions = 0;
+            data_base[i].periodical = 0;
+            free(data_base[i].args);
+            free(data_base[i].cmd);
+            return 0;
+        }
+    }
+    return 1;
+}
 #endif
 
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
@@ -444,26 +462,6 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
 
     return rc;
 }
-
-#if SCH_STORAGE_MODE ==0
-static int _dat_del_fp_async(int timetodo)
-{
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(timetodo == data_base[i].unixtime)
-        {
-            data_base[i].unixtime = 0;
-            data_base[i].executions = 0;
-            data_base[i].periodical = 0;
-            free(data_base[i].args);
-            free(data_base[i].cmd);
-            return 0;
-        }
-    }
-    return 1;
-}
-#endif
 
 int dat_del_fp(int timetodo)
 {
