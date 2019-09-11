@@ -40,15 +40,17 @@ void taskInit(void *param)
     LOGD(tag, "Initialization commands ...");
     // Init LibCSP system
     init_communications();
+
+#ifdef NANOMIND
     // Execute deployment activities if first boot
     int first_boot = dat_get_system_var(dat_dep_deployed) > 0 ? 0 : 1;
-#if 0
     if(first_boot)
     {
         LOGI(tag, "\tFirst boot! Execute init routines");
         init_routines();
     }
 #endif
+
     LOGD(tag, "Creating client tasks ...");
     int t_ok;
     int n_threads = 4;
@@ -105,6 +107,8 @@ void init_communications(void)
     int t_ok;
     t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
     if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
+
+    /* Init CSP */
     csp_set_hostname(SCH_NAME);
     csp_init(SCH_COMM_ADDRESS); // Init CSP with address MY_ADDRESS
 
