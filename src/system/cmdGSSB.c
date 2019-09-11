@@ -33,7 +33,7 @@ void cmd_gssb_init(void)
 {
     cmd_add("gssb_pwr", gssb_pwr, "%d %d", 2);
     cmd_add("gssb_select", gssb_select_addr, "%i", 1);
-    cmd_add("gssb_scan", gssb_bus_scan, "", 0);
+    cmd_add("gssb_scan", gssb_bus_scan, "%i %i", 2);
     cmd_add("gssb_fss_get_sun", gssb_read_sunsensor, "", 0);
     cmd_add("gssb_fss_get_temp", gssb_get_temp, "", 0);
     cmd_add("gssb_fss_set_config", gssb_sunsensor_conf, "%d", 1);
@@ -84,7 +84,7 @@ int gssb_pwr(char *fmt, char *params, int nparams)
 
 
 int gssb_select_addr(char *fmt, char *params, int nparams)
-{//OK
+{
     int addr;
 
     if (params == NULL)
@@ -103,17 +103,27 @@ int gssb_select_addr(char *fmt, char *params, int nparams)
 }
 
 int gssb_bus_scan(char *fmt, char *params, int nparams)
-{//OK
-    int8_t devices[127];
-    uint8_t addr;
-    uint8_t start = 1;
-    uint8_t end = 100;
+{
+    int8_t devices[128];
+    uint8_t addr = 0;
+    int start;
+    int end;
 
-    gs_gssb_bus_scan(start, end, 100, devices);
+    if(params == NULL || (sscanf(params, fmt, &start, &end) != nparams))
+    {
+        start = 1;
+        end = 100;
+    }
 
-    for (addr = start; addr <= end; addr++) {
+    printf("Scanning I2C bus from %d to %d...\n", start, end);
+    if(start > 128 || end > 128)
+        return CMD_ERROR_SYNTAX;
+
+    gs_gssb_bus_scan((uint8_t)start, (uint8_t)end, 100, devices);
+
+    for (addr = (uint8_t)start; addr < (uint8_t)end; addr++) {
         if (devices[addr] == GS_OK) {
-            printf("Found device at: %d\r\n", addr);
+            printf("\tFound device at: %#X (%d)\r\n", addr, addr);
         }
     }
 
@@ -121,7 +131,7 @@ int gssb_bus_scan(char *fmt, char *params, int nparams)
 }
 
 int gssb_read_sunsensor(char *fmt, char *params, int nparams)
-{//OK
+{
     uint16_t sun[4];
     int i;
 
@@ -143,7 +153,7 @@ int gssb_read_sunsensor(char *fmt, char *params, int nparams)
 }
 
 int gssb_get_temp(char *fmt, char *params, int nparams)
-{//OK
+{
     float temp;
 
     /* Command ADC to sample temp */
@@ -161,7 +171,7 @@ int gssb_get_temp(char *fmt, char *params, int nparams)
 }
 
 int gssb_sunsensor_conf(char *fmt, char *params, int nparams)
-{//OK
+{
     int conf;
 
     if (params == NULL)
@@ -177,7 +187,7 @@ int gssb_sunsensor_conf(char *fmt, char *params, int nparams)
 }
 
 int gssb_sunsensor_conf_save(char *fmt, char *params, int nparams)
-{//OK
+{
     if (gs_gssb_sun_sensor_conf_save(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
 
@@ -185,7 +195,7 @@ int gssb_sunsensor_conf_save(char *fmt, char *params, int nparams)
 }
 
 int gssb_set_i2c_addr(char *fmt, char *params, int nparams)
-{//OK
+{
     int new_i2c_addr;
     uint32_t uuid;
 
@@ -212,7 +222,7 @@ int gssb_set_i2c_addr(char *fmt, char *params, int nparams)
 }
 
 int gssb_commit_i2c_addr(char *fmt, char *params, int nparams)
-{//OK
+{
 
     if (gs_gssb_commit_i2c_addr(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
@@ -221,7 +231,7 @@ int gssb_commit_i2c_addr(char *fmt, char *params, int nparams)
 }
 
 int gssb_get_version(char *fmt, char *params, int nparams)
-{//OK
+{
 
     uint8_t rx_buff[20];
 
@@ -235,7 +245,7 @@ int gssb_get_version(char *fmt, char *params, int nparams)
 }
 
 int gssb_get_uuid(char *fmt, char *params, int nparams)
-{//OK
+{
     uint32_t uuid;
 
     if (gs_gssb_get_uuid(i2c_addr, i2c_timeout_ms, &uuid) != GS_OK)
@@ -246,7 +256,7 @@ int gssb_get_uuid(char *fmt, char *params, int nparams)
 }
 
 int gssb_get_model(char *fmt, char *params, int nparams)
-{//OK
+{
     gs_gssb_model_t model;
 
     if (gs_gssb_get_model(i2c_addr, i2c_timeout_ms, &model) != GS_OK)
@@ -275,7 +285,7 @@ int gssb_get_model(char *fmt, char *params, int nparams)
 }
 
 int gssb_interstage_temp(char *fmt, char *params, int nparams)
-{//OK
+{
     float temp;
 
     if (gs_gssb_istage_get_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
@@ -287,7 +297,7 @@ int gssb_interstage_temp(char *fmt, char *params, int nparams)
 }
 
 int gssb_msp_outside_temp(char *fmt, char *params, int nparams)
-{//OK
+{
     int16_t temp;
 
     if (gs_gssb_msp_get_outside_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
@@ -300,7 +310,7 @@ int gssb_msp_outside_temp(char *fmt, char *params, int nparams)
 
 //FIXME: Remove?
 int gssb_msp_outside_temp_calibrate(char *fmt, char *params, int nparams)
-{//OK
+{
     uint16_t current, resistor;
     int curr, res;
 
@@ -334,7 +344,7 @@ int gssb_msp_outside_temp_calibrate(char *fmt, char *params, int nparams)
 
 
 int gssb_internal_temp(char *fmt, char *params, int nparams)
-{//OK
+{
     int16_t temp;
 
     if (gs_gssb_istage_get_internal_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
@@ -347,7 +357,7 @@ int gssb_internal_temp(char *fmt, char *params, int nparams)
 
 
 int gssb_interstage_burn(char *fmt, char *params, int nparams)
-{//OK
+{
     if (gs_gssb_istage_burn(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
 
@@ -357,7 +367,7 @@ int gssb_interstage_burn(char *fmt, char *params, int nparams)
 
 
 int gssb_common_sun_voltage(char *fmt, char *params, int nparams)
-{//OK
+{
     uint16_t voltage;
 
     if (gs_gssb_istage_get_sun_voltage(i2c_addr, i2c_timeout_ms, &voltage) != GS_OK)
@@ -370,7 +380,7 @@ int gssb_common_sun_voltage(char *fmt, char *params, int nparams)
 
 /* Register the set and get with different parameters */
 int gssb_interstage_burn_settings(char *fmt, char *params, int nparams)
-{//OK
+{
     gs_gssb_istage_burn_settings_t settings;
     int std_time, increment_ms, short_cnt_down, max_repeat, rep_time_s;
     int switch_polarity, reboot_deploy_cnt;
@@ -491,7 +501,7 @@ int gssb_interstage_burn_settings(char *fmt, char *params, int nparams)
 
 
 int gssb_interstage_arm(char *fmt, char *params, int nparams)
-{//OK
+{
     uint8_t data = 0;
     int arm_auto = 0;
 
@@ -522,7 +532,7 @@ int gssb_interstage_arm(char *fmt, char *params, int nparams)
 
 
 int gssb_interstage_state(char *fmt, char *params, int nparams)
-{//OK
+{
     uint8_t armed_manual = 0;
 
     if (params == NULL)
@@ -548,7 +558,7 @@ int gssb_interstage_state(char *fmt, char *params, int nparams)
 
 
 int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams)
-{//OK
+{
     int unlock;
     if (sscanf(params, fmt, &unlock) != nparams)
         return CMD_ERROR_SYNTAX;
@@ -566,7 +576,7 @@ int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams)
 
 
 int gssb_soft_reset(char *fmt, char *params, int nparams)
-{//OK
+{
     printf("Resetting device %#X...", i2c_addr);
     if (gs_gssb_soft_reset(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
@@ -576,7 +586,7 @@ int gssb_soft_reset(char *fmt, char *params, int nparams)
 
 
 int gssb_interstage_get_status(char *fmt, char *params, int nparams)
-{//OK
+{
     gs_gssb_istage_status_t status;
     const char *state_str;
     
@@ -620,7 +630,7 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
 
 
 int gssb_ar6_burn(char *fmt, char *params, int nparams)
-{//OK
+{
     uint8_t duration;
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
@@ -640,7 +650,7 @@ int gssb_ar6_burn(char *fmt, char *params, int nparams)
 
 // FIXME: Remove?
 int gssb_ar6_get_status(char *fmt, char *params, int nparams)
-{//OK
+{
     gs_gssb_ar6_status_t status;
 
     if (gs_gssb_ar6_get_release_status(i2c_addr, i2c_timeout_ms, &status.release) != GS_OK)
@@ -691,7 +701,7 @@ int gssb_ar6_get_status(char *fmt, char *params, int nparams)
 
 
 int gssb_common_burn_channel(char *fmt, char *params, int nparams)
-{//OK
+{
     uint8_t channel, duration;
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
@@ -720,7 +730,7 @@ int gssb_common_burn_channel(char *fmt, char *params, int nparams)
 
 
 int gssb_common_stop_burn(char *fmt, char *params, int nparams)
-{//OK
+{
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
 
