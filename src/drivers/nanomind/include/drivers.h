@@ -1,3 +1,15 @@
+/**
+ * @file drivers.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @date 2019
+ * @copyright GNU GPL v3
+ *
+ * Include all platform specific drivers.
+ */
+
+#ifndef _DRIVERS_H
+#define _DRIVERS_H
+
 // MCU Drivers
 #include <board.h>
 #include <wdt.h>
@@ -33,9 +45,12 @@
 #include <gs/util/time.h>
 #include <gs/util/thread.h>
 #include <gs/util/clock.h>
+#include <gs/util/timestamp.h>
 #include <gs/util/error.h>
 // CSP
 #include <csp/csp.h>
+#include <csp/csp_types.h>
+#include <csp/csp_endian.h>
 #include <csp/drivers/i2c.h>
 #include <csp/interfaces/csp_if_i2c.h>
 // Param
@@ -51,3 +66,4 @@
 #include <gs/gssb/gssb_all_devices.h>
 #include <gs/gssb/gssb_autodeploy.h>
 
+#endif
