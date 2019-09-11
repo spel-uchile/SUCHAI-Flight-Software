@@ -21,20 +21,13 @@
 #ifndef DATA_REPO_H
 #define DATA_REPO_H
 
-#include "osSemphr.h"
-
 #include "config.h"
 #include "globals.h"
 #include "utils.h"
 
-#if SCH_STORAGE_MODE != 0
-    #include "data_storage.h"
-#endif
+#include "data_storage.h"
 
-#ifdef NANOMIND
-    #include "util/clock.h"
-    #include "util/timestamp.h"
-#endif
+#include "osSemphr.h"
 
 /** Union for easily casting status variable types */
 typedef union fvalue{
@@ -46,8 +39,6 @@ typedef union fvalue{
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
-
-// TODO: [Gedoix] Esto se puede hacer en el .c y usar #undef
 
 /** The repository's name */
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
@@ -494,7 +485,5 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay);
  * @return 0 if OK, -1 if an error occurred
  */
 int dat_delete_memory_sections(void);
-
-
 
 #endif // DATA_REPO_H

@@ -12,45 +12,14 @@
 #ifndef CMD_OBC_H
 #define CMD_OBC_H
 
+#include <signal.h>
+#include <malloc.h>
+
+#include "drivers.h"
 #include "config.h"
 
-#ifdef LINUX
-    #include <signal.h>
-#endif
-
-#ifdef AVR32
-    #include "led.h"
-    #include "wdt.h"
-    #include "avr32_reset_cause.h"
-#endif
-
-#ifdef NANOMIND
-    #include "drivers.h"
-//     #include "compiler.h"
-//     #include "led.h"*
-//     #include "wdt.h"
-//     #include "dev/cpu.h"
-//     #include "gs_pwm.h"**
-//     #include "gssb.h"
-//     #include "pwr_switch.h"*
-//     #include "util/error.h"*
-//     #include <conf_a3200.h>
-//     #include <lm70.h>**
-//     #include <mpu3300.h>*
-//     #include <hmc5843.h>*
-#endif
-
-#ifdef ESP32
-    #define BLINK_GPIO 5
-    #include "driver/gpio.h"
-#endif
-
-#define GSSB_ARMED_NONE 0
-#define GSSB_ARMED_AUTO 1
-#define GSSB_ARMED_MANUAL 2
-
-#include "repoCommand.h"
 #include "os/os.h"
+#include "repoCommand.h"
 
 /**
  * Register on board computer related (OBC) commands

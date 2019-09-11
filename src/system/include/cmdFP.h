@@ -14,11 +14,8 @@
 
 #include "config.h"
 
-#ifdef LINUX
-    #include "data_storage.h"
-#endif
-
 #include "repoCommand.h"
+#include "repoData.h"
 
 /**
  * This function registers the list of command in the system, initializing the

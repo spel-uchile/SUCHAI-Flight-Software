@@ -17,13 +17,6 @@
 #include "repoData.h"
 #include "repoCommand.h"
 
-//#ifdef NANOMIND
-//    #include <conf_a3200.h>
-//    #include <lm70.h>
-//    #include <mpu3300.h>
-//    #include <hmc5843.h>
-//#endif
-
 #define SCH_DRP_MAGIC (1010)    ///< Magic number to execute critical commands
 
 typedef union sensors_value{

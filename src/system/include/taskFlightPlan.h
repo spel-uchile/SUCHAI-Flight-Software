@@ -14,23 +14,15 @@
 
 #include <utils.h>
 #include <stdlib.h>
+#include <time.h>
+
 #include "config.h"
+
 #include "osDelay.h"
+#include "osQueue.h"
+
 #include "repoCommand.h"
 #include "repoData.h"
-
-#ifdef AVR32
-    #include <avr32/io.h>
-    #if __GNUC__
-    #  include "intc.h"
-    #endif
-    #include "board.h"
-    #include "compiler.h"
-    #include "rtc.h"
-    #include "usart.h"
-    #include "pm.h"
-    #include <time.h>
-#endif
 
 void taskFlightPlan(void *param);
 

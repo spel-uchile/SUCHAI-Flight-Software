@@ -10,14 +10,9 @@
 #ifndef CMDEPS_H
 #define CMDEPS_H
 
+#include "drivers.h"
 #include "config.h"
 #include "utils.h"
-
-#ifdef SCH_USE_NANOPOWER
-    #include "drivers.h"
-    //#include "nanopower2.h"
-    //#include "bpx.h"
-#endif
 
 #include "repoCommand.h"
 #include "repoData.h"

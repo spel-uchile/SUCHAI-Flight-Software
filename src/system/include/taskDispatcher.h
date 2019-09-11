@@ -15,6 +15,9 @@
 
 #include "config.h"
 #include "globals.h"
+
+#include "osQueue.h"
+
 #include "repoCommand.h"
 #include "repoData.h"
 

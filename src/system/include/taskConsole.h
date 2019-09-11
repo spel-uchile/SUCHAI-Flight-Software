@@ -11,15 +11,14 @@
 #ifndef T_COSOLE_H
 #define T_CONSOLE_H
 
-#include "config.h"
+#include <stdio.h>
 
-#include <ctype.h>
+#include "config.h"
+#include "globals.h"
+#include "utils.h"
 
 #include "osQueue.h"
 #include "osDelay.h"
-
-#include "globals.h"
-#include "utils.h"
 
 #include "repoCommand.h"
 

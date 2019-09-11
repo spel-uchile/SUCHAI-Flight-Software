@@ -18,45 +18,16 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_MAIN_H
 #define SUCHAI_FLIGHT_SOFTWARE_MAIN_H
 
-
-#include "config.h"
+/* std includes */
 #include <stdio.h>
 #include <signal.h>
 
-#ifdef AVR32
-    #include "asf.h"
-    #include <time.h>
-    #include <avr32/io.h>
-    #include "intc.h"
-    #include "board.h"
-    #include "compiler.h"
-    #include "rtc.h"
-    #include "usart.h"
-    #include "pm.h"
-    #include "twim.h"
-
-#endif
-
-#ifdef NANOMIND
+/* Global includes */
 #include "drivers.h"
-//     #include <conf_a3200.h>
-// 
-//     #include <sysclk.h>
-//     #include <wdt.h>
-//     #include <gpio.h>
-//     #include <sdramc.h>
-//     #include <reset_cause.h>
-// 
-//     #include <dev/usart.h>
-//     #include <dev/i2c.h>
-//     #include <dev/cpu.h>
-// 
-//     #include <fm33256b.h>
-// 
-//     #include <led.h>
-//     #include <pwr_switch.h>
-#endif
-
+#include "init.h"
+#include "config.h"
+#include "globals.h"
+#include "utils.h"
 
 /* OS includes */
 #include "osThread.h"
@@ -66,41 +37,32 @@
 #include "os/os.h"
 
 /* system includes */
-#include "globals.h"
-#include "utils.h"
 #include "repoData.h"
 #include "repoCommand.h"
 
-#ifndef AVR32
-#include "init.h"
-#endif
-
-#ifdef LINUX
-    #include <csp/csp.h>
-    #include <csp/interfaces/csp_if_zmqhub.h>
-#endif
-
 /* Task includes */
-#if SCH_TEST_ENABLED
-    #include "taskTest.h"
-#endif
-
+#include "taskInit.h"
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
 #include "taskWatchdog.h"
 #include "taskConsole.h"
-#include "taskInit.h"
-
 #if SCH_HK_ENABLED
-    #include "taskHousekeeping.h"
+#include "taskHousekeeping.h"
 #endif
 #if SCH_COMM_ENABLE
-    #include "taskCommunications.h"
+#include "taskCommunications.h"
 #endif
 #if SCH_FP_ENABLED
-    #include "taskFlightPlan.h"
+#include "taskFlightPlan.h"
+#endif
+#if SCH_TEST_ENABLED
+#include "taskTest.h"
 #endif
 
+/**
+ * ESP32 already define main in the esp-id framework, the entry point
+ * is app_main() instead
+ */
 #ifdef ESP32
     void app_main();
 #else
