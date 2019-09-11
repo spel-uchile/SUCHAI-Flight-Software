@@ -79,8 +79,8 @@ int main(void)
 
 }
 
-#ifdef FREERTOS
-#if  !defined(NANOMIND) && !defined(ESP32)
+/* FreeRTOS Hooks */
+#if  defined(FREERTOS) && !defined(NANOMIND) && !defined(ESP32)
 /**
  * Task idle handle function. Performs operations inside the idle task
  * configUSE_IDLE_HOOK must be set to 1
@@ -116,5 +116,4 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
     /* Stack overflow handle */
     while(1);
 }
-#endif
 #endif

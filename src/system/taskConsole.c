@@ -20,8 +20,6 @@
 
 #include "taskConsole.h"
 
-#define CON_BUFF_LEN 100
-
 static const char *tag = "Console";
 
 const char console_banner[] =
