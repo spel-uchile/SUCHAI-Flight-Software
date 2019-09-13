@@ -26,6 +26,7 @@ void cmd_fp_init(void)
     cmd_add("fp_set_cmd", fp_set, "%d %d %d %d %d %d %s %s %d %d", 10);
     cmd_add("fp_set_cmd_unix", fp_set_unix, "%d %s %s %d %d", 5);
     cmd_add("fp_del_cmd", fp_delete, "%d %d %d %d %d %d", 6);
+    cmd_add("fp_del_cmd_unix", fp_delete, "%d", 1);
     cmd_add("fp_show", fp_show, "", 0);
     cmd_add("fp_reset", fp_reset,"", 0);
     cmd_add("fp_test_params", test_fp_params, "%d %s %d", 3);
@@ -118,6 +119,28 @@ int fp_delete(char* fmt, char* params, int nparams)
     else
     {
         LOGW(tag, "fp_del_cmd used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
+}
+
+int fp_delete_unix(char* fmt, char* params, int nparams)
+{
+    time_t unixtime;
+    int tmptime;
+
+    if(sscanf(params, fmt, &tmptime) == nparams)
+    {
+        unixtime = (time_t)tmptime;
+        int rc = dat_del_fp((int)unixtime);
+
+        if(rc==0)
+            return CMD_OK;
+        else
+            return CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "fp_del_cmd_unix used with invalid params: %s", params);
         return CMD_FAIL;
     }
 }

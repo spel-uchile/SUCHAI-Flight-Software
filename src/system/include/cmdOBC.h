@@ -20,6 +20,7 @@
 
 #include "os/os.h"
 #include "repoCommand.h"
+#include "repoData.h"
 
 /**
  * Register on board computer related (OBC) commands

@@ -181,25 +181,14 @@ int obc_set_time(char* fmt, char* params,int nparams)
 
 int obc_get_time(char *fmt, char *params, int nparams)
 {
-    if(params == NULL)
+    int format = 0;
+    if((params == NULL) || (sscanf(params, fmt, &format) < nparams))
     {
-        LOGE(tag, "Parameter null");
-        return CMD_FAIL;
+        format = 0;
     }
-    int format;
-    if(sscanf(params, fmt, &format) == nparams)
-    {
-        int rc = dat_show_time(format);
-        if (rc == 0)
-            return CMD_OK;
-        else
-            return  CMD_FAIL;
-    }
-    else
-    {
-        LOGW(tag, "show_time used with invalid params: %s", params);
-        return CMD_FAIL;
-    }
+
+    int rc = dat_show_time(format);
+    return (rc == 0) ? CMD_OK : CMD_FAIL;
 }
 
 int obc_system(char* fmt, char* params, int nparams)
