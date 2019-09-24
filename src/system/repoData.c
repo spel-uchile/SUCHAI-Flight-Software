@@ -40,10 +40,10 @@ time_t sec = 0;
 #endif
 
 struct map data_map[last_sensor] = {
-        {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_mem_temp, dat_mem_ack_temp, "%u %f %f %f", "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
-        { "ads_data",      (uint16_t) (sizeof(ads_data_t)), dat_mem_ads, dat_mem_ack_ads, "%u %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
-        { "eps_data",      (uint16_t) (sizeof(eps_data_t)), dat_mem_eps, dat_mem_ack_eps, "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
-        { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_mem_lang, dat_mem_ack_lang, "%u %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
+        {"temp_data",      (uint16_t) (sizeof(temp_data_t)),     dat_drp_temp, dat_drp_ack_temp, "%u %f %f %f",                   "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+        { "ads_data",      (uint16_t) (sizeof(ads_data_t)),      dat_drp_ads,  dat_drp_ack_ads,  "%u %f %f %f %f %f %f",          "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        { "eps_data",      (uint16_t) (sizeof(eps_data_t)),      dat_drp_eps,  dat_drp_ack_eps,  "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
+        { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_drp_lang, dat_drp_ack_lang, "%u %f %f %f %d",                "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
 };
 
 void initialize_payload_vars(){
@@ -306,15 +306,15 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
 
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_lang);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_temp);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ads);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_eps);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_lang);
 
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_lang);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_temp);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_ads);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_eps);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_lang);
 }
 
 void dat_print_status(dat_status_t *status)
@@ -359,15 +359,15 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_lang);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_temp);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ads);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_eps);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_lang);
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_lang);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_temp);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_ads);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_eps);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_lang);
 }
 
 #if SCH_STORAGE_MODE == 0
