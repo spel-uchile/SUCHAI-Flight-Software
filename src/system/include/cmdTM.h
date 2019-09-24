@@ -50,6 +50,16 @@ int tm_send_status(char *fmt, char *params, int nparams);
  */
 int tm_parse_status(char *fmt, char *params, int nparams);
 
+
+/**
+ * Print last struct data stored from specific payload.
+ * @param fmt "%u"
+ * @param params "<payload> "
+ * @param nparams 1
+ * @return CMD_OK or CMD_FAIL
+ */
+int tm_get_last(char *fmt, char *params, int nparams);
+
 /**
  * Send last structs data stored as payload in csp frame.
  * @param fmt "%u %u"

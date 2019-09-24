@@ -703,3 +703,91 @@ int dat_delete_memory_sections(void)
 #endif
     return ret;
 }
+
+
+int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i)
+{
+    const char s[2] = " ";
+    tok_sym[0] = strtok(order, s);
+
+    int j=0;
+    while(tok_sym[j] != NULL) {
+        j++;
+        tok_sym[j] = strtok(NULL, s);
+    }
+
+    tok_var[0] = strtok(var_names, s);
+
+    j=0;
+    while(tok_var[j] != NULL) {
+        j++;
+        tok_var[j] = strtok(NULL, s);
+    }
+    return j;
+}
+
+void get_value_string(char* ret_string, char* c_type, char* buff)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        sprintf(ret_string, " %f", *((float*)buff));
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        sprintf(ret_string, " %d", *((int*)buff));
+    }
+    else if(strcmp(c_type, "%u") == 0) {
+        sprintf(ret_string, " %u", *((unsigned int*)buff));
+    }
+}
+
+int get_sizeof_type(char* c_type)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        return sizeof(float);
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        return sizeof(int);
+    } else if(strcmp(c_type, "%u") == 0) {
+        return sizeof(int);
+    } else {
+        return -1;
+    }
+}
+
+int dat_print_payload_struct(void* data, unsigned int payload)
+{
+    char* tok_sym[30];
+    char* tok_var[30];
+    char order[50];
+    strcpy(order, data_map[payload].data_order);
+    char var_names[200];
+    strcpy(var_names, data_map[payload].var_names);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
+
+    char values[500];
+    char names[500];
+    strcpy(names, "");
+    strcpy(values, "");
+
+    int j;
+    for(j=0; j < nparams; ++j) {
+        int param_size = get_sizeof_type(tok_sym[j]);
+        char buff[param_size];
+        memcpy(buff, data+(j*param_size), param_size);
+
+        char name[20];
+        sprintf(name, " %s", tok_var[j]);
+        strcat(names, name);
+
+        char val[20];
+        get_value_string(val, tok_sym[j], buff);
+        strcat(values, val);
+
+        if(j != nparams-1){
+            strcat(names, ",");
+            strcat(values, ",");
+        }
+    }
+    strcat(names, ":");
+    printf("%s %s\n", names, values);
+    return 0;
+}

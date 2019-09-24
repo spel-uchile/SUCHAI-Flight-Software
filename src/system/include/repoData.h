@@ -486,4 +486,42 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay);
  */
 int dat_delete_memory_sections(void);
 
+/**
+ * Print struct contained in data with payload schema
+ *
+ * @param data Pointer to the struct where the values will be stored
+ * @param payload Payload id
+ * @return 0 if OK, -1 if and error occurred
+ */
+int dat_print_payload_struct(void* data, unsigned int payload);
+
+/**
+ * Helper function to get var results in payload struct
+ *
+ * @param tok_sym
+ * @param tok_var
+ * @param order
+ * @param var_names
+ * @param i
+ * @return 0 if OK, -1 if and error occurred
+ */
+int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i);
+
+/**
+ * Helper function to get value as string in payload struct
+ *
+ * @param ret_string
+ * @param c_type
+ * @param buff
+ */
+void get_value_string(char* ret_string, char* c_type, char* buff);
+
+/**
+ *  Helper function to get size of variable in payload struct
+ *
+ * @param c_type
+ * @return
+ */
+int get_sizeof_type(char* c_type);
+
 #endif // DATA_REPO_H
