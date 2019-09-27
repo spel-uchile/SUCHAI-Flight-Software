@@ -12,14 +12,11 @@ create_vis:
     - echo "Creating Visualizations"
     - whoami
     - pwd
-    - last_commit=`git log -1 --pretty=%h`
-    - git log -1 --pretty=%h
-    - echo $last_commit
-    - echo $HOME
     - cd $HOME/Analyse/SUCHAI-Flight-Software
     - git pull origin master
+    - last_commit=`git log -1 --pretty=%h`
+    - echo $last_commit
     - cd ../Analyse
-    - pwd
     - python3 suchai_analysis.py ../SUCHAI-Flight-Software --hash $last_commit --svg
 #    - commit_file_="find . -maxdepth 1 -name "*\$last_commit.html" -print"
 #    - commit_file=`\$commit_file_`
