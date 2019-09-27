@@ -13,6 +13,8 @@ create_vis:
     - whoami
     - pwd
     - last_commit=`git log -1 --pretty=%h`
+    - git log -1 --pretty=%h
+    - echo $last_commit
     - echo $HOME
     - cd $HOME/Analyse/SUCHAI-Flight-Software
     - git pull origin master
