@@ -22,11 +22,11 @@ create_vis:
     - svg_file=`find . -maxdepth 1 -name "*\$last_commit.svg" -print`
     - cp -f $commit_file /home/ubuntu/SpelDataServer/public/viz_html/
     - rm $commit_file
-    - echo http://data.spel.cl/viz_html\${commit_file#"."}
+    - echo http://data.spel.cl/viz_html${commit_file#"."}
     - cp -f $svg_file /home/ubuntu/SpelDataServer/public/viz_svg/
     - cp -f $svg_file /home/ubuntu/SpelDataServer/public/viz_svg/last.svg
     - rm $svg_file
-    - echo http://data.spel.cl/viz_svg\${svg_file#"."}
+    - echo http://data.spel.cl/viz_svg${svg_file#"."}
   only:
     - cicd_test
 
