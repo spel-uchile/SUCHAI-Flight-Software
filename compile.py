@@ -27,6 +27,7 @@ def get_parameters():
     parser.add_argument('--st_triple_wr', type=str, default="1")
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
+    parser.add_argument('--ssh', action="store_true", help="Use ssh for git clone")
     # Force clean
     parser.add_argument('--clean', action="store_true", help="Clean before build")
     # Program
@@ -87,7 +88,10 @@ if __name__ == "__main__":
             os.chdir('src/drivers/nanomind')
             # Install Nanomind SDK and LibCSP
             if args.drivers:
-                result = os.system('sh install.sh')
+                if not args.ssh:
+                    result = os.system('sh install.sh')
+                else:
+                    result = os.system('sh install.sh --ssh')
             elif args.clean:
                 result = os.system('sh build.sh clean')
             elif args.program:
