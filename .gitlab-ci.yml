@@ -59,7 +59,7 @@ build_nanomind:
   stage: build_nanomind
   script:
     - echo "Building in nanomind"
-    - docker run -v ~/.ssh:/root/.ssh  -it suchai-fs sh install_build_nanomind.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_nanomind.sh
     - docker system prune -f
   only:
     - cicd_test
