@@ -1,6 +1,7 @@
 
 stages:
   - create_vis
+  - configure_docker
   - build_linux
   - build_esp
   - build_nanomind
@@ -30,6 +31,16 @@ create_vis:
   only:
     - cicd_test
 
+configure_docker:
+  stage: configure_docker
+  script:
+    - echo "Configure docker image"
+    - cd $HOME/suchai-docker
+    - docker build -t suchai-fs .
+    - docker system prune -f
+  only:
+    cicd_test
+
 build_linux:
   stage: build_linux
   script:
@@ -48,6 +59,8 @@ build_nanomind:
   stage: build_nanomind
   script:
     - echo "Building in nanomind"
+    - docker run -v ~/.ssh:/root/.ssh  -it suchai-fs sh install_build_nanomind.sh
+    - docker system prune -f
   only:
     - cicd_test
 
