@@ -37,6 +37,15 @@ void taskInit(void *param)
     on_init_task(NULL);
 #endif
 
+    /* Initialize system variables */
+    LOGD(tag, "Initializing system variables values...")
+    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
+    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
+    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+#if (SCH_STORAGE_MODE > 0)
+    initialize_payload_vars();
+#endif
+
     LOGD(tag, "Initialization commands ...");
     // Init LibCSP system
     init_communications();

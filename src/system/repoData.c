@@ -46,7 +46,7 @@ struct map data_map[last_sensor] = {
         { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_drp_lang, dat_drp_ack_lang, "%u %f %f %f %d",                "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
 };
 
-void initialize_payload_vars(){
+void initialize_payload_vars(void){
     int i =0;
     for(i=0; i< last_sensor; ++i) {
         if(dat_get_system_var(data_map[i].sys_index) == -1) {
@@ -112,16 +112,16 @@ void dat_repo_init(void)
     }
 #endif
 
-    /* TODO: Initialize custom variables */
-    LOGD(tag, "Initializing system variables values...")
-//    dat_set_system_var(dat_obc_hrs_alive, 0);
-    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
-    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
-    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
-
-#if (SCH_STORAGE_MODE > 0)
-    initialize_payload_vars();
-#endif
+//    /* TODO: Initialize custom variables */
+//    LOGD(tag, "Initializing system variables values...")
+////    dat_set_system_var(dat_obc_hrs_alive, 0);
+//    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
+//    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
+//    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+//
+//#if (SCH_STORAGE_MODE > 0)
+//    initialize_payload_vars();
+//#endif
 }
 
 void dat_repo_close(void)

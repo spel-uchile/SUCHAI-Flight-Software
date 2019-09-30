@@ -311,6 +311,11 @@ extern struct __attribute__((__packed__)) map {
 } data_map[last_sensor];
 
 /**
+ * Initializes payload storage helper variables
+ */
+void initialize_payload_vars(void);
+
+/**
  * Initializes data repositories, including:
  *      Both repo's mutexes.
  *      The storage system (if permanent memory is being used).
