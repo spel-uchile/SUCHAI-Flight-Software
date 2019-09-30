@@ -39,7 +39,7 @@ configure_docker:
     - docker build -t suchai-fs .
     - docker system prune -f
   only:
-    cicd_test
+    - cicd_test
 
 build_linux:
   stage: build_linux
