@@ -1,5 +1,6 @@
 stages:
   - create_vis
+  - configure_docker
   - build_linux
   - build_esp
   - build_nanomind
@@ -9,9 +10,35 @@ create_vis:
   stage: create_vis
   script:
     - echo "Creating Visualizations"
-    - whoiam
+    - whoami
+    - pwd
+    - cd $HOME/Analyse/SUCHAI-Flight-Software
+    - git pull origin master
+    - last_commit=`git log -1 --pretty=%h`
+    - echo $last_commit
+    - cd ../Analyse
+    - python3 suchai_analysis.py ../SUCHAI-Flight-Software --hash $last_commit --svg
+    - commit_file=`find . -maxdepth 1 -name "*\$last_commit.html" -print`
+    - svg_file=`find . -maxdepth 1 -name "*\$last_commit.svg" -print`
+    - cp -f $commit_file /home/ubuntu/SpelDataServer/public/viz_html/
+    - rm $commit_file
+    - echo http://data.spel.cl/viz_html${commit_file#"."}
+    - cp -f $svg_file /home/ubuntu/SpelDataServer/public/viz_svg/
+    - cp -f $svg_file /home/ubuntu/SpelDataServer/public/viz_svg/last.svg
+    - rm $svg_file
+    - echo http://data.spel.cl/viz_svg${svg_file#"."}
   only:
     - master
+
+configure_docker:
+  stage: configure_docker
+  script:
+    - echo "Configure docker image"
+    - cd $HOME/suchai-docker
+    - docker build -t suchai-fs .
+    - docker system prune -f
+  only:
+    - cicd_test
 
 build_linux:
   stage: build_linux
@@ -19,18 +46,20 @@ build_linux:
     - echo "Building in Linux"
   only:
     - master
-    
+
 build_esp:
   stage: build_esp
   script:
     - echo "Building in esp32"
   only:
     - master
-    
+
 build_nanomind:
   stage: build_nanomind
   script:
     - echo "Building in nanomind"
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_nanomind.sh
+    - docker system prune -f
   only:
     - master
 
@@ -38,9 +67,7 @@ test_linux:
   stage: test_linux
   script:
     - echo "Testing in Linux"
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_linux.sh
+    - docker system prune -f
   only:
     - master
-
-
-
-
