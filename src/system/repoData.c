@@ -658,6 +658,7 @@ int dat_add_payload_sample(void* data, int payload)
 
 int dat_get_recent_payload_sample(void* data, int payload, int delay)
 {
+    //TODO: Change variable name from delay to offset??
     int ret;
 
     int index = dat_get_system_var(data_map[payload].sys_index);
@@ -665,11 +666,13 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay)
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //TODO: Is this conditional required?
 #if defined(LINUX) || defined(NANOMIND)
     if(index-1-delay >= 0) {
         ret = storage_get_payload_data(index-1-delay, data, payload);
     }
     else {
+        //FIXME: "Asked for too large offset (%d) on payload (%d)
         LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
         ret = -1;
     }
@@ -755,16 +758,20 @@ int get_sizeof_type(char* c_type)
 
 int dat_print_payload_struct(void* data, unsigned int payload)
 {
+    //FIXME: Buffers allocated in stack with magical numbers! Use defined values
+    //FIXME: Use malloc to allocate large buffers, here 1280  bytes allocated!
+    //FIXME: Task stack size: 5*256 = 1280 bytes!
+
     char* tok_sym[30];
     char* tok_var[30];
-    char order[50];
+    char *order = (char *)malloc(50);
     strcpy(order, data_map[payload].data_order);
-    char var_names[200];
+    char *var_names = (char *)malloc(200);
     strcpy(var_names, data_map[payload].var_names);
-    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, (int)payload);
 
-    char values[500];
-    char names[500];
+    char *values = (char *)malloc(500);
+    char *names = (char *)malloc(500);
     strcpy(names, "");
     strcpy(values, "");
 
@@ -789,5 +796,11 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     }
     strcat(names, ":");
     printf("%s %s\n", names, values);
+
+    free(order);
+    free(var_names);
+    free(values);
+    free(names);
+
     return 0;
 }

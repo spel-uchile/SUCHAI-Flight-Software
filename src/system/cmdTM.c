@@ -154,6 +154,7 @@ int tm_get_last(char *fmt, char *params, int nparams)
         int payload_size = data_map[payload].size;
         char buff[payload_size];
         dat_get_recent_payload_sample(buff, payload,0);
+        //FIXME: Check memory usage
         dat_print_payload_struct(buff, payload);
         return CMD_OK;
     }

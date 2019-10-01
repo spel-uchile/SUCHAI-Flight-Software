@@ -475,6 +475,7 @@ int dat_show_time(int format);
 int dat_add_payload_sample(void* data, int payload);
 
 /**
+ * TODO: Change variable name from delay to offset??
  * Gets a data struct from the payload table.
  *
  * @param data Pointer to the struct where the values will be stored
