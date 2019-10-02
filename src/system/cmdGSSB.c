@@ -620,9 +620,9 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
     printf("\r\n");
 
     printf("Delay till deploy:\t\t\t %"PRIu16" s\r\n", status.deploy_in_s);
-    printf("Number of attemps since boot:\t\t %"PRIu8"\r\n", status.number_of_deploys);
-    printf("Knife that will be use in next deploy:\t %"PRIu8"\r\n", status.active_knife);
-    printf("Total deploy attemps:\t\t\t %"PRIu16"\r\n", status.total_number_of_deploys);
+    printf("Number of attempts since boot:\t\t %"PRIu8"\r\n", status.number_of_deploys);
+    printf("Knife that will be used in next deploy:\t %"PRIu8"\r\n", status.active_knife);
+    printf("Total deploy attempts:\t\t\t %"PRIu16"\r\n", status.total_number_of_deploys);
     printf("Reboot deploy cnt:\t\t\t %"PRIu8"\r\n", status.reboot_deploy_cnt);
 
     return CMD_ERROR_NONE;
