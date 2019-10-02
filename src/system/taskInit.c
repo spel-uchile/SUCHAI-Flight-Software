@@ -151,7 +151,8 @@ void init_communications(void)
     //csp_set_model("A3200");
     /* Init csp i2c interface with address 1 and 400 kHz clock */
     LOGI(tag, "csp_i2c_init...");
-    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400);
+    sch_a3200_init_twi0(GS_AVR_I2C_MULTIMASTER, SCH_COMM_ADDRESS, 400000);
+    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400000);
     if(t_ok != CSP_ERR_NONE) LOGE(tag, "\tcsp_i2c_init failed!");
 
     /**
