@@ -437,6 +437,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     int i;
+    rc = -1;  // not found by default
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
         if(elapsed_sec == data_base[i].unixtime)
@@ -450,7 +451,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
                 _dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
 
             _dat_del_fp_async(elapsed_sec);
-            rc = 0;
+            rc = 0;  // found, then break!
             break;
         }
     }
