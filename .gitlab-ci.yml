@@ -67,7 +67,7 @@ test_linux:
   stage: test_linux
   script:
     - echo "Testing in Linux"
-    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_linux.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh
     - docker system prune -f
   only:
     - master
