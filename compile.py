@@ -3,6 +3,7 @@ import os
 import argparse
 import src.system.include.configure as configure
 
+available_tests = ['test_cmd', 'test_unit', 'test_load', 'test_bug_delay']
 
 def get_parameters():
     """
@@ -28,6 +29,7 @@ def get_parameters():
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
     parser.add_argument('--ssh', action="store_true", help="Use ssh for git clone")
+    parser.add_argument('--test_type', type=str, default='')
     # Force clean
     parser.add_argument('--clean', action="store_true", help="Clean before build")
     # Program
@@ -61,11 +63,27 @@ if __name__ == "__main__":
             os.system('sh install_csp.sh')
             os.chdir(cwd_root)
 
-        os.system('rm -rf build_linux')
-        os.system('mkdir build_linux')
-        os.chdir('build_linux')
-        os.system('cmake ..')
-        result = os.system('make')
+        if args.test_type == '':
+            os.system('rm -rf build_linux')
+            os.system('mkdir build_linux')
+            os.chdir('build_linux')
+            os.system('cmake ..')
+            result = os.system('make')
+        elif args.test_type in available_tests:
+                os.chdir(cwd_root+'/test/' + args.test_type)
+                os.system('rm -rf build_test')
+                os.system('mkdir build_test')
+                os.chdir(cwd_root+'/test/' + args.test_type+'/build_test')
+                os.system('cmake ..')
+                os.system('make')
+
+                if args.test_type == 'test_cmd':
+                    os.system('./SUCHAI_Flight_Software_Test > log.txt')
+                    os.system('cp -f log.txt ../test_cmd_log.txt')
+                    os.chdir(cwd_root+'/test/' + args.test_type)
+                    os.system('python3 logs_comparator.py')
+                else:
+                    os.system('./SUCHAI_Flight_Software_Test')
 
     else:  # args.os = FREERTOS
         if args.arch == "ESP32":

@@ -34,6 +34,9 @@ configure_docker:
   stage: configure_docker
   script:
     - echo "Configure docker image"
+    - cd $HOME/suchai-docker
+    - docker build -t suchai-fs .
+    - docker system prune -f
   only:
     - cicd_test
 
