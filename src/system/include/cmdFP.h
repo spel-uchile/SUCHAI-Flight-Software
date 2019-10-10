@@ -2,7 +2,7 @@
  * @file  cmdFP.h
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related to the flight plan
@@ -14,11 +14,8 @@
 
 #include "config.h"
 
-#ifdef LINUX
-    #include "data_storage.h"
-#endif
-
 #include "repoCommand.h"
+#include "repoData.h"
 
 /**
  * This function registers the list of command in the system, initializing the

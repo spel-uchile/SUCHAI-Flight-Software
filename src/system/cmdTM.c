@@ -1,7 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2019, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ static const char *tag = "cmdTM";
 void cmd_tm_init(void)
 {
     cmd_add("tm_parse_status", tm_parse_status, "", 0);
+    cmd_add("tm_get_last", tm_get_last, "%u", 1);
     cmd_add("tm_send_status", tm_send_status, "%d", 1);
     cmd_add("tm_send_last", tm_send_last, "%u %u", 2);
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
@@ -127,6 +128,40 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         com_send_data("", (char *)&data, 0);
 
         print_buff(data.frame.data.data8, payload_size*structs_per_frame);
+    }
+}
+
+int tm_get_last(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "params is null!");
+        return CMD_ERROR;
+    }
+
+    uint32_t payload;
+    if(nparams == sscanf(params, fmt, &payload))
+    {
+        if(payload >= last_sensor) {
+            return CMD_FAIL;
+        }
+
+        int index_pay = dat_get_system_var(data_map[payload].sys_index);
+
+        if(index_pay < 1){
+            return CMD_FAIL;
+        }
+        int payload_size = data_map[payload].size;
+        char buff[payload_size];
+        dat_get_recent_payload_sample(buff, payload,0);
+        //FIXME: Check memory usage
+        dat_print_payload_struct(buff, payload);
+        return CMD_OK;
+    }
+    else
+    {
+        LOGW(tag, "Invalid args!");
+        return CMD_FAIL;
     }
 }
 

@@ -2,7 +2,7 @@
  * @file  taskFlightPlan.h
  * @author Matias Ramirez  - nicoram.mt@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This task implements a listener that send commands scheduled in the flight
@@ -14,23 +14,15 @@
 
 #include <utils.h>
 #include <stdlib.h>
+#include <time.h>
+
 #include "config.h"
+
 #include "osDelay.h"
+#include "osQueue.h"
+
 #include "repoCommand.h"
 #include "repoData.h"
-
-#ifdef AVR32
-    #include <avr32/io.h>
-    #if __GNUC__
-    #  include "intc.h"
-    #endif
-    #include "board.h"
-    #include "compiler.h"
-    #include "rtc.h"
-    #include "usart.h"
-    #include "pm.h"
-    #include <time.h>
-#endif
 
 void taskFlightPlan(void *param);
 

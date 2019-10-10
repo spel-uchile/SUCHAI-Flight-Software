@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2018 Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2019 Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2019, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
  */
 
 #include "taskConsole.h"
-
-#define CON_BUFF_LEN 100
 
 static const char *tag = "Console";
 

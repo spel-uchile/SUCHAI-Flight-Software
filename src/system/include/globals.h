@@ -2,7 +2,7 @@
  * @file  globals.h
  * @author Carlos Gonzalez C
  * @author Diego Ortego P
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header contains global variables

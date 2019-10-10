@@ -9,25 +9,20 @@
 #ifndef CMD_GSSB_H
 #define CMD_GSSB_H
 
+#include "drivers.h"
 #include "config.h"
 #include "globals.h"
 #include "utils.h"
 
-#include "drivers.h"
-// #include <gs/gssb/gssb_all_devices.h>
-// #include <gs/gssb/gssb_autodeploy.h>
-//#include <gs/gssb/internal/gssb_common.h>
-
 #include "osDelay.h"
 #include "repoCommand.h"
-
-
 
 /**
  * Register GSSB related commands
  */
 void cmd_gssb_init(void);
 
+/* TODO: Add documentation */
 int gssb_pwr(char *fmt, char *params, int nparams);
 int gssb_select_addr(char *fmt, char *params, int nparams);
 int gssb_bus_scan(char *fmt, char *params, int nparams);

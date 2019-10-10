@@ -2,7 +2,7 @@
  * @file  taskDispatcher.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This task implements the dispatcher. Reads commands from queue, determines
@@ -15,6 +15,9 @@
 
 #include "config.h"
 #include "globals.h"
+
+#include "osQueue.h"
+
 #include "repoCommand.h"
 #include "repoData.h"
 

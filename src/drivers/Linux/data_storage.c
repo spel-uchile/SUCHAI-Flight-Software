@@ -1,6 +1,22 @@
-//
-// Created by carlos on 22-08-17.
-//
+/*                                 SUCHAI
+ *                      NANOSATELLITE FLIGHT SOFTWARE
+ *
+ *      Copyright 2019, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2019, Camilo Rojas Milla, camrojas@uchile.cl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "data_storage.h"
 
@@ -252,40 +268,6 @@ const char* get_sql_type(char* c_type)
     }
 }
 
-int get_sizeof_type(char* c_type)
-{
-    if(strcmp(c_type, "%f") == 0) {
-        return sizeof(float);
-    }
-    else if(strcmp(c_type, "%d") == 0) {
-        return sizeof(int);
-    } else if(strcmp(c_type, "%u") == 0) {
-        return sizeof(int);
-    } else {
-        return -1;
-    }
-}
-
-int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i)
-{
-    const char s[2] = " ";
-    tok_sym[0] = strtok(order, s);
-
-    int j=0;
-    while(tok_sym[j] != NULL) {
-        j++;
-        tok_sym[j] = strtok(NULL, s);
-    }
-
-    tok_var[0] = strtok(var_names, s);
-
-    j=0;
-    while(tok_var[j] != NULL) {
-        j++;
-        tok_var[j] = strtok(NULL, s);
-    }
-    return j;
-}
 
 int storage_table_payload_init(int drop)
 {
@@ -645,18 +627,6 @@ int storage_show_table (void) {
     return 0;
 }
 
-void get_value_string(char* ret_string, char* c_type, char* buff)
-{
-    if(strcmp(c_type, "%f") == 0) {
-        sprintf(ret_string, " %f", *((float*)buff));
-    }
-    else if(strcmp(c_type, "%d") == 0) {
-        sprintf(ret_string, " %d", *((int*)buff));
-    }
-    else if(strcmp(c_type, "%u") == 0) {
-        sprintf(ret_string, " %u", *((unsigned int*)buff));
-    }
-}
 
 int storage_set_payload_data(int index, void* data, int payload)
 {

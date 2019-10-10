@@ -1,10 +1,10 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2018, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2019, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2019, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2019, Camilo Rojas Milla, camrojas@uchile.cl
+ *      Copyright 2019, Matias Ramirez Martinez, nicoram.mt@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,13 +40,13 @@ time_t sec = 0;
 #endif
 
 struct map data_map[last_sensor] = {
-        {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_mem_temp, dat_mem_ack_temp, "%u %f %f %f", "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
-        { "ads_data",      (uint16_t) (sizeof(ads_data_t)), dat_mem_ads, dat_mem_ack_ads, "%u %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
-        { "eps_data",      (uint16_t) (sizeof(eps_data_t)), dat_mem_eps, dat_mem_ack_eps, "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
-        { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_mem_lang, dat_mem_ack_lang, "%u %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
+        {"temp_data",      (uint16_t) (sizeof(temp_data_t)),     dat_drp_temp, dat_drp_ack_temp, "%u %f %f %f",                   "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+        { "ads_data",      (uint16_t) (sizeof(ads_data_t)),      dat_drp_ads,  dat_drp_ack_ads,  "%u %f %f %f %f %f %f",          "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        { "eps_data",      (uint16_t) (sizeof(eps_data_t)),      dat_drp_eps,  dat_drp_ack_eps,  "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
+        { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_drp_lang, dat_drp_ack_lang, "%u %f %f %f %d",                "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
 };
 
-void initialize_payload_vars(){
+void initialize_payload_vars(void){
     int i =0;
     for(i=0; i< last_sensor; ++i) {
         if(dat_get_system_var(data_map[i].sys_index) == -1) {
@@ -112,16 +112,16 @@ void dat_repo_init(void)
     }
 #endif
 
-    /* TODO: Initialize custom variables */
-    LOGD(tag, "Initializing system variables values...")
-//    dat_set_system_var(dat_obc_hrs_alive, 0);
-    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
-    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
-    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
-
-#if (SCH_STORAGE_MODE > 0)
-    initialize_payload_vars();
-#endif
+//    /* TODO: Initialize custom variables */
+//    LOGD(tag, "Initializing system variables values...")
+////    dat_set_system_var(dat_obc_hrs_alive, 0);
+//    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
+//    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
+//    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+//
+//#if (SCH_STORAGE_MODE > 0)
+//    initialize_payload_vars();
+//#endif
 }
 
 void dat_repo_close(void)
@@ -306,15 +306,15 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
 
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_lang);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_temp);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ads);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_eps);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_lang);
 
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_lang);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_temp);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_ads);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_eps);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_lang);
 }
 
 void dat_print_status(dat_status_t *status)
@@ -359,15 +359,15 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_lang);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_temp);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ads);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_eps);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_lang);
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_lang);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_temp);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_ads);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_eps);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_lang);
 }
 
 #if SCH_STORAGE_MODE == 0
@@ -392,6 +392,24 @@ static int _dat_set_fp_async(int timetodo, char* command, char* args, int execut
         }
     }
 
+    return 1;
+}
+
+static int _dat_del_fp_async(int timetodo)
+{
+    int i;
+    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
+    {
+        if(timetodo == data_base[i].unixtime)
+        {
+            data_base[i].unixtime = 0;
+            data_base[i].executions = 0;
+            data_base[i].periodical = 0;
+            free(data_base[i].args);
+            free(data_base[i].cmd);
+            return 0;
+        }
+    }
     return 1;
 }
 #endif
@@ -419,6 +437,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     int i;
+    rc = -1;  // not found by default
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
         if(elapsed_sec == data_base[i].unixtime)
@@ -432,7 +451,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
                 _dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
 
             _dat_del_fp_async(elapsed_sec);
-            rc = 0;
+            rc = 0;  // found, then break!
             break;
         }
     }
@@ -444,26 +463,6 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
 
     return rc;
 }
-
-#if SCH_STORAGE_MODE ==0
-static int _dat_del_fp_async(int timetodo)
-{
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(timetodo == data_base[i].unixtime)
-        {
-            data_base[i].unixtime = 0;
-            data_base[i].executions = 0;
-            data_base[i].periodical = 0;
-            free(data_base[i].args);
-            free(data_base[i].cmd);
-            return 0;
-        }
-    }
-    return 1;
-}
-#endif
 
 int dat_del_fp(int timetodo)
 {
@@ -660,6 +659,7 @@ int dat_add_payload_sample(void* data, int payload)
 
 int dat_get_recent_payload_sample(void* data, int payload, int delay)
 {
+    //TODO: Change variable name from delay to offset??
     int ret;
 
     int index = dat_get_system_var(data_map[payload].sys_index);
@@ -667,11 +667,13 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay)
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //TODO: Is this conditional required?
 #if defined(LINUX) || defined(NANOMIND)
     if(index-1-delay >= 0) {
         ret = storage_get_payload_data(index-1-delay, data, payload);
     }
     else {
+        //FIXME: "Asked for too large offset (%d) on payload (%d)
         LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
         ret = -1;
     }
@@ -704,4 +706,102 @@ int dat_delete_memory_sections(void)
     storage_flight_plan_reset();
 #endif
     return ret;
+}
+
+
+int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i)
+{
+    const char s[2] = " ";
+    tok_sym[0] = strtok(order, s);
+
+    int j=0;
+    while(tok_sym[j] != NULL) {
+        j++;
+        tok_sym[j] = strtok(NULL, s);
+    }
+
+    tok_var[0] = strtok(var_names, s);
+
+    j=0;
+    while(tok_var[j] != NULL) {
+        j++;
+        tok_var[j] = strtok(NULL, s);
+    }
+    return j;
+}
+
+void get_value_string(char* ret_string, char* c_type, char* buff)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        sprintf(ret_string, " %f", *((float*)buff));
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        sprintf(ret_string, " %d", *((int*)buff));
+    }
+    else if(strcmp(c_type, "%u") == 0) {
+        sprintf(ret_string, " %u", *((unsigned int*)buff));
+    }
+}
+
+int get_sizeof_type(char* c_type)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        return sizeof(float);
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        return sizeof(int);
+    } else if(strcmp(c_type, "%u") == 0) {
+        return sizeof(int);
+    } else {
+        return -1;
+    }
+}
+
+int dat_print_payload_struct(void* data, unsigned int payload)
+{
+    //FIXME: Buffers allocated in stack with magical numbers! Use defined values
+    //FIXME: Use malloc to allocate large buffers, here 1280  bytes allocated!
+    //FIXME: Task stack size: 5*256 = 1280 bytes!
+
+    char* tok_sym[30];
+    char* tok_var[30];
+    char *order = (char *)malloc(50);
+    strcpy(order, data_map[payload].data_order);
+    char *var_names = (char *)malloc(200);
+    strcpy(var_names, data_map[payload].var_names);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, (int)payload);
+
+    char *values = (char *)malloc(500);
+    char *names = (char *)malloc(500);
+    strcpy(names, "");
+    strcpy(values, "");
+
+    int j;
+    for(j=0; j < nparams; ++j) {
+        int param_size = get_sizeof_type(tok_sym[j]);
+        char buff[param_size];
+        memcpy(buff, data+(j*param_size), param_size);
+
+        char name[20];
+        sprintf(name, " %s", tok_var[j]);
+        strcat(names, name);
+
+        char val[20];
+        get_value_string(val, tok_sym[j], buff);
+        strcat(values, val);
+
+        if(j != nparams-1){
+            strcat(names, ",");
+            strcat(values, ",");
+        }
+    }
+    strcat(names, ":");
+    printf("%s %s\n", names, values);
+
+    free(order);
+    free(var_names);
+    free(values);
+    free(names);
+
+    return 0;
 }

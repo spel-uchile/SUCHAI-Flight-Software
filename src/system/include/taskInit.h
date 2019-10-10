@@ -2,7 +2,7 @@
  * @file  taskInit.h
  * @author Matias Ramirez  - nicoram.mt@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This task implements a listener, that sends commands at periodical times.
@@ -17,24 +17,14 @@
 #include "drivers.h"
 
 #include "osThread.h"
+#include "osQueue.h"
 
 /* Task includes */
 #include "taskConsole.h"
-
-
 #if SCH_HK_ENABLED
 #include "taskHousekeeping.h"
 #endif
 #if SCH_COMM_ENABLE
-//#include <csp/csp.h>
-//#include <csp/csp_rtable.h>
-//#ifdef LINUX
-//#include <csp/interfaces/csp_if_kiss.h>
-//#include <csp/drivers/usart.h>
-//#endif
-//#ifdef NANOMIND
-//#include <csp/interfaces/csp_if_i2c.h>
-//#endif
 #include "taskCommunications.h"
 #endif
 #if SCH_FP_ENABLED

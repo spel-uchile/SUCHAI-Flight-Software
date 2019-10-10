@@ -2,7 +2,7 @@
  * @file  osScheduler.h
  * @author Carlos Gonzalez Cortes
  * @author Ignacio Ibanez Aliaga
- * @date 2017
+ * @date 2019
  * @copyright GNU Public License.
  *
  * Creation of functions related with the scheduler for systems operating Linux as FreeRTOS

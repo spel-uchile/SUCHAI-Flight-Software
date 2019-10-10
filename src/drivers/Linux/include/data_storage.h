@@ -1,6 +1,12 @@
-//
-// Created by carlos on 22-08-17.
-//
+/**
+ * @file data_storage.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @author Camilo Rojas M - camrojas@uchile.cl
+ * @date 2019
+ * @copyright GNU GPL v3
+ *
+ * Persistent data storage functions.
+ */
 
 #ifndef SCH_PERSISTENT_H
 #define SCH_PERSISTENT_H

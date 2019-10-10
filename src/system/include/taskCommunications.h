@@ -1,7 +1,7 @@
 /**
  * @file  taskCommunications.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This task implements a client that reads remote commands from TRX. Also
@@ -12,15 +12,17 @@
 #ifndef T_COMMUNICATIONS_H
 #define T_COMMUNICATIONS_H
 
-#include "stdlib.h"
-
-#include "os/os.h"
-#include "csp/csp.h"
-#include "csp/csp_types.h"
-#include "csp/csp_endian.h"
+#include <stdlib.h>
 
 #include "config.h"
 #include "globals.h"
+
+#include <csp/csp.h>
+#include <csp/csp_types.h>
+#include <csp/csp_endian.h>
+
+#include "osQueue.h"
+#include "osDelay.h"
 
 #include "repoCommand.h"
 #include "cmdTM.h"

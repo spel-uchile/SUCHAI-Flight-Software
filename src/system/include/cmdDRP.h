@@ -2,7 +2,7 @@
  * @file  cmdDRP.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related with data repositories
@@ -16,13 +16,6 @@
 
 #include "repoData.h"
 #include "repoCommand.h"
-
-//#ifdef NANOMIND
-//    #include <conf_a3200.h>
-//    #include <lm70.h>
-//    #include <mpu3300.h>
-//    #include <hmc5843.h>
-//#endif
 
 #define SCH_DRP_MAGIC (1010)    ///< Magic number to execute critical commands
 

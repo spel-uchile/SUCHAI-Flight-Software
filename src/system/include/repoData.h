@@ -5,7 +5,7 @@
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @author Diego Ortego P - diortego@dcc.uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header is an API to the system's status repository and flight plan repository.
@@ -21,20 +21,13 @@
 #ifndef DATA_REPO_H
 #define DATA_REPO_H
 
-#include "osSemphr.h"
-
 #include "config.h"
 #include "globals.h"
 #include "utils.h"
 
-#if SCH_STORAGE_MODE != 0
-    #include "data_storage.h"
-#endif
+#include "data_storage.h"
 
-#ifdef NANOMIND
-    #include "util/clock.h"
-    #include "util/timestamp.h"
-#endif
+#include "osSemphr.h"
 
 /** Union for easily casting status variable types */
 typedef union fvalue{
@@ -46,8 +39,6 @@ typedef union fvalue{
 #define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
-
-// TODO: [Gedoix] Esto se puede hacer en el .c y usar #undef
 
 /** The repository's name */
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
@@ -144,16 +135,16 @@ typedef enum dat_system {
     dat_eps_temp_bat0,            ///< Battery temperature sensor
 
     /// Memory: Current payload memory addresses
-    dat_mem_temp,                 ///< Temperature data index
-    dat_mem_ads,                  ///< ADS data index
-    dat_mem_eps,                  ///< EPS data index
-    dat_mem_lang,                 ///< Langmuir data index
+    dat_drp_temp,                 ///< Temperature data index
+    dat_drp_ads,                  ///< ADS data index
+    dat_drp_eps,                  ///< EPS data index
+    dat_drp_lang,                 ///< Langmuir data index
 
     /// Memory: Current send acknowledge data
-    dat_mem_ack_temp,                 ///< Temperature data acknowledge
-    dat_mem_ack_ads,                  ///< ADS data index acknowledge
-    dat_mem_ack_eps,                  ///< EPS data index acknowledge
-    dat_mem_ack_lang,                 ///< Langmuir data index acknowledge
+    dat_drp_ack_temp,                 ///< Temperature data acknowledge
+    dat_drp_ack_ads,                  ///< ADS data index acknowledge
+    dat_drp_ack_eps,                  ///< EPS data index acknowledge
+    dat_drp_ack_lang,                 ///< Langmuir data index acknowledge
 
     /// Add custom status variables here
     //dat_custom,                 ///< Variable description
@@ -219,16 +210,16 @@ typedef struct __attribute__((packed)) dat_status_s {
     uint32_t dat_eps_temp_bat0;     ///< Battery temperature sensor
 
     /// Memory: Current payload memory address
-    uint32_t dat_mem_temp;          ///< Temperature data index
-    uint32_t dat_mem_ads;           ///< ADS data index
-    uint32_t dat_mem_eps;           ///< EPS data index
-    uint32_t dat_mem_lang;          ///< Langmuir data index
+    uint32_t dat_drp_temp;          ///< Temperature data index
+    uint32_t dat_drp_ads;           ///< ADS data index
+    uint32_t dat_drp_eps;           ///< EPS data index
+    uint32_t dat_drp_lang;          ///< Langmuir data index
 
     /// Memory: Current send acknowledge data
-    uint32_t dat_mem_ack_temp;      ///< Temperature data acknowledge
-    uint32_t dat_mem_ack_ads;       ///< ADS data index acknowledge
-    uint32_t dat_mem_ack_eps;       ///< EPS data index acknowledge
-    uint32_t dat_mem_ack_lang;      ///< Langmuir data index acknowledge
+    uint32_t dat_drp_ack_temp;      ///< Temperature data acknowledge
+    uint32_t dat_drp_ack_ads;       ///< ADS data index acknowledge
+    uint32_t dat_drp_ack_eps;       ///< EPS data index acknowledge
+    uint32_t dat_drp_ack_lang;      ///< Langmuir data index acknowledge
 
     /// Add custom status variables here
     //uint32_t dat_custom;          ///< Variable description
@@ -318,6 +309,11 @@ extern struct __attribute__((__packed__)) map {
     char data_order[50];
     char var_names[200];
 } data_map[last_sensor];
+
+/**
+ * Initializes payload storage helper variables
+ */
+void initialize_payload_vars(void);
 
 /**
  * Initializes data repositories, including:
@@ -479,6 +475,7 @@ int dat_show_time(int format);
 int dat_add_payload_sample(void* data, int payload);
 
 /**
+ * TODO: Change variable name from delay to offset??
  * Gets a data struct from the payload table.
  *
  * @param data Pointer to the struct where the values will be stored
@@ -495,6 +492,42 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay);
  */
 int dat_delete_memory_sections(void);
 
+/**
+ * Print struct contained in data with payload schema
+ *
+ * @param data Pointer to the struct where the values will be stored
+ * @param payload Payload id
+ * @return 0 if OK, -1 if and error occurred
+ */
+int dat_print_payload_struct(void* data, unsigned int payload);
 
+/**
+ * Helper function to get var results in payload struct
+ *
+ * @param tok_sym
+ * @param tok_var
+ * @param order
+ * @param var_names
+ * @param i
+ * @return 0 if OK, -1 if and error occurred
+ */
+int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i);
+
+/**
+ * Helper function to get value as string in payload struct
+ *
+ * @param ret_string
+ * @param c_type
+ * @param buff
+ */
+void get_value_string(char* ret_string, char* c_type, char* buff);
+
+/**
+ *  Helper function to get size of variable in payload struct
+ *
+ * @param c_type
+ * @return
+ */
+int get_sizeof_type(char* c_type);
 
 #endif // DATA_REPO_H

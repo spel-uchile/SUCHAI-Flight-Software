@@ -1,7 +1,7 @@
 /**
  * @file  cmdCOM.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU Public License.
  *
  * This header contains commands related with the communication system
@@ -18,11 +18,6 @@
 
 #include "drivers.h"
 #include "repoCommand.h"
-
-//#ifdef SCH_USE_NANOCOM
-
-    //#include "param/rparam_client.h"
-//#endif
 
 /**
  * Fixed size of one CSP frame is 200. A frame contains not only data but also
@@ -278,6 +273,7 @@ int com_get_config(char *fmt, char *params, int nparams);
  */
 int com_set_config(char *fmt, char *params, int nparams);
 
+/* TODO: Add documentation */
 int com_update_status_vars(char *fmt, char *params, int nparams);
 
 #endif /* CMD_COM_H */

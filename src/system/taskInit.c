@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2019, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2019, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,18 +37,29 @@ void taskInit(void *param)
     on_init_task(NULL);
 #endif
 
+    /* Initialize system variables */
+    LOGD(tag, "Initializing system variables values...")
+    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
+    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
+    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+#if (SCH_STORAGE_MODE > 0)
+    initialize_payload_vars();
+#endif
+
     LOGD(tag, "Initialization commands ...");
     // Init LibCSP system
     init_communications();
+
+#ifdef NANOMIND
     // Execute deployment activities if first boot
     int first_boot = dat_get_system_var(dat_dep_deployed) > 0 ? 0 : 1;
-#if 0
     if(first_boot)
     {
         LOGI(tag, "\tFirst boot! Execute init routines");
         init_routines();
     }
 #endif
+
     LOGD(tag, "Creating client tasks ...");
     int t_ok;
     int n_threads = 4;
@@ -102,20 +113,11 @@ void init_communications(void)
     }
 
     /* Init buffer system */
-//    csp_conf_t sch_csp_conf;
-//    csp_conf_get_defaults(&sch_csp_conf);
-//    sch_csp_conf.address = SCH_COMM_ADDRESS;
-//    sch_csp_conf.hostname = "SUCHAI"
-//    sch_csp_conf.conn_max = 10;
-//    sch_csp_conf.conn_queue_length = 10;
-//    sch_csp_conf.conn_dfl_so = CSP_O_NONE;
-//    sch_csp_conf.fifo_length = 25;
-//    sch_csp_conf.port_max_bind = 24;
-//    sch_csp_conf.rdp_max_window = 20;
-
     int t_ok;
     t_ok = csp_buffer_init(SCH_BUFFERS_CSP, SCH_BUFF_MAX_LEN);
     if(t_ok != 0) LOGE(tag, "csp_buffer_init failed!");
+
+    /* Init CSP */
     csp_set_hostname(SCH_NAME);
     csp_init(SCH_COMM_ADDRESS); // Init CSP with address MY_ADDRESS
 
@@ -149,7 +151,8 @@ void init_communications(void)
     //csp_set_model("A3200");
     /* Init csp i2c interface with address 1 and 400 kHz clock */
     LOGI(tag, "csp_i2c_init...");
-    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400);
+    sch_a3200_init_twi0(GS_AVR_I2C_MULTIMASTER, SCH_COMM_ADDRESS, 400000);
+    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400000);
     if(t_ok != CSP_ERR_NONE) LOGE(tag, "\tcsp_i2c_init failed!");
 
     /**
@@ -166,9 +169,9 @@ void init_communications(void)
     t_ok = csp_route_start_task(SCH_TASK_CSP_STACK, 1);
     if(t_ok != 0) LOGE(tag, "Task router not created!");
 
-    LOGD(tag, "Route table");
+    LOGI(tag, "Route table");
     csp_route_print_table();
-    LOGD(tag, "Interfaces");
+    LOGI(tag, "Interfaces");
     csp_route_print_interfaces();
 #endif //SCH_COMM_ENABLE
 }

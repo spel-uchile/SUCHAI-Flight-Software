@@ -1,7 +1,7 @@
 /**
  * @file  cmdEPS.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU Public License.
  *
  * This header contains commands related with the EPS subsystem
@@ -10,14 +10,9 @@
 #ifndef CMDEPS_H
 #define CMDEPS_H
 
+#include "drivers.h"
 #include "config.h"
 #include "utils.h"
-
-#ifdef SCH_USE_NANOPOWER
-    #include "drivers.h"
-    //#include "nanopower2.h"
-    //#include "bpx.h"
-#endif
 
 #include "repoCommand.h"
 #include "repoData.h"

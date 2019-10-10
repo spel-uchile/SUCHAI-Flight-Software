@@ -1,7 +1,7 @@
 /**
  * @file  cmdTM.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU Public License.
  *
  * This header contains commands related with telemetry proccessing and
@@ -49,6 +49,16 @@ int tm_send_status(char *fmt, char *params, int nparams);
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int tm_parse_status(char *fmt, char *params, int nparams);
+
+
+/**
+ * Print last struct data stored from specific payload.
+ * @param fmt "%u"
+ * @param params "<payload> "
+ * @param nparams 1
+ * @return CMD_OK or CMD_FAIL
+ */
+int tm_get_last(char *fmt, char *params, int nparams);
 
 /**
  * Send last structs data stored as payload in csp frame.

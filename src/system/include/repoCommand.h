@@ -2,7 +2,7 @@
  * @file  repoCommand.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header have definitions related to command repository
@@ -17,25 +17,26 @@
 #include "globals.h"
 
 /* Add files with commands */
-#if SCH_TEST_ENABLED
-    #include "cmdTestCommand.h"
-#endif
 #include "cmdOBC.h"
 #include "cmdDRP.h"
 #include "cmdConsole.h"
 #if SCH_FP_ENABLED
-    #include "cmdFP.h"
-#endif
-#ifdef SCH_USE_NANOPOWER
-    #include "cmdEPS.h"
+#include "cmdFP.h"
 #endif
 #if SCH_COMM_ENABLE
-    #include "cmdCOM.h"
-    #include "cmdTM.h"
+#include "cmdCOM.h"
+#include "cmdTM.h"
+#endif
+#if SCH_TEST_ENABLED
+#include "cmdTestCommand.h"
+#endif
+#ifdef SCH_USE_NANOPOWER
+#include "cmdEPS.h"
 #endif
 #ifdef SCH_USE_GSSB
-    #include "cmdGSSB.h"
+#include "cmdGSSB.h"
 #endif
+
 
 /* Macros */
 /**

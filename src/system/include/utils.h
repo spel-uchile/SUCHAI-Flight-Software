@@ -1,7 +1,7 @@
 /**
  * @file utils.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2018
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * This header have definitions related with general utilities such as logging,
