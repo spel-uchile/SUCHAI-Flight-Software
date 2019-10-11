@@ -35,6 +35,7 @@ configure_docker:
   script:
     - echo "Configure docker image"
     - cd $HOME/suchai-docker
+    - git pull
     - docker build -t suchai-fs .
     - docker system prune -f
   only:
@@ -44,6 +45,8 @@ build_linux:
   stage: build_linux
   script:
     - echo "Building in Linux"
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_linux.sh
+    - docker system prune -f
   only:
     - master
 
