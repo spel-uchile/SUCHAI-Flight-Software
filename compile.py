@@ -91,7 +91,10 @@ if __name__ == "__main__":
                 os.chdir('src/drivers/esp32')
                 os.system('sh install.sh')
                 os.chdir(cwd_root)
-            result = os.system('make')
+            elif args.program:
+                result = os.system('make flash')
+            else:
+                result = os.system('make')
 
         if args.arch == "AVR32":
             os.chdir('src/drivers/atmel')
