@@ -52,7 +52,7 @@ void taskConsole(void *param)
 
         /* Read console and parse commands (blocking, except in ESP32) */
         memset(buffer, '\0', SCH_BUFF_MAX_LEN);
-        if(console_read(buffer, SCH_BUFF_MAX_LEN) != 0)
+        if(console_read(buffer, SCH_BUFF_MAX_LEN-1) != 0)
             continue;
 
         new_cmd = cmd_parse_from_str(buffer);
@@ -83,7 +83,20 @@ int console_init(void)
 
 int console_read(char *buffer, int len)
 {
+#ifdef LINUX
+    char *line;
+    line = linenoise("SUCHAI> ");
+    if(line != NULL)
+    {
+        linenoiseHistoryAdd(line);
+        strncpy(buffer, line, len);
+        free(line);
+        return 0;
+    }
+    return -1;
+#else
     /* FIXME: Move to drivers to support different systems */
     char *s = fgets(buffer, len, stdin);
     return (s != NULL) ? 0 : -1;
+#endif
 }

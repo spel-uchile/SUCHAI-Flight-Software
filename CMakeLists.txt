@@ -6,6 +6,7 @@ option(USE_GSDRIVERS "Use and build nanopower drivers")
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
+        src/drivers/Linux/linenoise/linenoise.c
         src/drivers/Linux/data_storage.c
         src/drivers/Linux/init.c
         src/os/Linux/osDelay.c
@@ -40,6 +41,7 @@ include_directories(
         src/os/include
         src/drivers/Linux/include
         src/drivers/Linux/libcsp/include
+        src/drivers/Linux/linenoise
         /usr/include/postgresql
 )
 
