@@ -138,13 +138,16 @@ Refs:
 - http://learning-0mq-with-pyzmq.readthedocs.io/en/latest/pyzmq/devices/forwarder.html
 
 ### Build for other architectures
-Currently the fight software supports the following architectures (some platforms
+Currently the flight software supports the following architectures (some platforms
 may have limited or under development support):
 
-- Nanomind A3200: ```python3 compile.py FREERTOS --arch NANOMIND```
-- Atmel AV32UC3 Xplained board: ```python3 compile.py FREERTOS --arch AVR32 --sch_com 0```
-- Raspberry Pi: ```python3 compile.py LINUX```
-- Esspressif ESP32: ```python3 compile.py FREERTOS --arch ESP32 --sch_com 0```
+First install the drivers for the desired architecture
+```python3 compile.py <OS> <ARCH> --drivers```
+
+- Nanomind A3200: ```python3 compile.py FREERTOS NANOMIND```
+- Atmel AV32UC3 Xplained board: ```python3 compile.py FREERTOS AVR32 --comm 0```
+- Raspberry Pi: ```python3 compile.py LINUX RPI```
+- Esspressif ESP32: ```python3 compile.py FREERTOS ESP32 --comm 0```
 
 Please refer to the documentation for more details
 
