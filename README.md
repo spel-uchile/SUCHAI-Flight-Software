@@ -147,7 +147,7 @@ First install the drivers for the desired architecture
 - Nanomind A3200: ```python3 compile.py FREERTOS NANOMIND```
 - Atmel AV32UC3 Xplained board: ```python3 compile.py FREERTOS AVR32 --comm 0```
 - Raspberry Pi: ```python3 compile.py LINUX RPI```
-- Esspressif ESP32: ```python3 compile.py FREERTOS ESP32 --comm 0```
+- Esspressif ESP32: ```python3 compile.py FREERTOS ESP32 --comm 0 --fp 0 --hk 0 --st_mode 0```
 
 Please refer to the documentation for more details
 
