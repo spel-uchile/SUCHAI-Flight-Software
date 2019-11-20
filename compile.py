@@ -64,7 +64,7 @@ if __name__ == "__main__":
         arch_dir = os.path.join("src/drivers", arch)
         build_dir = "build_{}".format(arch)
 
-        # Install CSP drivers
+        # Install drivers
         if args.drivers:
             os.chdir(arch_dir)
             os.system('sh install.sh')
@@ -79,20 +79,20 @@ if __name__ == "__main__":
 
         # Run tests
         if args.test_type in available_tests:
-                os.chdir(cwd_root+'/test/' + args.test_type)
-                os.system('rm -rf build_test')
-                os.system('mkdir build_test')
-                os.chdir(cwd_root+'/test/' + args.test_type+'/build_test')
-                os.system('cmake ..')
-                os.system('make')
+            os.chdir(cwd_root+'/test/' + args.test_type)
+            os.system('rm -rf build_test')
+            os.system('mkdir build_test')
+            os.chdir(cwd_root+'/test/' + args.test_type+'/build_test')
+            os.system('cmake ..')
+            os.system('make')
 
-                if args.test_type == 'test_cmd':
-                    os.system('./SUCHAI_Flight_Software_Test > log.txt')
-                    os.system('cp -f log.txt ../test_cmd_log.txt')
-                    os.chdir(cwd_root+'/test/' + args.test_type)
-                    os.system('python3 logs_comparator.py')
-                else:
-                    os.system('./SUCHAI_Flight_Software_Test')
+            if args.test_type == 'test_cmd':
+                os.system('./SUCHAI_Flight_Software_Test > log.txt')
+                os.system('cp -f log.txt ../test_cmd_log.txt')
+                os.chdir(cwd_root+'/test/' + args.test_type)
+                os.system('python3 logs_comparator.py')
+            else:
+                os.system('./SUCHAI_Flight_Software_Test')
 
     else:  # args.os = FREERTOS
         if args.arch == "ESP32":
