@@ -27,7 +27,7 @@ With this setup we have two CSP nodes that can talk each others
 ### Ping
 Use one of the two running nodes and excute a ping from the console
 
-        ping 2
+        com_ping 2
 
 Yo will se the following output, indicating the ping delay
 
@@ -39,7 +39,7 @@ Yo will se the following output, indicating the ping delay
 You can also remotely execute a command in other node using the ```send_cmd```
 command
 
-        send_cmd 2 help
+        tm_send_cmd 2 help
         
 In the sending node you will see the following output
 
@@ -70,7 +70,7 @@ In the digital repeater mode the node A send a message to node B and then node
 B broadcast the message to all available nodes. Use the ```send_rpt``` command
 in A node
 
-        send_rpt 2 hello-world!
+        com_send_rpt 2 hello-world!
         [INFO ][1526531381][Executer] Running the command: send_rpt...
         [INFO ][1526531381][Executer] Command result: 1
         

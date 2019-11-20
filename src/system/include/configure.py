@@ -14,6 +14,7 @@ def call_git_describe(abbrev=4):
     except:
         return "0.0.0"
 
+
 def parse_args():
     """
     Parse console arguments
@@ -21,7 +22,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(prog='configure.py')
     parser.add_argument('os', type=str, default="LINUX")
-    parser.add_argument('--arch', type=str, default="NANOMIND")
+    parser.add_argument('--arch', type=str, default="X86")
     parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
     parser.add_argument('--name', type=str, default="SUCHAI-DEV")
     parser.add_argument('--id',   type=str, default="0")
@@ -38,6 +39,7 @@ def parse_args():
 
     args = parser.parse_args()
     return args
+
 
 def make_config(args, ftemp="config_template.h", fconfig="config.h"):
     """
@@ -69,6 +71,7 @@ def make_config(args, ftemp="config_template.h", fconfig="config.h"):
 
     with open(fconfig, 'w') as new_config:
         new_config.write(config)
+
 
 if __name__ == "__main__":
     make_config(parse_args())

@@ -3,7 +3,10 @@ import os
 import argparse
 import src.system.include.configure as configure
 
+available_os = ["LINUX", "FREERTOS"]
+available_archs = ["X86", "GROUNDSTATION", "RPI", "NANOMIND", "ESP32", "AVR32"]
 available_tests = ['test_cmd', 'test_unit', 'test_load', 'test_bug_delay']
+available_log_lvl = ["LOG_LVL_NONE", "LOG_LVL_ERROR", "LOG_LVL_WARN", "LOG_LVL_INFO", "LOG_LVL_DEBUG", "LOG_LVL_VERBOSE"]
 
 def get_parameters():
     """
@@ -11,9 +14,9 @@ def get_parameters():
     """
     parser = argparse.ArgumentParser(prog='compile.py')
     # config.h template parameters
-    parser.add_argument('os', type=str, default="LINUX")
-    parser.add_argument('arch', type=str, default="NANOMIND")
-    parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO")
+    parser.add_argument('os', type=str, default="LINUX", choices=available_os)
+    parser.add_argument('arch', type=str, default="X86", choices=available_archs)
+    parser.add_argument('--log_lvl', type=str, default="LOG_LVL_INFO", choices=available_log_lvl)
     parser.add_argument('--name', type=str, default="SUCHAI-DEV")
     parser.add_argument('--id',   type=str, default="0")
     parser.add_argument('--version',   type=str, default=configure.call_git_describe())
@@ -29,7 +32,7 @@ def get_parameters():
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
     parser.add_argument('--ssh', action="store_true", help="Use ssh for git clone")
-    parser.add_argument('--test_type', type=str, default='')
+    parser.add_argument('--test_type', type=str, default='', choices=available_tests)
     # Force clean
     parser.add_argument('--clean', action="store_true", help="Clean before build")
     # Program
@@ -57,19 +60,25 @@ if __name__ == "__main__":
 
     # Build
     if args.os == "LINUX":
+        arch = args.arch.lower()
+        arch_dir = os.path.join("src/drivers", arch)
+        build_dir = "build_{}".format(arch)
+
         # Install CSP drivers
         if args.drivers:
-            os.chdir('src/drivers/Linux/libcsp')
-            os.system('sh install_csp.sh')
+            os.chdir(arch_dir)
+            os.system('sh install.sh')
             os.chdir(cwd_root)
 
-        if args.test_type == '':
-            os.system('rm -rf build_linux')
-            os.system('mkdir build_linux')
-            os.chdir('build_linux')
-            os.system('cmake ..')
-            result = os.system('make')
-        elif args.test_type in available_tests:
+        # Build
+        os.system('rm -rf {}'.format(build_dir))
+        os.system('mkdir {}'.format(build_dir))
+        os.chdir(build_dir)
+        os.system('cmake {}'.format(os.path.join("..", arch_dir)))
+        result = os.system('make')
+
+        # Run tests
+        if args.test_type in available_tests:
                 os.chdir(cwd_root+'/test/' + args.test_type)
                 os.system('rm -rf build_test')
                 os.system('mkdir build_test')

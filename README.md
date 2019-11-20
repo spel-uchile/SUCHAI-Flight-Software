@@ -96,7 +96,7 @@ Use the ```compile.py``` python script to easily install drivers, create the
 settings header ```configure.h``` and build:
 
 ```bash
-python3 compile.py LINUX --drivers
+python3 compile.py LINUX X86 --drivers
 ```
 
 This will download and build the libcsp too. Subsequents builds do not require
@@ -108,7 +108,7 @@ python3 compile.py --help
 ```
 
 ### Run
-Go to the build folder ex: ```cd build_linux``` and execute
+Go to the build folder ex: ```cd build_x86``` and execute
 
 ```bash
 ./SUCHAI_Flight_Software

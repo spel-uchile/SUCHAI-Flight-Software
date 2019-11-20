@@ -10,11 +10,11 @@ Build for Atmel AV32UC3 Xplained
 
 2. Install ASF and drivers
 
-	python3 compile.py FREERTOS --arch AVR32 --drivers
+	python3 compile.py FREERTOS AVR32 --drivers
 
 3. Build (no communications, no permanent storage)
 
-	python3 compile.py FREERTOS --arch AVR32 --sch_com 0 --sch_st_mode 0
+	python3 compile.py FREERTOS AVR32 --sch_com 0 --sch_st_mode 0
 
 4. Program using dfu-programmer
 
