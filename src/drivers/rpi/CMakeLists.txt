@@ -46,7 +46,7 @@ link_directories(
         ../../../src/drivers/rpi/libcsp/lib
 )
 
-link_libraries(-lpthread -lsqlite3 -lpq -lzmq -lcsp )
+link_libraries(-lcsp -lzmq -lsqlite3 -lpq -lpthread)
 
 # Use pthread_setname_np included in <features.h>
 add_definitions(-D_GNU_SOURCE)
