@@ -7,6 +7,7 @@ set(SOURCE_FILES
         ../../src/drivers/Linux/data_storage.c
         ../../src/os/Linux/osSemphr.c
         ../../src/system/repoData.c
+        ../../src/system/repoDataSchema.c
         ../../src/system/repoCommand.c
         ../../src/system/cmdOBC.c
         ../../src/system/cmdDRP.c
