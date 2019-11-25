@@ -17,6 +17,7 @@
 #include <libpq-fe.h>
 #include "config.h"
 #include "repoData.h"
+#include "repoDataSchema.h"
 
 
 /**
