@@ -45,6 +45,7 @@ build_linux:
   stage: build_linux
   script:
     - echo "Building in Linux"
+    - echo "Going to execute the following commands" && cat install_build_linux.sh
     - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_linux.sh
     - docker system prune -f
   only:
@@ -54,6 +55,9 @@ build_esp:
   stage: build_esp
   script:
     - echo "Building in esp32"
+    - echo "Going to execute the following commands" && cat install_build_esp32.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_linux.sh
+    - docker system prune -f
   only:
     - master
 
@@ -61,6 +65,7 @@ build_nanomind:
   stage: build_nanomind
   script:
     - echo "Building in nanomind"
+    - echo "Going to execute the following commands" && cat install_build_nanomind.sh
     - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_nanomind.sh
     - docker system prune -f
   only:
@@ -70,6 +75,7 @@ test_linux:
   stage: test_linux
   script:
     - echo "Testing in Linux"
+    - echo "Going to execute the following commands" && cat install_test_linux.sh
     - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh
     - docker system prune -f
   only:
