@@ -22,13 +22,15 @@
 static const char *tag = "taskInit";
 
 #if SCH_COMM_ENABLE
-#ifdef LINUX
-    static csp_iface_t csp_if_kiss;
+static csp_iface_t csp_if_zmqhub;
+static csp_iface_t csp_if_kiss;
+
+#ifdef GROUNDSTATION
     static csp_kiss_handle_t csp_kiss_driver;
     void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
         csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
     }
-#endif //LINUX
+#endif //GROUNDSTATION
 #endif //SCH_COMM_ENABLE
 
 void taskInit(void *param)
@@ -68,7 +70,6 @@ void taskInit(void *param)
     /* Creating clients tasks */
     t_ok = osCreateTask(taskConsole, "console", SCH_TASK_CON_STACK, NULL, 2, &(thread_id[0]));
     if(t_ok != 0) LOGE(tag, "Task console not created!");
-
 #if SCH_HK_ENABLED
     t_ok = osCreateTask(taskHousekeeping, "housekeeping", SCH_TASK_HKP_STACK, NULL, 2, &(thread_id[1]));
     if(t_ok != 0) LOGE(tag, "Task housekeeping not created!");
@@ -91,26 +92,13 @@ void init_communications(void)
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
 
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
-    {
-        csp_debug_set_level(CSP_ERROR, 1);
-        csp_debug_set_level(CSP_WARN, 1);
-        csp_debug_set_level(CSP_INFO, 1);
-        csp_debug_set_level(CSP_BUFFER, 1);
-        csp_debug_set_level(CSP_PACKET, 1);
-        csp_debug_set_level(CSP_PROTOCOL, 1);
-        csp_debug_set_level(CSP_LOCK, 0);
-    }
-    else
-    {
-        csp_debug_set_level(CSP_ERROR, 1);
-        csp_debug_set_level(CSP_WARN, 1);
-        csp_debug_set_level(CSP_INFO, 1);
-        csp_debug_set_level(CSP_BUFFER, 0);
-        csp_debug_set_level(CSP_PACKET, 0);
-        csp_debug_set_level(CSP_PROTOCOL, 0);
-        csp_debug_set_level(CSP_LOCK, 0);
-    }
+    csp_debug_set_level(CSP_ERROR, 1);
+    csp_debug_set_level(CSP_WARN, 1);
+    csp_debug_set_level(CSP_INFO, 1);
+    csp_debug_set_level(CSP_BUFFER, 1);
+    csp_debug_set_level(CSP_PACKET, 0);
+    csp_debug_set_level(CSP_PROTOCOL, 0);
+    csp_debug_set_level(CSP_LOCK, 0);
 
     /* Init buffer system */
     int t_ok;
@@ -125,8 +113,7 @@ void init_communications(void)
      * Set interfaces and routes
      *  Platform dependent
      */
-#ifdef LINUX
-    #ifndef SIMULATED
+#ifdef GROUNDSTATION
     struct usart_conf conf;
     conf.device = SCH_KISS_DEVICE;
     conf.baudrate = SCH_KISS_UART_BAUDRATE;
@@ -138,14 +125,18 @@ void init_communications(void)
     usart_set_callback(my_usart_rx);
     csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
     csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
-    #endif
 
+    /* Set ZMQ interface, default route to the rest of the ground segment */
+    csp_zmqhub_init_w_endpoints(SCH_COMM_ADDRESS, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
+#endif //GROUNDSTATION
+
+#if defined(X86) || defined(RPI)
     /* Set ZMQ interface */
     static csp_iface_t csp_if_zmqhub;
     csp_zmqhub_init_w_endpoints(SCH_COMM_ADDRESS, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
-    csp_rtable_set(8, 2, &csp_if_zmqhub, SCH_TRX_ADDRESS);
-#endif //LINUX
+#endif //X86||RPI
 
 #ifdef NANOMIND
     //csp_set_model("A3200");
