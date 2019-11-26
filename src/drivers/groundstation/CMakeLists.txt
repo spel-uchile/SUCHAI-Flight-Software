@@ -4,6 +4,39 @@ project(SUCHAI_Flight_Software_GroundStation)
 set(CMAKE_C_STANDARD 99)
 
 set(SOURCE_FILES
+
+        #pendiente conf_util.h que se genera al correr ./waf en suchai-drivers-bus, actualmente solo se copio al include de groundstation
+
+        #nanocom-ax_client files
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/nanocom-ax_client/src/ax100_client.c
+
+        #libparam_client files
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/src/serialize.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/src/string.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/src/table.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/src/rparam/deprecated_rparam.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/src/rparam/query.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/src/rparam/rparam.c
+
+
+        #libutil files
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/log/log.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/error.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/byteorder.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/bytebuffer.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/fletcher.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/lock.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/strtoint.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/linux/mutex.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/rtc.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/string.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/linux/clock.c
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/src/log/appender/console.c
+
+        #nanopower files
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/nanopower_client/src/nanopower2.c
+
+
         ../../../src/drivers/groundstation/data_storage.c
         ../../../src/drivers/groundstation/init.c
         ../../../src/os/Linux/osDelay.c
@@ -35,6 +68,23 @@ set(SOURCE_FILES
         )
 
 include_directories(
+
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/src
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/include/deprecated
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/include
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libparam_client/include/gs
+
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libgscsp/include
+
+
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/nanocom-ax_client/include
+
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/include/deprecated/gs/gosh
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/include
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil/include/gs
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil
+        ../../../src/drivers/groundstation/suchai-drivers-bus/lib/nanopower_client
+
         ../../../src/system/include/
         ../../../src/os/include
         ../../../src/drivers/groundstation/include
@@ -43,8 +93,8 @@ include_directories(
 )
 
 link_directories(
-        ../../../src/drivers/Linux/libcsp/lib
-        ../../../src/drivers/Linux/gs-drivers/libparam/lib
+        ../../../src/drivers/groundstation/libcsp/lib
+        ../../../src/drivers/groundstation/gs-drivers/libparam/lib
 )
 
 link_libraries(-lcsp -lzmq -lsqlite3 -lpq -lpthread)
