@@ -126,9 +126,9 @@ uint16_t read16(uint8_t reg) {
                 perror("Failed to read from the i2c bus");
                 return 0;
             }
-            /*printf("buf[0] = %d\n", buf[0]);
+            printf("buf[0] = %d\n", buf[0]);
             printf("buf[1] = %d\n", buf[1]);
-            printf("buf[2] = %d\n", buf[2]);*/
+            printf("buf[2] = %d\n", buf[2]);
         }
         // Close the i2c device bus
         close(*deviceName);
