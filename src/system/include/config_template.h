@@ -34,7 +34,7 @@
     #define SCH_RESEND_TM_NODE  11  ///< If defined, resend TM packets to CosmosRB node
     #define SCH_USE_NANOPOWER
     #define SCH_USE_NANOCOM
-    #define SCH_USE_GSSB
+    //#define SCH_USE_GSSB
 #endif
 
 #ifdef NANOMIND

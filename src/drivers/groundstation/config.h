@@ -27,13 +27,13 @@
 /* Select one operating system */
 #define LINUX        ///< LINUX | FREERTOS
 /* Select the correct architecture */
-#define RPI      ///< X86 | RPI | GROUNDSTATION | ESP32 | AVR32 | NANOMIND
+#define GROUNDSTATION      ///< X86 | RPI | GROUNDSTATION | ESP32 | AVR32 | NANOMIND
 
 /* Platform specific settings */
 #ifdef GROUNDSTATION
     #define SCH_RESEND_TM_NODE  11  ///< If defined, resend TM packets to CosmosRB node
     #define SCH_USE_NANOPOWER
-    #define SCH_USE_NANOCOM
+    //#define SCH_USE_NANOCOM
     //#define SCH_USE_GSSB
 #endif
 
@@ -45,9 +45,9 @@
 
 /* System debug configurations */
 #define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
-#define SCH_NAME                "PlantSat-Chamber"         ///< Project code name
-#define SCH_DEVICE_ID           6             ///< Device unique ID
-#define SCH_SW_VERSION          "2.1.3-8-g4047"      ///< Software version
+#define SCH_NAME                "SUCHAI-DEV"         ///< Project code name
+#define SCH_DEVICE_ID           0             ///< Device unique ID
+#define SCH_SW_VERSION          "2.1.3-4-g3460"      ///< Software version
 
 /* General system settings */
 #define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
@@ -55,14 +55,14 @@
 #define SCH_HK_ENABLED          0      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
 #define SCH_WDT_PERIOD          120                 ///< CPU watchdog timer period in seconds
-#define SCH_MAX_WDT_TIMER       60                  ///< Seconds to send wdt_reset command
+#define SCH_MAX_WDT_TIMER       60000                  ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear
 #define SCH_UART_BAUDRATE       (500000)           ///< UART baud rate for serial console
 #define SCH_KISS_UART_BAUDRATE  (500000)           ///< UART baud rate for kiss communication
 #define SCH_KISS_DEVICE         "/dev/ttyUSB0"     ///< Kiss device path
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS        6  ///< Node address
+#define SCH_COMM_ADDRESS        1  ///< Node address
 #define SCH_TNC_ADDRESS         9                  ///< TNC node address
 #define SCH_TRX_ADDRESS         5                  ///< TRX node address
 #define SCH_EPS_ADDRESS         2                  ///< EPS node address
@@ -82,7 +82,7 @@
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-#define SCH_STORAGE_PGUSER      "pi"
+#define SCH_STORAGE_PGUSER      "felipe"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage

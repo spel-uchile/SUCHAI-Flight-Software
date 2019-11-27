@@ -6,12 +6,12 @@ set(CMAKE_C_STANDARD 99)
 set(SOURCE_FILES
         src/drivers/x86/data_storage.c
         src/drivers/x86/init.c
-        src/os/x86/osDelay.c
-        src/os/x86/osQueue.c
-        src/os/x86/osScheduler.c
-        src/os/x86/osSemphr.c
-        src/os/x86/osThread.c
-        src/os/x86/pthread_queue.c
+        src/os/Linux/osDelay.c
+        src/os/Linux/osQueue.c
+        src/os/Linux/osScheduler.c
+        src/os/Linux/osSemphr.c
+        src/os/Linux/osThread.c
+        src/os/Linux/pthread_queue.c
         src/system/cmdDRP.c
         src/system/cmdOBC.c
         src/system/cmdCOM.c

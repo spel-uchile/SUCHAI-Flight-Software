@@ -12,6 +12,7 @@
 #include "config.h"
 #include "globals.h"
 #include "repoData.h"
+#include "repoDataSchema.h"
 
 /**
  * This union represents a status variable stored in the FM33256B FRAM. Status
