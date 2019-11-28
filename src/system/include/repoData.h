@@ -26,7 +26,7 @@
 #include "utils.h"
 #include "data_storage.h"
 #include "osSemphr.h"
-#include "repoDataSchema.h"
+#include <repoDataSchema.h>
 
 /**
  * Initializes payload storage helper variables
