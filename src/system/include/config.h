@@ -27,7 +27,7 @@
 /* Select one operating system */
 #define LINUX        ///< LINUX | FREERTOS
 /* Select the correct architecture */
-#define GROUNDSTATION      ///< X86 | RPI | GROUNDSTATION | ESP32 | AVR32 | NANOMIND
+#define X86      ///< X86 | RPI | GROUNDSTATION | ESP32 | AVR32 | NANOMIND
 
 /* Platform specific settings */
 #ifdef GROUNDSTATION
@@ -45,9 +45,9 @@
 
 /* System debug configurations */
 #define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
-#define SCH_NAME                "GROUNDSTATION"         ///< Project code name
-#define SCH_DEVICE_ID           10             ///< Device unique ID
-#define SCH_SW_VERSION          "2.1.3-4-g3460"      ///< Software version
+#define SCH_NAME                "SUCHAI-FS"         ///< Project code name
+#define SCH_DEVICE_ID           1             ///< Device unique ID
+#define SCH_SW_VERSION          "2.1.3"      ///< Software version
 
 /* General system settings */
 #define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
@@ -62,7 +62,7 @@
 #define SCH_KISS_DEVICE         "/dev/ttyUSB0"     ///< Kiss device path
 
 /* Communications system settings */
-#define SCH_COMM_ADDRESS        10  ///< Node address
+#define SCH_COMM_ADDRESS        1  ///< Node address
 #define SCH_TNC_ADDRESS         9                  ///< TNC node address
 #define SCH_TRX_ADDRESS         5                  ///< TRX node address
 #define SCH_EPS_ADDRESS         2                  ///< EPS node address
@@ -82,7 +82,7 @@
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-#define SCH_STORAGE_PGUSER      "felipe"
+#define SCH_STORAGE_PGUSER      "spel"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage
