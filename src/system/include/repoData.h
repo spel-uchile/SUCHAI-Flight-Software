@@ -28,32 +28,6 @@
 #include "osSemphr.h"
 #include "repoDataSchema.h"
 
-/** Union for easily casting status variable types */
-typedef union fvalue{
-    float f;
-    int32_t i;
-} fvalue_t;
-
-
-#define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
-#define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
-#define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
-
-/** The repository's name */
-#define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
-
-/** Copy a system @var to a status struct @st */
-#define DAT_CPY_SYSTEM_VAR(st, var) st->var = dat_get_system_var(var)
-
-/** Copy a float system @var to a status struct @st */
-#define DAT_CPY_SYSTEM_VAR_F(st, var) {fvalue_t v; v.i = (float)dat_get_system_var(var); st->var = v.f;}
-
-/** Print the name and value of a integer system status variable */
-#define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %lu\n", #var, (unsigned long)st->var)
-
-/** Print the name and vale of a float system status variable */
-#define DAT_PRINT_SYSTEM_VAR_F(st, var) printf("\t%s: %f\n", #var, st->var)
-
 /**
  * Initializes payload storage helper variables
  */
@@ -94,29 +68,6 @@ void dat_set_system_var(dat_system_t index, int value);
  * @return The field's value
  */
 int dat_get_system_var(dat_system_t index);
-
-/**
- * Copies the status repository's field values to another dat_status_t struct.
- *
- * This function can be useful for debugging status fields with @c dat_print_status .
- *
- * And for packing the fields prior to sending them using libcsp in @c tm_send_status .
- *
- * @see dat_print_status
- * @see tm_send_status
- *
- * @param status dat_status_t *. Pointer to destination structure
- */
-void dat_status_to_struct(dat_status_t *status);
-
-/**
- * Print the names and values of a system status struct's fields.
- *
- * @seealso dat_status_to_struct
- *
- * @param status Pointer to a status variables struct
- */
-void dat_print_status(dat_status_t *status);
 
 /**
  * Gets an executable command from the flight plan repo.
