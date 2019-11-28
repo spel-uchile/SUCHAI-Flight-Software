@@ -252,8 +252,8 @@ int8_t i2c_write_n(uint8_t addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t l
                 printf("]\n");
                 printf("[rpi i2c_write] res_tmp: %d\n", res_tmp);
             #endif
-            if (res_tmp != 1) {
-                printf("[rpi i2c_write]Fail to write %d bytes\n", 1 - res_tmp);
+            if (res_tmp != len+1) {
+                printf("[rpi i2c_write]Fail to write %d bytes\n", len+1 - res_tmp);
                 return 1;
             }
         }
