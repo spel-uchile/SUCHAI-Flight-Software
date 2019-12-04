@@ -22,7 +22,7 @@
 static const char *tag = "taskInit";
 
 #if SCH_COMM_ENABLE
-static csp_iface_t csp_if_zmqhub;
+static csp_iface_t *csp_if_zmqhub;
 static csp_iface_t csp_if_kiss;
 
 #ifdef GROUNDSTATION
@@ -96,8 +96,8 @@ void init_communications(void)
     csp_debug_set_level(CSP_WARN, 1);
     csp_debug_set_level(CSP_INFO, 1);
     csp_debug_set_level(CSP_BUFFER, 1);
-    csp_debug_set_level(CSP_PACKET, 0);
-    csp_debug_set_level(CSP_PROTOCOL, 0);
+    csp_debug_set_level(CSP_PACKET, 1);
+    csp_debug_set_level(CSP_PROTOCOL, 1);
     csp_debug_set_level(CSP_LOCK, 0);
 
     /* Init buffer system */
@@ -137,7 +137,7 @@ void init_communications(void)
                                               rxfilter, rxfilter_count,
                                               SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN,
                                               &csp_if_zmqhub);
-    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
+    csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
 #endif //X86||RPI||GROUNDSTATION
 
 #ifdef NANOMIND
