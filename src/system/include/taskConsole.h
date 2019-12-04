@@ -16,6 +16,7 @@
 #include "config.h"
 #include "globals.h"
 #include "utils.h"
+#include "linenoise.h"
 
 #include "osQueue.h"
 #include "osDelay.h"
