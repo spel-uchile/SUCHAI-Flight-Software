@@ -22,33 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define BIuC_ADDR 0x11
-
-/**
- * Register reaction whee related (rw) commands
- */
-
-int i2c_write(uint8_t addr, uint8_t data1, uint8_t data2, uint8_t data3);
-
-/**
- * i2c write master transaction to slave
- *
- * @param addr Slave address to write to
- * @param data1 first byte to send
- * @param data2 second byte to send
- * @param data3 third byte to send
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-
-int i2c_read(char* buf);
-
-/**
- * i2c read master transaction to slave
- *
- * @param buf registers to save data from slave
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-
 
 int8_t i2c_write_n(uint8_t addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
 
