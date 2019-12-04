@@ -17,8 +17,8 @@ else
     cd -
 fi
 
-echo "Preparing BUS drivers build tools"
-cd suchai-drivers-bus
-python2 ./tools/buildtools/gsbuildtools_bootstrap.py
+#echo "Preparing BUS drivers build tools"
+#cd suchai-drivers-bus
+#python2 ./tools/buildtools/gsbuildtools_bootstrap.py
 
 cd -
