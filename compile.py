@@ -60,23 +60,6 @@ if __name__ == "__main__":
 
     # Build
     if args.os == "LINUX":
-        arch = args.arch.lower()
-        arch_dir = os.path.join("src/drivers", arch)
-        build_dir = "build_{}".format(arch)
-
-        # Install drivers
-        if args.drivers:
-            os.chdir(arch_dir)
-            os.system('sh install.sh')
-            os.chdir(cwd_root)
-
-        # Build
-        os.system('rm -rf {}'.format(build_dir))
-        os.system('mkdir {}'.format(build_dir))
-        os.chdir(build_dir)
-        os.system('cmake {}'.format(os.path.join("..", arch_dir)))
-        result = os.system('make')
-
         # Run tests
         if args.test_type in available_tests:
             os.chdir(cwd_root+'/test/' + args.test_type)
@@ -93,6 +76,23 @@ if __name__ == "__main__":
                 os.system('python3 logs_comparator.py')
             else:
                 os.system('./SUCHAI_Flight_Software_Test')
+        else:
+            arch = args.arch.lower()
+            arch_dir = os.path.join("src/drivers", arch)
+            build_dir = "build_{}".format(arch)
+
+            # Install drivers
+            if args.drivers:
+                os.chdir(arch_dir)
+                os.system('sh install.sh')
+                os.chdir(cwd_root)
+
+            # Build
+            os.system('rm -rf {}'.format(build_dir))
+            os.system('mkdir {}'.format(build_dir))
+            os.chdir(build_dir)
+            os.system('cmake {}'.format(os.path.join("..", arch_dir)))
+            result = os.system('make')
 
     else:  # args.os = FREERTOS
         if args.arch == "ESP32":
