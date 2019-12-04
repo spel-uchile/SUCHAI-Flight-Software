@@ -4,6 +4,7 @@ project(SUCHAI_Flight_Software)
 set(CMAKE_C_STANDARD 99)
 
 set(SOURCE_FILES
+        ../../../src/drivers/x86/linenoise/linenoise.c
         ../../../src/drivers/x86/data_storage.c
         ../../../src/drivers/x86/init.c
         ../../../src/os/Linux/osDelay.c
@@ -39,6 +40,7 @@ include_directories(
         ../../../src/os/include
         ../../../src/drivers/x86/include
         ../../../src/drivers/x86/libcsp/include
+        ../../../src/drivers/x86/linenoise
         /usr/include/postgresql
 )
 

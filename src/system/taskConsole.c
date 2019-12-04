@@ -95,7 +95,6 @@ int console_read(char *buffer, int len)
     }
     return -1;
 #else
-    /* FIXME: Move to drivers to support different systems */
     char *s = fgets(buffer, len, stdin);
     return (s != NULL) ? 0 : -1;
 #endif

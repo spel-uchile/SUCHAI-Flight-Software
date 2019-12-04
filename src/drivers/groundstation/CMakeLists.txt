@@ -37,6 +37,7 @@ set(SOURCE_FILES
         ../../../src/drivers/groundstation/suchai-drivers-bus/lib/nanopower_client/src/nanopower2.c
 
 
+        ../../../src/drivers/groundstation/linenoise/linenoise.c
         ../../../src/drivers/groundstation/data_storage.c
         ../../../src/drivers/groundstation/init.c
         ../../../src/os/Linux/osDelay.c
@@ -89,6 +90,7 @@ include_directories(
         ../../../src/os/include
         ../../../src/drivers/groundstation/include
         ../../../src/drivers/groundstation/libcsp/include
+        ../../../src/drivers/groundstation/linenoise
         /usr/include/postgresql
 )
 
