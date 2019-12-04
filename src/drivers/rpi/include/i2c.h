@@ -11,7 +11,7 @@
 #ifndef I2C_H
 #define I2C_H
 
-#include "osDelay.h"
+//#include "osDelay.h"
 
 #include <stdint.h>
 #include <fcntl.h>
@@ -19,6 +19,8 @@
 #include <linux/i2c-dev.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
 #define BIuC_ADDR 0x11
 #define MCP9808_I2CADDR_DEFAULT 0x1f ///< I2C address
@@ -82,5 +84,31 @@ uint8_t read8(uint8_t reg);
  *    @return value
  */
 
+
+int8_t i2c_write_n(uint8_t addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
+
+/*!
+ *    @brief  Low level generic i2c write
+ *    @param  addr, reg_addr, reg_data, len
+ *    @return err_code
+ */
+
+int8_t i2c_read_n(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len, uint8_t delay_ms);
+
+/*!
+ *    @brief  Low level generic i2c read
+ *    @param  addr, reg_addr, reg_data, len
+ *    @return err_code
+ */
+
+int8_t i2c_read_from(uint8_t dev_id, uint8_t *reg_data);
+
+/*!
+ *    @brief  Low level specific i2c write
+ *    @param  addr, data
+ *    @return err_code
+ */
+
+int8_t i2c_write_addr(uint8_t addr, uint8_t data);
 
 #endif /* CMD_RW_H */
