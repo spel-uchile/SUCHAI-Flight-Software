@@ -17,8 +17,8 @@ else
     cd -
 fi
 
-echo "Preparing BUS drivers build tools"
-cd suchai-drivers-bus
-python2 ./tools/buildtools/gsbuildtools_bootstrap.py
-
-cd -
+# Dowload linenoise
+echo "Installing linenoise..."
+if [ ! -d "./linenoise" ]; then
+  git clone https://github.com/antirez/linenoise.git
+fi
