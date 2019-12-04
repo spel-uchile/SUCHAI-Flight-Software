@@ -101,7 +101,7 @@ int8_t i2c_read_n(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t 
  *    @return err_code
  */
 
-int8_t i2c_read_from(uint8_t dev_id, uint8_t *reg_data);
+int8_t i2c_read_from_n(uint8_t dev_id, uint8_t *reg_data, uint8_t len);
 
 /*!
  *    @brief  Low level specific i2c write

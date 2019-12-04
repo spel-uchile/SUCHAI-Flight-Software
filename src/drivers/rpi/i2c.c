@@ -318,7 +318,7 @@ int8_t i2c_read_n(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t 
     @brief  Reads n bytes over I2C
 */
 /**************************************************************************/
-int8_t i2c_read_from(uint8_t dev_id, uint8_t *reg_data)
+int8_t i2c_read_from_n(uint8_t dev_id, uint8_t *reg_data, uint8_t len)
 {
     int i2cHandle;
     if ((i2cHandle = open(deviceName, O_RDWR)) < 0)
@@ -336,17 +336,18 @@ int8_t i2c_read_from(uint8_t dev_id, uint8_t *reg_data)
         }
         else
         {
-            uint8_t bytes_r = read(i2cHandle, reg_data, 1);
+            memset(reg_data, 0, len);
+            uint8_t bytes_r = read(i2cHandle, reg_data, len);
             #ifdef RPI_I2C_DEBUG
                 printf("rpi i2c_read_from: [");
-                for (int i = 0; i < 1; i++) {
+                for (int i = 0; i < len; i++) {
                     printf("%d,", reg_data[i]);
                 }
                 printf("]\n");
             #endif
-            if (bytes_r != 1)
+            if (bytes_r != len)
             {
-                printf("bytes_r = %d, len = %d\n", bytes_r, 1);
+                printf("bytes_r = %d, len = %d\n", bytes_r, len);
                 perror("Failed to read from the i2c bus");
                 return 1;
             }
