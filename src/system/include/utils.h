@@ -57,11 +57,11 @@ static inline int log_init(void)
 }
 
 /// Logging functions @see log_level_t
-#define LOGE(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_ERROR)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[ERROR][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,LF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
-#define LOGW(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_WARN)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[WARN ][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,LF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
-#define LOGI(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_INFO)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[INFO ][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,LF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
-#define LOGD(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_DEBUG)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[DEBUG][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,LF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
-#define LOGV(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_VERBOSE) {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[VERB ][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,LF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
+#define LOGE(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_ERROR)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[ERROR][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,CRLF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
+#define LOGW(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_WARN)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[WARN ][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,CRLF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
+#define LOGI(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_INFO)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[INFO ][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,CRLF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
+#define LOGD(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_DEBUG)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[DEBUG][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,CRLF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
+#define LOGV(tag, msg, ...) if(LOG_LEVEL >= LOG_LVL_VERBOSE) {osSemaphoreTake(&log_mutex, portMAX_DELAY); fprintf(LOGOUT,"[VERB ][%lu][%s] ", (unsigned long)time(NULL), tag); fprintf(LOGOUT,msg, ##__VA_ARGS__); fprintf(LOGOUT,CRLF); fflush(LOGOUT); osSemaphoreGiven(&log_mutex);}
 
 /// Assert functions
 #define clean_errno() (errno == 0 ? "None" : strerror(errno))

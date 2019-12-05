@@ -92,34 +92,34 @@ void testParseCommands(void)
     char *name;
 
     // Case 1: command without parameters; command do not req. parameters.
-    cmd = cmd_parse_from_str("get_mem");
+    cmd = cmd_parse_from_str("obc_get_mem");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
-    CU_ASSERT_STRING_EQUAL("get_mem", name)
+    CU_ASSERT_STRING_EQUAL("obc_get_mem", name)
     CU_ASSERT_PTR_NULL(cmd->params);
     free(cmd); free(name);
 
     // Case 2: command with parameters; command do not req. parameters.
-    cmd = cmd_parse_from_str("get_mem foo");
+    cmd = cmd_parse_from_str("obc_get_mem foo");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
-    CU_ASSERT_STRING_EQUAL("get_mem", name)
+    CU_ASSERT_STRING_EQUAL("obc_get_mem", name)
     CU_ASSERT_STRING_EQUAL("foo", cmd->params);
     free(cmd); free(name);
 
     // Case 3: command with parameters; command require parameters.
-    cmd = cmd_parse_from_str("debug_obc 1");
+    cmd = cmd_parse_from_str("obc_debug 1");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
-    CU_ASSERT_STRING_EQUAL("debug_obc", name)
+    CU_ASSERT_STRING_EQUAL("obc_debug", name)
     CU_ASSERT_STRING_EQUAL("1", cmd->params);
     free(cmd); free(name);
 
     // Case 4: command without parameters; command require parameters.
-    cmd = cmd_parse_from_str("debug_obc");
+    cmd = cmd_parse_from_str("obc_debug");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
-    CU_ASSERT_STRING_EQUAL("debug_obc", name)
+    CU_ASSERT_STRING_EQUAL("obc_debug", name)
     CU_ASSERT_PTR_NULL(cmd->params);
     free(cmd); free(name);
 

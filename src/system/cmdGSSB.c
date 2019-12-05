@@ -533,7 +533,7 @@ int gssb_interstage_arm(char *fmt, char *params, int nparams)
 
 int gssb_interstage_state(char *fmt, char *params, int nparams)
 {
-    uint8_t armed_manual = 0;
+    int armed_manual = 0;
 
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
@@ -542,14 +542,18 @@ int gssb_interstage_state(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &armed_manual) != nparams)
         return CMD_ERROR_SYNTAX;
 
-    if (gs_gssb_istage_settings_unlock(i2c_addr, i2c_timeout_ms) != GS_OK)
+    if (gs_gssb_istage_settings_unlock(i2c_addr, i2c_timeout_ms) != GS_OK) {
+        LOGE(tag,"Error unlocking istage settings\n");
         return CMD_ERROR_FAIL;
+    }
 
-    if (gs_gssb_istage_set_state(i2c_addr, i2c_timeout_ms, armed_manual) != GS_OK)
+    if (gs_gssb_istage_set_state(i2c_addr, i2c_timeout_ms, (uint8_t)armed_manual) != GS_OK) {
+        LOGE(tag,"Error setting istage state\n");
         return CMD_ERROR_FAIL;
+    }
 
     if (gs_gssb_istage_settings_lock(i2c_addr, i2c_timeout_ms) != GS_OK) {
-        printf("\r\n Warning could not lock settings after they was unlocked\r\n");
+        LOGE(tag, "Warning could not lock settings after they was unlocked\n");
         return CMD_ERROR_FAIL;
     }
 
@@ -620,9 +624,9 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
     printf("\r\n");
 
     printf("Delay till deploy:\t\t\t %"PRIu16" s\r\n", status.deploy_in_s);
-    printf("Number of attemps since boot:\t\t %"PRIu8"\r\n", status.number_of_deploys);
-    printf("Knife that will be use in next deploy:\t %"PRIu8"\r\n", status.active_knife);
-    printf("Total deploy attemps:\t\t\t %"PRIu16"\r\n", status.total_number_of_deploys);
+    printf("Number of attempts since boot:\t\t %"PRIu8"\r\n", status.number_of_deploys);
+    printf("Knife that will be used in next deploy:\t %"PRIu8"\r\n", status.active_knife);
+    printf("Total deploy attempts:\t\t\t %"PRIu16"\r\n", status.total_number_of_deploys);
     printf("Reboot deploy cnt:\t\t\t %"PRIu8"\r\n", status.reboot_deploy_cnt);
 
     return CMD_ERROR_NONE;
@@ -631,7 +635,7 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
 
 int gssb_ar6_burn(char *fmt, char *params, int nparams)
 {
-    uint8_t duration;
+    int duration;
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
     if (sscanf(params, fmt, &duration) != nparams)
@@ -642,7 +646,7 @@ int gssb_ar6_burn(char *fmt, char *params, int nparams)
         return CMD_ERROR_SYNTAX;
     }
 
-    if (gs_gssb_ar6_burn(i2c_addr, i2c_timeout_ms, duration) != GS_OK)
+    if (gs_gssb_ar6_burn(i2c_addr, i2c_timeout_ms, (uint8_t)duration) != GS_OK)
         return CMD_ERROR_FAIL;
     else
         return CMD_ERROR_NONE;
@@ -702,7 +706,7 @@ int gssb_ar6_get_status(char *fmt, char *params, int nparams)
 
 int gssb_common_burn_channel(char *fmt, char *params, int nparams)
 {
-    uint8_t channel, duration;
+    int channel, duration;
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
 
@@ -721,7 +725,7 @@ int gssb_common_burn_channel(char *fmt, char *params, int nparams)
 
     //Can be ant6 or i4... but we do not want to use the internal API, implement the
     //specific device commands instead
-    if (gs_gssb_ant6_burn_channel(i2c_addr, i2c_timeout_ms, channel, duration) != GS_OK)
+    if (gs_gssb_ant6_burn_channel(i2c_addr, i2c_timeout_ms, (uint8_t)channel, (uint8_t)duration) != GS_OK)
     //if (gs_gssb_i4_burn_channel(i2c_addr, i2c_timeout_ms, channel, duration) != GS_OK)
         return CMD_ERROR_FAIL;
     else

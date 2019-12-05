@@ -39,14 +39,7 @@ time_t sec = 0;
     fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
-struct map data_map[last_sensor] = {
-        {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_mem_temp, dat_mem_ack_temp, "%u %f %f %f", "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
-        { "ads_data",      (uint16_t) (sizeof(ads_data_t)), dat_mem_ads, dat_mem_ack_ads, "%u %f %f %f %f %f %f", "timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
-        { "eps_data",      (uint16_t) (sizeof(eps_data_t)), dat_mem_eps, dat_mem_ack_eps, "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
-        { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_mem_lang, dat_mem_ack_lang, "%u %f %f %f %d", "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
-};
-
-void initialize_payload_vars(){
+void initialize_payload_vars(void){
     int i =0;
     for(i=0; i< last_sensor; ++i) {
         if(dat_get_system_var(data_map[i].sys_index) == -1) {
@@ -112,16 +105,16 @@ void dat_repo_init(void)
     }
 #endif
 
-    /* TODO: Initialize custom variables */
-    LOGD(tag, "Initializing system variables values...")
-//    dat_set_system_var(dat_obc_hrs_alive, 0);
-    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
-    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
-    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
-
-#if (SCH_STORAGE_MODE > 0)
-    initialize_payload_vars();
-#endif
+//    /* TODO: Initialize custom variables */
+//    LOGD(tag, "Initializing system variables values...")
+////    dat_set_system_var(dat_obc_hrs_alive, 0);
+//    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
+//    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
+//    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+//
+//#if (SCH_STORAGE_MODE > 0)
+//    initialize_payload_vars();
+//#endif
 }
 
 void dat_repo_close(void)
@@ -263,113 +256,6 @@ int dat_get_system_var(dat_system_t index)
 #endif
 }
 
-void dat_status_to_struct(dat_status_t *status)
-{
-    assert(status != NULL);
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_opmode);        ///< General operation mode
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_last_reset);    ///< Last reset source
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_hrs_alive);     ///< Hours since first boot
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_hrs_wo_reset);  ///< Hours since last reset
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_reset_counter); ///< Number of reset since first boot
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_sw_wdt);        ///< Software watchdog timer counter
-    DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_1);        ///< Temperature value of the first sensor
-    DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_2);        ///< Temperature value of the second sensor
-    DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_3);        ///< Temperature value of the gyroscope
-
-    DAT_CPY_SYSTEM_VAR(status, dat_dep_deployed);      ///< Was the satellite deployed?
-    DAT_CPY_SYSTEM_VAR(status, dat_dep_ant_deployed);  ///< Was the antenna deployed?
-    DAT_CPY_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix time
-
-    DAT_CPY_SYSTEM_VAR(status, dat_rtc_date_time);     /// RTC current unix time
-
-    DAT_CPY_SYSTEM_VAR(status, dat_com_count_tm);      ///< number of TM sent
-    DAT_CPY_SYSTEM_VAR(status, dat_com_count_tc);      ///< number of received TC
-    DAT_CPY_SYSTEM_VAR(status, dat_com_last_tc);       ///< Unix time of the last received tc
-    DAT_CPY_SYSTEM_VAR(status, dat_com_freq);          ///< Frequency [Hz]
-    DAT_CPY_SYSTEM_VAR(status, dat_com_tx_pwr);        ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-    DAT_CPY_SYSTEM_VAR(status, dat_com_baud);          ///< Baudrate [bps]
-    DAT_CPY_SYSTEM_VAR(status, dat_com_mode);          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-    DAT_CPY_SYSTEM_VAR(status, dat_com_bcn_period);    ///< Number of seconds between beacon packets
-
-    DAT_CPY_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
-    DAT_CPY_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
-
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_x);         ///< Gyroscope acceleration value along the x axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_y);         ///< Gyroscope acceleration value along the y axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_z);         ///< Gyroscope acceleration value along the z axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
-
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
-
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_lang);
-
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_mem_ack_lang);
-}
-
-void dat_print_status(dat_status_t *status)
-{
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_opmode);        ///< General operation mode
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_last_reset);    ///< Last reset source
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_hrs_alive);     ///< Hours since first boot
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_hrs_wo_reset);  ///< Hours since last reset
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_reset_counter); ///< Number of reset since first boot
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_sw_wdt);        ///< Software watchdog timer counter
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_1);      ///< Temperature value of the first sensor
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_2);      ///< Temperature value of the second sensor
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_3);      ///< Temperature value of the gyroscope
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_dep_deployed);      ///< Was the satellite deployed?
-    DAT_PRINT_SYSTEM_VAR(status, dat_dep_ant_deployed);  ///< Was the antenna deployed?
-    DAT_PRINT_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix time
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_rtc_date_time);     /// RTC current unix time
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_count_tm);      ///< number of TM sent
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_count_tc);      ///< number of received TC
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_last_tc);       ///< Unix time of the last received tc
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_freq);          ///< Frequency [Hz]
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_tx_pwr);        ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_baud);          ///< Baudrate [bps]
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_mode);          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_bcn_period);    ///< Number of seconds between beacon packets
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
-    DAT_PRINT_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
-
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_x);         ///< Gyroscope acceleration value along the x axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_y);         ///< Gyroscope acceleration value along the y axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_z);         ///< Gyroscope acceleration value along the z axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_lang);
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_mem_ack_lang);
-}
-
 #if SCH_STORAGE_MODE == 0
 static int _dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
 {
@@ -437,6 +323,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     int i;
+    rc = -1;  // not found by default
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
         if(elapsed_sec == data_base[i].unixtime)
@@ -450,7 +337,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
                 _dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
 
             _dat_del_fp_async(elapsed_sec);
-            rc = 0;
+            rc = 0;  // found, then break!
             break;
         }
     }
@@ -658,6 +545,7 @@ int dat_add_payload_sample(void* data, int payload)
 
 int dat_get_recent_payload_sample(void* data, int payload, int delay)
 {
+    //TODO: Change variable name from delay to offset??
     int ret;
 
     int index = dat_get_system_var(data_map[payload].sys_index);
@@ -665,11 +553,13 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay)
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //TODO: Is this conditional required?
 #if defined(LINUX) || defined(NANOMIND)
     if(index-1-delay >= 0) {
         ret = storage_get_payload_data(index-1-delay, data, payload);
     }
     else {
+        //FIXME: "Asked for too large offset (%d) on payload (%d)
         LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
         ret = -1;
     }
@@ -702,4 +592,102 @@ int dat_delete_memory_sections(void)
     storage_flight_plan_reset();
 #endif
     return ret;
+}
+
+
+int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i)
+{
+    const char s[2] = " ";
+    tok_sym[0] = strtok(order, s);
+
+    int j=0;
+    while(tok_sym[j] != NULL) {
+        j++;
+        tok_sym[j] = strtok(NULL, s);
+    }
+
+    tok_var[0] = strtok(var_names, s);
+
+    j=0;
+    while(tok_var[j] != NULL) {
+        j++;
+        tok_var[j] = strtok(NULL, s);
+    }
+    return j;
+}
+
+void get_value_string(char* ret_string, char* c_type, char* buff)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        sprintf(ret_string, " %f", *((float*)buff));
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        sprintf(ret_string, " %d", *((int*)buff));
+    }
+    else if(strcmp(c_type, "%u") == 0) {
+        sprintf(ret_string, " %u", *((unsigned int*)buff));
+    }
+}
+
+int get_sizeof_type(char* c_type)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        return sizeof(float);
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        return sizeof(int);
+    } else if(strcmp(c_type, "%u") == 0) {
+        return sizeof(int);
+    } else {
+        return -1;
+    }
+}
+
+int dat_print_payload_struct(void* data, unsigned int payload)
+{
+    //FIXME: Buffers allocated in stack with magical numbers! Use defined values
+    //FIXME: Use malloc to allocate large buffers, here 1280  bytes allocated!
+    //FIXME: Task stack size: 5*256 = 1280 bytes!
+
+    char* tok_sym[30];
+    char* tok_var[30];
+    char *order = (char *)malloc(50);
+    strcpy(order, data_map[payload].data_order);
+    char *var_names = (char *)malloc(200);
+    strcpy(var_names, data_map[payload].var_names);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, (int)payload);
+
+    char *values = (char *)malloc(500);
+    char *names = (char *)malloc(500);
+    strcpy(names, "");
+    strcpy(values, "");
+
+    int j;
+    for(j=0; j < nparams; ++j) {
+        int param_size = get_sizeof_type(tok_sym[j]);
+        char buff[param_size];
+        memcpy(buff, data+(j*param_size), param_size);
+
+        char name[20];
+        sprintf(name, " %s", tok_var[j]);
+        strcat(names, name);
+
+        char val[20];
+        get_value_string(val, tok_sym[j], buff);
+        strcat(values, val);
+
+        if(j != nparams-1){
+            strcat(names, ",");
+            strcat(values, ",");
+        }
+    }
+    strcat(names, ":");
+    printf("%s %s\n", names, values);
+
+    free(order);
+    free(var_names);
+    free(values);
+    free(names);
+
+    return 0;
 }

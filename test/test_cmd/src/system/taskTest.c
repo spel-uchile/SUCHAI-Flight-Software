@@ -41,20 +41,20 @@ void taskTest(void *param)
 #endif
 
     LOGI(tag, "---- Testing DRP commands ----");
-    LOGI(tag, "Test: ebf");
-    test_cmd = cmd_get_str("ebf");
+    LOGI(tag, "Test: drp_ebf");
+    test_cmd = cmd_get_str("drp_ebf");
     cmd_add_params_str(test_cmd, "1010");
     cmd_send(test_cmd);
     osDelay(500);
 
-    LOGI(tag, "Test: print_vars");
-    test_cmd = cmd_get_str("print_vars");
+    LOGI(tag, "Test: drp_get_vars");
+    test_cmd = cmd_get_str("drp_get_vars");
     cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
     osDelay(500);
 
-    LOGI(tag, "Test: update_sys_var");
-    test_cmd = cmd_get_str("update_sys_var");
+    LOGI(tag, "Test: drp_set_var");
+    test_cmd = cmd_get_str("drp_set_var");
     cmd_add_params_var(test_cmd, dat_obc_opmode, 123);
     cmd_send(test_cmd);
     osDelay(500);
@@ -62,8 +62,8 @@ void taskTest(void *param)
     int op_mode = dat_get_system_var(dat_obc_opmode);
     assertf(op_mode == 123, tag, "Failed to set variable, read: %d", op_mode);
 
-    LOGI(tag, "Test: update_hours_alive");
-    test_cmd = cmd_get_str("update_hours_alive");
+    LOGI(tag, "Test: drp_add_hrs_alive");
+    test_cmd = cmd_get_str("drp_add_hrs_alive");
     cmd_add_params_var(test_cmd, 123);
     cmd_send(test_cmd);
     osDelay(500);
@@ -71,22 +71,22 @@ void taskTest(void *param)
     int hours_alive = dat_get_system_var(dat_obc_hrs_alive);
     assertf(hours_alive == 123, tag, "Failed to set variable, read: %d", hours_alive);
 
-    LOGI(tag, "Test: print_vars");
-    test_cmd = cmd_get_str("print_vars");
+    LOGI(tag, "Test: drp_get_vars");
+    test_cmd = cmd_get_str("drp_get_vars");
     cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
     osDelay(500);
 
     LOGI(tag, "---- Testing OBC commands ----");
-    LOGI(tag, "Test: get_mem");
-    test_cmd = cmd_get_str("get_mem");
+    LOGI(tag, "Test: obc_get_mem");
+    test_cmd = cmd_get_str("obc_get_mem");
     cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
     osDelay(500);
 
     //LAST COMMAND - EXIT OR RESET THE SYSTEM
-    LOGI(tag, "Test: reset");
-    test_cmd = cmd_get_str("reset");
+    LOGI(tag, "Test: obc_reset");
+    test_cmd = cmd_get_str("obc_reset");
     cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
 }

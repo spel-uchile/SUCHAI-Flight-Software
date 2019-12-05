@@ -25,14 +25,16 @@
 #include <string.h>
 
 /* Select one operating system */
-#define LINUX                                      ///< LINUX | FREERTOS
+#define LINUX        ///< LINUX | FREERTOS
 /* Select the correct architecture */
-#ifdef FREERTOS
-    #define NANOMIND                                ///< ESP32 | AVR32 | NANOMIND
-#endif
+#define X86      ///< X86 | RPI | GROUNDSTATION | ESP32 | AVR32 | NANOMIND
 
-#ifdef LINUX
+/* Platform specific settings */
+#ifdef GROUNDSTATION
     #define SCH_RESEND_TM_NODE  11  ///< If defined, resend TM packets to CosmosRB node
+    #define SCH_USE_NANOPOWER
+    #define SCH_USE_NANOCOM
+    //#define SCH_USE_GSSB
 #endif
 
 #ifdef NANOMIND
@@ -43,14 +45,14 @@
 
 /* System debug configurations */
 #define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
-#define SCH_NAME                "SUCHAI-DEV"         ///< Project code name
-#define SCH_DEVICE_ID           0                   ///< Device unique ID
-#define SCH_SW_VERSION          "2.0.4-dev"      ///< Software version
+#define SCH_NAME                "SUCHAI-FS"         ///< Project code name
+#define SCH_DEVICE_ID           1             ///< Device unique ID
+#define SCH_SW_VERSION          "2.1.3"      ///< Software version
 
 /* General system settings */
 #define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          1      ///< TaskFlightPlan enabled (0 | 1)
-#define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
+#define SCH_HK_ENABLED          0      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_TEST_ENABLED        0    ///< Set to run tests (0 | 1)
 #define SCH_WDT_PERIOD          120                 ///< CPU watchdog timer period in seconds
 #define SCH_MAX_WDT_TIMER       60                  ///< Seconds to send wdt_reset command
@@ -77,7 +79,7 @@
 #define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        0    ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 #define SCH_STORAGE_PGUSER      "spel"

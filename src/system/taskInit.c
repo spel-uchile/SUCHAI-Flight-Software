@@ -22,19 +22,30 @@
 static const char *tag = "taskInit";
 
 #if SCH_COMM_ENABLE
-#ifdef LINUX
-    static csp_iface_t csp_if_kiss;
+static csp_iface_t *csp_if_zmqhub;
+static csp_iface_t csp_if_kiss;
+
+#ifdef GROUNDSTATION
     static csp_kiss_handle_t csp_kiss_driver;
     void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
         csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
     }
-#endif //LINUX
+#endif //GROUNDSTATION
 #endif //SCH_COMM_ENABLE
 
 void taskInit(void *param)
 {
 #ifdef NANOMIND
     on_init_task(NULL);
+#endif
+
+    /* Initialize system variables */
+    LOGD(tag, "Initializing system variables values...")
+    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
+    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
+    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+#if (SCH_STORAGE_MODE > 0)
+    initialize_payload_vars();
 #endif
 
     LOGD(tag, "Initialization commands ...");
@@ -59,7 +70,6 @@ void taskInit(void *param)
     /* Creating clients tasks */
     t_ok = osCreateTask(taskConsole, "console", SCH_TASK_CON_STACK, NULL, 2, &(thread_id[0]));
     if(t_ok != 0) LOGE(tag, "Task console not created!");
-
 #if SCH_HK_ENABLED
     t_ok = osCreateTask(taskHousekeeping, "housekeeping", SCH_TASK_HKP_STACK, NULL, 2, &(thread_id[1]));
     if(t_ok != 0) LOGE(tag, "Task housekeeping not created!");
@@ -82,26 +92,13 @@ void init_communications(void)
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
 
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
-    {
-        csp_debug_set_level(CSP_ERROR, 1);
-        csp_debug_set_level(CSP_WARN, 1);
-        csp_debug_set_level(CSP_INFO, 1);
-        csp_debug_set_level(CSP_BUFFER, 1);
-        csp_debug_set_level(CSP_PACKET, 1);
-        csp_debug_set_level(CSP_PROTOCOL, 1);
-        csp_debug_set_level(CSP_LOCK, 0);
-    }
-    else
-    {
-        csp_debug_set_level(CSP_ERROR, 1);
-        csp_debug_set_level(CSP_WARN, 1);
-        csp_debug_set_level(CSP_INFO, 1);
-        csp_debug_set_level(CSP_BUFFER, 0);
-        csp_debug_set_level(CSP_PACKET, 0);
-        csp_debug_set_level(CSP_PROTOCOL, 0);
-        csp_debug_set_level(CSP_LOCK, 0);
-    }
+    csp_debug_set_level(CSP_ERROR, 1);
+    csp_debug_set_level(CSP_WARN, 1);
+    csp_debug_set_level(CSP_INFO, 1);
+    csp_debug_set_level(CSP_BUFFER, 1);
+    csp_debug_set_level(CSP_PACKET, 1);
+    csp_debug_set_level(CSP_PROTOCOL, 1);
+    csp_debug_set_level(CSP_LOCK, 0);
 
     /* Init buffer system */
     int t_ok;
@@ -116,8 +113,7 @@ void init_communications(void)
      * Set interfaces and routes
      *  Platform dependent
      */
-#ifdef LINUX
-    #ifndef SIMULATED
+#ifdef GROUNDSTATION
     struct usart_conf conf;
     conf.device = SCH_KISS_DEVICE;
     conf.baudrate = SCH_KISS_UART_BAUDRATE;
@@ -129,20 +125,27 @@ void init_communications(void)
     usart_set_callback(my_usart_rx);
     csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
     csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
-    #endif
+#endif //GROUNDSTATION
 
-    /* Set ZMQ interface */
-    static csp_iface_t csp_if_zmqhub;
-    csp_zmqhub_init_w_endpoints(SCH_COMM_ADDRESS, SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN);
-    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_zmqhub, CSP_NODE_MAC);
-    csp_rtable_set(8, 2, &csp_if_zmqhub, SCH_TRX_ADDRESS);
-#endif //LINUX
+#if defined(X86) || defined(RPI) || defined(GROUNDSTATION)
+    /* Set ZMQ interface as a default route*/
+    uint8_t addr = (uint8_t)SCH_COMM_ADDRESS;
+    uint8_t *rxfilter = &addr;
+    unsigned  int rxfilter_count = 1;
+
+    csp_zmqhub_init_w_name_endpoints_rxfilter(CSP_ZMQHUB_IF_NAME,
+                                              rxfilter, rxfilter_count,
+                                              SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN,
+                                              &csp_if_zmqhub);
+    csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
+#endif //X86||RPI||GROUNDSTATION
 
 #ifdef NANOMIND
     //csp_set_model("A3200");
     /* Init csp i2c interface with address 1 and 400 kHz clock */
     LOGI(tag, "csp_i2c_init...");
-    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400);
+    sch_a3200_init_twi0(GS_AVR_I2C_MULTIMASTER, SCH_COMM_ADDRESS, 400000);
+    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400000);
     if(t_ok != CSP_ERR_NONE) LOGE(tag, "\tcsp_i2c_init failed!");
 
     /**
