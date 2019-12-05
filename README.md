@@ -1,6 +1,6 @@
 # Nanosatellite Flight Software
 
-[![Build Status](http://jenkins.spel.cl/buildStatus/icon?job=SUCHAI-Flight-Software-pipeline)](http://jenkins.spel.cl/job/SUCHAI-Flight-Software-pipeline/)
+[![Build Status](https://gitlab.com/spel-uchile/suchai-flight-software/badges/master/pipeline.svg)](https://gitlab.com/spel-uchile/suchai-flight-software/pipelines)
 [![GitHub tag](https://img.shields.io/github/tag/spel-uchile/SUCHAI-Flight-Software.svg)]()
 [![license](https://img.shields.io/github/license/spel-uchile/SUCHAI-Flight-Software.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -96,7 +96,7 @@ Use the ```compile.py``` python script to easily install drivers, create the
 settings header ```configure.h``` and build:
 
 ```bash
-python3 compile.py LINUX --drivers
+python3 compile.py LINUX X86 --drivers
 ```
 
 This will download and build the libcsp too. Subsequents builds do not require
@@ -108,7 +108,7 @@ python3 compile.py --help
 ```
 
 ### Run
-Go to the build folder ex: ```cd build_linux``` and execute
+Go to the build folder ex: ```cd build_x86``` and execute
 
 ```bash
 ./SUCHAI_Flight_Software
@@ -138,13 +138,16 @@ Refs:
 - http://learning-0mq-with-pyzmq.readthedocs.io/en/latest/pyzmq/devices/forwarder.html
 
 ### Build for other architectures
-Currently the fight software supports the following architectures (some platforms
+Currently the flight software supports the following architectures (some platforms
 may have limited or under development support):
 
-- Nanomind A3200: ```python3 compile.py FREERTOS --arch NANOMIND```
-- Atmel AV32UC3 Xplained board: ```python3 compile.py FREERTOS --arch AVR32 --sch_com 0```
-- Raspberry Pi: ```python3 compile.py LINUX```
-- Esspressif ESP32: ```python3 compile.py FREERTOS --arch ESP32 --sch_com 0```
+First install the drivers for the desired architecture
+```python3 compile.py <OS> <ARCH> --drivers```
+
+- Nanomind A3200: ```python3 compile.py FREERTOS NANOMIND```
+- Atmel AV32UC3 Xplained board: ```python3 compile.py FREERTOS AVR32 --comm 0```
+- Raspberry Pi: ```python3 compile.py LINUX RPI```
+- Esspressif ESP32: ```python3 compile.py FREERTOS ESP32 --comm 0 --fp 0 --hk 0 --st_mode 0```
 
 Please refer to the documentation for more details
 

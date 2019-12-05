@@ -33,6 +33,6 @@ void taskTest(void *param)
     cmd_add_params_str(cmd_log, "----Test-Finished----");
     cmd_send(cmd_log);
 
-    cmd_t *cmd_exit = cmd_get_str("reset");
+    cmd_t *cmd_exit = cmd_get_str("obc_reset");
     cmd_send(cmd_exit);
 }

@@ -40,6 +40,7 @@
 build/
 build_linux/
 cmake-build-debug/
+build_rpi/
 
 # Play Ground
 playground

@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
 project(SUCHAI_Flight_Software)
 
-option(USE_GSDRIVERS "Use and build nanopower drivers")
-
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 
 set(SOURCE_FILES
-        src/drivers/Linux/data_storage.c
-        src/drivers/Linux/init.c
+        src/drivers/x86/linenoise/linenoise.c
+        src/drivers/x86/data_storage.c
+        src/drivers/x86/init.c
         src/os/Linux/osDelay.c
         src/os/Linux/osQueue.c
         src/os/Linux/osScheduler.c
@@ -38,32 +37,20 @@ set(SOURCE_FILES
 include_directories(
         src/system/include/
         src/os/include
-        src/drivers/Linux/include
-        src/drivers/Linux/libcsp/include
+        src/drivers/x86/linenoise
+        src/drivers/x86/include
+        src/drivers/x86/libcsp/include
         /usr/include/postgresql
 )
 
 link_directories(
-        src/drivers/Linux/libcsp/lib
-        src/drivers/Linux/gs-drivers/libparam/lib
+        src/drivers/x86/libcsp/lib
 )
 
-link_libraries(-lpthread -lsqlite3 -lcsp -lzmq -lpq)
+link_libraries(-lcsp -lzmq -lsqlite3 -lpq -lpthread)
 
 # Use pthread_setname_np included in <features.h>
 add_definitions(-D_GNU_SOURCE)
-
-# Build nanopower drivers
-if(USE_GSDRIVERS)
-    add_definitions(-DSCH_USE_NANOPOWER)
-    list(APPEND SOURCE_FILES src/drivers/Linux/gs-drivers/nanopower2.c)
-    include_directories(src/drivers/Linux/gs-drivers/include)
-
-    add_definitions(-DSCH_USE_NANOCOM)
-    link_libraries(-lparam)
-    include_directories(src/drivers/Linux/gs-drivers/libparam/include)
-    include_directories(src/drivers/Linux/gs-drivers/libparam/src/include)
-endif()
 
 add_executable(SUCHAI_Flight_Software ${SOURCE_FILES})
 

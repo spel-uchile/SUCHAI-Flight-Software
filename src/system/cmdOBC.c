@@ -263,6 +263,8 @@ int obc_set_pwm_freq(char* fmt, char* params, int nparams)
     float actual_freq = gs_a3200_pwm_set_freq(channel, freq);
     LOGI(tag, "PWM %d Freq set to: %.4f", channel, actual_freq);
     return CMD_OK;
+#else
+    return CMD_FAIL;
 #endif
 }
 

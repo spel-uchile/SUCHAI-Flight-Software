@@ -1,36 +1,30 @@
-CMakeCache.txt
-CMakeFiles
-cmake_install.cmake
-log.txt
-Makefile
-SUCHAI_Flight_Software_Test
-[INFO ][1542925091][main] Creating tasks...
+[INFO ][1570724182][main] Creating tasks...
 [WARN] (dispatcher) Failed to assign task priority, try as root
+[INFO ][1570724182][Dispatcher] Started
 [WARN] (executer) Failed to assign task priority, try as root
+[INFO ][1570724182][Executer] Started
 [WARN] (test) Failed to assign task priority, try as root
-[INFO ][1542925091][osScheduler] Linux scheduler: waiting threads
-[INFO ][1542925091][taskTest] Started
-[INFO ][1542925091][taskTest] ---- Testing commands interface ----
-[INFO ][1542925091][taskTest] Test: test_str_int from string
-[INFO ][1542925091][Executer] Started
-[INFO ][1542925091][Dispatcher] Started
-[INFO ][1542925091][Executer] Running the command: test_str_int...
-[INFO ][1542925091][cmdTest] con_str_int: STR1_12
-[INFO ][1542925091][Executer] Command result: 1
-[INFO ][1542925092][taskTest] Test: test_double_int from vars
-[INFO ][1542925092][Executer] Running the command: test_double_int...
-[INFO ][1542925092][cmdTest] con_double_int: 1.080000_2.090000_12_23
-[INFO ][1542925092][Executer] Command result: 1
-[INFO ][1542925092][taskTest] Test: test_str_double_int from string
-[INFO ][1542925092][Executer] Running the command: test_str_double_int...
-[INFO ][1542925092][cmdTest] str_double_int: STR1_12.456000_STR2_13.078000_456
-[INFO ][1542925092][Executer] Command result: 1
-[INFO ][1542925093][taskTest] ---- Testing DRP commands ----
-[INFO ][1542925093][taskTest] Test: ebf
-[INFO ][1542925093][Executer] Running the command: ebf...
-[INFO ][1542925093][Executer] Command result: 1
-[INFO ][1542925093][taskTest] Test: print_vars
-[INFO ][1542925093][Executer] Running the command: print_vars...
+[INFO ][1570724182][osScheduler] Linux scheduler: waiting threads
+[INFO ][1570724182][taskTest] Started
+[INFO ][1570724182][taskTest] ---- Testing commands interface ----
+[INFO ][1570724182][taskTest] Test: test_str_int from string
+[INFO ][1570724182][Executer] Running the command: test_str_int...
+[INFO ][1570724182][cmdTest] con_str_int: STR1_12
+[INFO ][1570724182][Executer] Command result: 1
+[INFO ][1570724182][taskTest] Test: test_double_int from vars
+[INFO ][1570724182][Executer] Running the command: test_double_int...
+[INFO ][1570724182][cmdTest] con_double_int: 1.080000_2.090000_12_23
+[INFO ][1570724182][Executer] Command result: 1
+[INFO ][1570724183][taskTest] Test: test_str_double_int from string
+[INFO ][1570724183][Executer] Running the command: test_str_double_int...
+[INFO ][1570724183][cmdTest] str_double_int: STR1_12.456000_STR2_13.078000_456
+[INFO ][1570724183][Executer] Command result: 1
+[INFO ][1570724183][taskTest] ---- Testing DRP commands ----
+[INFO ][1570724183][taskTest] Test: drp_ebf
+[INFO ][1570724183][Executer] Running the command: drp_ebf...
+[INFO ][1570724184][taskTest] Test: drp_get_vars
+[INFO ][1570724184][Executer] Command result: 1
+[INFO ][1570724184][Executer] Running the command: drp_get_vars...
 	dat_obc_opmode: 0
 	dat_obc_last_reset: 0
 	dat_obc_hrs_alive: 0
@@ -40,9 +34,10 @@ SUCHAI_Flight_Software_Test
 	dat_obc_temp_1: 0.000000
 	dat_obc_temp_2: 0.000000
 	dat_obc_temp_3: 0.000000
+	dat_dep_deployed: 0
 	dat_dep_ant_deployed: 0
 	dat_dep_date_time: 0
-	dat_rtc_date_time: 1542925093
+	dat_rtc_date_time: 1570724184
 	dat_com_count_tm: 0
 	dat_com_count_tc: 0
 	dat_com_last_tc: 0
@@ -63,17 +58,23 @@ SUCHAI_Flight_Software_Test
 	dat_eps_cur_sun: 0
 	dat_eps_cur_sys: 0
 	dat_eps_temp_bat0: 0
-	dat_mem_temp: 0
-	dat_mem_ads: 0
-[INFO ][1542925093][Executer] Command result: 1
-[INFO ][1542925094][taskTest] Test: update_sys_var
-[INFO ][1542925094][Executer] Running the command: update_sys_var...
-[INFO ][1542925094][Executer] Command result: 1
-[INFO ][1542925094][taskTest] Test: update_hours_alive
-[INFO ][1542925094][Executer] Running the command: update_hours_alive...
-[INFO ][1542925094][Executer] Command result: 1
-[INFO ][1542925095][taskTest] Test: print_vars
-[INFO ][1542925095][Executer] Running the command: print_vars...
+	dat_drp_temp: 0
+	dat_drp_ads: 0
+	dat_drp_eps: 0
+	dat_drp_lang: 0
+	dat_drp_ack_temp: 0
+	dat_drp_ack_ads: 0
+	dat_drp_ack_eps: 0
+	dat_drp_ack_lang: 0
+[INFO ][1570724184][Executer] Command result: 1
+[INFO ][1570724184][taskTest] Test: drp_set_var
+[INFO ][1570724184][Executer] Running the command: drp_set_var...
+[INFO ][1570724184][Executer] Command result: 1
+[INFO ][1570724185][taskTest] Test: drp_add_hrs_alive
+[INFO ][1570724185][Executer] Running the command: drp_add_hrs_alive...
+[INFO ][1570724185][Executer] Command result: 1
+[INFO ][1570724185][taskTest] Test: drp_get_vars
+[INFO ][1570724185][Executer] Running the command: drp_get_vars...
 	dat_obc_opmode: 123
 	dat_obc_last_reset: 0
 	dat_obc_hrs_alive: 123
@@ -83,9 +84,10 @@ SUCHAI_Flight_Software_Test
 	dat_obc_temp_1: 0.000000
 	dat_obc_temp_2: 0.000000
 	dat_obc_temp_3: 0.000000
+	dat_dep_deployed: 0
 	dat_dep_ant_deployed: 0
 	dat_dep_date_time: 0
-	dat_rtc_date_time: 1542925093
+	dat_rtc_date_time: 1570724184
 	dat_com_count_tm: 0
 	dat_com_count_tc: 0
 	dat_com_last_tc: 0
@@ -106,62 +108,29 @@ SUCHAI_Flight_Software_Test
 	dat_eps_cur_sun: 0
 	dat_eps_cur_sys: 0
 	dat_eps_temp_bat0: 0
-	dat_mem_temp: 0
-	dat_mem_ads: 0
-[INFO ][1542925095][Executer] Command result: 1
-[INFO ][1542925095][taskTest] ---- Testing OBC commands ----
-[INFO ][1542925095][taskTest] Test: get_mem
-[INFO ][1542925095][Executer] Running the command: get_mem...
-Name:	SUCHAI_Flight_S
-State:	S (sleeping)
-Tgid:	27305
-Ngid:	0
-Pid:	27305
-PPid:	27045
-TracerPid:	0
-Uid:	112	112	112	112
-Gid:	116	116	116	116
-FDSize:	256
-Groups:	27 116
-NStgid:	27305
-NSpid:	27305
-NSpgid:	27305
-NSsid:	26839
-VmPeak:	  236040 kB
-VmSize:	  170504 kB
-VmLck:	       0 kB
-VmPin:	       0 kB
-VmHWM:	    1232 kB
-VmRSS:	    1232 kB
-VmData:	  155872 kB
-VmStk:	     132 kB
-VmExe:	      44 kB
-VmLib:	    4144 kB
-VmPTE:	      72 kB
-VmPMD:	      12 kB
-VmSwap:	       0 kB
-HugetlbPages:	       0 kB
-Threads:	4
-SigQ:	0/7932
-SigPnd:	0000000000000000
-ShdPnd:	0000000000000000
-SigBlk:	0000000000000000
-SigIgn:	0000000000000000
-SigCgt:	0000000180004002
-CapInh:	0000000000000000
-CapPrm:	0000000000000000
-CapEff:	0000000000000000
-CapBnd:	0000003fffffffff
-CapAmb:	0000000000000000
-Seccomp:	0
-Speculation_Store_Bypass:	vulnerable
-Cpus_allowed:	7fff
-Cpus_allowed_list:	0-14
-Mems_allowed:	00000000,00000001
-Mems_allowed_list:	0
-voluntary_ctxt_switches:	1
-nonvoluntary_ctxt_switches:	0
-[INFO ][1542925095][Executer] Command result: 1
-[INFO ][1542925096][taskTest] Test: reset
-[INFO ][1542925096][Executer] Running the command: reset...
+	dat_drp_temp: 0
+	dat_drp_ads: 0
+	dat_drp_eps: 0
+	dat_drp_lang: 0
+	dat_drp_ack_temp: 0
+	dat_drp_ack_ads: 0
+	dat_drp_ack_eps: 0
+	dat_drp_ack_lang: 0
+[INFO ][1570724185][Executer] Command result: 1
+[INFO ][1570724186][taskTest] ---- Testing OBC commands ----
+[INFO ][1570724186][taskTest] Test: obc_get_mem
+[INFO ][1570724186][Executer] Running the command: obc_get_mem...
+Total non-mmapped bytes (arena):       540672
+# of free chunks (ordblks):            12
+# of free fastbin blocks (smblks):     3
+# of mapped regions (hblks):           0
+Bytes in mapped regions (hblkhd):      0
+Max. total allocated space (usmblks):  0
+Free bytes held in fastbins (fsmblks): 144
+Total allocated space (uordblks):      273360
+Total free space (fordblks):           267312
+Topmost releasable block (keepcost):   27072
+[INFO ][1570724186][Executer] Command result: 45
+[INFO ][1570724186][taskTest] Test: obc_reset
+[INFO ][1570724186][Executer] Running the command: obc_reset...
 Resetting system NOW!!
