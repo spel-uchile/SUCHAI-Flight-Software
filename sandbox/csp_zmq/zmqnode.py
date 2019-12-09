@@ -121,7 +121,7 @@ class CspHeader(object):
         self.src_port = dst_port
 
     def __parse(self, hdr_int):
-        self.src_node = (hdr_int >> 25) & 0x1
+        self.src_node = (hdr_int >> 25) & 0x1f
         self.dst_node = (hdr_int >> 20) & 0x1f
         self.dst_port = (hdr_int >> 14) & 0x3f
         self.src_port = (hdr_int >> 8) & 0x3f
