@@ -24,32 +24,38 @@
 void cmd_fp_init(void);
 
 /**
- * Set a command to be added in the flight plan
+ * Add a command to the flight plan by date and time
  *
- * Each argument for the command must be separated by a comma ',' character
- * instead os a space ' ' character.
- *
- * @param fmt Str. Parameters format "%d %d %d %d %d %d %s %s %d %d"
+ * @param fmt Str. Parameters format "%d %d %d %d %d %d %d %d %s %n"
  * @param params Str. Parameters as string
- *  "<day> <month> <year> <hour> <min> <sec> <command> <args> <executions> <periodical>"
+ *  "<day> <month> <year> <hour> <min> <sec> <executions> <period> <command> [args]"
  * @param nparams Int. Number of parameters 10
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int fp_set(char *fmt, char *params, int nparams);
 
 /**
- * Set a command to be added in the flight plan
+ * Add a command to the flight plan by unix time
  *
- * Each argument for the command must be separated by a comma ',' character
- * instead os a space ' ' character.
- *
- * @param fmt Str. Parameters format "%d %s %s %d %d"
+ * @param fmt Str. Parameters format "%d %d %d %s %n"
  * @param params Str. Parameters as string
- *  "<unixtime> <command> <args> <executions> <periodical>"
+ *  "<unixtime> <executions> <period> <command> [args]"
  * @param nparams Int. Number of parameters 5
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int fp_set_unix(char *fmt, char *params, int nparams);
+
+/**
+ * Add a command to the flight plan to be executed <seconds> seconds after
+ * current unix time.
+ *
+ * @param fmt Str. Parameters format "%d %d %d %s %n"
+ * @param params Str. Parameters as string
+ *  "<seconds> <executions> <period>  <command> [args]"
+ * @param nparams Int. Number of parameters 5
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int fp_set_dt(char *fmt, char *params, int nparams);
 
 /**
  * Delete a command in the flight plan by the execution time
@@ -60,6 +66,16 @@ int fp_set_unix(char *fmt, char *params, int nparams);
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int fp_delete(char* fmt, char* params, int nparams);
+
+/**
+ * Delete a command in the flight plan by the execution unix time
+ *
+ * @param fmt Str. Parameters format "%d"
+ * @param params Str. Parameters as string "<unix_time>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int fp_delete_unix(char* fmt, char* params, int nparams);
 
 /**
  * Show all the commands presents in the flight plan

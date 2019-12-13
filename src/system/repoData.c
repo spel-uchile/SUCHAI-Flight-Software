@@ -268,11 +268,11 @@ static int _dat_set_fp_async(int timetodo, char* command, char* args, int execut
             data_base[i].executions = executions;
             data_base[i].periodical = periodical;
 
-            data_base[i].cmd = malloc(sizeof(char)*50);
-            data_base[i].args = malloc(sizeof(char)*50);
+            data_base[i].cmd = malloc(sizeof(char)*SCH_CMD_MAX_STR_NAME);
+            data_base[i].args = malloc(sizeof(char)*SCH_CMD_MAX_STR_PARAMS);
 
-            strcpy(data_base[i].cmd, command);
-            strcpy(data_base[i].args,args);
+            strncpy(data_base[i].cmd, command, SCH_CMD_MAX_STR_NAME);
+            strncpy(data_base[i].args,args, SCH_CMD_MAX_STR_FORMAT);
 
             return 0;
         }
@@ -316,7 +316,7 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
     return rc;
 }
 
-int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical)
+int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* period)
 {
     int rc;
     osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
@@ -331,10 +331,10 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
             strcpy(command, data_base[i].cmd);
             strcpy(args,data_base[i].args);
             *executions = data_base[i].executions;
-            *periodical = data_base[i].periodical;
+            *period = data_base[i].periodical;
 
             if (data_base[i].periodical > 0)
-                _dat_set_fp_async(elapsed_sec+*periodical,data_base[i].cmd,data_base[i].args,*executions,*periodical);
+                _dat_set_fp_async(elapsed_sec+*period, data_base[i].cmd, data_base[i].args, *executions, *period);
 
             _dat_del_fp_async(elapsed_sec);
             rc = 0;  // found, then break!
@@ -342,7 +342,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
         }
     }
 #else
-    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, periodical);
+    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, period);
 #endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
@@ -398,6 +398,8 @@ int dat_show_fp (void)
 #if SCH_STORAGE_MODE ==0
     int cont = 0;
     int i;
+    char buffer[80];
+
     for(i = 0;i < SCH_FP_MAX_ENTRIES; i++)
     {
         if(data_base[i].unixtime!=0)
@@ -408,7 +410,8 @@ int dat_show_fp (void)
                 cont++;
             }
             time_t time_to_show = data_base[i].unixtime;
-            printf("%s\t%s\t%s\t%d\t%d\n",ctime(&time_to_show),data_base[i].cmd,data_base[i].args,data_base[i].executions,data_base[i].periodical);
+            strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
+            printf("%s\t%s\t%s\t%d\t%d\n",buffer,data_base[i].cmd,data_base[i].args,data_base[i].executions,data_base[i].periodical);
         }
     }
     if(cont == 0)
@@ -449,13 +452,14 @@ int dat_set_time(int new_time)
     sec = (time_t)new_time;
     return 0;
 #elif defined ESP32
-    return 0;
+    //TODO: Implement set time
 #elif defined NANOMIND
     timestamp_t timestamp = {(uint32_t)new_time, 0};
     clock_set_time(&timestamp);
     return 0;
-#else
-    // TODO: This needs to be tested on a raspberry LINUX system, to see if the sudo call asks for permissions or not
+#elif defined(LINUX)
+    // TODO: This needs to be tested on a raspberry LINUX system, to see if the
+    //  sudo call asks for permissions or not
 
     size_t command_length = 28;
 
@@ -487,31 +491,28 @@ int dat_set_time(int new_time)
     {
         return rc != 0 ? 1 : 0;
     }
+#else
+    LOGE(tag, "dat_set_time NOT suported in this platform!")
+    return 0;
 #endif
 }
 
 int dat_show_time(int format)
 {
-#ifdef AVR32
     time_t time_to_show = dat_get_time();
-#else
-    time_t time_to_show = time(NULL);
-#endif
 
-    if(format == 0)
+    if(format == 0 || format > 1)
     {
-        printf("%s\n",ctime(&time_to_show));
-        return 0;
+        char buffer[80];
+        strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
+        printf(buffer);
     }
-    else if(format == 1)
+    if(format >= 1)
     {
         printf("%u\n", (unsigned int)time_to_show);
-        return 0;
     }
-    else
-    {
-        return 1;
-    }
+
+    return 0;
 }
 
 int dat_add_payload_sample(void* data, int payload)

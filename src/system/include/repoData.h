@@ -82,10 +82,10 @@ int dat_get_system_var(dat_system_t index);
  * @param command Pointer for saving the command name
  * @param args Pointer for saving the command arguments
  * @param executions Pointer for saving the amount of executions the command does per periodic cycle
- * @param periodical Pointer for saving the period of periodical execution of the command, in unix-time
+ * @param period Pointer for saving the period of period execution of the command, in unix-time
  * @return 0 if OK, -1 if no command was found
  */
-int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* periodical);
+int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* period);
 
 /**
  * Saves a new command into the flight plan repo.
@@ -151,9 +151,9 @@ int dat_update_time(void);
 int dat_set_time(int new_time);
 
 /**
- * Show the system time in a given format.
+ * Print the UTC system time in a given format.
  *
- * 0 for ISO format or 1 for UNIX TIME format.
+ * 0 for ISO format or 1 for UNIX TIME format, >1 Both formats.
  *
  * @param format Format of the print
  * @return 0 if OK, 1 if the format input doesn't exist
