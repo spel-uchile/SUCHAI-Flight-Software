@@ -1,9 +1,15 @@
+import re
+import sys
 import zmq
 import argparse
 from random import randint
+
+sys.path.append("../csp_zmq")
+print(sys.path)
+
 from zmqnode import CspZmqNode
 from zmqnode import threaded
-
+from zmqnode import CspHeader
 
 class CspZmqHub(CspZmqNode):
 
@@ -29,13 +35,24 @@ class CspZmqHub(CspZmqNode):
 
     @threaded
     def console_hub(self):
-        prompt = "<node> <port> <message>: "
+        prompt = "[mac] <node> <port> <message>: "
         try:
             while self._run:
-                dest, port, msg = input(prompt).split(" ", 2)
-                self.send_message(msg, int(dest))
-        except Exception:
-            pass
+                #dest, port, msg = input(prompt).split(' ', 2)
+                arguments = input(prompt)
+                arguments = [a for a in re.split(r"(\d+) ", arguments) if a]
+                if len(arguments) > 3:
+                    mac, dest, port, msg = arguments[:]
+                else:
+                    dest, port, msg = arguments[:]
+                    mac = dest
+                print(dest, port, msg, mac)
+                hdr = CspHeader(src_node=0, dst_node=int(dest), dst_port=int(port), src_port=randint(48, 63))
+                hdr.mac_node = mac
+                print(hdr, msg)
+                self.send_message(msg, hdr)
+        except Exception as e:
+            print(e)
         print("Console stopped!")
 
     def start(self):

@@ -37,6 +37,8 @@ class CspHeader(object):
         self.xtea = False
         self.rdp = False
         self.crc32 = False
+        
+        self.mac_node = dst_node
 
         self.__bytes = None
 
@@ -83,7 +85,9 @@ class CspHeader(object):
         assert len(hdr_bytes) == 4
         self.__bytes = hdr_bytes
         hdr_hex = bytes(reversed(hdr_bytes)).hex()
+        print(hdr_hex)
         hdr_int = int(hdr_hex, 16)
+        print(hdr_int)
         self.__parse(hdr_int)
 
     def to_bytes(self):
@@ -119,9 +123,11 @@ class CspHeader(object):
         dst_port = self.dst_port
         self.dst_port = self.src_port
         self.src_port = dst_port
+        
+        self.mac_node = self.dst_node
 
     def __parse(self, hdr_int):
-        self.src_node = (hdr_int >> 25) & 0x1
+        self.src_node = (hdr_int >> 25) & 0x1f
         self.dst_node = (hdr_int >> 20) & 0x1f
         self.dst_port = (hdr_int >> 14) & 0x3f
         self.src_port = (hdr_int >> 8) & 0x3f
@@ -130,6 +136,8 @@ class CspHeader(object):
         self.xtea = True if ((hdr_int >> 2) & 0x01) else False
         self.rdp = True if ((hdr_int >> 1) & 0x01) else False
         self.crc32 = True if ((hdr_int >> 0) & 0x01) else False
+        
+        self.mac_node = self.dst_node
 
     def __dump(self):
         #          Prio   SRC   DST    DP   SP  RES    H     X      R    C
@@ -199,17 +207,19 @@ class CspZmqNode(object):
                 # print(frame)
                 header = frame[1:5]
                 data = frame[5:]
+                print(header)
                 try:
                     csp_header = CspHeader()
                     csp_header.from_bytes(header)
                 except:
                     csp_header = None
 
-                if self.monitor:
-                    print('\nMON:', frame)
-                    print('\tHeader: {},'.format(csp_header))
-                    print('\tData: {}'.format(data))
+                # if self.monitor:
+                #     print('\nMON:', frame)
+                #     print('\tHeader: {},'.format(csp_header))
+                #     print('\tData: {}'.format(data))
 
+                print("Header", csp_header)
                 self.read_message(data, csp_header)
             except zmq.error.Again:
                 pass
@@ -238,11 +248,11 @@ class CspZmqNode(object):
             try:
                 # dnode, dport, sport, data = self._queue.get()
                 data, csp_header = self._queue.get()
-                print("W:", csp_header, data)
+                #print("W:", csp_header, data)
                 if len(data) > 0:
                     # Get CSP header and data
                     hdr = csp_header.to_bytes()
-                    msg = bytearray([int(csp_header.dst_node), ]) + hdr + bytearray(data, "ascii")
+                    msg = bytearray([int(csp_header.mac_node), ]) + hdr + bytearray(data, "ascii")
                     # print("con:", msg)
                     sock.send(msg)
             except Exception as e:
