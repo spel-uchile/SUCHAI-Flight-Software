@@ -26,7 +26,11 @@ void taskFlightPlan(void *param)
 {
 
     LOGI(tag, "Started");
-
+    char command[SCH_CMD_MAX_STR_PARAMS];
+    char args[SCH_CMD_MAX_STR_PARAMS];
+    int executions;
+    int period;
+    int i;
     portTick delay_ms = 1000;          //Task period in [ms]
     portTick xLastWakeTime = osTaskGetTickCount();
 
@@ -35,54 +39,24 @@ void taskFlightPlan(void *param)
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
-
-#ifdef AVR32
+        // Get next command in the flight plan, if any
         elapsed_sec = dat_get_time();
-#else
-        elapsed_sec = time(NULL);
-#endif
-
-        char command[SCH_CMD_MAX_STR_PARAMS];
-        char args[SCH_CMD_MAX_STR_PARAMS];
-        int executions;
-        int periodical;
-
-        int rc = dat_get_fp((int)elapsed_sec, command, args, &executions, &periodical);
-
-        if(rc == -1){
+        int rc = dat_get_fp((int)elapsed_sec, command, args, &executions, &period);
+        if(rc == -1)
             continue;
-        }
 
-        char* fixed_args = fix_fmt(args);
-        int i;
+        LOGI(tag, "Command: %s", command);
+        LOGI(tag, "Arguments: %s", args);
+        LOGI(tag, "Executions: %d", executions);
+        LOGI(tag, "Period: %d", period);
+
+        // Send the command for N execution
+        dat_set_system_var(dat_fpl_last, (int) elapsed_sec);
         for(i=0; i < executions; i++)
         {
             cmd_t *new_cmd = cmd_get_str(command);
-            cmd_add_params_str(new_cmd, fixed_args);
-
-            LOGD(tag, "Command: %s", command);
-            LOGD(tag, "Arguments: %s", fixed_args);
-            LOGD(tag, "Executions: %d", executions);
-            LOGD(tag, "Periodical: %d", periodical);
-            dat_set_system_var(dat_fpl_last, (int) elapsed_sec);
+            cmd_add_params_str(new_cmd, args);
             cmd_send(new_cmd);
         }
     }
-}
-
-int date_to_unixtime(int day, int month, int year, int hour, int min, int sec)
-{
-    struct tm str_time;
-    time_t unixtime;
-
-    str_time.tm_mday = day;
-    str_time.tm_mon = month-1;
-    str_time.tm_year = year-1900;
-    str_time.tm_hour = hour;
-    str_time.tm_min = min;
-    str_time.tm_sec = sec;
-
-    unixtime = mktime(&str_time);
-
-    return (int)unixtime;
 }

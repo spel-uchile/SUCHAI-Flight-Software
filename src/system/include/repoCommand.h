@@ -255,13 +255,4 @@ int cmd_print(cmd_t* cmd);
  */
 char* cmd_get_fmt(char* name);
 
-/**
- * Fix the format to be used in the set function of the flight plan.
- * The function allocates memory so make sure to free the array after use.
- *
- * @param fmt *char. pointer to the format string to fix
- * @return char* with the command's format
- */
-char* fix_fmt(char* fmt);
-
 #endif /* CMD_REPO_H */

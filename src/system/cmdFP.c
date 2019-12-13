@@ -23,10 +23,11 @@ static const char* tag = "cmdFlightPlan";
 
 void cmd_fp_init(void)
 {
-    cmd_add("fp_set_cmd", fp_set, "%d %d %d %d %d %d %s %s %d %d", 10);
-    cmd_add("fp_set_cmd_unix", fp_set_unix, "%d %s %s %d %d", 5);
+    cmd_add("fp_set_cmd", fp_set, "%d %d %d %d %d %d %d %d %s %n", 10);
+    cmd_add("fp_set_cmd_unix", fp_set_unix, "%d %d %d %s %n ", 5);
+    cmd_add("fp_set_cmd_dt", fp_set_dt, "%d %d %d %s %n", 5);
     cmd_add("fp_del_cmd", fp_delete, "%d %d %d %d %d %d", 6);
-    cmd_add("fp_del_cmd_unix", fp_delete, "%d", 1);
+    cmd_add("fp_del_cmd_unix", fp_delete_unix, "%d", 1);
     cmd_add("fp_show", fp_show, "", 0);
     cmd_add("fp_reset", fp_reset,"", 0);
     cmd_add("fp_test_params", test_fp_params, "%d %s %d", 3);
@@ -37,11 +38,13 @@ int fp_set(char *fmt, char *params, int nparams)
     struct tm str_time;
     time_t unixtime;
     int day, month, year, hour, min, sec;
+    int executions, period, next;
     char command[SCH_CMD_MAX_STR_PARAMS];
     char args[SCH_CMD_MAX_STR_PARAMS];
-    int executions,periodical;
+    memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
+    memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &command, &args, &executions, &periodical) == nparams)
+    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &executions, &period, &command, &next) == nparams-1)
     {
         str_time.tm_mday = day;
         str_time.tm_mon = month-1;
@@ -52,8 +55,8 @@ int fp_set(char *fmt, char *params, int nparams)
         str_time.tm_isdst = 0;
 
         unixtime = mktime(&str_time);
-
-        int rc = dat_set_fp((int)unixtime, command, args, executions, periodical);
+        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+        int rc = dat_set_fp((int)unixtime, command, args, executions, period);
 
         if (rc == 0)
             return CMD_OK;
@@ -70,13 +73,42 @@ int fp_set(char *fmt, char *params, int nparams)
 int fp_set_unix(char *fmt, char *params, int nparams)
 {
     int unixtime;
-    int executions,periodical;
+    int executions, periodical, next;
     char command[SCH_CMD_MAX_STR_PARAMS];
     char args[SCH_CMD_MAX_STR_PARAMS];
+    memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
+    memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
 
-    if(sscanf(params, fmt, &unixtime, &command, &args, &executions, &periodical) == nparams)
+    if(sscanf(params, fmt, &unixtime, &executions, &periodical, &command, &next) == nparams-1)
     {
+        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
         int rc = dat_set_fp(unixtime, command, args, executions, periodical);
+
+        if (rc == 0)
+            return CMD_OK;
+        else
+            return CMD_FAIL;
+    }
+    else
+    {
+        LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
+        return CMD_FAIL;
+    }
+}
+
+int fp_set_dt(char *fmt, char *params, int nparams)
+{
+    int seconds, executions, periodical, next;
+    char command[SCH_CMD_MAX_STR_PARAMS];
+    char args[SCH_CMD_MAX_STR_PARAMS];
+    memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
+    memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
+
+    if(sscanf(params, fmt, &seconds, &executions, &periodical, &command, &next) == nparams-1)
+    {
+        time_t current = time(NULL);
+        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+        int rc = dat_set_fp((int)current+seconds, command, args, executions, periodical);
 
         if (rc == 0)
             return CMD_OK;
