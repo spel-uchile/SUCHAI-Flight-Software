@@ -20,15 +20,17 @@ set(SOURCE_FILES
         src/system/cmdTM.c
         src/system/cmdEPS.c
         src/system/cmdConsole.c
+        src/system/cmdSensors.c
         src/system/repoCommand.c
         src/system/repoData.c
+        src/system/repoDataSchema.c
         src/system/taskDispatcher.c
         src/system/taskExecuter.c
         src/system/taskHousekeeping.c
         src/system/taskCommunications.c
         src/system/taskConsole.c
         src/system/taskFlightPlan.c
-        src/system/cmdFP.c
+        src/system/taskSensors.c
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c

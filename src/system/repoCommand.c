@@ -351,6 +351,9 @@ int cmd_repo_init(void)
     cmd_com_init();
     cmd_tm_init();
 #endif
+#ifdef SCH_SEN_ENABLED
+    cmd_sensors_init();
+#endif
 #ifdef SCH_USE_GSSB
     cmd_gssb_init();
 #endif

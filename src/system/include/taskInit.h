@@ -30,6 +30,9 @@
 #if SCH_FP_ENABLED
 #include "taskFlightPlan.h"
 #endif
+#if SCH_SEN_ENABLED
+#include "taskSensors.h"
+#endif
 
 void taskInit(void *param);
 void init_communications(void);
