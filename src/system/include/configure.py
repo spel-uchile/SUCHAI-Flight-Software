@@ -36,6 +36,7 @@ def parse_args():
     parser.add_argument('--zmq_out', type=str, default="tcp://127.0.0.1:8002")
     parser.add_argument('--st_mode', type=str, default="1")
     parser.add_argument('--st_triple_wr', type=str, default="1")
+    parser.add_argument('--sen', type=str, default="1")
 
     args = parser.parse_args()
     return args
@@ -62,6 +63,7 @@ def make_config(args, ftemp="config_template.h", fconfig="config.h"):
     config = config.replace("{{SCH_EN_FP}}", args.fp)
     config = config.replace("{{SCH_EN_HK}}", args.hk)
     config = config.replace("{{SCH_EN_TEST}}", args.test)
+    config = config.replace("{{SCH_EN_SEN}}", args.sen)
     config = config.replace("{{SCH_COMM_NODE}}", args.node)
     config = config.replace("{{SCH_ZMQ_OUT}}", args.zmq_out)
     config = config.replace("{{SCH_ZMQ_IN}}", args.zmq_in)
