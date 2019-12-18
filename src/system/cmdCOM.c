@@ -31,8 +31,8 @@ void cmd_com_init(void)
 {
     cmd_add("com_ping", com_ping, "%d", 1);
     cmd_add("com_send_rpt", com_send_rpt, "%d %s", 2);
-    cmd_add("com_send_cmd", com_send_cmd, "%d %n", 1);
-    cmd_add("com_send_tc", com_send_tc_frame, "%d %n", 1);
+    cmd_add("com_send_cmd", com_send_cmd, "%d %n", 2);
+    cmd_add("com_send_tc", com_send_tc_frame, "%d %n", 2);
     cmd_add("com_send_data", com_send_data, "%p", 1);
     cmd_add("com_debug", com_debug, "", 0);
     cmd_add("com_set_node", com_set_node, "%d", 1);
@@ -41,7 +41,7 @@ void cmd_com_init(void)
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%s", 1);
     cmd_add("com_set_config", com_set_config, "%s %s", 2);
-    cmd_add("com_update_status", com_set_config, "", 2);
+    cmd_add("com_update_status", com_update_status_vars, "", 0);
 #endif
 }
 
