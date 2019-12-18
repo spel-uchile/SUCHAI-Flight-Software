@@ -34,7 +34,8 @@ void taskSensors(void *param)
     char *get_cmds[] = {"obc_get_sensors"};
 
     machine = (sample_machine_t) {ST_SAMPLING, ACT_STAND_BY, last_sensor, 5, -1};
-    if(osSemaphoreCreate(&sample_machine_sem) != CSP_SEMAPHORE_OK)
+
+    if(osSemaphoreCreate(&repo_machine_sem) != CSP_SEMAPHORE_OK)
     {
         LOGE(tag, "Unable to create system status repository mutex");
     }
@@ -51,7 +52,7 @@ void taskSensors(void *param)
     {
         osTaskDelayUntil(&xLastWakeTime, 1000); //Suspend task
         LOGD(tag, "state: %d, action %d, samples left: %d", machine.state, machine.action, machine.samples_left)
-        osSemaphoreTake(&sample_machine_sem, portMAX_DELAY);
+        osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
         // Apply action
         if (machine.action != ACT_STAND_BY) {
             if (machine.action == ACT_START) {
@@ -82,22 +83,8 @@ void taskSensors(void *param)
                 }
             }
         }
-        osSemaphoreGiven(&sample_machine_sem);
+        osSemaphoreGiven(&repo_machine_sem);
         elapsed_sec += 1;
         // TODO: Store in system variables machine state
     }
-}
-
-int set_machine_state(machine_action_t action, unsigned int step, int nsamples)
-{
-    LOGI(tag, "Changing state to  %d %u %d", action, step, nsamples);
-    if (action >= 0 && action < ACT_LAST && step > 0 && nsamples > -2) {
-        osSemaphoreTake(&sample_machine_sem, portMAX_DELAY);
-        machine.action = action;
-        machine.step = step;
-        machine.samples_left = nsamples;
-        osSemaphoreGiven(&sample_machine_sem);
-        return 1;
-    }
-    return 0;
 }

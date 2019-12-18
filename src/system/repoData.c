@@ -692,3 +692,17 @@ int dat_print_payload_struct(void* data, unsigned int payload)
 
     return 0;
 }
+
+int set_machine_state(machine_action_t action, unsigned int step, int nsamples)
+{
+    LOGI(tag, "Changing state to  %d %u %d", action, step, nsamples);
+    if (action >= 0 && action < ACT_LAST && step > 0 && nsamples > -2) {
+        osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
+        machine.action = action;
+        machine.step = step;
+        machine.samples_left = nsamples;
+        osSemaphoreGiven(&repo_machine_sem);
+        return 1;
+    }
+    return 0;
+}

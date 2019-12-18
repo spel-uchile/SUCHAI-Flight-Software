@@ -47,6 +47,6 @@ int set_state(char *fmt, char *params, int nparams)
 
 int init_dummy_sensor(char *fmt, char *params, int nparams)
 {
-    LOGI(tag, "Initializing dummy sernsor");
+    LOGI(tag, "Initializing dummy sensor");
     return CMD_OK;
 }
