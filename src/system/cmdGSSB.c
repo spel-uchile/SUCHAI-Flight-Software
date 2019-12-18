@@ -45,12 +45,12 @@ void cmd_gssb_init(void)
     cmd_add("gssb_get_model", gssb_get_model, "", 0);
     cmd_add("gssb_get_temp", gssb_interstage_temp, "", 0);
     cmd_add("gssb_msp_get_temp", gssb_msp_outside_temp, "", 0);
-    cmd_add("gssb_msp_cal_temp", gssb_msp_outside_temp_calibrate, "", 0);
+    cmd_add("gssb_msp_cal_temp", gssb_msp_outside_temp_calibrate, "%d %d", 2);
     cmd_add("gssb_get_temp_int", gssb_internal_temp, "", 0);
     cmd_add("gssb_burn", gssb_interstage_burn, "", 0);
     cmd_add("gssb_get_sun", gssb_common_sun_voltage, "", 0);
-    cmd_add("gssb_get_burn_config", gssb_interstage_burn_settings, "", 0);
-    cmd_add("gssb_set_burn_config", gssb_interstage_burn_settings, "%d %d %d %d %d %d %d", 7);
+    cmd_add("gssb_get_burn_config", gssb_interstage_get_burn_settings, "", 0);
+    cmd_add("gssb_set_burn_config", gssb_interstage_set_burn_settings, "%d %d %d %d %d %d %d", 7);
     cmd_add("gssb_arm_auto", gssb_interstage_arm, "%d", 1);
     cmd_add("gssb_arm_manual", gssb_interstage_state, "%d", 1);
     cmd_add("gssb_unlock_config", gssb_interstage_settings_unlock, "%d", 1);
@@ -379,7 +379,7 @@ int gssb_common_sun_voltage(char *fmt, char *params, int nparams)
 }
 
 /* Register the set and get with different parameters */
-int gssb_interstage_burn_settings(char *fmt, char *params, int nparams)
+int gssb_interstage_get_burn_settings(char *fmt, char *params, int nparams)
 {
     gs_gssb_istage_burn_settings_t settings;
     int std_time, increment_ms, short_cnt_down, max_repeat, rep_time_s;
@@ -405,8 +405,24 @@ int gssb_interstage_burn_settings(char *fmt, char *params, int nparams)
         printf("Settings locked:\t %"PRIu8"\r\n", settings.locked);
 
     /* Else set settings */
-    } else if (sscanf(params, fmt, &std_time, &increment_ms, &short_cnt_down,
-            &max_repeat, &rep_time_s, &switch_polarity, &reboot_deploy_cnt) == nparams) {
+    }else {
+        return CMD_ERROR_SYNTAX;
+    }
+
+    return CMD_ERROR_NONE;
+}
+
+
+/* Register the set and get with different parameters */
+int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
+{
+    gs_gssb_istage_burn_settings_t settings;
+    int std_time, increment_ms, short_cnt_down, max_repeat, rep_time_s;
+    int switch_polarity, reboot_deploy_cnt;
+
+    /* When the command is called with out arguments then print the settings */
+    if (sscanf(params, fmt, &std_time, &increment_ms, &short_cnt_down,
+                      &max_repeat, &rep_time_s, &switch_polarity, &reboot_deploy_cnt) == nparams) {
         /* First fetch settings and check that the interstage is unlocked and if it
          * is not then print warning about the settings cannot be changed */
 
@@ -498,7 +514,6 @@ int gssb_interstage_burn_settings(char *fmt, char *params, int nparams)
 
     return CMD_ERROR_NONE;
 }
-
 
 int gssb_interstage_arm(char *fmt, char *params, int nparams)
 {
