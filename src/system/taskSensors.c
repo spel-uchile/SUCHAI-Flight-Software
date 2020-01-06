@@ -29,11 +29,11 @@ void taskSensors(void *param)
     int i;
     cmd_t *cmd_init;
     cmd_t *cmd_get;
-    int nsensors = 1;
-    char *init_cmds[] = {"init_dummy_sensor"};
-    char *get_cmds[] = {"obc_get_sensors"};
+    int nsensors = 2;
+    char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor"};
+    char *get_cmds[] = {"obc_get_sensors", "obc_get_sensors"};
 
-    machine = (sample_machine_t) {ST_SAMPLING, ACT_STAND_BY, last_sensor, 5, -1};
+    machine = (sample_machine_t) {ST_PAUSE, ACT_STAND_BY, 3, 5, -1};
 
     if(osSemaphoreCreate(&repo_machine_sem) != CSP_SEMAPHORE_OK)
     {
@@ -74,17 +74,40 @@ void taskSensors(void *param)
             // Check for step
             else if (elapsed_sec % machine.step == 0) {
                 LOGD(tag, "SAMPLING...");
+
                 for(i=0; i<nsensors; i++) {
-                    cmd_get = cmd_get_str(get_cmds[i]);
-                    cmd_send(cmd_get);
+//                    printf("payload %d active status %d\n", i, is_payload_active(i, machine.active_payloads, nsensors));
+                    if (is_payload_active(i, machine.active_payloads, nsensors)) {
+                        cmd_get = cmd_get_str(get_cmds[i]);
+                        cmd_send(cmd_get);
+                    }
                 }
                 if (machine.samples_left != -1) {
                     machine.samples_left -= 1;
                 }
             }
         }
+
+        int action = (int) machine.action;
+        int state = (int) machine.state;
+        int step = (int) machine.step;
+        int active_payloads = (int) machine.active_payloads;
+        int samples_left = (int) machine.samples_left;
         osSemaphoreGiven(&repo_machine_sem);
+
+        dat_set_system_var(dat_drp_mach_action, action);
+        dat_set_system_var(dat_drp_mach_state, state);
+        dat_set_system_var(dat_drp_mach_step, step);
+        dat_set_system_var(dat_drp_mach_payloads, active_payloads);
+        dat_set_system_var(dat_drp_mach_left, samples_left);
         elapsed_sec += 1;
-        // TODO: Store in system variables machine state
     }
+}
+
+int is_payload_active(int payload, int active_payloads, int n_payloads) {
+//    printf("max number of active payload %d\n", (1 << n_payloads));
+    if ( active_payloads >= (1 << n_payloads) ) {
+        return 0;
+    }
+    return ( (active_payloads & (1 << payload)) != 0 );
 }
