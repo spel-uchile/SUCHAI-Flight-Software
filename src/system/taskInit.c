@@ -178,33 +178,33 @@ void init_routines(void)
     LOGD(tag, "\tAntenna deployment...")
     //Turn on gssb and update antenna deployment status
     cmd_t *cmd_dep;
-    cmd_dep = cmd_get_str("istage_pwr");
-    cmd_add_params_str(cmd_dep, "1 0");
+    cmd_dep = cmd_get_str("gssb_pwr");
+    cmd_add_params_str(cmd_dep, "1 1");
     cmd_send(cmd_dep);
 
-    cmd_dep = cmd_get_str("istage_update_status");
+    cmd_dep = cmd_get_str("gssb_update_status");
     cmd_send(cmd_dep);
 
     //Try to deploy antennas if necessary
     //      istage 1. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_dep = cmd_get_str("gssb_antenna_release");
     cmd_add_params_var(cmd_dep, 16, 2, 1, 5);
     cmd_send(cmd_dep);
     //      istage 2. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_dep = cmd_get_str("gssb_antenna_release");
     cmd_add_params_var(cmd_dep, 17, 2, 1, 5);
     cmd_send(cmd_dep);
     //      istage 3. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_dep = cmd_get_str("gssb_antenna_release");
     cmd_add_params_var(cmd_dep, 18, 2, 1, 5);
     cmd_send(cmd_dep);
     //      istage 4. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("istage_antenna_release");
+    cmd_dep = cmd_get_str("gssb_antenna_release");
     cmd_add_params_var(cmd_dep, 19, 2, 1, 5);
     cmd_send(cmd_dep);
 
     //Update antenna deployment status
-    cmd_dep = cmd_get_str("istage_update_status");
+    cmd_dep = cmd_get_str("gssb_update_status");
     cmd_send(cmd_dep);
 
 
