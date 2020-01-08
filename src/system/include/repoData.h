@@ -44,7 +44,7 @@ typedef enum machine_state {
 typedef struct sample_machine{
     machine_state_t state;
     machine_action_t action;
-    payload_id_t payload;
+    unsigned int active_payloads;
     unsigned int step;
     int samples_left;
 } sample_machine_t;
@@ -56,9 +56,10 @@ sample_machine_t machine;
  *
  * @param machine action to take (ST_PAUSE, ST_SAMPLING)
  * @param step seconds period of sampling measure in seconds
- * @param nsamples maximum samples to take, if value -1 samples will be unlimited
+ * @param nsamples maximum samples to take, if value is-1 the machine will take unlimited samples
  */
 int set_machine_state(machine_action_t action, unsigned int step, int nsamples);
+
 
 /**
  * Initializes payload storage helper variables

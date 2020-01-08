@@ -104,6 +104,13 @@ typedef enum dat_system {
     dat_drp_ack_eps,                  ///< EPS data index acknowledge
     dat_drp_ack_lang,                 ///< Langmuir data index acknowledge
 
+    /// Sample Machine: Current state of sample machine
+    dat_drp_mach_action,
+    dat_drp_mach_state,
+    dat_drp_mach_step,
+    dat_drp_mach_payloads,
+    dat_drp_mach_left,
+
     /// Add custom status variables here
     //dat_custom,                 ///< Variable description
 
@@ -178,6 +185,13 @@ typedef struct __attribute__((packed)) dat_status_s {
     uint32_t dat_drp_ack_ads;       ///< ADS data index acknowledge
     uint32_t dat_drp_ack_eps;       ///< EPS data index acknowledge
     uint32_t dat_drp_ack_lang;      ///< Langmuir data index acknowledge
+
+    /// Sample Machine:
+    uint32_t dat_drp_mach_action;
+    uint32_t dat_drp_mach_state;
+    int32_t dat_drp_mach_step;
+    uint32_t dat_drp_mach_payloads;
+    int32_t dat_drp_mach_left;
 
     /// Add custom status variables here
     //uint32_t dat_custom;          ///< Variable description

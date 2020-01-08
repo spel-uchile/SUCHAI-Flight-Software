@@ -69,6 +69,12 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_ads);
     DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_eps);
     DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_lang);
+
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_action);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_state);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_step);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_payloads);
+    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_left);
 }
 
 void dat_print_status(dat_status_t *status)
@@ -122,5 +128,11 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_ads);
     DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_eps);
     DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_lang);
+
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_action);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_state);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_step);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_payloads);
+    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_left);
 }
 

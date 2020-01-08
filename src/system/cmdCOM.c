@@ -126,7 +126,7 @@ int com_send_cmd(char *fmt, char *params, int nparams)
 
     //format: <node> <command> [parameters]
     n_args = sscanf(params, fmt, &node, &next);
-    if(n_args == nparams && next > 1)
+    if(n_args == nparams-1 && next > 1)
     {
         strncpy(msg, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
         LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, msg, next);
@@ -166,7 +166,7 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
 
     //format: <node> <command> [parameters];...;<command> [parameters]
     n_args = sscanf(params, fmt, &node, &next);
-    if(n_args == nparams && next > 1)
+    if(n_args == nparams-1 && next > 1)
     {
         strncpy(tc_frame, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
         LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, tc_frame, next);
