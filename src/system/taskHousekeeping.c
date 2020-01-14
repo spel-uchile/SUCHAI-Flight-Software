@@ -43,10 +43,15 @@ void taskHousekeeping(void *param)
 
         /* 1 second actions */
         dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
+
         //  Debug command
-        cmd_t *cmd_dbg = cmd_get_str("obc_debug");
-        cmd_add_params_var(cmd_dbg, 0);
-        cmd_send(cmd_dbg);
+        #if(LOG_LEVEL > LOG_LVL_DEBUG)
+        {
+            cmd_t *cmd_dbg = cmd_get_str("obc_debug");
+            cmd_add_params_var(cmd_dbg, 0);
+            cmd_send(cmd_dbg);
+        }
+        #endif
 
         /* 1 minute actions */
         // Update status vars

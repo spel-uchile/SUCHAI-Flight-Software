@@ -49,6 +49,9 @@ int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams);
 int gssb_soft_reset(char *fmt, char *params, int nparams);
 int gssb_interstage_get_status(char *fmt, char *params, int nparams);
 
+int gssb_update_status(char *fmt, char *params, int nparams);
+int gssb_antenna_release(char *fmt, char *params, int nparams);
+
 //NOT REGISTERED AS COMMANDS
 int gssb_ar6_burn(char *fmt, char *params, int nparams);
 int gssb_ar6_get_status(char *fmt, char *params, int nparams);

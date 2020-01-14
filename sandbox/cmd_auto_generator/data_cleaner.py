@@ -1,7 +1,6 @@
 import re
 import os
 
-
 def data_cleaner_cmd(TXT):
     """Return a list of tuples, that contains {function user name , function name, type of args, number of args}
 
@@ -10,7 +9,7 @@ def data_cleaner_cmd(TXT):
     TXT -- a string that is all of the files already read to be processed
 
     """
-    regex = r"cmd_add\((.*), (.*), (.*), (.*)\)"
+    regex = r"    cmd_add\((.*),(.*),(.*),(.*)\);"
     DirtyData = []
     cleanData = []
     for x in TXT:
@@ -28,10 +27,11 @@ def data_cleaner_param(TXT):
     TXT -- a string that is all of the files already read to be processed
 
     """
+
     cleanData = []
     toRemove = []
-    # why 47:len((char *fmt, char *params, int nparams))=37 + 10 = 47 its about the max length a function head will have
-    regex = r"int (.{1,47}?)\((?:char..fmt, char..params, ?int nparams\))(?:\n| ?\{).*?(?:sscanf\(params, fmt, (&.*?)\)|(?=int .{1,50}?\((?:char..fmt, char..params, ?int nparams\)\n)))"
+    # why 47:len((char *fmt, char *params, int nparams))=37 + 10 = 47 its about the max length a function header will have
+    regex= r"int (.{1,47}?)\((?:char..fmt, char..params, ?int nparams\))(?:\n| ?\{).*?(?:(?:sscanf\(params, fmt, (&.*?)\))|(?:\n\}))"
     DirtyData = []
     for x in TXT:
         ListOfCommands = re.findall(regex, x, flags=re.DOTALL)
@@ -97,6 +97,7 @@ def data_clean(files_path):
 
                 """
     TXT=files_to_string(files_path)
+
     a = data_cleaner_cmd(TXT)
     b = data_cleaner_param(TXT)
     clean_data = data_cleaner_dict(a, b)

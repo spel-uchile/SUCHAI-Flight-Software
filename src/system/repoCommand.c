@@ -262,49 +262,47 @@ void cmd_free(cmd_t *cmd)
     }
 }
 
-static void quicksort_by_name(cmd_list_t* commands, int start, int end)
-{
-    if (start >= end)
-        return;
-
-    int pivot = start;
-
-    for (int i = pivot+1; i <= end; i++)
-    {
-        if (strcmp(commands[i].name, commands[pivot].name) < 0)
-        {
-            cmd_list_t aux = commands[i];
-            for (int j = i; j > pivot; j--)
-                commands[j] = commands[j-1];
-            commands[pivot] = aux;
-            pivot++;
-        }
-    }
-
-    quicksort_by_name(commands, start, pivot);
-    quicksort_by_name(commands, pivot+1, end);
-}
-
-static void sort_cmd_list()
-{
-    if (!cmd_is_sorted)
-    {
-        LOGD(tag, "Sorting Command List");
-
-        quicksort_by_name(cmd_list, 0, cmd_index-1);
-        cmd_is_sorted = 1;
-
-        LOGD(tag, "Command List Sorted");
-    }
-}
+//static void quicksort_by_name(cmd_list_t* commands, int start, int end)
+//{
+//    if (start >= end)
+//        return;
+//
+//    int pivot = start;
+//
+//    for (int i = pivot+1; i <= end; i++)
+//    {
+//        if (strcmp(commands[i].name, commands[pivot].name) < 0)
+//        {
+//            cmd_list_t aux = commands[i];
+//            for (int j = i; j > pivot; j--)
+//                commands[j] = commands[j-1];
+//            commands[pivot] = aux;
+//            pivot++;
+//        }
+//    }
+//
+//    quicksort_by_name(commands, start, pivot);
+//    quicksort_by_name(commands, pivot+1, end);
+//}
+//
+//static void sort_cmd_list()
+//{
+//    if (!cmd_is_sorted)
+//    {
+//        LOGD(tag, "Sorting Command List");
+//
+//        quicksort_by_name(cmd_list, 0, cmd_index-1);
+//        cmd_is_sorted = 1;
+//
+//        LOGD(tag, "Command List Sorted");
+//    }
+//}
 
 void cmd_print_all(void)
 {
 
     LOGD(tag, "Command list");
     osSemaphoreTake(&repo_cmd_sem, portMAX_DELAY);
-
-    sort_cmd_list();
 
     //Make sure no LOG functions are used in this zone
     osSemaphoreTake(&log_mutex, portMAX_DELAY);
@@ -314,12 +312,9 @@ void cmd_print_all(void)
     {
         int printed = printf("%5d %s", i, cmd_list[i].name);
         if (*cmd_list[i].fmt != '\0')
-        {
-            for (int g = 0; g < 30 - printed; g++)
-                printf((g%2 ? "-" : " "));
-            printf("%s\n", cmd_list[i].fmt);
-        }
-        else printf("\n");
+            printf(" %s\n", cmd_list[i].fmt);
+        else
+            printf("\n");
     }
     osSemaphoreGiven(&log_mutex);
     //End log_mutex, can use LOG functions
