@@ -211,7 +211,7 @@ int dat_add_payload_sample(void* data, int payload);
  * @param delay Delay of the recent value
  * @return 0 if OK, -1 if and error occurred
  */
-int dat_get_recent_payload_sample(void* data, int payload, int delay);
+int dat_get_recent_payload_sample(void* data, int payload, int offset);
 
 /**
  * Deletes all memory sections in NOR FLASH.

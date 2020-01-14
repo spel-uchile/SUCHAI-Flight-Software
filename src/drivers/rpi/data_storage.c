@@ -187,7 +187,6 @@ int storage_table_repo_init(char* table, int drop)
      "name TEXT UNIQUE, "
      "value INT);", table);
     LOGD(tag, "SQL command: %s", create_table_string);
-    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, create_table_string);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command CREATE failed: %s", PQerrorMessage(conn));
@@ -319,7 +318,6 @@ int storage_table_payload_init(int drop)
             LOGD(tag, "Table %s created successfully", data_map[i].table);
         }
 #elif SCH_STORAGE_MODE==2
-        // TODO: manage connection error in res
         PGresult *res = PQexec(conn, create_table);
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
             LOGE(tag, "command CREATE PAYLOAD failed: %s", PQerrorMessage(conn));
@@ -363,7 +361,6 @@ int storage_repo_get_value_idx(int index, char *table)
     char get_value_query[100];
     sprintf(get_value_query, "SELECT value FROM %s WHERE idx=%d;", table, index);
     LOGD(tag, "%s",  get_value_query);
-    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command storage_repo_get_value_idx failed: %s", PQerrorMessage(conn));
@@ -409,7 +406,6 @@ int storage_repo_get_value_str(char *name, char *table)
 #elif SCH_STORAGE_MODE == 2
     char get_value_query[100];
     sprintf(get_value_query, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
-    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
@@ -461,7 +457,6 @@ int storage_repo_set_value_idx(int index, int value, char *table)
                              "SET value = %d; "
                              , table, index, value, value);
     LOGD(tag, "%s",  set_value_query);
-    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, set_value_query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));
@@ -688,7 +683,6 @@ int storage_set_payload_data(int index, void* data, int payload)
         return -1;
     }
 #elif SCH_STORAGE_MODE == 2
-    // TODO: manage connection error in res
     PGresult *res = PQexec(conn, insert_row);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));

@@ -544,9 +544,8 @@ int dat_add_payload_sample(void* data, int payload)
 }
 
 
-int dat_get_recent_payload_sample(void* data, int payload, int delay)
+int dat_get_recent_payload_sample(void* data, int payload, int offset)
 {
-    //TODO: Change variable name from delay to offset??
     int ret;
 
     int index = dat_get_system_var(data_map[payload].sys_index);
@@ -556,12 +555,11 @@ int dat_get_recent_payload_sample(void* data, int payload, int delay)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //TODO: Is this conditional required?
 #if defined(LINUX) || defined(NANOMIND)
-    if(index-1-delay >= 0) {
-        ret = storage_get_payload_data(index-1-delay, data, payload);
+    if(index-1-offset >= 0) {
+        ret = storage_get_payload_data(index-1-offset, data, payload);
     }
     else {
-        //FIXME: "Asked for too large offset (%d) on payload (%d)
-        LOGE(tag, "Asked for too great of a delay when requesting payload %d on delay %d", payload, delay);
+        LOGE(tag, "Asked for too large offset (%d) on payload (%d)", offset, payload);
         ret = -1;
     }
 #else
