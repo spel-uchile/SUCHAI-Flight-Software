@@ -7,6 +7,7 @@ set(SOURCE_FILES
         src/drivers/x86/linenoise/linenoise.c
         src/drivers/x86/data_storage.c
         src/drivers/x86/init.c
+        src/drivers/nanomind/rwdrv10987.c
         src/os/Linux/osDelay.c
         src/os/Linux/osQueue.c
         src/os/Linux/osScheduler.c
@@ -34,6 +35,7 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
+        src/system/cmdRW.c
         )
 
 include_directories(
@@ -42,6 +44,7 @@ include_directories(
         src/drivers/x86/linenoise
         src/drivers/x86/include
         src/drivers/x86/libcsp/include
+        src/drivers/nanomind/
         /usr/include/postgresql
 )
 
