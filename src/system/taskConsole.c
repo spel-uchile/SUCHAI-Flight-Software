@@ -59,11 +59,12 @@ void taskConsole(void *param)
 
         if(new_cmd != NULL)
         {
-#if LOG_LEVEL >= LOG_LVL_DEBUG
-            char *name = cmd_get_name(new_cmd->id);
-            LOGD(tag, "Command sent: %d (%s)", new_cmd->id, name);
-            free(name);
-#endif
+            if(log_lvl >= LOG_LVL_DEBUG)
+            {
+                char *name = cmd_get_name(new_cmd->id);
+                LOGD(tag, "Command sent: %d (%s)", new_cmd->id, name);
+                free(name);
+            }
             /* Queue NewCmd - Blocking */
             cmd_send(new_cmd);
         }

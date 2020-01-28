@@ -128,6 +128,12 @@ void taskCommunications(void *param)
                     csp_send(conn, rep_ok, 1000);
                     break;
 
+                case SCH_TRX_PORT_DBG:
+                    /* Debug port, print to console */
+                    LOGR(tag, "(%d)%s", packet->id.src, (char *)(packet->data));
+                    csp_buffer_free(packet);
+                    break;
+
                 default:
                     /* Let the service handler reply pings, buffer use, etc. */
                     csp_service_handler(conn, packet);

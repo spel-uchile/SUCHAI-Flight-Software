@@ -214,7 +214,7 @@ void init_routines(void)
     trx_cmd = cmd_get_str("com_set_config");
     cmd_add_params_var(trx_cmd, "tx_inhibit", TOSTRING(SCH_TX_INHIBIT));
     cmd_send(trx_cmd);
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    if(log_lvl >= LOG_LVL_DEBUG)
     {
         trx_cmd = cmd_get_str("com_get_config");
         cmd_add_params_str(trx_cmd, "tx_inhibit");
@@ -224,7 +224,7 @@ void init_routines(void)
     trx_cmd = cmd_get_str("com_set_config");
     cmd_add_params_var(trx_cmd, "tx_pwr", TOSTRING(SCH_TX_PWR));
     cmd_send(trx_cmd);
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    if(log_lvl >= LOG_LVL_DEBUG)
     {
         trx_cmd = cmd_get_str("com_get_config");
         cmd_add_params_str(trx_cmd, "tx_pwr");
@@ -234,7 +234,7 @@ void init_routines(void)
     trx_cmd = cmd_get_str("com_set_config");
     cmd_add_params_var(trx_cmd, "bcn_interval", TOSTRING(SCH_TX_BCN_PERIOD));
     cmd_send(trx_cmd);
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    if(log_lvl >= LOG_LVL_DEBUG)
     {
         trx_cmd = cmd_get_str("com_get_config");
         cmd_add_params_str(trx_cmd, "bcn_interval");
@@ -244,7 +244,7 @@ void init_routines(void)
     trx_cmd = cmd_get_str("com_set_config");
     cmd_add_params_var(trx_cmd, "freq", TOSTRING(SCH_TX_FREQ));
     cmd_send(trx_cmd);
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    if(log_lvl >= LOG_LVL_DEBUG)
     {
         trx_cmd = cmd_get_str("com_get_config");
         cmd_add_params_str(trx_cmd, "freq");
@@ -254,7 +254,7 @@ void init_routines(void)
     trx_cmd = cmd_get_str("com_set_config");
     cmd_add_params_var(trx_cmd, "baud", TOSTRING(SCH_TX_BAUD));
     cmd_send(trx_cmd);
-    if(LOG_LEVEL >= LOG_LVL_DEBUG)
+    if(log_lvl >= LOG_LVL_DEBUG)
     {
         trx_cmd = cmd_get_str("com_get_config");
         cmd_add_params_str(trx_cmd, "baud");

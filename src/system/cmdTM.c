@@ -54,7 +54,7 @@ int tm_send_status(char *fmt, char *params, int nparams)
         // Pack status variables to a structure
         dat_status_t status;
         dat_status_to_struct(&status);
-        if(LOG_LEVEL >= LOG_LVL_DEBUG)
+        if(log_lvl >= LOG_LVL_DEBUG)
         {
             LOGD(tag, "Sending system status to node %d", dest_node)
             dat_print_status(&status);
