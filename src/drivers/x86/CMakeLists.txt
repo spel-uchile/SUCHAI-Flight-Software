@@ -13,6 +13,8 @@ set(SOURCE_FILES
         ../../../src/os/Linux/osSemphr.c
         ../../../src/os/Linux/osThread.c
         ../../../src/os/Linux/pthread_queue.c
+        ../../../src/system/globals.c
+        ../../../src/system/utils.c
         ../../../src/system/cmdDRP.c
         ../../../src/system/cmdOBC.c
         ../../../src/system/cmdCOM.c

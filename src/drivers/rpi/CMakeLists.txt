@@ -14,6 +14,8 @@ set(SOURCE_FILES
         ../../../src/os/Linux/osSemphr.c
         ../../../src/os/Linux/osThread.c
         ../../../src/os/Linux/pthread_queue.c
+        ../../../src/system/globals.c
+        ../../../src/system/utils.c
         ../../../src/system/cmdDRP.c
         ../../../src/system/cmdOBC.c
         ../../../src/system/cmdCOM.c
@@ -21,6 +23,7 @@ set(SOURCE_FILES
         ../../../src/system/cmdTM.c
         ../../../src/system/cmdEPS.c
         ../../../src/system/cmdConsole.c
+        ../../../src/system/cmdSensors.c
         ../../../src/system/repoCommand.c
         ../../../src/system/repoData.c
         ../../../src/system/repoDataSchema.c
@@ -30,7 +33,7 @@ set(SOURCE_FILES
         ../../../src/system/taskCommunications.c
         ../../../src/system/taskConsole.c
         ../../../src/system/taskFlightPlan.c
-        ../../../src/system/cmdFP.c
+        ../../../src/system/taskSensors.c
         ../../../src/system/taskInit.c
         ../../../src/system/taskWatchdog.c
         ../../../src/system/main.c
