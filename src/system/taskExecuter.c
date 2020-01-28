@@ -27,7 +27,6 @@ void taskExecuter(void *param)
     LOGI(tag, "Started");
 
     cmd_t *run_cmd = NULL;
-
     int cmd_stat, queue_stat;
         
     while(1)
@@ -37,22 +36,18 @@ void taskExecuter(void *param)
 
         if(queue_stat == pdPASS)
         {
-#if LOG_LEVEL >= LOG_LVL_INFO
-            char *cmd_name = cmd_get_name(run_cmd->id);
-            LOGI(tag, "Running the command: %s...", cmd_name);
-            free(cmd_name);
-#endif
-            /* Commands may take a long time, so reset the WDT */
-            //ClrWdt();
+            if(log_lvl >= LOG_LVL_INFO)
+            {
+                char *cmd_name = cmd_get_name(run_cmd->id);
+                LOGI(tag, "Running the command: %s...", cmd_name);
+                free(cmd_name);
+            }
 
             /* Execute the command */
-            // TODO: Check that we are dereferencing a valid function pointer
             cmd_stat = run_cmd->function(run_cmd->fmt, run_cmd->params, run_cmd->nparams);
             cmd_free(run_cmd);
             run_cmd = NULL;
 
-            /* Commands may take a long time, so reset the WDT */
-            //ClrWdt();
             LOGI(tag, "Command result: %d", cmd_stat);
 
             /* Send the result to Dispatcher - BLOCKING */

@@ -40,7 +40,7 @@ int main(void)
     printf("-----------------------------------------\n\n");
 
     /* Init software subsystems */
-    log_init();      // Logging system
+    log_init(LOG_LEVEL, -1);      // Logging system
     cmd_repo_init(); // Command repository initialization
     dat_repo_init(); // Update status repository
 
