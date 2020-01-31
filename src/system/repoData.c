@@ -39,6 +39,8 @@ time_t sec = 0;
     fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
+sample_machine_t machine;
+
 void initialize_payload_vars(void){
     int i =0;
     for(i=0; i< last_sensor; ++i) {

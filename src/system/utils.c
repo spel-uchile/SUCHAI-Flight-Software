@@ -19,6 +19,11 @@
  
 #include "utils.h"
 
+osSemaphore log_mutex;  ///< Sync logging functions, require initialization
+void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
+log_level_t log_lvl;
+uint8_t log_node;
+
 void log_print(const char *lvl, const char *tag, const char *msg, ...)
 {
     va_list args;
