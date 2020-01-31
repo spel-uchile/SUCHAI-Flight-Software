@@ -26,6 +26,7 @@ void cmd_console_init(void)
 {
     cmd_add("test", con_debug_msg, "%s", 1);
     cmd_add("help", con_help, "", 0);
+    cmd_add("log_set", con_set_logger, "%d %d", 2);
 }
 
 /**
@@ -38,15 +39,11 @@ int con_debug_msg(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Parameter null");
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
-    char msg[SCH_CMD_MAX_STR_PARAMS];
-    if(sscanf(params,fmt, msg) == nparams)
-    {
-        printf("[Debug Msg] %s\n", msg);
-        return CMD_OK;
-    }
-    return CMD_FAIL;
+
+    printf("%s", params);
+    return CMD_OK;
 }
 
 int con_help(char *fmt, char *params, int nparams)
@@ -55,5 +52,20 @@ int con_help(char *fmt, char *params, int nparams)
     printf("List of commands:\n");
     cmd_print_all();
 //    osSemaphoreGiven(&log_mutex);
+    return CMD_OK;
+}
+
+int con_set_logger(char *fmt, char *params, int nparams)
+{
+    int log_lvl;
+    int log_node;
+
+    if(params == NULL || (sscanf(params, fmt, &log_lvl, &log_node) != nparams))
+        return CMD_ERROR;
+
+    if(log_lvl > LOG_LVL_VERBOSE)
+        return CMD_FAIL;
+
+    log_set((log_level_t)log_lvl, log_node);
     return CMD_OK;
 }
