@@ -2,7 +2,7 @@
  * @file  osSemphr.h
  * @author Carlos Gonzalez Cortes
  * @author Ignacio Ibanez Aliaga
- * @date 2019
+ * @date 2020
  * @copyright GNU Public License.
  */
 

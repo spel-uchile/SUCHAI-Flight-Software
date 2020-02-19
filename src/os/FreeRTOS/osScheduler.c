@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2019, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2019, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
+ *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,8 @@ void osScheduler(os_thread* thread_id, int n_thread)
     printf("[INFO] Starting FreeRTOS scheduler...\n");
     vTaskStartScheduler();
 
-    /* FIXME: Should the system restart? */
     while(1)
     {
-    	printf("[ERROR] FreeRTOS scheduler stopped!\n");
+    	  printf("[ERROR] FreeRTOS scheduler stopped!\n");
     }
 }
