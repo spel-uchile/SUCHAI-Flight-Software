@@ -422,7 +422,7 @@ int dat_show_fp (void)
     }
     rc = 0;
 #else
-    rc = storage_show_table();
+    rc = storage_flight_plan_show_table();
 #endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);
