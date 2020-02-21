@@ -49,7 +49,7 @@ typedef struct sample_machine{
     int samples_left;
 } sample_machine_t;
 
-sample_machine_t machine;
+extern sample_machine_t machine;
 
 /**
  * Change sample machine state.

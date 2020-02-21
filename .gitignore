@@ -53,3 +53,7 @@ docs/html/
 
 # Custom
 src/system/include/config.h
+
+# Python Cache
+*__pycache__
+*.pyc

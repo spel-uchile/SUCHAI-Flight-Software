@@ -47,7 +47,7 @@ typedef enum {
 #define LF   "\n"       ///< Use LF terminated log strings
 #define CRLF "\r\n"     ///< USE CRLF terminated log strings
 
-osSemaphore log_mutex;  ///< Sync logging functions, require initialization
+extern osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 
 /**
  * Init logging system, specifically shared mutex
@@ -67,12 +67,12 @@ int log_init(log_level_t level, int node);
  */
 void log_set(log_level_t level, int node);
 
-void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
 void log_print(const char *lvl, const char *tag, const char *msg, ...);
 void log_send(const char *lvl, const char *tag, const char *msg, ...);
 
-log_level_t log_lvl;
-uint8_t log_node;
+extern void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
+extern log_level_t log_lvl;
+extern uint8_t log_node;
 
 /// Logging functions @see log_level_t
 #define LOGE(tag, msg, ...) if(log_lvl >= LOG_LVL_ERROR)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("ERROR", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}

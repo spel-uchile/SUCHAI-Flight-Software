@@ -18,3 +18,11 @@
  */
 
 #include "globals.h"
+
+osQueue dispatcher_queue;         ///< Commands queue
+osQueue executer_cmd_queue;       ///< Executer commands queue
+osQueue executer_stat_queue;      ///< Executer result queue
+osSemaphore repo_data_sem;        ///< Data repository mutex
+osSemaphore repo_data_fp_sem;     ///< Flight plan repository mutex
+osSemaphore repo_machine_sem;     ///< State machine repository mutex
+osSemaphore repo_cmd_sem;         ///< Command repository mutex

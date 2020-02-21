@@ -2,7 +2,6 @@
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
  *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,30 +19,44 @@
 
 #include "osDelay.h"
 
+static portTick ticks_us;
+pthread_cond_t delay_cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t tick_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 portTick osDefineTime(uint32_t mseconds)
 {
-    //use time
+    // Translate user time (ms) to system ticks (us)
     return (portTick)mseconds*1000;
 }
 
 portTick osTaskGetTickCount(void)
 {
-    //calculate time
-    struct timespec time;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &time);
-    //return time in microseconds
-    return (portTick)(time.tv_sec*1000000+time.tv_nsec/1000);
+    // Return current system ticks (us)
+    return (portTick)(ticks_us);
+}
+
+void osTaskSetTickCount(portTick new_tick_us)
+{
+    // Set current tick (us) and signal the change to waiting threads
+    pthread_mutex_lock(&tick_mutex);
+    ticks_us = new_tick_us;
+    pthread_cond_broadcast(&delay_cond);
+    pthread_mutex_unlock(&tick_mutex);
 }
 
 void osDelay(uint32_t mseconds)
 {
-    //transform to microseconds
-    usleep(mseconds*1000);
+    // Use the conditional variable to block the thread for the necessary ticks.
+    pthread_mutex_lock(&tick_mutex);
+    portTick max_ticks_us = mseconds*1000 + ticks_us;
+    while(ticks_us < max_ticks_us)
+        pthread_cond_wait(&delay_cond, &tick_mutex);
+    pthread_mutex_unlock(&tick_mutex);
 }
 
 void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds)
 {
-    //calculate time left
+    // Calculate time left
     portTick c_usec = osTaskGetTickCount();   // Current ticks
     portTick d_usec = c_usec - *lastTime;     // Delta ticks
     portTick s_usec = osDefineTime(mseconds); // Sleep ticks

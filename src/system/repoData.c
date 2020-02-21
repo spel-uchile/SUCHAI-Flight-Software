@@ -39,6 +39,8 @@ time_t sec = 0;
     fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
+sample_machine_t machine;
+
 void initialize_payload_vars(void){
     int i =0;
     for(i=0; i< last_sensor; ++i) {
@@ -420,7 +422,7 @@ int dat_show_fp (void)
     }
     rc = 0;
 #else
-    rc = storage_show_table();
+    rc = storage_flight_plan_show_table();
 #endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_fp_sem);

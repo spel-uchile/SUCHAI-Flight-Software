@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
-echo "Downloading libcsp v1.4"
-[ ! -e libcsp ] && git clone https://github.com/libcsp/libcsp 
-
-cd libcsp
-git pull origin master
-cd ..
+echo "Downloading Gomspace-libcsp v1.5"
+if [ ! -d "./libcsp" ]; then
+    git clone https://github.com/GomSpace/libcsp.git
+    cd libcsp
+    git checkout 1.5.16
+    cd -
+fi
 
 echo "Copy csp config for FreeRTOS"
 [ -e csp_config.h  ] && cp -rf csp_config.h include/csp/csp_autoconfig.h
-
-#echo $PATH
-#echo "Build libcsp"
-#./waf configure --with-os=freertos  --enable-if-i2c  --install-csp --prefix=../ build install
 
 cd -
