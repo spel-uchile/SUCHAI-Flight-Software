@@ -7,6 +7,7 @@ import src.system.include.configure as configure
 available_os = ["LINUX", "FREERTOS"]
 available_archs = ["X86", "GROUNDSTATION", "RPI", "NANOMIND", "ESP32", "AVR32"]
 available_tests = ['test_cmd', 'test_unit', 'test_load', 'test_bug_delay']
+available_test_archs = ["X86"]
 available_log_lvl = ["LOG_LVL_NONE", "LOG_LVL_ERROR", "LOG_LVL_WARN", "LOG_LVL_INFO", "LOG_LVL_DEBUG", "LOG_LVL_VERBOSE"]
 
 def get_parameters():
@@ -62,34 +63,35 @@ if __name__ == "__main__":
 
     # Build
     if args.os == "LINUX":
+        arch = args.arch.lower()
+        arch_dir = os.path.join("src/drivers", arch)
+        build_dir = "build_{}".format(arch)
+
+        # Install drivers
+        if args.drivers:
+            os.chdir(arch_dir)
+            os.system('sh install.sh')
+            os.chdir(cwd_root)
+            
         # Run tests
-        if args.test_type in available_tests:
-            os.chdir(cwd_root+'/test/' + args.test_type)
-            os.system('rm -rf build_test')
-            os.system('mkdir build_test')
-            os.chdir(cwd_root+'/test/' + args.test_type+'/build_test')
+        if args.test_type in available_tests and args.arch in available_test_archs:
+            test_dir = os.path.join(cwd_root, "test", args.test_type, "build_test")
+            os.system('rm -rf {}'.format(test_dir))
+            os.system('mkdir {}'.format(test_dir))
+            os.chdir(test_dir)
             os.system('cmake ..')
             result = os.system('make')
+            # Run the test
             if result == 0:
                 if args.test_type == 'test_cmd':
                     os.system('./SUCHAI_Flight_Software_Test > log.txt')
                     os.system('cp -f log.txt ../test_cmd_log.txt')
-                    os.chdir(cwd_root+'/test/' + args.test_type)
+                    os.chdir("..")
                     result = os.system('python3 logs_comparator.py')
                 else:
                     result = os.system('./SUCHAI_Flight_Software_Test')
+        # Build
         else:
-            arch = args.arch.lower()
-            arch_dir = os.path.join("src/drivers", arch)
-            build_dir = "build_{}".format(arch)
-
-            # Install drivers
-            if args.drivers:
-                os.chdir(arch_dir)
-                os.system('sh install.sh')
-                os.chdir(cwd_root)
-
-            # Build
             os.system('rm -rf {}'.format(build_dir))
             os.system('mkdir {}'.format(build_dir))
             os.chdir(build_dir)
