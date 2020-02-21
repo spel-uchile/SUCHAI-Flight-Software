@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import argparse
 import src.system.include.configure as configure
 
@@ -68,15 +69,15 @@ if __name__ == "__main__":
             os.system('mkdir build_test')
             os.chdir(cwd_root+'/test/' + args.test_type+'/build_test')
             os.system('cmake ..')
-            os.system('make')
-
-            if args.test_type == 'test_cmd':
-                os.system('./SUCHAI_Flight_Software_Test > log.txt')
-                os.system('cp -f log.txt ../test_cmd_log.txt')
-                os.chdir(cwd_root+'/test/' + args.test_type)
-                os.system('python3 logs_comparator.py')
-            else:
-                os.system('./SUCHAI_Flight_Software_Test')
+            result = os.system('make')
+            if result == 0:
+                if args.test_type == 'test_cmd':
+                    os.system('./SUCHAI_Flight_Software_Test > log.txt')
+                    os.system('cp -f log.txt ../test_cmd_log.txt')
+                    os.chdir(cwd_root+'/test/' + args.test_type)
+                    result = os.system('python3 logs_comparator.py')
+                else:
+                    result = os.system('./SUCHAI_Flight_Software_Test')
         else:
             arch = args.arch.lower()
             arch_dir = os.path.join("src/drivers", arch)
@@ -131,5 +132,5 @@ if __name__ == "__main__":
                 result = os.system('sh build.sh')
 
     if result != 0:
-        exit(1)
+        sys.exit(1)
 

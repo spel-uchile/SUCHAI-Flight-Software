@@ -3,10 +3,8 @@ echo "Downloading Gomspace-libcsp v1.5"
 if [ ! -d "./libcsp" ]; then
     git clone https://github.com/GomSpace/libcsp.git
     cd libcsp
-    git checkout release-1.5
-    #mv wscript wscript.old
+    git checkout 1.5.16
     cd -
-    #cp wscript libcsp/wscript
 fi
 
 cd libcsp
