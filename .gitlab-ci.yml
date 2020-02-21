@@ -1,10 +1,8 @@
 stages:
   - create_vis
   - configure_docker
-  - build_linux
-  - build_esp
-  - build_nanomind
-  - test_linux
+  - build
+  - test
 
 create_vis:
   stage: create_vis
@@ -42,7 +40,7 @@ configure_docker:
     - master
 
 build_linux:
-  stage: build_linux
+  stage: build
   script:
     - echo "Building in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_build_linux.sh
@@ -52,7 +50,7 @@ build_linux:
     - master
 
 build_esp:
-  stage: build_esp
+  stage: build
   script:
     - echo "Building in esp32"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_build_esp32.sh
@@ -62,7 +60,7 @@ build_esp:
     - master
 
 build_nanomind:
-  stage: build_nanomind
+  stage: build
   script:
     - echo "Building in nanomind"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_build_nanomind.sh
@@ -72,7 +70,7 @@ build_nanomind:
     - master
 
 test_linux:
-  stage: test_linux
+  stage: test
   script:
     - echo "Testing in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
