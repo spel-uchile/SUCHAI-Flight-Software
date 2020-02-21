@@ -4,8 +4,9 @@ project(SUCHAI_Flight_Software_Test)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
-        ../../src/drivers/x86/data_storage.c
         ../../src/drivers/x86/init.c
+        ../../src/drivers/x86/data_storage.c
+        ../../src/drivers/x86/linenoise/linenoise.c
         ../../src/os/Linux/osDelay.c
         ../../src/os/Linux/osQueue.c
         ../../src/os/Linux/osScheduler.c
@@ -16,11 +17,14 @@ set(SOURCE_FILES
         ../../src/system/cmdDRP.c
         ../../src/system/cmdFP.c
         ../../src/system/cmdConsole.c
+        ../../src/system/cmdSensors.c
         ../../src/system/repoCommand.c
         ../../src/system/repoData.c
         ../../src/system/repoDataSchema.c
         ../../src/system/taskDispatcher.c
         ../../src/system/taskExecuter.c
+        ../../src/system/globals.c
+        ../../src/system/utils.c
         src/system/taskTest.c
         src/system/main.c
         )
@@ -29,6 +33,7 @@ include_directories(
         ../../src/system/include
         ../../src/os/include
         ../../src/drivers/x86/include
+        ../../src/drivers/x86/linenoise
         ../../src/drivers/x86/libcsp/include
         src/system/include
         /usr/include/postgresql
