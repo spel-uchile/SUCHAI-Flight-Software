@@ -1,12 +1,12 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2018, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2018, Tamara Gutierrez Rojo TGR_93@hotmail.com
- *      Copyright 2018, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
+ *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
+ *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2020, Tamara Gutierrez Rojo TGR_93@hotmail.com
+ *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@ void testParseCommands(void)
 void testFPSET(void)
 {
     char* fmt = "%d %d %d %d %d %d %d %d %s %n";
-    char* params = "26 01 2018 12 35 00 1 0 helloworld 1 2 3 3 4";
+    char* params = "26 01 2020 12 35 00 1 0 helloworld 1 2 3 3 4";
     int nparams = 10;
     int result;
     result = fp_set(fmt, params, nparams);
@@ -154,7 +154,7 @@ void testFPSET(void)
 void testFPDELETE(void)
 {
     char* fmt = "%d %d %d %d %d %d";
-    char* params = "26 01 2018 12 35 00";
+    char* params = "26 01 2020 12 35 00";
     int nparams = 6;
     int result;
     result = fp_delete(fmt, params, nparams);
