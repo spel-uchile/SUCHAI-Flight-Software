@@ -418,7 +418,7 @@ int storage_flight_plan_reset(void)
     return 0;
 }
 
-int storage_show_table(void)
+int storage_flight_plan_show_table(void)
 {
     int entries = dat_get_system_var(dat_fpl_queue);
 

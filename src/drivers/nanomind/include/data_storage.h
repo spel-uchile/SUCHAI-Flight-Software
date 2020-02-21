@@ -169,7 +169,7 @@ int storage_flight_plan_reset(void);
  *
  * @return 0 OK
  */
-int storage_show_table(void);
+int storage_flight_plan_show_table(void);
 
 // TODO: Check why this function isn't in Linux/include/data_storage.h
 /**
