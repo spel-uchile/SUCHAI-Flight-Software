@@ -142,8 +142,8 @@ void testParseCommands(void)
 // Test of fp_set.
 void testFPSET(void)
 {
-    char* fmt = "%d %d %d %d %d %d %s %s %d %d";
-    char* params = "26 01 2018 12 35 00 helloworld 1,2,3,3,4 1 0";
+    char* fmt = "%d %d %d %d %d %d %d %d %s %n";
+    char* params = "26 01 2018 12 35 00 1 0 helloworld 1 2 3 3 4";
     int nparams = 10;
     int result;
     result = fp_set(fmt, params, nparams);

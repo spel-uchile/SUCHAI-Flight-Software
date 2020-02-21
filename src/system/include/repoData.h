@@ -93,6 +93,7 @@ void dat_repo_close(void);
  * @param value Integer value to set the variable to
  */
 void dat_set_system_var(dat_system_t index, int value);
+void _dat_set_system_var(dat_system_t index, int value);  //Auxiliary function for testing
 
 /**
  * Returns an int field's value inside the status repository.
@@ -101,6 +102,7 @@ void dat_set_system_var(dat_system_t index, int value);
  * @return The field's value
  */
 int dat_get_system_var(dat_system_t index);
+int _dat_get_system_var(dat_system_t index);  //Auxiliary function for testing
 
 /**
  * Gets an executable command from the flight plan repo.

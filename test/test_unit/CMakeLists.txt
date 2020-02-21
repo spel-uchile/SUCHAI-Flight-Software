@@ -15,6 +15,9 @@ set(SOURCE_FILES
         ../../src/system/cmdConsole.c
         ../../src/system/cmdCOM.c
         ../../src/system/cmdTM.c
+        ../../src/system/cmdSensors.c
+        ../../src/system/utils.c
+        ../../src/system/globals.c
         src/system/main.c
         )
 
