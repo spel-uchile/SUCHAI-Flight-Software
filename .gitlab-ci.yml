@@ -2,7 +2,7 @@ stages:
   - create_vis
   - configure_docker
   - build
-  - test
+  - test_linux
 
 create_vis:
   stage: create_vis
@@ -69,12 +69,52 @@ build_nanomind:
   only:
     - master
 
-test_linux:
-  stage: test
+test_cmd:
+  stage: test_linux
   script:
     - echo "Testing in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
-    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_cmd
+    - docker system prune -f
+  only:
+    - master
+    
+test_unit:
+  stage: test_linux
+  script:
+    - echo "Testing in Linux"
+    - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_unit
+    - docker system prune -f
+  only:
+    - master
+    
+test_load:
+  stage: test_linux
+  script:
+    - echo "Testing in Linux"
+    - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_load
+    - docker system prune -f
+  only:
+    - master
+    
+test_bug_delay:
+  stage: test_linux
+  script:
+    - echo "Testing in Linux"
+    - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_bug_delay
+    - docker system prune -f
+  only:
+    - master
+    
+test_sgp4:
+  stage: test_linux
+  script:
+    - echo "Testing in Linux"
+    - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_sgp4
     - docker system prune -f
   only:
     - master

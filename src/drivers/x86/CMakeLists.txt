@@ -4,6 +4,8 @@ project(SUCHAI_Flight_Software)
 set(CMAKE_C_STANDARD 99)
 
 set(SOURCE_FILES
+        ../../../src/drivers/x86/sgp4/TLE.c
+        ../../../src/drivers/x86/sgp4/SGP4.c
         ../../../src/drivers/x86/linenoise/linenoise.c
         ../../../src/drivers/x86/data_storage.c
         ../../../src/drivers/x86/init.c
@@ -44,6 +46,7 @@ include_directories(
         ../../../src/drivers/x86/include
         ../../../src/drivers/x86/libcsp/include
         ../../../src/drivers/x86/linenoise
+        ../../../src/drivers/x86/sgp4
         /usr/include/postgresql
 )
 
@@ -51,7 +54,7 @@ link_directories(
         ../../../src/drivers/x86/libcsp/lib
 )
 
-link_libraries(-lcsp -lzmq -lsqlite3 -lpq -lpthread)
+link_libraries(-lm -lcsp -lzmq -lsqlite3 -lpq -lpthread)
 
 
 # Use pthread_setname_np included in <features.h>
