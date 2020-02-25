@@ -6,7 +6,7 @@ import src.system.include.configure as configure
 
 available_os = ["LINUX", "FREERTOS"]
 available_archs = ["X86", "GROUNDSTATION", "RPI", "NANOMIND", "ESP32", "AVR32"]
-available_tests = ['test_cmd', 'test_unit', 'test_load', 'test_bug_delay']
+available_tests = ['test_cmd', 'test_unit', 'test_load', 'test_bug_delay', 'test_sgp4']
 available_test_archs = ["X86"]
 available_log_lvl = ["LOG_LVL_NONE", "LOG_LVL_ERROR", "LOG_LVL_WARN", "LOG_LVL_INFO", "LOG_LVL_DEBUG", "LOG_LVL_VERBOSE"]
 

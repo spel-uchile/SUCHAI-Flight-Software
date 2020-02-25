@@ -17,4 +17,6 @@
 #include <csp/interfaces/csp_if_kiss.h>
 #include <csp/drivers/usart.h>
 
+#include "TLE.h"
+
 #endif
