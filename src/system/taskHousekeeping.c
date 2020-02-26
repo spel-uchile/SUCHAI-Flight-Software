@@ -52,6 +52,21 @@ void taskHousekeeping(void *param)
             cmd_send(cmd_dbg);
         }
 
+        /* 10 sec actions */
+        // Update position
+        if ((elapsed_sec % _10sec_check) == 0)
+        {
+            // Check if the TLE epoch is valid
+            int tle_epoch = dat_get_system_var(dat_ads_tle_epoch);
+            if(tle_epoch > 0)
+            {
+                cmd_t *cmd_tle_prop;
+                cmd_tle_prop = cmd_get_str("obc_prop_tle");
+                cmd_add_params_str(cmd_tle_prop, "0");
+                cmd_send(cmd_tle_prop);
+            }
+        }
+
         /* 1 minute actions */
         // Update status vars
         if ((elapsed_sec % _01min_check) == 0)

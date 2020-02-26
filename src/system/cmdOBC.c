@@ -18,7 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
+#include <math.h>
 #include "cmdOBC.h"
 
 static const char* tag = "cmdOBC";
@@ -488,8 +489,16 @@ int obc_set_tle(char *fmt, char *params, int nparams)
 int obc_update_tle(char *fmt, char *params, int nparams)
 {
     parseLines(&tle, tle1, tle2);
-    tle.rec.whichconst = wgs84;
-    return tle.sgp4Error == 0 ? CMD_OK : CMD_FAIL;
+    //TODO: Check errors
+    if(tle.sgp4Error != 0)
+    {
+        dat_set_system_var(dat_ads_tle_epoch, 0);
+        return CMD_FAIL;
+    }
+
+    LOGV(tag, "Updated to epoch %ld (%d)", tle.epoch, (int)(tle.epoch));
+    dat_set_system_var(dat_ads_tle_epoch, (int)(tle.epoch));
+    return CMD_OK;
 }
 
 int obc_prop_tle(char *fmt, char *params, int nparams)
@@ -505,10 +514,17 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
         ts = time(NULL);
 
     getRVForDate(&tle, ts*1000, r, v);
-    LOGI(tag, "R : (%.4f, %.4f, %.4f)", r[0], r[1], r[2]);
-    LOGI(tag, "V : (%.4f, %.4f, %.4f)", v[0], v[1], v[2]);
-    LOGI(tag, "T : %d", ts);
-    LOGI(tag, "Er: %d", tle.rec.error);
-    //TODO Save to system vars
-    return tle.sgp4Error == 0 ? CMD_OK : CMD_FAIL;
+    LOGV(tag, "R : (%.4f, %.4f, %.4f)", r[0], r[1], r[2]);
+    LOGV(tag, "V : (%.4f, %.4f, %.4f)", v[0], v[1], v[2]);
+    LOGV(tag, "T : %d", ts);
+    LOGV(tag, "Er: %d", tle.rec.error);
+
+    if(tle.sgp4Error != 0)
+        return CMD_FAIL;
+
+    value pos[3] = {(float)r[0], (float)r[1], (float)r[2]};
+    dat_set_system_var(dat_ads_pos_x, pos[0].i);
+    dat_set_system_var(dat_ads_pos_y, pos[1].i);
+    dat_set_system_var(dat_ads_pos_z, pos[2].i);
+    dat_set_system_var(dat_ads_tle_last, (int)ts);
 }
