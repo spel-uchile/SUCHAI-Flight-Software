@@ -84,9 +84,11 @@ if __name__ == "__main__":
             # Run the test
             if result == 0:
                 if args.test_type == 'test_cmd':
+                    print('./SUCHAI_Flight_Software_Test > log.txt...')
                     os.system('./SUCHAI_Flight_Software_Test > log.txt')
                     os.system('cp -f log.txt ../test_cmd_log.txt')
                     os.chdir("..")
+                    print('python3 logs_comparator.py...')
                     result = os.system('python3 logs_comparator.py')
                 else:
                     result = os.system('./SUCHAI_Flight_Software_Test')
