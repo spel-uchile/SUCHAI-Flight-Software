@@ -13,12 +13,16 @@
 
 #include "utils.h"
 #include <stdio.h>
-#include <sqlite3.h>
-#include <libpq-fe.h>
 #include "config.h"
 #include "repoData.h"
-#include "repoDataSchema.h"
 
+#if SCH_STORAGE_MODE == 1
+    #include <sqlite3.h>
+#elif SCH_STORAGE_MODE == 2
+    // TODO: Implement Flight Plan to remove sqlite dependency in STORAGE_MODE 2
+    #include <sqlite3.h>
+    #include <libpq-fe.h>
+#endif
 
 /**
  * Init data storage system.
@@ -104,18 +108,6 @@ int storage_repo_get_value_str(char *name, char *table);
 int storage_repo_set_value_idx(int index, int value, char *table);
 
 /**
- * Set or update the value of a INT (integer) variable by name.
- *
- * @note: non-reentrant function, use mutex to sync access
- *
- * @param name Str. Variable name
- * @param value Int. Value to set
- * @param table Str. Table name
- * @return 0 OK, -1 Error
- */
-int storage_repo_set_value_str(char *name, int value, char *table);
-
-/**
  * Set or update the row of a certain time
  *
  * @note: non-reentrant function, use mutex to sync access
@@ -170,7 +162,7 @@ int storage_flight_plan_reset(void);
  *
  * @return 0 OK
  */
-int storage_show_table(void);
+int storage_flight_plan_show_table(void);
 
 /**
  * Set a value for specific payload with index value
@@ -206,5 +198,31 @@ int storage_get_payload_data(int index, void* data, int payload);
  * @return 0 OK, -1 Error
  */
 int storage_close(void);
+
+/**
+ * Translate to sql format a c format type
+ * @param c_type
+ * @return string in sql syntax
+ */
+const char* get_sql_type(char* c_type);
+
+#if SCH_STORAGE_MODE == 1
+    void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
+#elif SCH_STORAGE_MODE == 2
+    void get_psql_value(char* c_type, void* buff, PGresult *res, int j);
+#endif
+
+// TODO: Remove not used function?
+/**
+// * Set or update the value of a INT (integer) variable by name.
+// *
+// * @note: non-reentrant function, use mutex to sync access
+// *
+// * @param name Str. Variable name
+// * @param value Int. Value to set
+// * @param table Str. Table name
+// * @return 0 OK, -1 Error
+// */
+//int storage_repo_set_value_str(char *name, int value, char *table);
 
 #endif //SCH_PERSISTENT_H
