@@ -1,10 +1,25 @@
 #!/bin/sh
+echo "Checking os..."
+uname -a
+
+echo "Checking locale..."
+locale
+
 echo "Checking avr32-gcc Version..."
 avr32-gcc --version
 avr32-as --version
 
 if  [ -n "$1" ] && [ $1 = "--ssh" ]; then
     SSH_ACTIVE="TRUE"
+fi
+
+# Download SGP4
+echo "Installing SGP4..."
+if [ ! -d "./sgp4" ]; then
+  git clone https://github.com/spel-uchile/sgp4.git
+  cd sgp4/src/c
+  mv TestSGP4.c TestSGP4.bak
+  cd -
 fi
 
 echo "Downloading OBC drivers SDK..."

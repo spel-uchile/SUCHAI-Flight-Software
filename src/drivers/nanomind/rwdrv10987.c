@@ -49,13 +49,13 @@ uint16_t rwdrv10987_get_speed(uint8_t motor_id)
         printf("[RWDRV10987:Error]: Bad id");
         return -1;
     }
-    usleep(1e3);
+    osDelay(100);
     //read data regs
     uint8_t res[2];
     gs_i2c_master_transaction(2, BIuC_ADDR, NULL, 0, res, 2, 20);
 
     uint16_t speed = (res[0]<<8) | res[1];
-    usleep(100e3);
+    osDelay(100);
     return speed;
 }
 
@@ -84,7 +84,7 @@ float rwdrv10987_get_current(uint8_t motor_id)
         printf("[RWDRV10987:Error]: Bad id");
         return -1;
     }
-    usleep(1e3);
+    osDelay(1);
     //read data regs
     uint8_t res[2];
     gs_i2c_master_transaction(2, BIuC_ADDR, NULL, 0, res, 2, 20);
@@ -124,6 +124,6 @@ int8_t rwdrv10987_set_speed(uint8_t motor_id, uint16_t speed)
         printf("[RWDRV10987:Error]: Bad id");
         return -1;
     }
-    usleep(150e3);
+    osDelay(150);
     return result_cmd;
 }

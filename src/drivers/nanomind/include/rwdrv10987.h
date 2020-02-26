@@ -12,11 +12,12 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_RWDRV10987_H
 #define SUCHAI_FLIGHT_SOFTWARE_RWDRV10987_H
 
-//#include <gs/util/drivers/i2c/master.h>
 #include <stdint.h>
 #include "drivers.h"
 #include "globals.h"
 #include "utils.h"
+
+#include "osDelay.h"
 
 #define OBC_ADDR 0x10
 #define BIuC_ADDR 0x11

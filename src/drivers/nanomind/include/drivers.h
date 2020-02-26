@@ -9,6 +9,8 @@
 
 #ifndef _DRIVERS_H
 #define _DRIVERS_H
+//SPEL
+#include "TLE.h"
 
 // MCU Drivers
 #include <board.h>
@@ -47,6 +49,7 @@
 #include <gs/util/clock.h>
 #include <gs/util/timestamp.h>
 #include <gs/util/error.h>
+#include <gs/util/drivers/i2c/master.h>
 // CSP
 #include <csp/csp.h>
 #include <csp/csp_types.h>
