@@ -47,9 +47,6 @@ void cmd_obc_init(void)
     cmd_add("obc_set_tle", obc_set_tle, "%d %n", 2);
     cmd_add("obc_update_tle", obc_update_tle, "", 0);
     cmd_add("obc_prop_tle", obc_prop_tle, "%ld", 1);
-#if SCH_TEST_ENABLED
-    cmd_add("obc_prop_tle_test", _obc_prop_tle_test, "%ld %s", 2);
-#endif
 }
 
 int obc_ident(char* fmt, char* params, int nparams)

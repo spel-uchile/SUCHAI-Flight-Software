@@ -19,4 +19,6 @@
 
 #include "i2c.h"
 
+#include "TLE.h"
+
 #endif

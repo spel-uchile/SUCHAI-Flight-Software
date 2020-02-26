@@ -36,7 +36,9 @@ set(SOURCE_FILES
         #nanopower files
         ../../../src/drivers/groundstation/suchai-drivers-bus/lib/nanopower_client/src/nanopower2.c
 
-
+        # FS files
+        ../../../src/drivers/groundstation/sgp4/src/c/TLE.c
+        ../../../src/drivers/groundstation/sgp4/src/c/SGP4.c
         ../../../src/drivers/groundstation/linenoise/linenoise.c
         ../../../src/drivers/groundstation/data_storage.c
         ../../../src/drivers/groundstation/init.c
@@ -94,6 +96,7 @@ include_directories(
         ../../../src/drivers/groundstation/include
         ../../../src/drivers/groundstation/libcsp/include
         ../../../src/drivers/groundstation/linenoise
+        ../../../src/drivers/groundstation/sgp4/src/c
         /usr/include/postgresql
 )
 
@@ -102,7 +105,7 @@ link_directories(
         ../../../src/drivers/groundstation/gs-drivers/libparam/lib
 )
 
-link_libraries(-lcsp -lzmq -lsqlite3 -lpq -lpthread)
+link_libraries(-lm -lcsp -lzmq -lsqlite3 -lpq -lpthread)
 
 # Use pthread_setname_np included in <features.h>
 add_definitions(-D_GNU_SOURCE)

@@ -9,6 +9,7 @@
 
 #ifndef _DRIVERS_H
 #define _DRIVERS_H
+#include "TLE.h"
 
 #include <csp/csp.h>
 #include <csp/csp_types.h>
