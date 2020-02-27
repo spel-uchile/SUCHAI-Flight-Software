@@ -43,9 +43,16 @@ int _test_tle_prop(char *fmt, char *params, int nparams)
     assert(!(file == NULL));
         //return CMD_ERROR;
 
+    portTick init_time = osTaskGetTickCount();
     getRVForDate(&tle, ts*1000, r, v);
+    portTick getrv_time = osTaskGetTickCount();
+
     fprintf(file, "%ld,%lf,%lf,%lf,%lf,%lf,%lf\n", ts, r[0], r[1], r[2], v[0], v[1], v[2]);
     fclose(file);
+    portTick final_time = osTaskGetTickCount();
+
+    LOGI(tag, "getRVForDate: %.06f ms", (getrv_time-init_time)/1000.0);
+    LOGI(tag, "Total time  : %.06f ms", (final_time-init_time)/1000.0);
     return CMD_OK;
 }
 
