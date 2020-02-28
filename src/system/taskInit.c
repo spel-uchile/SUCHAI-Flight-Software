@@ -25,6 +25,27 @@ static const char *tag = "taskInit";
 static csp_iface_t *csp_if_zmqhub;
 static csp_iface_t csp_if_kiss;
 
+#ifdef SIMULATOR
+osQueue csp_if_queue_tx;
+int csp_queue_tx(csp_iface_t *ifc, csp_packet_t *packet, uint32_t timeout);
+
+csp_iface_t csp_if_queue = {
+  .name = "queue",
+  .nexthop = csp_queue_tx,
+  .mtu = SCH_BUFF_MAX_LEN,
+};
+
+int csp_queue_tx(csp_iface_t *ifc, csp_packet_t *packet, uint32_t timeout) {
+  /* Write packet to queue */
+  int rc = osQueueSend(csp_if_queue_tx, &packet, timeout);
+  if (rc > 0)
+    return CSP_ERR_NONE;
+
+  printf("Failed to write frame\r\n");
+  return CSP_ERR_TX;
+}
+#endif //SIMULATOR
+
 #ifdef GROUNDSTATION
     static csp_kiss_handle_t csp_kiss_driver;
     void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
@@ -102,7 +123,7 @@ void init_communications(void)
     csp_debug_set_level(CSP_ERROR, 1);
     csp_debug_set_level(CSP_WARN, 1);
     csp_debug_set_level(CSP_INFO, 1);
-    csp_debug_set_level(CSP_BUFFER, 1);
+    csp_debug_set_level(CSP_BUFFER, 0);
     csp_debug_set_level(CSP_PACKET, 1);
     csp_debug_set_level(CSP_PROTOCOL, 1);
     csp_debug_set_level(CSP_LOCK, 0);
@@ -120,6 +141,11 @@ void init_communications(void)
      * Set interfaces and routes
      *  Platform dependent
      */
+#ifdef SIMULATOR
+    csp_if_queue_tx = osQueueCreate(100, sizeof(csp_packet_t*));
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_queue, CSP_NODE_MAC);
+#endif
+
 #ifdef GROUNDSTATION
     struct usart_conf conf;
     conf.device = SCH_KISS_DEVICE;

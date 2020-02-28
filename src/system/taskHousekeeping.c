@@ -29,12 +29,25 @@ void taskHousekeeping(void *param)
     portTick delay_ms    = 1000;            //Task period in [ms]
 
     unsigned int elapsed_sec = 1;           // Seconds counter
-    unsigned int _10sec_check = 10;         //10[s] condition
+    unsigned int _10sec_check = 1;         //10[s] condition
     unsigned int _01min_check = 1*60;       //05[m] condition
     unsigned int _05min_check = 5*60;       //05[m] condition
     unsigned int _1hour_check = 60*60;      //01[h] condition
 
     portTick xLastWakeTime = osTaskGetTickCount();
+
+    cmd_t *tle1 = cmd_get_str("obc_set_tle");
+    cmd_add_params_str(tle1, "1 42788U 17036Z   20027.14771603  .00000881  00000-0  39896-4 0  9992");
+    cmd_send(tle1);
+
+    cmd_t *tle2 = cmd_get_str("obc_set_tle");
+    cmd_add_params_str(tle2, "2 42788  97.3234  85.2817 0012095 159.3521 200.8207 15.23399088144212");
+    cmd_send(tle2);
+
+    cmd_t *tle_u = cmd_get_str("obc_update_tle");
+    cmd_send(tle_u);
+    tle_u = cmd_get_str("obc_get_tle");
+    cmd_send(tle_u);
 
     while(1)
     {
@@ -58,12 +71,14 @@ void taskHousekeeping(void *param)
         {
             // Check if the TLE epoch is valid
             int tle_epoch = dat_get_system_var(dat_ads_tle_epoch);
-            if(tle_epoch > 0)
+            if(tle_epoch != 0)
             {
-                cmd_t *cmd_tle_prop;
-                cmd_tle_prop = cmd_get_str("obc_prop_tle");
+                cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
                 cmd_add_params_str(cmd_tle_prop, "0");
                 cmd_send(cmd_tle_prop);
+
+                cmd_t *cmd_point = cmd_get_str("sim_adcs_point");
+                cmd_send(cmd_point);
             }
         }
 
