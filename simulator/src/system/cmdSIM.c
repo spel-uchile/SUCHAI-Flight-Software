@@ -37,9 +37,9 @@ int sim_adcs_point(char* fmt, char* params, int nparams)
     memset(packet->data, 0, COM_FRAME_MAX_LEN);
 
     value rx, ry, rz;
-    rx.i = dat_ads_pos_x;
-    ry.i = dat_ads_pos_y;
-    rz.i = dat_ads_pos_z;
+    rx.i = dat_get_system_var(dat_ads_pos_x);
+    ry.i = dat_get_system_var(dat_ads_pos_y);
+    rz.i = dat_get_system_var(dat_ads_pos_z);
 
     int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
       "adcs_point_to %.06f %.06f %.06f", rx.f, ry.f, rz.f);
