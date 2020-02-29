@@ -124,7 +124,7 @@ void init_communications(void)
     csp_debug_set_level(CSP_WARN, 1);
     csp_debug_set_level(CSP_INFO, 1);
     csp_debug_set_level(CSP_BUFFER, 0);
-    csp_debug_set_level(CSP_PACKET, 1);
+    csp_debug_set_level(CSP_PACKET, 0);
     csp_debug_set_level(CSP_PROTOCOL, 1);
     csp_debug_set_level(CSP_LOCK, 0);
 

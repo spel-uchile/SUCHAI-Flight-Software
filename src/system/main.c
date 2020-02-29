@@ -23,14 +23,17 @@
  */
 
 #include "main.h"
+#include "osDelay.h"
+#include "repoData.h"
+#include "pthread.h"
 
 const char *tag = "main";
 
-#ifdef ESP32
-void app_main()
-#else
+void pre_tick_hook(void);
+void pos_tick_hook(void);
+int run(time_t start, unsigned int seconds, int dt_s);
+
 int main(void)
-#endif
 {
     /* On reset */
     on_reset();
@@ -46,14 +49,12 @@ int main(void)
 
     /* Initializing shared Queues */
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
-    if(dispatcher_queue == 0)
-        LOGE(tag, "Error creating dispatcher queue");
     executer_stat_queue = osQueueCreate(1,sizeof(int));
-    if(executer_stat_queue == 0)
-        LOGE(tag, "Error creating executer stat queue");
     executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
-    if(executer_cmd_queue == 0)
-        LOGE(tag, "Error creating executer cmd queue");
+
+    if(dispatcher_queue == 0) LOGE(tag, "Error creating dispatcher queue");
+    if(executer_stat_queue == 0) LOGE(tag, "Error creating executer stat queue");
+    if(executer_cmd_queue == 0) LOGE(tag, "Error creating executer cmd queue");
 
     int n_threads = 4;
     os_thread threads_id[n_threads];
@@ -71,13 +72,85 @@ int main(void)
     if(t_wdt_ok != 0) LOGE(tag, "Task watchdog not created!");
     if(t_ini_ok != 0) LOGE(tag, "Task init not created!");
 
-#ifndef ESP32
-    /* Start the scheduler. Should never return */
+#ifdef SIMULATOR
+    /**
+     * Wait the initialization task finish, so all threads are running
+     */
+    pthread_join(threads_id[3], NULL);
+    /**
+     * Main loop, run the simulation
+     * start: start time in unix epoch time (seconds)
+     * seconds: total simulation time in seconds
+     * dt_s: simulation time increment in seconds
+     */
+    int rc = run(time(NULL), 120, 1);
+    exit(rc);
+#else
     osScheduler(threads_id, n_threads);
-    return 0;
+    exit(0);
 #endif
-
 }
+
+/**
+ * Simulator main loop
+ *  Outer loop count seconds with dt_s resolution, set date time
+ *  Inner loop count milliseconds, set system tick
+ * @param start Start time in unix time (seconds)
+ * @param seconds Simulation total time in seconds
+ * @param dt_s Outer loop resolution
+ * @return 0
+ */
+int run(time_t start, unsigned int seconds, int dt_s)
+{
+    int current_s = 0;
+    int current_ms = 0;
+    int tick_ms = 0;
+    double progress = 0.0;
+    time_t current_time = start;
+
+    for(current_s = 0; current_s < seconds; current_s+=dt_s)
+    {
+        progress = 100.0*current_s/seconds;
+        LOGI(tag, "Progress: %0.01f%%...", progress);
+
+        for(current_ms = 0; current_ms < 1000*dt_s; current_ms++)
+        {
+            pre_tick_hook();
+            osTaskSetTickCount(1000*tick_ms++); // Tick in us
+            pos_tick_hook();
+        }
+
+        current_time += dt_s;
+        dat_set_time(current_time);
+    }
+
+    return 0;
+}
+
+/**
+ * This function is called before set the system tick.
+ * Incoming messages can be put into CSP queue here.s
+ */
+void pre_tick_hook(void)
+{
+    //TODO: Put messages into the FS
+};
+
+/**
+ * This function is called after set the system tick.
+ * CSP messages are received and processed here
+ */
+void pos_tick_hook(void)
+{
+    extern osQueue csp_if_queue_tx;  // Defined in taskInit.c
+    csp_packet_t *buff;
+    int rc = osQueueReceive(csp_if_queue_tx, &buff, 0);
+
+    if(rc > 0) {
+      printf("OUT: "); print_buff(buff->data, buff->length);
+      csp_buffer_free(buff);
+    }
+};
 
 /* FreeRTOS Hooks */
 #if  defined(FREERTOS) && !defined(NANOMIND) && !defined(ESP32)

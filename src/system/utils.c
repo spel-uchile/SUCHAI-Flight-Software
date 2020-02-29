@@ -28,7 +28,7 @@ void log_print(const char *lvl, const char *tag, const char *msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    fprintf(LOGOUT,"[%s][%lu][%s] ", lvl, (unsigned long)time(NULL), tag);
+    fprintf(LOGOUT,"[%s][%lu][%s] ", lvl, (unsigned long)dat_get_time(), tag);
     vfprintf(LOGOUT, msg, args);
     fprintf(LOGOUT,CRLF); fflush(LOGOUT);
     va_end(args);
