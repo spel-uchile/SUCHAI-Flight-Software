@@ -1,7 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2019, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2020, Elias Obreque Sepulveda, elias.obreque@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,4 +73,56 @@ int log_init(log_level_t level, int node)
     int rc = osSemaphoreCreate(&log_mutex);
     log_set(level, node);
     return rc;
+}
+
+
+void quat_mult(double *lhs, double *rhs, double *res) {
+    res[0] = lhs[3]*rhs[0]-lhs[2]*rhs[1]+lhs[1]*rhs[2]+lhs[0]*rhs[3];
+    res[1] = lhs[2]*rhs[0]+lhs[3]*rhs[1]-lhs[0]*rhs[2]+lhs[1]*rhs[3];
+    res[2] =-lhs[1]*rhs[0]+lhs[0]*rhs[1]+lhs[3]*rhs[2]+lhs[2]*rhs[3];
+    res[3] =-lhs[0]*rhs[0]-lhs[1]*rhs[1]-lhs[2]*rhs[2]+lhs[3]*rhs[3];
+}
+
+void quat_normalize(double *q, double *res)
+{
+    double n = 0.0;
+    for(int i=0; i<4 ; ++i)
+    {
+        n += pow(q[i], 2.0);
+    }
+    if (n == 0.0){return;}
+    n = 1.0/ sqrt(n);
+
+    res[0] = q[0] * n;
+    res[1] = q[1] * n;
+    res[2] = q[2] * n;
+    res[3] = q[3] * n;
+}
+
+void quat_inverse(double *q, double *res)
+{
+    double temp1[4];
+
+    quat_normalize(q, temp1);
+    quat_conjugate(temp1, res);
+}
+
+void quat_conjugate(double *q, double *res)
+{
+    res[0] = -q[0];
+    res[1] = -q[1];
+    res[2] = -q[2];
+    res[3] = q[3];
+}
+
+void quat_frame_conv(double *q_rot_a2b, double *v_a, double *v_b)
+{
+    double q0 = q_rot_a2b[3]; // real part
+    double q1 = q_rot_a2b[0]; // i
+    double q2 = q_rot_a2b[1]; // j
+    double q3 = q_rot_a2b[2]; // k
+
+    v_b[0] = (2.0 * pow(q0, 2.0) - 1.0 + 2.0 * pow(q1, 2.0)) * v_a[0] + (2 * q1 * q2 + 2.0 * q0 * q3) * v_a[1] + (2.0 * q1 * q3 - 2.0 * q0 * q2) * v_a[2];
+    v_b[1] = (2.0 * q1 * q2 - 2.0 * q0 * q3) * v_a[0] + (2 * pow(q2, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a[1] + (2.0 * q2 * q3 + 2.0 * q0 * q1) * v_a[2];
+    v_b[2] = (2.0 * q1 * q3 + 2.0 * q0 * q2) * v_a[0] + (2 * q2 * q3 - 2.0 * q0 * q1) * v_a[1] + (2.0 * pow(q3, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a[2];
 }

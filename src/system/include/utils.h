@@ -1,7 +1,8 @@
 /**
  * @file utils.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2019
+ * @author Elias Obreque S - elias.obreque@uchile.cl
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header have definitions related with general utilities such as logging,
@@ -94,5 +95,40 @@ extern uint8_t log_node;
 /// Defines to string
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
+
+
+/**
+ * Calculate the multiplication of two quaternions (it is not commutative)
+ * @param lhs left side quaternion
+ * @param rhs right side quaternion
+ * @param res result of quaternion multiplication
+ */
+void quat_mult(double *lhs, double *rhs, double *res);
+
+/**
+ * Normalize the quaternion
+ * @param q quaternion
+ * @param res quaternion normalized
+ */
+void quat_normalize(double *q, double *res);
+/**
+ * Calculate the conjugate of the quaternion
+ * @param q quaternion
+ * @param res Conjugate of the quaternion
+ */
+void quat_conjugate(double *q, double *res);
+/**
+ * Transformation of vector v from (a) frame (_a) to (b) frame (_b)
+ * @param q_rot_a2b Quaternion to rotate from reference (a) to reference frame (b)
+ * @param v_a vector respect to (a) frame
+ * @param v_b vector respect to (b) frame
+ */
+void quat_frame_conv(double *q_rot_a2b, double *v_a, double *v_b);
+/**
+ * Calculate the inverse of the quaternion q
+ * @param q quaternion
+ * @param res inverse of quaternion
+ */
+void quat_inverse(double *q, double *res);
 
 #endif //UTILS_H
