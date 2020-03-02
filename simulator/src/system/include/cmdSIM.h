@@ -31,4 +31,13 @@ void cmd_sim_init(void);
  */
 int sim_adcs_point(char* fmt, char* params, int nparams);
 
+/**
+ * Read current spacecraft quaternion from the ADCS/STT
+ * @param fmt ""
+ * @param params ""
+ * @param nparams 0
+ * @return CMD_OK | CMD_FAIL | CMD_ERROR
+ */
+int sim_adcs_get_quaternion(char* fmt, char* params, int nparams);
+
 #endif //_CMDSIM_H

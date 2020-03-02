@@ -90,6 +90,10 @@ typedef enum dat_system {
     dat_ads_pos_z,                ///< Satellite orbit position z (ECI)
     dat_ads_tle_epoch,            ///< Current TLE epoch, 0 if TLE is invalid
     dat_ads_tle_last,             ///< Las time position was propagated
+    dat_q_i2b_0,                  ///< Attitude quaternion (Inertial to body)
+    dat_q_i2b_1,                  ///< Attitude quaternion (Inertial to body)
+    dat_q_i2b_2,                  ///< Attitude quaternion (Inertial to body)
+    dat_q_i2b_3,                  ///< Attitude quaternion (Inertial to body)
 
     /// EPS: Energy power system
     dat_eps_vbatt,                ///< Voltage of the battery [mV]
@@ -175,8 +179,12 @@ typedef struct __attribute__((packed)) dat_status_s {
     float dat_ads_pos_x;            ///< Satellite orbit position x (ECI)
     float dat_ads_pos_y;            ///< Satellite orbit position y (ECI)
     float dat_ads_pos_z;            ///< Satellite orbit position z (ECI)
-    int dat_ads_tle_epoch;          ///< Current TLE epoch, 0 if TLE is invalid
-    int dat_ads_tle_last;           ///< Las time position was propagated
+    int32_t dat_ads_tle_epoch;      ///< Current TLE epoch, 0 if TLE is invalid
+    int32_t  dat_ads_tle_last;      ///< Las time position was propagated
+    float dat_q_i2b_0;              ///< Attitude quaternion (Inertial to body)
+    float dat_q_i2b_1;              ///< Attitude quaternion (Inertial to body)
+    float dat_q_i2b_2;              ///< Attitude quaternion (Inertial to body)
+    float dat_q_i2b_3;              ///< Attitude quaternion (Inertial to body)
 
     /// EPS: Energy power system
     uint32_t dat_eps_vbatt;         ///< Voltage of battery [mV]
