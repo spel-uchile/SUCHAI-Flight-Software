@@ -27,6 +27,7 @@ static const char* tag = "cmdSIM";
 void cmd_sim_init(void)
 {
     cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
+    cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
 }
 
 int sim_adcs_point(char* fmt, char* params, int nparams)
@@ -47,7 +48,7 @@ int sim_adcs_point(char* fmt, char* params, int nparams)
     LOGI(tag, "ADCS CMD: (%d) %s", packet->length, packet->data);
 
     int rc = csp_sendto(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD,
-      SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
+      SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 1000);
 
     if(rc != 0)
     {
@@ -55,5 +56,45 @@ int sim_adcs_point(char* fmt, char* params, int nparams)
         return CMD_FAIL;
     }
 
+    return CMD_OK;
+}
+
+int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
+{
+    char *out_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    char *in_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    memset(out_buff, 0, COM_FRAME_MAX_LEN);
+    memset(in_buff, 0, COM_FRAME_MAX_LEN);
+
+    int len = snprintf(out_buff, COM_FRAME_MAX_LEN, "adcs_get_quaternion 0");
+
+    int rc = csp_transaction(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD, 100,
+      out_buff, COM_FRAME_MAX_LEN, in_buff, COM_FRAME_MAX_LEN);
+
+    if(rc != COM_FRAME_MAX_LEN)
+    {
+        free(out_buff);
+        free(in_buff);
+        LOGE(tag, "csp_transaction failed! (%d)", rc);
+        return CMD_FAIL;
+    }
+
+    LOGI(tag, "QUAT: %s", in_buff);
+    value q0, q1, q2, q3;
+    rc = sscanf(in_buff, "%f %f %f %f", &q0.f, &q1.f, &q2.f, &q3.f);
+    if(rc != 4)
+    {
+        free(out_buff);
+        free(in_buff);
+        LOGE(tag, "Error reading values!")
+        return CMD_FAIL;
+    }
+
+    dat_set_system_var(dat_q_i2b_0, q0.i);
+    dat_set_system_var(dat_q_i2b_1, q1.i);
+    dat_set_system_var(dat_q_i2b_2, q2.i);
+    dat_set_system_var(dat_q_i2b_3, q3.i);
+
+    drp_print_system_vars("", "", 0);
     return CMD_OK;
 }
