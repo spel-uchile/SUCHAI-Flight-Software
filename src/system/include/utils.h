@@ -96,23 +96,34 @@ extern uint8_t log_node;
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-
+/**
+ * Quaternion structure
+ * q = q0*i + q1*j + q2*k + q3
+ * q = (scalar, vect)
+ */
 typedef union quaternion {
-    double q[4];
+    double q[4];      ///< Quaternion as array [a, b, c, d]
     struct {
-        double q0;
-        double q1;
-        double q2;
-        double q3;
+          double q0; ///< Quaternion a
+          double q1; ///< Quaternion b
+          double q2; ///< Quaternion c
+          double q3; ///< Quaternion d (scalar)
+      };
+    struct {
+      double vect[3]; ///< Quaternion vector
+      double scalar;  ///< Quaternion scalar
     };
 }quaternion_t;
 
+/**
+ * 3D vector structure
+ */
 typedef union vector3 {
-    double v[3];
+    double v[3];    ///< Vector as array [x, y, z]
     struct {
-        double v0;
-        double v1;
-        double v2;
+        double v0;  ///< Vector x
+        double v1;  ///< Vector y
+        double v2;  ///< Vector z
     };
 }vector3_t;
 
