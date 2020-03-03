@@ -167,7 +167,7 @@ void quat_mult(quaternion_t *lhs, quaternion_t *rhs, quaternion_t *res);
 /**
  * Normalize the quaternion
  * @param q quaternion
- * @param res quaternion normalized
+ * @param res quaternion normalized, if NULL result is stored in q
  */
 void quat_normalize(quaternion_t *q, quaternion_t *res);
 
@@ -206,7 +206,7 @@ double vec_norm(vector3_t vec);
  * @param res normalized unitary vector
  * @return 1 if it is ok, 0 if vec degenerates to a point
  */
-int vec_normalize(vector3_t vec, vector3_t * res);
+int vec_normalize(vector3_t *vec, vector3_t *res);
 
 /**
  * Calculates the inner product between two vectors of dimension 3
@@ -246,9 +246,9 @@ void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t * res);
  * res = a * vec.
  * @param a input constant.
  * @param vec input vector.
- * @param res vector of dimension 3
+ * @param res vector of dimension 3. If NULL, result is stored in vec
  */
-void vec_cons_mult(double a, vector3_t vec, vector3_t * res);
+void vec_cons_mult(double a, vector3_t *vec, vector3_t *res);
 
 /**
  * Calculates the matrix, vector product of dimensions (3,3) and 3.
@@ -258,5 +258,18 @@ void vec_cons_mult(double a, vector3_t vec, vector3_t * res);
  * @param res
  */
 void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
+
+/**
+ * Set a diagonal 3x3 matrix
+ *     [a 0 0]
+ *     [0 b 0]
+ *     [0 0 c]
+ *
+ * @param m pointer to matrix
+ * @param a diagonal value
+ * @param b diagonal value
+ * @param c diagonal value
+ */
+void mat_set_diag(matrix3_t *m, double a, double b, double c);
 
 #endif //UTILS_H

@@ -110,7 +110,10 @@ void quat_normalize(quaternion_t *q, quaternion_t *res)
 
     n = 1.0/sqrt(n);
     for(int i=0; i<4; i++)
-      res->q[i] = q->q[i]*n;
+      if(res != NULL)
+        res->q[i] = q->q[i]*n;
+      else
+        q->q[i] = q->q[i]*n;
 }
 
 void quat_inverse(quaternion_t *q, quaternion_t *res)
@@ -149,14 +152,17 @@ double vec_norm(vector3_t vec)
     return sqrt(res);
 }
 
-int vec_normalize(vector3_t vec, vector3_t * res)
+int vec_normalize(vector3_t *vec, vector3_t *res)
 {
-    double n = vec_norm(vec);
+    double n = vec_norm(*vec);
     if(n == 0.0) { return 0; }
 
     n = 1.0/n;
     for(int i=0; i<3; ++i){
-        res->v[i]*=n;
+        if(res != NULL)
+            res->v[i]*=n;
+        else
+            vec->v[i]*=n;
     }
     return 1;
 }
@@ -190,10 +196,13 @@ void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t * res)
     }
 }
 
-void vec_cons_mult(double a, vector3_t vec, vector3_t * res)
+void vec_cons_mult(double a, vector3_t *vec, vector3_t *res)
 {
     for(int i=0; i<3; ++i){
-        res->v[i] = vec.v[i] * a;
+        if(res != NULL)
+            res->v[i] = vec->v[i] * a;
+        else
+            vec->v[i] = vec->v[i] * a;
     }
 }
 
@@ -206,4 +215,11 @@ void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res)
             res->v[i] += mat.m[i][j]*vec.v[j];
         }
     }
+}
+
+void mat_set_diag(matrix3_t *m, double a, double b, double c)
+{
+    m->row0[0] = a; m->row0[1] = 0; m->row0[2] = 0;
+    m->row1[0] = 0; m->row1[1] = b; m->row1[2] = 0;
+    m->row2[0] = 0; m->row2[1] = 0; m->row2[2] = c;
 }
