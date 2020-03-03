@@ -75,7 +75,6 @@ int log_init(log_level_t level, int node)
     return rc;
 }
 
-
 void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t res )
 {
     rot *= 0.5;
@@ -86,57 +85,59 @@ void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t res )
     }
 }
 
-
-
-void quat_mult(double *lhs, double *rhs, double *res) {
-    res[0] = lhs[3]*rhs[0]-lhs[2]*rhs[1]+lhs[1]*rhs[2]+lhs[0]*rhs[3];
-    res[1] = lhs[2]*rhs[0]+lhs[3]*rhs[1]-lhs[0]*rhs[2]+lhs[1]*rhs[3];
-    res[2] =-lhs[1]*rhs[0]+lhs[0]*rhs[1]+lhs[3]*rhs[2]+lhs[2]*rhs[3];
-    res[3] =-lhs[0]*rhs[0]-lhs[1]*rhs[1]-lhs[2]*rhs[2]+lhs[3]*rhs[3];
+void quat_sum(quaternion_t *q1, quaternion_t *q2, quaternion_t *res)
+{
+    int i;
+    for(i = 0; i<4; i++)
+       res->q[i] = q1->q[i] + q2->q[i];
 }
 
-void quat_normalize(double *q, double *res)
+void quat_mult(quaternion_t *lhs, quaternion_t *rhs, quaternion_t *res) {
+    res->q[0] = lhs->q[3]*rhs->q[0]-lhs->q[2]*rhs->q[1]+lhs->q[1]*rhs->q[2]+lhs->q[0]*rhs->q[3];
+    res->q[1] = lhs->q[2]*rhs->q[0]+lhs->q[3]*rhs->q[1]-lhs->q[0]*rhs->q[2]+lhs->q[1]*rhs->q[3];
+    res->q[2] =-lhs->q[1]*rhs->q[0]+lhs->q[0]*rhs->q[1]+lhs->q[3]*rhs->q[2]+lhs->q[2]*rhs->q[3];
+    res->q[3] =-lhs->q[0]*rhs->q[0]-lhs->q[1]*rhs->q[1]-lhs->q[2]*rhs->q[2]+lhs->q[3]*rhs->q[3];
+}
+
+void quat_normalize(quaternion_t *q, quaternion_t *res)
 {
     double n = 0.0;
-    for(int i=0; i<4 ; ++i)
-    {
-        n += pow(q[i], 2.0);
-    }
-    if (n == 0.0){return;}
-    n = 1.0/ sqrt(n);
+    for(int i=0; i<4 ; i++)
+        n += pow(q->q[i], 2.0);
 
-    res[0] = q[0] * n;
-    res[1] = q[1] * n;
-    res[2] = q[2] * n;
-    res[3] = q[3] * n;
+    if (n == 0.0)
+      return;
+
+    n = 1.0/sqrt(n);
+    for(int i=0; i<4; i++)
+      res->q[i] = q->q[i]*n;
 }
 
-void quat_inverse(double *q, double *res)
+void quat_inverse(quaternion_t *q, quaternion_t *res)
 {
-    double temp1[4];
-
-    quat_normalize(q, temp1);
-    quat_conjugate(temp1, res);
+    quaternion_t temp1;
+    quat_normalize(q, &temp1);
+    quat_conjugate(&temp1, res);
 }
 
-void quat_conjugate(double *q, double *res)
+void quat_conjugate(quaternion_t *q, quaternion_t *res)
 {
-    res[0] = -q[0];
-    res[1] = -q[1];
-    res[2] = -q[2];
-    res[3] = q[3];
+    res->q[0] = -q->q[0];
+    res->q[1] = -q->q[1];
+    res->q[2] = -q->q[2];
+    res->q[3] = q->q[3];
 }
 
-void quat_frame_conv(double *q_rot_a2b, double *v_a, double *v_b)
+void quat_frame_conv(quaternion_t *q_rot_a2b, vector3_t *v_a, vector3_t *v_b)
 {
-    double q0 = q_rot_a2b[3]; // real part
-    double q1 = q_rot_a2b[0]; // i
-    double q2 = q_rot_a2b[1]; // j
-    double q3 = q_rot_a2b[2]; // k
+    double q0 = q_rot_a2b->q3; // real part
+    double q1 = q_rot_a2b->q0; // i
+    double q2 = q_rot_a2b->q1; // j
+    double q3 = q_rot_a2b->q2; // k
 
-    v_b[0] = (2.0 * pow(q0, 2.0) - 1.0 + 2.0 * pow(q1, 2.0)) * v_a[0] + (2 * q1 * q2 + 2.0 * q0 * q3) * v_a[1] + (2.0 * q1 * q3 - 2.0 * q0 * q2) * v_a[2];
-    v_b[1] = (2.0 * q1 * q2 - 2.0 * q0 * q3) * v_a[0] + (2 * pow(q2, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a[1] + (2.0 * q2 * q3 + 2.0 * q0 * q1) * v_a[2];
-    v_b[2] = (2.0 * q1 * q3 + 2.0 * q0 * q2) * v_a[0] + (2 * q2 * q3 - 2.0 * q0 * q1) * v_a[1] + (2.0 * pow(q3, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a[2];
+    v_b->v[0] = (2.0 * pow(q0, 2.0) - 1.0 + 2.0 * pow(q1, 2.0)) * v_a->v[0] + (2 * q1 * q2 + 2.0 * q0 * q3) * v_a->v[1] + (2.0 * q1 * q3 - 2.0 * q0 * q2) * v_a->v[2];
+    v_b->v[1] = (2.0 * q1 * q2 - 2.0 * q0 * q3) * v_a->v[0] + (2 * pow(q2, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a->v[1] + (2.0 * q2 * q3 + 2.0 * q0 * q1) * v_a->v[2];
+    v_b->v[2] = (2.0 * q1 * q3 + 2.0 * q0 * q2) * v_a->v[0] + (2 * q2 * q3 - 2.0 * q0 * q1) * v_a->v[1] + (2.0 * pow(q3, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a->v[2];
 }
 
 double vec_norm(vector3_t vec)

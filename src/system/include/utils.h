@@ -17,13 +17,13 @@
 #include <time.h>
 #include <errno.h>
 #include <assert.h>
+#include <math.h>
 
 #include "config.h"
 #include "os/os.h"
 #include "osSemphr.h"
 
 #include "csp/csp.h"
-#include "math.h"
 
 /**
  * @brief Log level
@@ -103,12 +103,12 @@ extern uint8_t log_node;
  * q = (scalar, vect)
  */
 typedef union quaternion {
-    double q[4];      ///< Quaternion as array [a, b, c, d]
+    double q[4];      ///< Quaternion as array
     struct {
-          double q0; ///< Quaternion a
-          double q1; ///< Quaternion b
-          double q2; ///< Quaternion c
-          double q3; ///< Quaternion d (scalar)
+          double q0; ///< Quaternion i
+          double q1; ///< Quaternion j
+          double q2; ///< Quaternion k
+          double q3; ///< Quaternion scalar
       };
     struct {
       double vec[3]; ///< Quaternion vector
@@ -149,27 +149,34 @@ typedef union matrix3 {
 void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t res);
 
 /**
+ * Sum. of quaternions
+ * @param q1 left side quaternion
+ * @param q2 right side quaternion
+ * @param res result quaternion
+ */
+void quat_sum(quaternion_t *q1, quaternion_t *q2, quaternion_t *res);
+
+/**
  * Calculate the multiplication of two quaternions (it is not commutative)
  * @param lhs left side quaternion
  * @param rhs right side quaternion
  * @param res result of quaternion multiplication
  */
-void quat_mult(double *lhs, double *rhs, double *res);
+void quat_mult(quaternion_t *lhs, quaternion_t *rhs, quaternion_t *res);
 
 /**
  * Normalize the quaternion
  * @param q quaternion
  * @param res quaternion normalized
  */
-void quat_normalize(double *q, double *res);
+void quat_normalize(quaternion_t *q, quaternion_t *res);
 
 /**
  * Calculate the conjugate of the quaternion
  * @param q quaternion
  * @param res Conjugate of the quaternion
  */
-void quat_conjugate(double *q, double *res);
-
+void quat_conjugate(quaternion_t *q, quaternion_t *res);
 
 /**
  * Transformation of vector v from (a) frame (_a) to (b) frame (_b)
@@ -177,14 +184,14 @@ void quat_conjugate(double *q, double *res);
  * @param v_a vector respect to (a) frame
  * @param v_b vector respect to (b) frame
  */
-void quat_frame_conv(double *q_rot_a2b, double *v_a, double *v_b);
+void quat_frame_conv(quaternion_t *q_rot_a2b, vector3_t *v_a, vector3_t *v_b);
 
 /**
  * Calculate the inverse of the quaternion q
  * @param q quaternion
  * @param res inverse of quaternion
  */
-void quat_inverse(double *q, double *res);
+void quat_inverse(quaternion_t *q, quaternion_t *res);
 
 /**
  * Calculate euclidean norm in a 3 dimension vector
@@ -242,7 +249,5 @@ void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t res);
  * @param res
  */
 void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t res);
-
-
 
 #endif //UTILS_H
