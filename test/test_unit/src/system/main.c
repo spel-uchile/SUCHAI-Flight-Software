@@ -267,36 +267,36 @@ int clean_suite4(void)
 //Test of quaternion library
 void testQUATERNION(void)
 {
-    double q[4];
-    double q1[4];
-    double q2[4];
-    double q3[4];
-    double vec[3];
-    double new_vec[3];
+    quaternion_t q;
+    quaternion_t q1;
+    quaternion_t q2;
+    quaternion_t q3;
+    vector3_t vec;
+    vector3_t new_vec;
 
-    vec[0] = 2; vec[1] = -5; vec[2] = -1;
-    q1[0] = -1; q1[1] = -0.5; q1[2] = 4; q1[3] = 2;
+    vec.v[0] = 2; vec.v[1] = -5; vec.v[2] = -1;
+    q1.q[0] = -1; q1.q[1] = -0.5; q1.q[2] = 4; q1.q[3] = 2;
 
     /**
      * Testing quaternion identity
      * I = Q x Q*
      */
-    quat_normalize(q1, q2);
-    quat_inverse(q1, q3);
-    quat_mult(q3, q2, q);
+    quat_normalize(&q1, &q2);
+    quat_inverse(&q1, &q3);
+    quat_mult(&q3, &q2, &q);
 
-    CU_ASSERT_DOUBLE_EQUAL(q[0], 0.0, 1e-6);
-    CU_ASSERT_DOUBLE_EQUAL(q[1], 0.0, 1e-6);
-    CU_ASSERT_DOUBLE_EQUAL(q[2], 0.0, 1e-6);
-    CU_ASSERT_DOUBLE_EQUAL(q[3], 1.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q.q0, 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q.q1, 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q.q2, 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q.q3, 1.0, 1e-6);
 
     /**
      * Testing known convertion
      */
-    quat_frame_conv(q2, vec, new_vec);
-    CU_ASSERT_DOUBLE_EQUAL(new_vec[0], -4.7764705882352940, 1e-6);
-    CU_ASSERT_DOUBLE_EQUAL(new_vec[1],  1.9647058823529413, 1e-6);
-    CU_ASSERT_DOUBLE_EQUAL(new_vec[2], -1.8235294117647058, 1e-6);
+    quat_frame_conv(&q2, &vec, &new_vec);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec.v0, -4.7764705882352940, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec.v1,  1.9647058823529413, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec.v2, -1.8235294117647058, 1e-6);
 }
 
 /* The main() function for setting up and running the tests.
