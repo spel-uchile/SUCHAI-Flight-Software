@@ -53,6 +53,7 @@ void cmd_sim_init(void)
 {
     cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
     cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
+    cmd_add("sim_adcs_control", sim_adcs_control_torque, "", 0);
 }
 
 int sim_adcs_point(char* fmt, char* params, int nparams)
@@ -123,4 +124,95 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
     free(out_buff);
     free(in_buff);
     return CMD_OK;
+}
+
+int sim_adcs_control_torque(char* fmt, char* params, int nparams)
+{
+    // GLOBALS
+    double ctrl_cycle;
+    matrix3_t I_quat;
+    mat_set_diag(&I_quat, 0.0, 0.0, 0.0);
+    matrix3_t P_quat;
+    mat_set_diag(&P_quat, 0.00001, 0.00001, 0.00001);
+    matrix3_t P_omega;
+    mat_set_diag(&P_omega, 0.01, 0.01, 0.01);
+
+    // PARAMETERS
+    quaternion_t q_i2b_est; // Current quaternion. Read as from ADCS
+    quaternion_t q_i2b_tar; // Target quaternion. Read as parameter
+//    vector3_t omega_b_est;  // Current GYRO. Read from ADCS
+//    vector3_t omega_b_tar;  // Target GYRO. Read as parameter
+    _get_sat_quaterion(&q_i2b_est);
+    //TODO: DELETE. READ TARGET INSTEAD
+    _get_sat_quaterion(&q_i2b_tar);
+    q_i2b_tar.q0 += 0.01; q_i2b_tar.q1 += 0.01; q_i2b_tar.q2 += 0.01; q_i2b_tar.q3 += 0.01;
+//    _get_sat_omega(&omega_b_est);
+
+//  libra::Quaternion q_b2i_est = q_i2b_est_.conjugate(); //body frame to inertial frame
+//  libra::Quaternion q_i2b_now2tar = q_b2i_est * q_i2b_tar_;//q_i2b_tar_ = qi2b_est * qi2b_now2tar：クオータニオンによる2回転は積であらわされる。
+//  q_i2b_now2tar.normalize();
+    quaternion_t q_b2i_est;
+    quat_conjugate(&q_i2b_est, &q_b2i_est);
+    quaternion_t q_i2b_now2tar;
+    quat_mult(&q_b2i_est, &q_i2b_tar, &q_i2b_now2tar);
+    quat_normalize(&q_i2b_now2tar, NULL);
+
+//    Vector<3> TorqueDirection;
+//    TorqueDirection[0] = q_i2b_now2tar[0];
+//    TorqueDirection[1] = q_i2b_now2tar[1];
+//    TorqueDirection[2] = q_i2b_now2tar[2];
+//    TorqueDirection = normalize(TorqueDirection);//q1,q2,q3を標準化している。つまり、p=(l,m,n)Tを求めている。
+    vector3_t torq_dir;
+    memcpy(torq_dir.v, q_i2b_now2tar.vec, sizeof(vector3_t));
+    assert(torq_dir.v0 == q_i2b_now2tar.q0 && torq_dir.v1 == q_i2b_now2tar.q1 && torq_dir.v2 == q_i2b_now2tar.q2);
+    vec_normalize(&torq_dir, NULL);
+
+//    double AttitudeRotation = 2 * acos(q_i2b_now2tar[3]) * 180 / M_PI; //回転角θ。q_i2b_now2tar[3]は授業ではq0として扱った。
+//    error_integral = ctrl_cycle_ * AttitudeRotation * TorqueDirection;
+    double att_rot = 2*acos(q_i2b_now2tar.q[3])*180/M_PI;
+    vector3_t error_integral;
+    vec_cons_mult(att_rot*ctrl_cycle, &torq_dir, &error_integral);
+
+//    Vector<3> ControlTorque = P_quat_ * (AttitudeRotation * TorqueDirection)
+//                              + I_quat_ * error_integral
+//                              + P_omega_ * (omega_b_tar_ - omega_b_est_);
+    vector3_t torque_rot;
+    vec_cons_mult(att_rot, &torq_dir, &torque_rot); //(AttitudeRotation * TorqueDirection)
+    vector3_t P;
+    mat3_vec3_mult(P_quat, torque_rot, &P);  //P_quat_ * (AttitudeRotation * TorqueDirection)
+    vector3_t I;
+    mat3_vec3_mult(I_quat, error_integral, &I); //I_quat_ * error_integral
+//    vector3_t omega_b;
+//    vector3_t P_o;
+//    vec_cons_mult(-1.0, &omega_b_est, NULL);
+//    vec_sum(omega_b_tar, omega_b_est, &omega_b);
+//    mat3_vec3_mult(P_omega, omega_b, &P_o); //P_omega_ * (omega_b_tar_ - omega_b_est_);
+
+    vector3_t control_torque_tmp, control_torque;
+    vec_sum(P, I, &control_torque);
+//    vec_sum(P_o, control_torque_tmp, &control_torque);
+
+    LOGI(tag, "CTRL_TORQUE: %f, %f, %f", control_torque.v0, control_torque.v1, control_torque.v2);
+
+    csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
+    if(packet == NULL)
+      return CMD_FAIL;
+
+    int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
+                       "adcs_set_torque %.06f %.06f %.06f",
+                       control_torque.v0, control_torque.v1, control_torque.v2);
+    packet->length = len;
+    LOGI(tag, "ADCS CMD: (%d) %s", packet->length, packet->data);
+
+    int rc = csp_sendto(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD,
+                        SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
+
+    if(rc != 0)
+    {
+      csp_buffer_free((void *)packet);
+      return CMD_FAIL;
+    }
+
+    return CMD_OK;
+
 }

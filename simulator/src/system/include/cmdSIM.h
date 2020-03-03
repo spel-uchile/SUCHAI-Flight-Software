@@ -40,4 +40,13 @@ int sim_adcs_point(char* fmt, char* params, int nparams);
  */
 int sim_adcs_get_quaternion(char* fmt, char* params, int nparams);
 
+/**
+ *
+ * @param fmt
+ * @param params
+ * @param nparams
+ * @return
+ */
+int sim_adcs_control_torque(char* fmt, char* params, int nparams);
+
 #endif //_CMDSIM_H

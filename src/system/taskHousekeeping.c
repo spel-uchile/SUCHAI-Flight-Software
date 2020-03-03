@@ -82,6 +82,9 @@ void taskHousekeeping(void *param)
 
                 cmd_t *cmd_stt = cmd_get_str("sim_adcs_quat");
                 cmd_send(cmd_stt);
+
+                cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_control");
+                cmd_send(cmd_ctrl);
             }
         }
 
