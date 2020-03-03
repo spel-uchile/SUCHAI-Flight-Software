@@ -49,11 +49,60 @@ void _set_sat_quaterion(quaternion_t *q)
   }
 }
 
+static inline void _get_tgt_quaterion(quaternion_t *q);
+void _get_tgt_quaterion(quaternion_t *q)
+{
+  int i;
+  for(i=0; i<4; i++)
+  {
+    value v;
+    v.i = dat_get_system_var(dat_q_tgt_0+i);
+    q->q[i] = (double)v.f;
+  }
+}
+
+static inline void _set_tgt_quaterion(quaternion_t *q);
+void _set_tgt_quaterion(quaternion_t *q)
+{
+  int i;
+  for(i=0; i<4; i++)
+  {
+    value v;
+    v.f = (float)q->q[i];
+    dat_set_system_var(dat_q_tgt_0+i, v.i);
+  }
+}
+
+static inline void _get_sat_position(vector3_t *r);
+void _get_sat_position(vector3_t *r)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        value v;
+        v.i = dat_get_system_var(dat_ads_pos_x+i);
+        r->v[i] = (double)v.f;
+    }
+}
+
+static inline void _set_sat_position(vector3_t *r);
+void _set_sat_position(vector3_t *r)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        value v;
+        v.f = (float)r->v[i];
+        dat_set_system_var(dat_ads_pos_x+i, v.i);
+    }
+}
+
 void cmd_sim_init(void)
 {
     cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
     cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
     cmd_add("sim_adcs_control", sim_adcs_control_torque, "", 0);
+    cmd_add("sim_adcs_to_nadir", sim_adcs_target_nadir, "", 0);
 }
 
 int sim_adcs_point(char* fmt, char* params, int nparams)
@@ -63,13 +112,11 @@ int sim_adcs_point(char* fmt, char* params, int nparams)
         return CMD_FAIL;
     memset(packet->data, 0, COM_FRAME_MAX_LEN);
 
-    value rx, ry, rz;
-    rx.i = dat_get_system_var(dat_ads_pos_x);
-    ry.i = dat_get_system_var(dat_ads_pos_y);
-    rz.i = dat_get_system_var(dat_ads_pos_z);
+    vector3_t r;
+    _get_sat_position(&r);
 
     int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
-      "adcs_point_to %.06f %.06f %.06f", rx.f, ry.f, rz.f);
+      "adcs_point_to %lf %lf %lf", r.v0, r.v1, r.v2);
     packet->length = len;
     LOGI(tag, "ADCS CMD: (%d) %s", packet->length, packet->data);
 
@@ -140,12 +187,10 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     // PARAMETERS
     quaternion_t q_i2b_est; // Current quaternion. Read as from ADCS
     quaternion_t q_i2b_tar; // Target quaternion. Read as parameter
+    _get_sat_quaterion(&q_i2b_est);
+    _get_tgt_quaterion(&q_i2b_tar);
 //    vector3_t omega_b_est;  // Current GYRO. Read from ADCS
 //    vector3_t omega_b_tar;  // Target GYRO. Read as parameter
-    _get_sat_quaterion(&q_i2b_est);
-    //TODO: DELETE. READ TARGET INSTEAD
-    _get_sat_quaterion(&q_i2b_tar);
-    q_i2b_tar.q0 += 0.01; q_i2b_tar.q1 += 0.01; q_i2b_tar.q2 += 0.01; q_i2b_tar.q3 += 0.01;
 //    _get_sat_omega(&omega_b_est);
 
 //  libra::Quaternion q_b2i_est = q_i2b_est_.conjugate(); //body frame to inertial frame
@@ -214,5 +259,47 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     }
 
     return CMD_OK;
+}
 
+int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
+{
+    vector3_t b_dir;
+    vector3_t b_tar;
+    vector3_t b_lambda;
+    double rot;
+
+    b_dir.v0=0; b_dir.v1=0; b_dir.v2=1;
+
+    vector3_t i_tar;
+    _get_sat_position(&i_tar);
+    vec_normalize(&i_tar, NULL);
+
+    quaternion_t q_i2b_est;
+    _get_sat_quaterion(&q_i2b_est);
+
+    quat_frame_conv(&q_i2b_est, &i_tar, &b_tar);
+
+    vector3_t nadir_b_t;
+    vec_normalize(&b_tar, &nadir_b_t);
+
+    vec_outer_product(b_dir, b_tar, &b_lambda);
+    vec_normalize(&b_dir, NULL);
+    vec_normalize(&b_tar, NULL);
+    rot = acos(vec_inner_product(b_dir, b_tar));
+
+    quaternion_t q_b2b_now2tar;
+    axis_rotation_to_quat(b_lambda, rot, &q_b2b_now2tar);
+    quat_normalize(&q_b2b_now2tar, NULL);
+
+    quaternion_t q_i2b_tar;
+    quat_mult(&q_i2b_est, &q_b2b_now2tar, &q_i2b_tar);
+
+    _set_tgt_quaterion(&q_i2b_tar);
+
+    //TODO: Remove this print
+    quaternion_t _q;
+    _get_tgt_quaterion(&_q);
+    LOGI(tag, "TGT QUAT: %lf %lf %lf %lf", _q.q0, _q.q1, _q.q2, _q.q3);
+
+    return CMD_OK;
 }

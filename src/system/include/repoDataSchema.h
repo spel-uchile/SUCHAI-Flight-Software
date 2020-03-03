@@ -94,6 +94,10 @@ typedef enum dat_system {
     dat_q_i2b_1,                  ///< Attitude quaternion (Inertial to body)
     dat_q_i2b_2,                  ///< Attitude quaternion (Inertial to body)
     dat_q_i2b_3,                  ///< Attitude quaternion (Inertial to body)
+    dat_q_tgt_0,                  ///< Target quaternion (Inertial to body)
+    dat_q_tgt_1,                  ///< Target quaternion (Inertial to body)
+    dat_q_tgt_2,                  ///< Target quaternion (Inertial to body)
+    dat_q_tgt_3,                  ///< Target quaternion (Inertial to body)
 
     /// EPS: Energy power system
     dat_eps_vbatt,                ///< Voltage of the battery [mV]
@@ -185,6 +189,10 @@ typedef struct __attribute__((packed)) dat_status_s {
     float dat_q_i2b_1;              ///< Attitude quaternion (Inertial to body)
     float dat_q_i2b_2;              ///< Attitude quaternion (Inertial to body)
     float dat_q_i2b_3;              ///< Attitude quaternion (Inertial to body)
+    float dat_q_tgt_0;              ///< Target quaternion (Inertial to body)
+    float dat_q_tgt_1;              ///< Target quaternion (Inertial to body)
+    float dat_q_tgt_2;              ///< Target quaternion (Inertial to body)
+    float dat_q_tgt_3;              ///< Target quaternion (Inertial to body)
 
     /// EPS: Energy power system
     uint32_t dat_eps_vbatt;         ///< Voltage of battery [mV]

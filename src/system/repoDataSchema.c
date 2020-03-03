@@ -63,6 +63,10 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR_F(status, dat_q_i2b_1);           ///< Attitude quaternion (Inertial to body)
     DAT_CPY_SYSTEM_VAR_F(status, dat_q_i2b_2);           ///< Attitude quaternion (Inertial to body)
     DAT_CPY_SYSTEM_VAR_F(status, dat_q_i2b_3);           ///< Attitude quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_0);           ///< Target quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_1);           ///< Target quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_2);           ///< Target quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_3);           ///< Target quaternion (Inertial to body)
 
   DAT_CPY_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]
@@ -131,6 +135,10 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR_F(status, dat_q_i2b_1);           ///< Attitude quaternion (Inertial to body)
     DAT_PRINT_SYSTEM_VAR_F(status, dat_q_i2b_2);           ///< Attitude quaternion (Inertial to body)
     DAT_PRINT_SYSTEM_VAR_F(status, dat_q_i2b_3);           ///< Attitude quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_0);           ///< Target quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_1);           ///< Target quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_2);           ///< Target quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_3);           ///< Target quaternion (Inertial to body)
 
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]

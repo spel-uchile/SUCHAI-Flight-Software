@@ -77,11 +77,11 @@ void taskHousekeeping(void *param)
                 cmd_add_params_str(cmd_tle_prop, "0");
                 cmd_send(cmd_tle_prop);
 
-                cmd_t *cmd_point = cmd_get_str("sim_adcs_point");
-                cmd_send(cmd_point);
-
                 cmd_t *cmd_stt = cmd_get_str("sim_adcs_quat");
                 cmd_send(cmd_stt);
+
+                cmd_t *cmd_point = cmd_get_str("sim_adcs_to_nadir");
+                cmd_send(cmd_point);
 
                 cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_control");
                 cmd_send(cmd_ctrl);
