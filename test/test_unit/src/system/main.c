@@ -247,6 +247,57 @@ void testDATGET_SYSVAR(void)
     }
 }
 
+/** SUIT 4 **/
+/* The suite initialization function.
+ * Initializes
+ */
+int init_suite4(void)
+{
+    return 0;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite4(void)
+{
+    return 0;
+}
+
+//Test of quaternion library
+void testQUATERNION(void)
+{
+    double q[4];
+    double q1[4];
+    double q2[4];
+    double q3[4];
+    double vec[3];
+    double new_vec[3];
+
+    vec[0] = 2; vec[1] = -5; vec[2] = -1;
+    q1[0] = -1; q1[1] = -0.5; q1[2] = 4; q1[3] = 2;
+
+    /**
+     * Testing quaternion identity
+     * I = Q x Q*
+     */
+    quat_normalize(q1, q2);
+    quat_inverse(q1, q3);
+    quat_mult(q3, q2, q);
+
+    CU_ASSERT_DOUBLE_EQUAL(q[0], 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q[1], 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q[2], 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q[3], 1.0, 1e-6);
+
+    /**
+     * Testing known convertion
+     */
+    quat_frame_conv(q2, vec, new_vec);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec[0], -4.7764705882352940, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec[1],  1.9647058823529413, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec[2], -1.8235294117647058, 1e-6);
+}
 
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
@@ -304,6 +355,21 @@ int main()
     if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", testSYSVARS)) ||
             (NULL == CU_add_test(pSuite, "test of dat_set_system_var", testDATSET_SYSVAR)) ||
             (NULL == CU_add_test(pSuite, "test of dat_get_system_var", testDATGET_SYSVAR))){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /*
+     * SUITE 4: Quaternions in utils.c
+     */
+    pSuite = CU_add_suite("Suite quaternions", init_suite4, clean_suite4);
+    if (NULL == pSuite) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /* add the tests to the suite */
+    if ((NULL == CU_add_test(pSuite, "test of quaternions", testQUATERNION))){
         CU_cleanup_registry();
         return CU_get_error();
     }
