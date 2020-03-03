@@ -97,6 +97,25 @@ extern uint8_t log_node;
 #define TOSTRING(x) STRINGIFY(x)
 
 
+typedef union quaternion {
+    double q[4];
+    struct {
+        double q0;
+        double q1;
+        double q2;
+        double q3;
+    };
+}quaternion_t;
+
+typedef union vector3 {
+    double v[3];
+    struct {
+        double v0;
+        double v1;
+        double v2;
+    };
+}vector3_t;
+
 /**
  * Calculate the multiplication of two quaternions (it is not commutative)
  * @param lhs left side quaternion

@@ -20,9 +20,34 @@
  */
 
 #include "cmdSIM.h"
+#include <math.h>
 static const char* tag = "cmdSIM";
 
 #define ADCS_PORT 7
+
+static inline void _get_sat_quaterion(quaternion_t *q);
+void _get_sat_quaterion(quaternion_t *q)
+{
+  int i;
+  for(i=0; i<4; i++)
+  {
+    value v;
+    v.i = dat_get_system_var(dat_q_i2b_0+i);
+    q->q[i] = (double)v.f;
+  }
+}
+
+static inline void _set_sat_quaterion(quaternion_t *q);
+void _set_sat_quaterion(quaternion_t *q)
+{
+  int i;
+  for(i=0; i<4; i++)
+  {
+    value v;
+    v.f = (float)q->q[i];
+    dat_set_system_var(dat_q_i2b_0+i, v.i);
+  }
+}
 
 void cmd_sim_init(void)
 {
@@ -80,8 +105,8 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
     }
 
     LOGI(tag, "QUAT: %s", in_buff);
-    value q0, q1, q2, q3;
-    rc = sscanf(in_buff, "%f %f %f %f", &q0.f, &q1.f, &q2.f, &q3.f);
+    quaternion_t q;
+    rc = sscanf(in_buff, "%lf %lf %lf %lf", &q.q0, &q.q1, &q.q2, &q.q3);
     if(rc != 4)
     {
         free(out_buff);
@@ -90,11 +115,12 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
         return CMD_FAIL;
     }
 
-    dat_set_system_var(dat_q_i2b_0, q0.i);
-    dat_set_system_var(dat_q_i2b_1, q1.i);
-    dat_set_system_var(dat_q_i2b_2, q2.i);
-    dat_set_system_var(dat_q_i2b_3, q3.i);
+    _set_sat_quaterion(&q);
 
-    drp_print_system_vars("", "", 0);
+    quaternion_t tmp;
+    _get_sat_quaterion(&tmp);
+    LOGI(tag, "SAT_QUAT: %.04f, %.04f, %.04f, %.04f", tmp.q0, tmp.q1, tmp.q2, tmp.q3);
+    free(out_buff);
+    free(in_buff);
     return CMD_OK;
 }
