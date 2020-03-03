@@ -23,6 +23,7 @@
 #include "osSemphr.h"
 
 #include "csp/csp.h"
+#include "math.h"
 
 /**
  * @brief Log level
@@ -110,7 +111,7 @@ typedef union quaternion {
           double q3; ///< Quaternion d (scalar)
       };
     struct {
-      double vect[3]; ///< Quaternion vector
+      double vec[3]; ///< Quaternion vector
       double scalar;  ///< Quaternion scalar
     };
 }quaternion_t;
@@ -128,6 +129,26 @@ typedef union vector3 {
 }vector3_t;
 
 /**
+ * 3x3 matrix structure
+ */
+typedef union matrix3 {
+    double m[3][3];    ///< Matrix as array
+    struct {
+        double row0[3];
+        double row1[3];
+        double row2[3];
+    };
+}matrix3_t;
+
+/**
+ * Calculates equivalent quaternion from a rotation arround an axis.
+ * @param axis vector of dimension 3 representing a rotation axis.
+ * @param rot angle of rotation, in radians.
+ * @param res equivalent rotation quaternion.
+ */
+void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t res);
+
+/**
  * Calculate the multiplication of two quaternions (it is not commutative)
  * @param lhs left side quaternion
  * @param rhs right side quaternion
@@ -141,12 +162,15 @@ void quat_mult(double *lhs, double *rhs, double *res);
  * @param res quaternion normalized
  */
 void quat_normalize(double *q, double *res);
+
 /**
  * Calculate the conjugate of the quaternion
  * @param q quaternion
  * @param res Conjugate of the quaternion
  */
 void quat_conjugate(double *q, double *res);
+
+
 /**
  * Transformation of vector v from (a) frame (_a) to (b) frame (_b)
  * @param q_rot_a2b Quaternion to rotate from reference (a) to reference frame (b)
@@ -154,11 +178,71 @@ void quat_conjugate(double *q, double *res);
  * @param v_b vector respect to (b) frame
  */
 void quat_frame_conv(double *q_rot_a2b, double *v_a, double *v_b);
+
 /**
  * Calculate the inverse of the quaternion q
  * @param q quaternion
  * @param res inverse of quaternion
  */
 void quat_inverse(double *q, double *res);
+
+/**
+ * Calculate euclidean norm in a 3 dimension vector
+ * @param vec input vector
+ * @return euclidean norm of vec
+ */
+double vec_norm(vector3_t vec);
+
+/**
+ * Normalize input vector vec into an unitary vector with norm 1
+ * @param vec input vector of dim 3
+ * @param res normalized unitary vector
+ * @return 1 if it is ok, 0 if vec degenerates to a point
+ */
+int vec_normalize(vector3_t vec, vector3_t res);
+
+/**
+ * Calculates the inner product between two vectors of dimension 3
+ * @param lhs left input vector of dim 3
+ * @param rhs right input vector of dim 3
+ * @return double with the inner product
+ */
+double vec_inner_product(vector3_t lhs, vector3_t rhs);
+
+/**
+ * Calculates the other product between two vectors of dimension 3,
+ * by definition, the result vector will be perpendicular to input vectors.
+ * @param lhs left input vector of dimension 3.
+ * @param rhs right input vector of dimension 3.
+ * @param res vector of dimension 3 , result of the inner product.
+ */
+void vec_outer_product(vector3_t lhs, vector3_t rhs, vector3_t res);
+
+/**
+ * Calculates the angle, radians, between two input vectors of dim 3.
+ * @param v1 first input vector of dim 3.
+ * @param v2 second input vector of dim 3.
+ * @return
+ */
+double vec_angle(vector3_t v1, vector3_t v2);
+
+/**
+ * Calculates the algebraic sum between two input vector of dim 3.
+ * @param lhs left input vector of dim 3.
+ * @param rhs right input vector of dim 3.
+ * @param res vector storing the sum between inputs.
+ */
+void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t res);
+
+/**
+ * Calculates the matrix, vector product of dimensions (3,3) and 3.
+ * w = M * v, where M is a (3x3) matrix, v is the input vector and w the result.
+ * @param mat input matrix of dimensions (3x3).
+ * @param vec input vector of dimensions
+ * @param res
+ */
+void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t res);
+
+
 
 #endif //UTILS_H
