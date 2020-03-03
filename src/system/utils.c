@@ -75,13 +75,13 @@ int log_init(log_level_t level, int node)
     return rc;
 }
 
-void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t res )
+void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t * res )
 {
     rot *= 0.5;
-    res.scalar = cos(rot);
+    res->scalar = cos(rot);
 
     for(int i=0; i < 3; ++i) {
-        res.vec[i] = axis.v[i] * sin(rot);
+        res->vec[i] = axis.v[i] * sin(rot);
     }
 }
 
@@ -149,14 +149,14 @@ double vec_norm(vector3_t vec)
     return sqrt(res);
 }
 
-int vec_normalize(vector3_t vec, vector3_t res)
+int vec_normalize(vector3_t vec, vector3_t * res)
 {
     double n = vec_norm(vec);
     if(n == 0.0) { return 0; }
 
     n = 1.0/n;
     for(int i=0; i<3; ++i){
-        res.v[i]*=n;
+        res->v[i]*=n;
     }
     return 1;
 }
@@ -170,11 +170,11 @@ double vec_inner_product(vector3_t lhs, vector3_t rhs)
     return res;
 }
 
-void vec_outer_product(vector3_t lhs, vector3_t rhs, vector3_t res)
+void vec_outer_product(vector3_t lhs, vector3_t rhs, vector3_t * res)
 {
-    res.v[0] = lhs.v[1]*rhs.v[2]-lhs.v[2]*rhs.v[1];
-    res.v[1] = lhs.v[2]*rhs.v[0]-lhs.v[0]*rhs.v[2];
-    res.v[2] = lhs.v[0]*rhs.v[1]-lhs.v[1]*rhs.v[0];
+    res->v[0] = lhs.v[1]*rhs.v[2]-lhs.v[2]*rhs.v[1];
+    res->v[1] = lhs.v[2]*rhs.v[0]-lhs.v[0]*rhs.v[2];
+    res->v[2] = lhs.v[0]*rhs.v[1]-lhs.v[1]*rhs.v[0];
 }
 
 double vec_angle(vector3_t v1, vector3_t v2)
@@ -183,20 +183,27 @@ double vec_angle(vector3_t v1, vector3_t v2)
     return acos(cos);
 }
 
-void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t res)
+void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t * res)
 {
-    for(size_t i=0; i<3; ++i){
-        res.v[i] = lhs.v[i]+rhs.v[i];
+    for(int i=0; i<3; ++i) {
+        res->v[i] = lhs.v[i]+rhs.v[i];
     }
 }
 
-void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t res)
+void vec_cons_mult(double a, vector3_t vec, vector3_t * res)
+{
+    for(int i=0; i<3; ++i){
+        res->v[i] = vec.v[i] * a;
+    }
+}
+
+void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res)
 {
     for(int i=0; i<3; ++i)
     {
         for(int j=0; j<3; ++j)
         {
-            res.v[i] += mat.m[i][j]*vec.v[j];
+            res->v[i] += mat.m[i][j]*vec.v[j];
         }
     }
 }

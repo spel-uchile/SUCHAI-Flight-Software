@@ -146,7 +146,7 @@ typedef union matrix3 {
  * @param rot angle of rotation, in radians.
  * @param res equivalent rotation quaternion.
  */
-void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t res);
+void axis_rotation_to_quat(vector3_t axis, double rot, quaternion_t * res);
 
 /**
  * Sum. of quaternions
@@ -206,7 +206,7 @@ double vec_norm(vector3_t vec);
  * @param res normalized unitary vector
  * @return 1 if it is ok, 0 if vec degenerates to a point
  */
-int vec_normalize(vector3_t vec, vector3_t res);
+int vec_normalize(vector3_t vec, vector3_t * res);
 
 /**
  * Calculates the inner product between two vectors of dimension 3
@@ -223,7 +223,7 @@ double vec_inner_product(vector3_t lhs, vector3_t rhs);
  * @param rhs right input vector of dimension 3.
  * @param res vector of dimension 3 , result of the inner product.
  */
-void vec_outer_product(vector3_t lhs, vector3_t rhs, vector3_t res);
+void vec_outer_product(vector3_t lhs, vector3_t rhs, vector3_t * res);
 
 /**
  * Calculates the angle, radians, between two input vectors of dim 3.
@@ -239,7 +239,16 @@ double vec_angle(vector3_t v1, vector3_t v2);
  * @param rhs right input vector of dim 3.
  * @param res vector storing the sum between inputs.
  */
-void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t res);
+void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t * res);
+
+/**
+ * Multiply a vector of dim 3 with a constant.
+ * res = a * vec.
+ * @param a input constant.
+ * @param vec input vector.
+ * @param res vector of dimension 3
+ */
+void vec_cons_mult(double a, vector3_t vec, vector3_t * res);
 
 /**
  * Calculates the matrix, vector product of dimensions (3,3) and 3.
@@ -248,6 +257,6 @@ void vec_sum(vector3_t lhs, vector3_t rhs, vector3_t res);
  * @param vec input vector of dimensions
  * @param res
  */
-void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t res);
+void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
 
 #endif //UTILS_H
