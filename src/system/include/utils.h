@@ -129,6 +129,14 @@ typedef union vector3 {
 }vector3_t;
 
 /**
+ * Sum. of quaternions
+ * @param q1 left side quaternion
+ * @param q2 right side quaternion
+ * @param res result quaternion
+ */
+void quat_sum(quaternion_t *q1, quaternion_t *q2, quaternion_t *res);
+
+/**
  * Calculate the multiplication of two quaternions (it is not commutative)
  * @param lhs left side quaternion
  * @param rhs right side quaternion
@@ -142,12 +150,14 @@ void quat_mult(quaternion_t *lhs, quaternion_t *rhs, quaternion_t *res);
  * @param res quaternion normalized
  */
 void quat_normalize(quaternion_t *q, quaternion_t *res);
+
 /**
  * Calculate the conjugate of the quaternion
  * @param q quaternion
  * @param res Conjugate of the quaternion
  */
 void quat_conjugate(quaternion_t *q, quaternion_t *res);
+
 /**
  * Transformation of vector v from (a) frame (_a) to (b) frame (_b)
  * @param q_rot_a2b Quaternion to rotate from reference (a) to reference frame (b)
@@ -155,6 +165,7 @@ void quat_conjugate(quaternion_t *q, quaternion_t *res);
  * @param v_b vector respect to (b) frame
  */
 void quat_frame_conv(quaternion_t *q_rot_a2b, vector3_t *v_a, vector3_t *v_b);
+
 /**
  * Calculate the inverse of the quaternion q
  * @param q quaternion

@@ -75,6 +75,12 @@ int log_init(log_level_t level, int node)
     return rc;
 }
 
+void quat_sum(quaternion_t *q1, quaternion_t *q2, quaternion_t *res)
+{
+    int i;
+    for(i = 0; i<4; i++)
+       res->q[i] = q1->q[i] + q2->q[i];
+}
 
 void quat_mult(quaternion_t *lhs, quaternion_t *rhs, quaternion_t *res) {
     res->q[0] = lhs->q[3]*rhs->q[0]-lhs->q[2]*rhs->q[1]+lhs->q[1]*rhs->q[2]+lhs->q[0]*rhs->q[3];
