@@ -97,10 +97,35 @@ void _set_sat_position(vector3_t *r)
     }
 }
 
+static inline void _get_sat_acc(vector3_t *r);
+void _get_sat_acc(vector3_t *r)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        value v;
+        v.i = dat_get_system_var(dat_ads_acc_x+i);
+        r->v[i] = (double)v.f;
+    }
+}
+
+static inline void _set_sat_acc(vector3_t *r);
+void _set_sat_acc(vector3_t *r)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        value v;
+        v.f = (float)r->v[i];
+        dat_set_system_var(dat_ads_acc_x+i, v.i);
+    }
+}
+
 void cmd_sim_init(void)
 {
     cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
     cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
+    cmd_add("sim_adcs_acc", sim_adcs_get_acc, "", 0);
     cmd_add("sim_adcs_control", sim_adcs_control_torque, "", 0);
     cmd_add("sim_adcs_to_nadir", sim_adcs_target_nadir, "", 0);
     cmd_add("set_adcs_attitude", sim_adcs_send_attitude, "", 0);
@@ -145,33 +170,64 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
     int rc = csp_transaction(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD, 100,
       out_buff, COM_FRAME_MAX_LEN, in_buff, COM_FRAME_MAX_LEN);
 
-    if(rc != COM_FRAME_MAX_LEN)
+    if(rc == COM_FRAME_MAX_LEN)
     {
-        free(out_buff);
-        free(in_buff);
-        LOGE(tag, "csp_transaction failed! (%d)", rc);
-        return CMD_FAIL;
-    }
-
-    LOGI(tag, "QUAT: %s", in_buff);
-    quaternion_t q;
-    rc = sscanf(in_buff, "%lf %lf %lf %lf", &q.q0, &q.q1, &q.q2, &q.q3);
-    if(rc != 4)
-    {
-        free(out_buff);
-        free(in_buff);
+        LOGI(tag, "QUAT: %s", in_buff);
+        quaternion_t q;
+        rc = sscanf(in_buff, "%lf %lf %lf %lf", &q.q0, &q.q1, &q.q2, &q.q3);
+        if(rc == 4)
+        {
+            _set_sat_quaterion(&q);
+            quaternion_t tmp;
+            _get_sat_quaterion(&tmp);
+            LOGI(tag, "SAT_QUAT: %.04f, %.04f, %.04f, %.04f", tmp.q0, tmp.q1, tmp.q2, tmp.q3);
+            free(out_buff);
+            free(in_buff);
+            return CMD_OK;
+        }
         LOGE(tag, "Error reading values!")
-        return CMD_FAIL;
     }
+    LOGE(tag, "csp_transaction failed! (%d)", rc);
 
-    _set_sat_quaterion(&q);
-
-    quaternion_t tmp;
-    _get_sat_quaterion(&tmp);
-    LOGI(tag, "SAT_QUAT: %.04f, %.04f, %.04f, %.04f", tmp.q0, tmp.q1, tmp.q2, tmp.q3);
     free(out_buff);
     free(in_buff);
-    return CMD_OK;
+    return CMD_FAIL;
+}
+
+int sim_adcs_get_acc(char* fmt, char* params, int nparams)
+{
+    char *out_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    char *in_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    memset(out_buff, 0, COM_FRAME_MAX_LEN);
+    memset(in_buff, 0, COM_FRAME_MAX_LEN);
+
+    int len = snprintf(out_buff, COM_FRAME_MAX_LEN, "adcs_get_acc 0");
+
+    int rc = csp_transaction(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD, 100,
+                             out_buff, COM_FRAME_MAX_LEN, in_buff, COM_FRAME_MAX_LEN);
+
+    if(rc == COM_FRAME_MAX_LEN)
+    {
+        LOGI(tag, "ACC: %s", in_buff);
+        vector3_t acc;
+        rc = sscanf(in_buff, "%lf %lf %lf", &acc.v0, &acc.v1, &acc.v2);
+        if(rc == 3)
+        {
+            _set_sat_acc(&acc);
+            vector3_t tmp;
+            _get_sat_acc(&tmp);
+            LOGI(tag, "SAT_ACC: %lf, %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
+            free(out_buff);
+            free(in_buff);
+            return CMD_OK;
+        }
+        LOGE(tag, "Error reading values!")
+    }
+    LOGE(tag, "csp_transaction failed! (%d)", rc);
+
+    free(out_buff);
+    free(in_buff);
+    return CMD_FAIL;
 }
 
 int sim_adcs_control_torque(char* fmt, char* params, int nparams)
@@ -190,9 +246,16 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     quaternion_t q_i2b_tar; // Target quaternion. Read as parameter
     _get_sat_quaterion(&q_i2b_est);
     _get_tgt_quaterion(&q_i2b_tar);
-//    vector3_t omega_b_est;  // Current GYRO. Read from ADCS
-//    vector3_t omega_b_tar;  // Target GYRO. Read as parameter
-//    _get_sat_omega(&omega_b_est);
+    vector3_t omega_b_est;  // Current GYRO. Read from ADCS
+    _get_sat_acc(&omega_b_est);
+
+    vector3_t omega_i_tar;  // Target GYRO. ECI frame. For LEO sat -> nadir
+    omega_i_tar.v[0] = 0.00038772452510785394;
+    omega_i_tar.v[1] = -0.0010289117582512489;
+    omega_i_tar.v[2] = -0.00014131086334682821;
+    // Omega to boby frame;
+    vector3_t omega_b_tar;
+    quat_frame_conv(&q_i2b_est, &omega_i_tar, &omega_b_tar);
 
 //  libra::Quaternion q_b2i_est = q_i2b_est_.conjugate(); //body frame to inertial frame
 //  libra::Quaternion q_i2b_now2tar = q_b2i_est * q_i2b_tar_;//q_i2b_tar_ = qi2b_est * qi2b_now2tar：クオータニオンによる2回転は積であらわされる。
@@ -228,15 +291,15 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     mat3_vec3_mult(P_quat, torque_rot, &P);  //P_quat_ * (AttitudeRotation * TorqueDirection)
     vector3_t I;
     mat3_vec3_mult(I_quat, error_integral, &I); //I_quat_ * error_integral
-//    vector3_t omega_b;
-//    vector3_t P_o;
-//    vec_cons_mult(-1.0, &omega_b_est, NULL);
-//    vec_sum(omega_b_tar, omega_b_est, &omega_b);
-//    mat3_vec3_mult(P_omega, omega_b, &P_o); //P_omega_ * (omega_b_tar_ - omega_b_est_);
+    vector3_t omega_b;
+    vector3_t P_o;
+    vec_cons_mult(-1.0, &omega_b_est, NULL);
+    vec_sum(omega_b_tar, omega_b_est, &omega_b);
+    mat3_vec3_mult(P_omega, omega_b, &P_o); //P_omega_ * (omega_b_tar_ - omega_b_est_);
 
     vector3_t control_torque_tmp, control_torque;
-    vec_sum(P, I, &control_torque);
-//    vec_sum(P_o, control_torque_tmp, &control_torque);
+    vec_sum(P, I, &control_torque_tmp);
+    vec_sum(P_o, control_torque_tmp, &control_torque);
 
     LOGI(tag, "CTRL_TORQUE: %f, %f, %f", control_torque.v0, control_torque.v1, control_torque.v2);
 

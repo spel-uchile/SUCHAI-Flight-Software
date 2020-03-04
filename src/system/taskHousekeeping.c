@@ -80,6 +80,9 @@ void taskHousekeeping(void *param)
                 cmd_t *cmd_stt = cmd_get_str("sim_adcs_quat");
                 cmd_send(cmd_stt);
 
+                cmd_t *cmd_acc = cmd_get_str("sim_adcs_acc");
+                cmd_send(cmd_acc);
+
                 cmd_t *cmd_point = cmd_get_str("sim_adcs_to_nadir");
                 cmd_send(cmd_point);
 
