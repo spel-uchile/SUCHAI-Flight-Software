@@ -103,6 +103,7 @@ void cmd_sim_init(void)
     cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
     cmd_add("sim_adcs_control", sim_adcs_control_torque, "", 0);
     cmd_add("sim_adcs_to_nadir", sim_adcs_target_nadir, "", 0);
+    cmd_add("set_adcs_attitude", sim_adcs_send_attitude, "", 0);
 }
 
 int sim_adcs_point(char* fmt, char* params, int nparams)
@@ -302,4 +303,33 @@ int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
     LOGI(tag, "TGT QUAT: %lf %lf %lf %lf", _q.q0, _q.q1, _q.q2, _q.q3);
 
     return CMD_OK;
+}
+
+int sim_adcs_send_attitude(char* fmt, char* params, int nparams)
+{
+  quaternion_t q_est, q_tgt;
+  _get_sat_quaterion(&q_est);
+  _get_tgt_quaterion(&q_tgt);
+
+  csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
+  if(packet == NULL)
+    return CMD_FAIL;
+
+  int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
+                     "adcs_set_attitude %lf %lf %lf %lf %lf %lf %lf %lf",
+                     q_est.q0, q_est.q1, q_est.q2, q_est.q3,
+                     q_tgt.q0, q_tgt.q1, q_tgt.q2, q_tgt.q3);
+  packet->length = len;
+  LOGI(tag, "OBC ATT: (%d) %s", packet->length, packet->data);
+
+  int rc = csp_sendto(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD,
+                      SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
+
+  if(rc != 0)
+  {
+    csp_buffer_free((void *)packet);
+    return CMD_FAIL;
+  }
+
+  return CMD_OK;
 }

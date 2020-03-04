@@ -58,4 +58,13 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams);
  */
 int sim_adcs_target_nadir(char* fmt, char* params, int nparams);
 
+/**
+ * Send current attitude variables to ADCS system. For testing purposes.
+ * @param fmt
+ * @param params
+ * @param nparams
+ * @return
+ */
+int sim_adcs_send_attitude(char* fmt, char* params, int nparams);
+
 #endif //_CMDSIM_H

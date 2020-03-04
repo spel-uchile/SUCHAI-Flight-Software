@@ -85,6 +85,9 @@ void taskHousekeeping(void *param)
 
                 cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_control");
                 cmd_send(cmd_ctrl);
+
+                cmd_t *cmd_att = cmd_get_str("set_adcs_attitude");
+                cmd_send(cmd_att);
             }
         }
 
