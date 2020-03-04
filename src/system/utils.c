@@ -160,7 +160,7 @@ int vec_normalize(vector3_t *vec, vector3_t *res)
     n = 1.0/n;
     for(int i=0; i<3; ++i){
         if(res != NULL)
-            res->v[i]*=n;
+            res->v[i] = vec->v[i]*n;
         else
             vec->v[i]*=n;
     }
@@ -210,6 +210,7 @@ void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res)
 {
     for(int i=0; i<3; ++i)
     {
+        res->v[i] = 0.0;
         for(int j=0; j<3; ++j)
         {
             res->v[i] += mat.m[i][j]*vec.v[j];

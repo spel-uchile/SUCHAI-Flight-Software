@@ -177,7 +177,7 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
 int sim_adcs_control_torque(char* fmt, char* params, int nparams)
 {
     // GLOBALS
-    double ctrl_cycle;
+    double ctrl_cycle = 1000.0/20.0;
     matrix3_t I_quat;
     mat_set_diag(&I_quat, 0.0, 0.0, 0.0);
     matrix3_t P_quat;
@@ -273,6 +273,7 @@ int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
 
     vector3_t i_tar;
     _get_sat_position(&i_tar);
+    vec_cons_mult(-1.0, &i_tar, NULL);
     vec_normalize(&i_tar, NULL);
 
     quaternion_t q_i2b_est;
