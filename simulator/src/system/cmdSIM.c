@@ -25,111 +25,66 @@ static const char* tag = "cmdSIM";
 
 #define ADCS_PORT 7
 
-static inline void _get_sat_quaterion(quaternion_t *q);
-void _get_sat_quaterion(quaternion_t *q)
-{
-  int i;
-  for(i=0; i<4; i++)
-  {
-    value v;
-    v.i = dat_get_system_var(dat_q_i2b_0+i);
-    q->q[i] = (double)v.f;
-  }
-}
-
-static inline void _set_sat_quaterion(quaternion_t *q);
-void _set_sat_quaterion(quaternion_t *q)
-{
-  int i;
-  for(i=0; i<4; i++)
-  {
-    value v;
-    v.f = (float)q->q[i];
-    dat_set_system_var(dat_q_i2b_0+i, v.i);
-  }
-}
-
-static inline void _get_tgt_quaterion(quaternion_t *q);
-void _get_tgt_quaterion(quaternion_t *q)
-{
-  int i;
-  for(i=0; i<4; i++)
-  {
-    value v;
-    v.i = dat_get_system_var(dat_q_tgt_0+i);
-    q->q[i] = (double)v.f;
-  }
-}
-
-static inline void _set_tgt_quaterion(quaternion_t *q);
-void _set_tgt_quaterion(quaternion_t *q)
-{
-  int i;
-  for(i=0; i<4; i++)
-  {
-    value v;
-    v.f = (float)q->q[i];
-    dat_set_system_var(dat_q_tgt_0+i, v.i);
-  }
-}
-
-static inline void _get_sat_position(vector3_t *r);
-void _get_sat_position(vector3_t *r)
-{
-    int i;
-    for(i=0; i<3; i++)
-    {
-        value v;
-        v.i = dat_get_system_var(dat_ads_pos_x+i);
-        r->v[i] = (double)v.f;
-    }
-}
-
-static inline void _set_sat_position(vector3_t *r);
-void _set_sat_position(vector3_t *r)
-{
-    int i;
-    for(i=0; i<3; i++)
-    {
-        value v;
-        v.f = (float)r->v[i];
-        dat_set_system_var(dat_ads_pos_x+i, v.i);
-    }
-}
-
-static inline void _get_sat_acc(vector3_t *r);
-void _get_sat_acc(vector3_t *r)
-{
-    int i;
-    for(i=0; i<3; i++)
-    {
-        value v;
-        v.i = dat_get_system_var(dat_ads_acc_x+i);
-        r->v[i] = (double)v.f;
-    }
-}
-
-static inline void _set_sat_acc(vector3_t *r);
-void _set_sat_acc(vector3_t *r)
-{
-    int i;
-    for(i=0; i<3; i++)
-    {
-        value v;
-        v.f = (float)r->v[i];
-        dat_set_system_var(dat_ads_acc_x+i, v.i);
-    }
-}
-
 void cmd_sim_init(void)
 {
     cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
     cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
     cmd_add("sim_adcs_acc", sim_adcs_get_acc, "", 0);
-    cmd_add("sim_adcs_control", sim_adcs_control_torque, "", 0);
-    cmd_add("sim_adcs_to_nadir", sim_adcs_target_nadir, "", 0);
-    cmd_add("set_adcs_attitude", sim_adcs_send_attitude, "", 0);
+    cmd_add("sim_adcs_do_control", sim_adcs_control_torque, "%lf", 1);
+    cmd_add("sim_adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
+    cmd_add("sim_adcs_set_to_nadir", sim_adcs_target_nadir, "", 0);
+    cmd_add("sim_adcs_send_attitude", sim_adcs_send_attitude, "", 0);
 }
+
+static inline void _get_sat_quaterion(quaternion_t *q, dat_system_t index);
+void _get_sat_quaterion(quaternion_t *q,  dat_system_t index)
+{
+  int i;
+  for(i=0; i<4; i++)
+  {
+    assert(index+i < dat_system_last_var);
+    value v;
+    v.i = dat_get_system_var(index+i);
+    q->q[i] = (double)v.f;
+  }
+}
+static inline void _set_sat_quaterion(quaternion_t *q,  dat_system_t index);
+void _set_sat_quaterion(quaternion_t *q,  dat_system_t index)
+{
+  int i;
+  for(i=0; i<4; i++)
+  {
+    assert(index+i < dat_system_last_var);
+    value v;
+    v.f = (float)q->q[i];
+    dat_set_system_var(index+i, v.i);
+  }
+}
+static inline void _get_sat_vector(vector3_t *r, dat_system_t index);
+void _get_sat_vector(vector3_t *r, dat_system_t index)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        assert(index+i < dat_system_last_var);
+        value v;
+        v.i = dat_get_system_var(index+i);
+        r->v[i] = (double)v.f;
+    }
+}
+static inline void _set_sat_vector(vector3_t *r, dat_system_t index);
+void _set_sat_vector(vector3_t *r, dat_system_t index)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        assert(index+i < dat_system_last_var);
+        value v;
+        v.f = (float)r->v[i];
+        dat_set_system_var(index+i, v.i);
+    }
+}
+
 
 int sim_adcs_point(char* fmt, char* params, int nparams)
 {
@@ -139,7 +94,7 @@ int sim_adcs_point(char* fmt, char* params, int nparams)
     memset(packet->data, 0, COM_FRAME_MAX_LEN);
 
     vector3_t r;
-    _get_sat_position(&r);
+    _get_sat_vector(&r, dat_ads_pos_x);
 
     int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
       "adcs_point_to %lf %lf %lf", r.v0, r.v1, r.v2);
@@ -166,7 +121,6 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
     memset(in_buff, 0, COM_FRAME_MAX_LEN);
 
     int len = snprintf(out_buff, COM_FRAME_MAX_LEN, "adcs_get_quaternion 0");
-
     int rc = csp_transaction(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD, 100,
       out_buff, COM_FRAME_MAX_LEN, in_buff, COM_FRAME_MAX_LEN);
 
@@ -177,9 +131,9 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
         rc = sscanf(in_buff, "%lf %lf %lf %lf", &q.q0, &q.q1, &q.q2, &q.q3);
         if(rc == 4)
         {
-            _set_sat_quaterion(&q);
+            _set_sat_quaterion(&q, dat_ads_q0);
             quaternion_t tmp;
-            _get_sat_quaterion(&tmp);
+            _get_sat_quaterion(&tmp, dat_ads_q0);
             LOGI(tag, "SAT_QUAT: %.04f, %.04f, %.04f, %.04f", tmp.q0, tmp.q1, tmp.q2, tmp.q3);
             free(out_buff);
             free(in_buff);
@@ -213,9 +167,9 @@ int sim_adcs_get_acc(char* fmt, char* params, int nparams)
         rc = sscanf(in_buff, "%lf %lf %lf", &acc.v0, &acc.v1, &acc.v2);
         if(rc == 3)
         {
-            _set_sat_acc(&acc);
+            _set_sat_vector(&acc, dat_ads_acc_x);
             vector3_t tmp;
-            _get_sat_acc(&tmp);
+            _get_sat_vector(&tmp, dat_ads_acc_x);
             LOGI(tag, "SAT_ACC: %lf, %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
             free(out_buff);
             free(in_buff);
@@ -233,7 +187,7 @@ int sim_adcs_get_acc(char* fmt, char* params, int nparams)
 int sim_adcs_control_torque(char* fmt, char* params, int nparams)
 {
     // GLOBALS
-    double ctrl_cycle = 1000.0/20.0;
+    double ctrl_cycle;
     matrix3_t I_quat;
     mat_set_diag(&I_quat, 0.0, 0.0, 0.0);
     matrix3_t P_quat;
@@ -241,21 +195,18 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     matrix3_t P_omega;
     mat_set_diag(&P_omega, 0.01, 0.01, 0.01);
 
+    if(params == NULL || sscanf(params, fmt, &ctrl_cycle) != nparams)
+        return CMD_FAIL;
+
     // PARAMETERS
     quaternion_t q_i2b_est; // Current quaternion. Read as from ADCS
     quaternion_t q_i2b_tar; // Target quaternion. Read as parameter
-    _get_sat_quaterion(&q_i2b_est);
-    _get_tgt_quaterion(&q_i2b_tar);
+    _get_sat_quaterion(&q_i2b_est, dat_ads_q0);
+    _get_sat_quaterion(&q_i2b_tar, dat_tgt_q0);
     vector3_t omega_b_est;  // Current GYRO. Read from ADCS
-    _get_sat_acc(&omega_b_est);
-
-    vector3_t omega_i_tar;  // Target GYRO. ECI frame. For LEO sat -> nadir
-    omega_i_tar.v[0] = 0.00038772452510785394;
-    omega_i_tar.v[1] = -0.0010289117582512489;
-    omega_i_tar.v[2] = -0.00014131086334682821;
-    // Omega to boby frame;
+    _get_sat_vector(&omega_b_est, dat_ads_acc_x);
     vector3_t omega_b_tar;
-    quat_frame_conv(&q_i2b_est, &omega_i_tar, &omega_b_tar);
+    _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
 
 //  libra::Quaternion q_b2i_est = q_i2b_est_.conjugate(); //body frame to inertial frame
 //  libra::Quaternion q_i2b_now2tar = q_b2i_est * q_i2b_tar_;//q_i2b_tar_ = qi2b_est * qi2b_now2tar：クオータニオンによる2回転は積であらわされる。
@@ -325,55 +276,83 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     return CMD_OK;
 }
 
-int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
+int sim_adcs_set_target(char* fmt, char* params, int nparams)
 {
-    vector3_t b_dir;
-    vector3_t b_tar;
-    vector3_t b_lambda;
     double rot;
-
-    b_dir.v0=0; b_dir.v1=0; b_dir.v2=1;
-
-    vector3_t i_tar;
-    _get_sat_position(&i_tar);
-    vec_cons_mult(-1.0, &i_tar, NULL);
-    vec_normalize(&i_tar, NULL);
-
+    vector3_t i_tar;  // Target vector, intertial frame, read as parameter
+    vector3_t b_tar;
+    vector3_t b_dir;  // Face to point to, body frame
+    vector3_t b_lambda;
+    vector3_t omega_tar;  // Target velocity vector, body frame, read as parameter
     quaternion_t q_i2b_est;
-    _get_sat_quaterion(&q_i2b_est);
-
-    quat_frame_conv(&q_i2b_est, &i_tar, &b_tar);
-
-    vector3_t nadir_b_t;
-    vec_normalize(&b_tar, &nadir_b_t);
-
-    vec_outer_product(b_dir, b_tar, &b_lambda);
-    vec_normalize(&b_dir, NULL);
-    vec_normalize(&b_tar, NULL);
-    rot = acos(vec_inner_product(b_dir, b_tar));
-
     quaternion_t q_b2b_now2tar;
-    axis_rotation_to_quat(b_lambda, rot, &q_b2b_now2tar);
-    quat_normalize(&q_b2b_now2tar, NULL);
+    quaternion_t q_i2b_tar; // Target quaternion, inertial to body frame. Calculate
 
-    quaternion_t q_i2b_tar;
-    quat_mult(&q_i2b_est, &q_b2b_now2tar, &q_i2b_tar);
+    if(params == NULL && sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2,
+        &omega_tar.v0, &omega_tar.v1, &omega_tar.v2) != nparams)
+        return CMD_ERROR;
 
-    _set_tgt_quaterion(&q_i2b_tar);
+    // Set Z+ [0, 0, 1] as the face to point to
+    b_dir.v0 = 0.0; b_dir.v1 = 0.0; b_dir.v2 = 0.0;
+    vec_normalize(&b_dir, NULL);
+
+    // Get target vector in body frame
+    _get_sat_quaterion(&q_i2b_est, dat_ads_q0);
+    vec_normalize(&i_tar, NULL);
+    quat_frame_conv(&q_i2b_est, &i_tar, &b_tar);
+    vec_normalize(&b_tar, NULL);
+
+    // Get I2B target quaternion
+    vec_outer_product(b_dir, b_tar, &b_lambda);
+    vec_normalize(&b_lambda, NULL);
+    rot = acos(vec_inner_product(b_dir, b_tar));
+    axis_rotation_to_quat(b_lambda, rot, &q_b2b_now2tar); //Calculate quaternion of shaft rotation
+    quat_mult(&q_i2b_est, &q_b2b_now2tar, &q_i2b_tar); //Calculate quaternion after rotation
+
+    _set_sat_quaterion(&q_i2b_tar, dat_tgt_q0);
+    _set_sat_vector(&omega_tar, dat_tgt_acc_x);
 
     //TODO: Remove this print
     quaternion_t _q;
-    _get_tgt_quaterion(&_q);
+    _get_sat_quaterion(&_q, dat_tgt_q0);
     LOGI(tag, "TGT QUAT: %lf %lf %lf %lf", _q.q0, _q.q1, _q.q2, _q.q3);
 
     return CMD_OK;
 }
 
+int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
+{
+    // Get Nadir vector
+    vector3_t i_tar;
+    _get_sat_vector(&i_tar, dat_ads_pos_x);
+    vec_cons_mult(-1.0, &i_tar, NULL);
+    vec_normalize(&i_tar, NULL);
+
+    // Get required Nadir velocity
+    // Target GYRO. ECI frame. For LEO sat -> nadir
+    vector3_t omega_i_tar;
+    omega_i_tar.v[0] = 0.00038772452510785394;
+    omega_i_tar.v[1] = -0.0010289117582512489;
+    omega_i_tar.v[2] = -0.00014131086334682821;
+    vector3_t omega_b_tar;
+    quaternion_t q_i2b_est;
+    _get_sat_quaterion(&q_i2b_est, dat_ads_q0);
+    quat_frame_conv(&q_i2b_est, &omega_i_tar, &omega_b_tar);
+
+    char *_fmt = "%lf %lf %lf %lf %lf %lf";
+    char _params[SCH_CMD_MAX_STR_PARAMS];
+    snprintf(_params, SCH_CMD_MAX_STR_PARAMS, fmt, i_tar.v0, i_tar.v1, i_tar.v2,
+             omega_b_tar.v0, omega_b_tar.v1, omega_b_tar.v2);
+    int ret = sim_adcs_set_target(_fmt, _params, 6);
+
+    return ret;
+}
+
 int sim_adcs_send_attitude(char* fmt, char* params, int nparams)
 {
   quaternion_t q_est, q_tgt;
-  _get_sat_quaterion(&q_est);
-  _get_tgt_quaterion(&q_tgt);
+  _get_sat_quaterion(&q_est, dat_ads_q0);
+  _get_sat_quaterion(&q_tgt, dat_tgt_q0);
 
   csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
   if(packet == NULL)

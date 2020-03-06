@@ -59,20 +59,30 @@ int sim_adcs_get_acc(char* fmt, char* params, int nparams);
 int sim_adcs_control_torque(char* fmt, char* params, int nparams);
 
 /**
+ * Set ADCS vector (Intertial frame) and velocity (body frame) targets
+ * @param fmt "%lf lf lf lf lf lf"
+ * @param params "<x y z> <wx wy wz>"
+ * @param nparams 6
+ * @return CMD_OK | CMD_ERROR | CMD_FAIL
+ */
+int sim_adcs_set_target(char* fmt, char* params, int nparams);
+
+/**
  * Set ADCS target to Nadir based on current quaternion and position
- * @param fmt
- * @param params
- * @param nparams
- * @return
+ * Uses sim_adcs_set_target
+ * @param fmt ""
+ * @param params ""
+ * @param nparams 0
+ * @return CMD_OK | CMD_ERROR | CMD_FAIL
  */
 int sim_adcs_target_nadir(char* fmt, char* params, int nparams);
 
 /**
  * Send current attitude variables to ADCS system. For testing purposes.
- * @param fmt
- * @param params
- * @param nparams
- * @return
+ * @param fmt ""
+ * @param params ""
+ * @param nparams 0
+ * @return CMD_OK | CMD_ERROR | CMD_FAIL
  */
 int sim_adcs_send_attitude(char* fmt, char* params, int nparams);
 

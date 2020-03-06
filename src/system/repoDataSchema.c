@@ -51,6 +51,9 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_x);         ///< Gyroscope acceleration value along the x axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_y);         ///< Gyroscope acceleration value along the y axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_z);         ///< Gyroscope acceleration value along the z axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_acc_x);         ///< Target acceleration value along the x axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_acc_y);         ///< Target acceleration value along the y axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_acc_z);         ///< Target acceleration value along the z axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
@@ -59,16 +62,16 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_pos_z);         ///< Satellite orbit position z (ECI)
     DAT_CPY_SYSTEM_VAR(status, dat_ads_tle_epoch);       ///< Current TLE epoch, 0 if TLE is invalid
     DAT_CPY_SYSTEM_VAR(status, dat_ads_tle_last);        ///< Las time position was propagated
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_i2b_0);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_i2b_1);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_i2b_2);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_i2b_3);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_0);           ///< Target quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_1);           ///< Target quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_2);           ///< Target quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_q_tgt_3);           ///< Target quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q0);           ///< Attitude quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q1);           ///< Attitude quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q2);           ///< Attitude quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q3);           ///< Attitude quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q0);           ///< Target quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q1);           ///< Target quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q2);           ///< Target quaternion (Inertial to body)
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q3);           ///< Target quaternion (Inertial to body)
 
-  DAT_CPY_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
+    DAT_CPY_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
     DAT_CPY_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
@@ -123,6 +126,9 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_x);         ///< Gyroscope acceleration value along the x axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_y);         ///< Gyroscope acceleration value along the y axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_z);         ///< Gyroscope acceleration value along the z axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_acc_x);         ///< Target acceleration value along the x axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_acc_y);         ///< Target acceleration value along the y axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_acc_z);         ///< Target acceleration value along the z axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
@@ -131,14 +137,14 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_pos_z);         ///< Satellite orbit position z (ECI)
     DAT_PRINT_SYSTEM_VAR(status, dat_ads_tle_epoch);       ///< Current TLE epoch, 0 if TLE is invalid
     DAT_PRINT_SYSTEM_VAR(status, dat_ads_tle_last);        ///< Las time position was propagated
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_i2b_0);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_i2b_1);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_i2b_2);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_i2b_3);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_0);           ///< Target quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_1);           ///< Target quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_2);           ///< Target quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_q_tgt_3);           ///< Target quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q0);           ///< Attitude quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q1);           ///< Attitude quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q2);           ///< Attitude quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q3);           ///< Attitude quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q0);           ///< Target quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q1);           ///< Target quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q2);           ///< Target quaternion (Inertial to body)
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q3);           ///< Target quaternion (Inertial to body)
 
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
     DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]

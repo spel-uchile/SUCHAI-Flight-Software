@@ -82,6 +82,9 @@ typedef enum dat_system {
     dat_ads_acc_x,                ///< Gyroscope acceleration value along the x axis
     dat_ads_acc_y,                ///< Gyroscope acceleration value along the y axis
     dat_ads_acc_z,                ///< Gyroscope acceleration value along the z axis
+    dat_tgt_acc_x,                ///< Target acceleration value along the x axis
+    dat_tgt_acc_y,                ///< Target acceleration value along the y axis
+    dat_tgt_acc_z,                ///< Target acceleration value along the z axis
     dat_ads_mag_x,                ///< Magnetometer value along the x axis
     dat_ads_mag_y,                ///< Magnetometer value along the y axis
     dat_ads_mag_z,                ///< Magnetometer value along the z axis
@@ -90,14 +93,14 @@ typedef enum dat_system {
     dat_ads_pos_z,                ///< Satellite orbit position z (ECI)
     dat_ads_tle_epoch,            ///< Current TLE epoch, 0 if TLE is invalid
     dat_ads_tle_last,             ///< Las time position was propagated
-    dat_q_i2b_0,                  ///< Attitude quaternion (Inertial to body)
-    dat_q_i2b_1,                  ///< Attitude quaternion (Inertial to body)
-    dat_q_i2b_2,                  ///< Attitude quaternion (Inertial to body)
-    dat_q_i2b_3,                  ///< Attitude quaternion (Inertial to body)
-    dat_q_tgt_0,                  ///< Target quaternion (Inertial to body)
-    dat_q_tgt_1,                  ///< Target quaternion (Inertial to body)
-    dat_q_tgt_2,                  ///< Target quaternion (Inertial to body)
-    dat_q_tgt_3,                  ///< Target quaternion (Inertial to body)
+    dat_ads_q0,                  ///< Attitude quaternion (Inertial to body)
+    dat_ads_q1,                  ///< Attitude quaternion (Inertial to body)
+    dat_ads_q2,                  ///< Attitude quaternion (Inertial to body)
+    dat_ads_q3,                  ///< Attitude quaternion (Inertial to body)
+    dat_tgt_q0,                  ///< Target quaternion (Inertial to body)
+    dat_tgt_q1,                  ///< Target quaternion (Inertial to body)
+    dat_tgt_q2,                  ///< Target quaternion (Inertial to body)
+    dat_tgt_q3,                  ///< Target quaternion (Inertial to body)
 
     /// EPS: Energy power system
     dat_eps_vbatt,                ///< Voltage of the battery [mV]
@@ -177,6 +180,9 @@ typedef struct __attribute__((packed)) dat_status_s {
     float dat_ads_acc_x;            ///< Gyroscope acceleration value along the x axis
     float dat_ads_acc_y;            ///< Gyroscope acceleration value along the y axis
     float dat_ads_acc_z;            ///< Gyroscope acceleration value along the z axis
+    float dat_tgt_acc_x;            ///< Target acceleration value along the x axis
+    float dat_tgt_acc_y;            ///< Target acceleration value along the y axis
+    float dat_tgt_acc_z;            ///< Target acceleration value along the z axis
     float dat_ads_mag_x;            ///< Magnetometer value along the x axis
     float dat_ads_mag_y;            ///< Magnetometer value along the y axis
     float dat_ads_mag_z;            ///< Magnetometer value along the z axis
@@ -185,14 +191,14 @@ typedef struct __attribute__((packed)) dat_status_s {
     float dat_ads_pos_z;            ///< Satellite orbit position z (ECI)
     int32_t dat_ads_tle_epoch;      ///< Current TLE epoch, 0 if TLE is invalid
     int32_t  dat_ads_tle_last;      ///< Las time position was propagated
-    float dat_q_i2b_0;              ///< Attitude quaternion (Inertial to body)
-    float dat_q_i2b_1;              ///< Attitude quaternion (Inertial to body)
-    float dat_q_i2b_2;              ///< Attitude quaternion (Inertial to body)
-    float dat_q_i2b_3;              ///< Attitude quaternion (Inertial to body)
-    float dat_q_tgt_0;              ///< Target quaternion (Inertial to body)
-    float dat_q_tgt_1;              ///< Target quaternion (Inertial to body)
-    float dat_q_tgt_2;              ///< Target quaternion (Inertial to body)
-    float dat_q_tgt_3;              ///< Target quaternion (Inertial to body)
+    float dat_ads_q0;               ///< Attitude quaternion (Inertial to body)
+    float dat_ads_q1;               ///< Attitude quaternion (Inertial to body)
+    float dat_ads_q2;               ///< Attitude quaternion (Inertial to body)
+    float dat_ads_q3;               ///< Attitude quaternion (Inertial to body)
+    float dat_tgt_q0;               ///< Target quaternion (Inertial to body)
+    float dat_tgt_q1;               ///< Target quaternion (Inertial to body)
+    float dat_tgt_q2;               ///< Target quaternion (Inertial to body)
+    float dat_tgt_q3;               ///< Target quaternion (Inertial to body)
 
     /// EPS: Energy power system
     uint32_t dat_eps_vbatt;         ///< Voltage of battery [mV]
