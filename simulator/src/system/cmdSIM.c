@@ -226,9 +226,9 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     // GLOBALS
     double ctrl_cycle;
     matrix3_t I_quat;
-    mat_set_diag(&I_quat, 0.0, 0.0, 0.0);
+    mat_set_diag(&I_quat, 0.00, 0.00, 0.00);
     matrix3_t P_quat;
-    mat_set_diag(&P_quat, 0.0012, 0.0012, 0.0012);
+    mat_set_diag(&P_quat, 0.001, 0.001, 0.001);
     matrix3_t P_omega;
     mat_set_diag(&P_omega, 0.003, 0.003, 0.003);
 
@@ -264,11 +264,11 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     assert(torq_dir.v0 == q_i2b_now2tar.q0 && torq_dir.v1 == q_i2b_now2tar.q1 && torq_dir.v2 == q_i2b_now2tar.q2);
     vec_normalize(&torq_dir, NULL);
 
-//    double AttitudeRotation = 2 * acos(q_i2b_now2tar[3]);
-//    error_integral += (AttitudeRotation * ctrl_cycle_ *10E-3) * TorqueDirection;
+//    double AttitudeRotation = 2 * acos(q_i2b_now2tar[3]) * 180 / M_PI; //回転角θ。q_i2b_now2tar[3]は授業ではq0として扱った。
+//    error_integral = ctrl_cycle_ * AttitudeRotation * TorqueDirection;
     double att_rot = 2*acos(q_i2b_now2tar.q[3]);
-    vector3_t error_integral; //TODO: SUM?
-    vec_cons_mult(att_rot*ctrl_cycle*1e-3, &torq_dir, &error_integral);
+    vector3_t error_integral;
+    vec_cons_mult(att_rot*ctrl_cycle, &torq_dir, &error_integral);
 
 //    Vector<3> ControlTorque = (P_quat_ * (AttitudeRotation * TorqueDirection))
 //                              + (I_quat_ * error_integral)
