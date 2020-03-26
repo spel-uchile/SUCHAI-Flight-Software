@@ -3,7 +3,7 @@
  * @author Gustavo Díaz H - g.hernan.diaz@ing.uchile.cl
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Camilo Rojas - camrojas@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related to the PlantSat payload

@@ -9,7 +9,7 @@
  * @author Ignacio Ibanez A
  * @author Diego Ortego P
  *
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header contains system wide settings to customize different submodules

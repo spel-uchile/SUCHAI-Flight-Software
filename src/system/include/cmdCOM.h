@@ -1,7 +1,7 @@
 /**
  * @file  cmdCOM.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU Public License.
  *
  * This header contains commands related with the communication system

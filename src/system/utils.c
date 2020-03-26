@@ -2,6 +2,7 @@
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
  *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2020, Camilo Roja Milla, camrojas@uchile.cl
  *      Copyright 2020, Elias Obreque Sepulveda, elias.obreque@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify

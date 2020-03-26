@@ -2,7 +2,7 @@
  * @file init.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Matias Ramirez M - nicoram.mt@gmail.com
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * Initialization functions

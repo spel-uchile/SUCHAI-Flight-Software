@@ -1,7 +1,7 @@
 /**
  * @file  taskCommunications.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This task implements a client that reads remote commands from TRX. Also

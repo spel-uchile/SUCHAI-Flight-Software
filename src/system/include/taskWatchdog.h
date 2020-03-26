@@ -1,7 +1,7 @@
 /**
  * @file  taskWatchdog.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This task implements a client that controls watchdog timers.

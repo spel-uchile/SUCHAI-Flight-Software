@@ -1,6 +1,7 @@
 /**
  * @file utils.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @author Camilo Roja M - camrojas@uchile.cl
  * @author Elias Obreque S - elias.obreque@uchile.cl
  * @date 2020
  * @copyright GNU GPL v3

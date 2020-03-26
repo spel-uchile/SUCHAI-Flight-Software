@@ -5,7 +5,7 @@
  *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
  *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2020, Tamara Gutierrez Rojo TGR_93@hotmail.com
+ *      Copyright 2020, Tamara Gutierrez Rojo tamigr.2293@gmail.com
  *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *
  * This program is free software: you can redistribute it and/or modify
