@@ -2,7 +2,7 @@
  * @file  taskFlightPlan.h
  * @author Matias Ramirez  - nicoram.mt@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This task implements a listener that send commands scheduled in the flight

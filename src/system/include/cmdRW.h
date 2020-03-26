@@ -1,7 +1,7 @@
 /**
  * @file  cmdRW.h
  * @author Gustavo Díaz H - g.hernan.diaz@ing.uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related to reaction wheel driver

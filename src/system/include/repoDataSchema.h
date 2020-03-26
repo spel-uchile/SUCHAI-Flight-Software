@@ -1,7 +1,7 @@
 /**
  * @file  dataSchema.h
  * @author Camilo Rojas M - camrojas@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header contains structs symbolizing the schema of data.

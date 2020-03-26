@@ -2,7 +2,7 @@
  * @file data_storage.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Camilo Rojas M - camrojas@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * Persistent data storage functions.

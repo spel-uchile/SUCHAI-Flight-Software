@@ -2,7 +2,7 @@
  * @file  taskSensors.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Camilo Rojas - camrojas@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This task implements a listener, that sends commands at periodical times.

@@ -2,7 +2,7 @@
  * @file  cmdFP.h
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related to the flight plan

@@ -2,7 +2,7 @@
  * @file  cmdConsole.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
- * @date 2019
+ * @date 2020
  * @copyright GNU Public License.
  *
  * This header contains commands related with serial console functions

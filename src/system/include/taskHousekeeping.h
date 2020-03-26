@@ -2,7 +2,7 @@
  * @file  taskHousekeeping.h
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This task implements a listener, that sends commands at periodical times.

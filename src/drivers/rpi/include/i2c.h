@@ -1,7 +1,7 @@
 /**
  * @file  i2c.h
  * @author Gustavo Díaz H - g.hernan.diaz@ing.uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header have definitions of commands related to i2c interface for Linux
