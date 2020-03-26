@@ -30,6 +30,7 @@ void cmd_sim_init(void)
     cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
     cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
     cmd_add("sim_adcs_acc", sim_adcs_get_acc, "", 0);
+    cmd_add("sim_adcs_mag", sim_adcs_get_mag, "", 0);
     cmd_add("sim_adcs_do_control", sim_adcs_control_torque, "%lf", 1);
     cmd_add("sim_adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
     cmd_add("sim_adcs_set_to_nadir", sim_adcs_target_nadir, "", 0);
@@ -170,7 +171,43 @@ int sim_adcs_get_acc(char* fmt, char* params, int nparams)
             _set_sat_vector(&acc, dat_ads_acc_x);
             vector3_t tmp;
             _get_sat_vector(&tmp, dat_ads_acc_x);
-            LOGI(tag, "SAT_ACC: %lf, %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
+            LOGI(tag, "SAT_ACC: %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
+            free(out_buff);
+            free(in_buff);
+            return CMD_OK;
+        }
+        LOGE(tag, "Error reading values!")
+    }
+    LOGE(tag, "csp_transaction failed! (%d)", rc);
+
+    free(out_buff);
+    free(in_buff);
+    return CMD_FAIL;
+}
+
+int sim_adcs_get_mag(char* fmt, char* params, int nparams)
+{
+    char *out_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    char *in_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    memset(out_buff, 0, COM_FRAME_MAX_LEN);
+    memset(in_buff, 0, COM_FRAME_MAX_LEN);
+
+    int len = snprintf(out_buff, COM_FRAME_MAX_LEN, "adcs_get_mag 0");
+
+    int rc = csp_transaction(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD, 100,
+                             out_buff, COM_FRAME_MAX_LEN, in_buff, COM_FRAME_MAX_LEN);
+
+    if(rc == COM_FRAME_MAX_LEN)
+    {
+        LOGI(tag, "MAG: %s", in_buff);
+        vector3_t mag;
+        rc = sscanf(in_buff, "%lf %lf %lf", &mag.v0, &mag.v1, &mag.v2);
+        if(rc == 3)
+        {
+            _set_sat_vector(&mag, dat_ads_mag_x);
+            vector3_t tmp;
+            _get_sat_vector(&tmp, dat_ads_mag_x);
+            LOGI(tag, "SAT_MAG: %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
             free(out_buff);
             free(in_buff);
             return CMD_OK;
@@ -189,11 +226,11 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     // GLOBALS
     double ctrl_cycle;
     matrix3_t I_quat;
-    mat_set_diag(&I_quat, 0.0, 0.0, 0.0);
+    mat_set_diag(&I_quat, 0.00, 0.00, 0.00);
     matrix3_t P_quat;
-    mat_set_diag(&P_quat, 0.00001, 0.00001, 0.00001);
+    mat_set_diag(&P_quat, 0.001, 0.001, 0.001);
     matrix3_t P_omega;
-    mat_set_diag(&P_omega, 0.01, 0.01, 0.01);
+    mat_set_diag(&P_omega, 0.003, 0.003, 0.003);
 
     if(params == NULL || sscanf(params, fmt, &ctrl_cycle) != nparams)
         return CMD_FAIL;
@@ -208,9 +245,9 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     vector3_t omega_b_tar;
     _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
 
-//  libra::Quaternion q_b2i_est = q_i2b_est_.conjugate(); //body frame to inertial frame
-//  libra::Quaternion q_i2b_now2tar = q_b2i_est * q_i2b_tar_;//q_i2b_tar_ = qi2b_est * qi2b_now2tar：クオータニオンによる2回転は積であらわされる。
-//  q_i2b_now2tar.normalize();
+//    libra::Quaternion q_b2i_est = q_i2b_est_.conjugate(); //body frame to inertial frame
+//    libra::Quaternion q_i2b_now2tar = q_b2i_est * q_i2b_tar_;//q_i2b_tar_ = qi2b_est * qi2b_now2tar：クオータニオンによる2回転は積であらわされる。
+//    q_i2b_now2tar.normalize();
     quaternion_t q_b2i_est;
     quat_conjugate(&q_i2b_est, &q_b2i_est);
     quaternion_t q_i2b_now2tar;
@@ -229,13 +266,13 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
 
 //    double AttitudeRotation = 2 * acos(q_i2b_now2tar[3]) * 180 / M_PI; //回転角θ。q_i2b_now2tar[3]は授業ではq0として扱った。
 //    error_integral = ctrl_cycle_ * AttitudeRotation * TorqueDirection;
-    double att_rot = 2*acos(q_i2b_now2tar.q[3])*180/M_PI;
+    double att_rot = 2*acos(q_i2b_now2tar.q[3]);
     vector3_t error_integral;
     vec_cons_mult(att_rot*ctrl_cycle, &torq_dir, &error_integral);
 
-//    Vector<3> ControlTorque = P_quat_ * (AttitudeRotation * TorqueDirection)
-//                              + I_quat_ * error_integral
-//                              + P_omega_ * (omega_b_tar_ - omega_b_est_);
+//    Vector<3> ControlTorque = (P_quat_ * (AttitudeRotation * TorqueDirection))
+//                              + (I_quat_ * error_integral)
+//                              + (P_omega_ * (omega_b_tar_ - omega_b_est_));
     vector3_t torque_rot;
     vec_cons_mult(att_rot, &torq_dir, &torque_rot); //(AttitudeRotation * TorqueDirection)
     vector3_t P;
@@ -288,12 +325,13 @@ int sim_adcs_set_target(char* fmt, char* params, int nparams)
     quaternion_t q_b2b_now2tar;
     quaternion_t q_i2b_tar; // Target quaternion, inertial to body frame. Calculate
 
-    if(params == NULL && sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2,
-        &omega_tar.v0, &omega_tar.v1, &omega_tar.v2) != nparams)
-        return CMD_ERROR;
-
+//    if(params == NULL || sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2, &omega_tar.v0, &omega_tar.v1, &omega_tar.v2) != nparams)
+//        return CMD_ERROR;
+    int p = sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2, &omega_tar.v0, &omega_tar.v1, &omega_tar.v2);
+    LOGW(tag, fmt, fmt, i_tar.v0, i_tar.v1, i_tar.v2,
+         omega_tar.v0, omega_tar.v1, omega_tar.v2)
     // Set Z+ [0, 0, 1] as the face to point to
-    b_dir.v0 = 0.0; b_dir.v1 = 0.0; b_dir.v2 = 0.0;
+    b_dir.v0 = 0.0; b_dir.v1 = 0.0; b_dir.v2 = 1.0;
     vec_normalize(&b_dir, NULL);
 
     // Get target vector in body frame
@@ -307,6 +345,7 @@ int sim_adcs_set_target(char* fmt, char* params, int nparams)
     vec_normalize(&b_lambda, NULL);
     rot = acos(vec_inner_product(b_dir, b_tar));
     axis_rotation_to_quat(b_lambda, rot, &q_b2b_now2tar); //Calculate quaternion of shaft rotation
+    quat_normalize(&q_b2b_now2tar, NULL);
     quat_mult(&q_i2b_est, &q_b2b_now2tar, &q_i2b_tar); //Calculate quaternion after rotation
 
     _set_sat_quaterion(&q_i2b_tar, dat_tgt_q0);

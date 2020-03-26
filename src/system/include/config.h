@@ -44,10 +44,10 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define LOG_LEVEL               LOG_LVL_NONE        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
 #define SCH_NAME                "SUCHAI-DEV"         ///< Project code name
 #define SCH_DEVICE_ID           0             ///< Device unique ID
-#define SCH_SW_VERSION          "2.1.5-37-g5bae"      ///< Software version
+#define SCH_SW_VERSION          "2.1.5-45-gdadc"      ///< Software version
 
 /* General system settings */
 #define SCH_CON_ENABLED         0     ///< TaskConsole enabled (0 | 1)

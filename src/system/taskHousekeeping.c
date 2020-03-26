@@ -51,24 +51,6 @@ void taskHousekeeping(void *param)
     tle_u = cmd_get_str("obc_get_tle");
     cmd_send(tle_u);
 
-    /**
-     * Set-up control targets
-     */
-    osDelay(10000);
-    cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
-    cmd_add_params_str(cmd_tle_prop, "0");
-    cmd_send(cmd_tle_prop);
-    // Update attitude
-    cmd_t *cmd_stt = cmd_get_str("sim_adcs_quat");
-    cmd_send(cmd_stt);
-    cmd_t *cmd_acc = cmd_get_str("sim_adcs_acc");
-    cmd_send(cmd_acc);
-    // Set target attitude
-    cmd_t *cmd_point = cmd_get_str("sim_adcs_set_target");
-    cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
-    cmd_send(cmd_point);
-
-
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
@@ -82,10 +64,20 @@ void taskHousekeeping(void *param)
          */
         if ((elapsed_sec % _adcs_ctrl_period) == 0)
         {
-            // Update position
             cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
             cmd_add_params_str(cmd_tle_prop, "0");
             cmd_send(cmd_tle_prop);
+            // Update attitude
+            cmd_t *cmd_stt = cmd_get_str("sim_adcs_quat");
+            cmd_send(cmd_stt);
+            cmd_t *cmd_acc = cmd_get_str("sim_adcs_acc");
+            cmd_send(cmd_acc);
+            cmd_t *cmd_mag = cmd_get_str("sim_adcs_mag");
+            cmd_send(cmd_mag);
+            // Set target attitude
+            cmd_t *cmd_point = cmd_get_str("sim_adcs_set_target");
+            cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
+            cmd_send(cmd_point);
             // Do control loop
             cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_do_control");
             cmd_add_params_var(cmd_ctrl, _adcs_ctrl_period * 1000);

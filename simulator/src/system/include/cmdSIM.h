@@ -50,6 +50,15 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams);
 int sim_adcs_get_acc(char* fmt, char* params, int nparams);
 
 /**
+ * Read current magnetic sensors from ADCS
+ * @param fmt ""
+ * @param params ""
+ * @param nparams 0
+ * @return
+ */
+int sim_adcs_get_mag(char* fmt, char* params, int nparams);
+
+/**
  *
  * @param fmt
  * @param params
