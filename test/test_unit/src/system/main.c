@@ -5,7 +5,7 @@
  *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
  *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2020, Tamara Gutierrez Rojo TGR_93@hotmail.com
+ *      Copyright 2020, Tamara Gutierrez Rojo tamigr.2293@gmail.com
  *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *
  * This program is free software: you can redistribute it and/or modify
@@ -247,6 +247,57 @@ void testDATGET_SYSVAR(void)
     }
 }
 
+/** SUIT 4 **/
+/* The suite initialization function.
+ * Initializes
+ */
+int init_suite4(void)
+{
+    return 0;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite4(void)
+{
+    return 0;
+}
+
+//Test of quaternion library
+void testQUATERNION(void)
+{
+    quaternion_t q;
+    quaternion_t q1;
+    quaternion_t q2;
+    quaternion_t q3;
+    vector3_t vec;
+    vector3_t new_vec;
+
+    vec.v[0] = 2; vec.v[1] = -5; vec.v[2] = -1;
+    q1.q[0] = -1; q1.q[1] = -0.5; q1.q[2] = 4; q1.q[3] = 2;
+
+    /**
+     * Testing quaternion identity
+     * I = Q x Q*
+     */
+    quat_normalize(&q1, &q2);
+    quat_inverse(&q1, &q3);
+    quat_mult(&q3, &q2, &q);
+
+    CU_ASSERT_DOUBLE_EQUAL(q.q0, 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q.q1, 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q.q2, 0.0, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(q.q3, 1.0, 1e-6);
+
+    /**
+     * Testing known convertion
+     */
+    quat_frame_conv(&q2, &vec, &new_vec);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec.v0, -4.7764705882352940, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec.v1,  1.9647058823529413, 1e-6);
+    CU_ASSERT_DOUBLE_EQUAL(new_vec.v2, -1.8235294117647058, 1e-6);
+}
 
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
@@ -304,6 +355,21 @@ int main()
     if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", testSYSVARS)) ||
             (NULL == CU_add_test(pSuite, "test of dat_set_system_var", testDATSET_SYSVAR)) ||
             (NULL == CU_add_test(pSuite, "test of dat_get_system_var", testDATGET_SYSVAR))){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /*
+     * SUITE 4: Quaternions in utils.c
+     */
+    pSuite = CU_add_suite("Suite quaternions", init_suite4, clean_suite4);
+    if (NULL == pSuite) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /* add the tests to the suite */
+    if ((NULL == CU_add_test(pSuite, "test of quaternions", testQUATERNION))){
         CU_cleanup_registry();
         return CU_get_error();
     }
