@@ -4,8 +4,9 @@
  * @author Camilo Rojas M - camrojas@uchile.cl
  * @author Tomas Opazo T - tomas.opazo.t@gmail.com
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
+ * @author Tamara Gutierrez R - tamigr.2293@gmail.com
  * @author Diego Ortego P - diortego@dcc.uchile.cl
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header is an API to the system's status repository and flight plan repository.

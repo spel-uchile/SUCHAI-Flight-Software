@@ -8,8 +8,9 @@
  * @author Matias Ramirez M
  * @author Ignacio Ibanez A
  * @author Diego Ortego P
+ * @author Elias Obreque S
  *
- * @date 2019
+ * @date 2020
  * @copyright GNU GPL v3
  *
  * This header contains the main's includes

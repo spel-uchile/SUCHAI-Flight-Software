@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include "cmdOBC.h"
+#include "TLE.h"
 
 static const char* tag = "cmdOBC";
 
@@ -519,7 +520,7 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
         return CMD_ERROR;
 
     if(ts == 0)
-        ts = time(NULL);
+        ts = dat_get_time();
 
     portTick init_time = osTaskGetTickCount();
     getRVForDate(&tle, ts*1000, r, v);

@@ -1,12 +1,14 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2019, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2019, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2019, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2019, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2019, Tamara Gutierrez Rojo TGR_93@hotmail.com
- *      Copyright 2019, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
+ *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
+ *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2020, Tamara Gutierrez Rojo tamigr.2293@gmail.com
+ *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
+ *      Copyright 2020, Diego Ortego Prieto, diortego@dcc.uchile.cl
+ *      Copyright 2020, Elias Obreque Sepulveda, elias.obreque@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,14 +48,12 @@ int main(void)
 
     /* Initializing shared Queues */
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
-    if(dispatcher_queue == 0)
-        LOGE(tag, "Error creating dispatcher queue");
     executer_stat_queue = osQueueCreate(1,sizeof(int));
-    if(executer_stat_queue == 0)
-        LOGE(tag, "Error creating executer stat queue");
     executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
-    if(executer_cmd_queue == 0)
-        LOGE(tag, "Error creating executer cmd queue");
+
+    if(dispatcher_queue == 0) LOGE(tag, "Error creating dispatcher queue");
+    if(executer_stat_queue == 0) LOGE(tag, "Error creating executer stat queue");
+    if(executer_cmd_queue == 0) LOGE(tag, "Error creating executer cmd queue");
 
     int n_threads = 4;
     os_thread threads_id[n_threads];
