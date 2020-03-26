@@ -86,6 +86,16 @@ int obc_reset(char *fmt, char *params, int nparams);
 int obc_get_os_memory(char *fmt, char *params, int nparams);
 
 /**
+ * Set current OS tick.
+ * @warning Only useful in simulation environment
+ * @param fmt "%d"
+ * @param params "<tick_ms>"
+ * @param nparams 1
+ * @return CMD_OK | CMD_ERROR
+ */
+int obc_set_tick(char* fmt, char* params,int nparams);
+
+/**
  * Set the system time only if is not running Linux
  *
  * @param fmt Str. Parameters format "%d"

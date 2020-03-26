@@ -36,6 +36,7 @@ void cmd_obc_init(void)
     cmd_add("obc_debug", obc_debug, "%d", 1);
     cmd_add("obc_reset", obc_reset, "", 0);
     cmd_add("obc_get_mem", obc_get_os_memory, "", 0);
+    cmd_add("obc_set_tick", obc_set_tick, "%d", 1);
     cmd_add("obc_set_time", obc_set_time,"%d",1);
     cmd_add("obc_get_time", obc_get_time, "%d", 1);
     cmd_add("obc_reset_wdt", obc_reset_wdt, "", 0);
@@ -166,6 +167,16 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
         #endif
         return CMD_OK;
     #endif
+}
+
+int obc_set_tick(char* fmt, char* params,int nparams)
+{
+    int tick_ms;
+    if(params == NULL || sscanf(params, fmt, &tick_ms) != nparams)
+        return CMD_ERROR;
+
+    osTaskSetTickCount(tick_ms*1000);
+    return CMD_OK;
 }
 
 int obc_set_time(char* fmt, char* params,int nparams)
