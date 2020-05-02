@@ -380,7 +380,7 @@ int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
 
     char *_fmt = "%lf %lf %lf %lf %lf %lf";
     char _params[SCH_CMD_MAX_STR_PARAMS];
-    snprintf(_params, SCH_CMD_MAX_STR_PARAMS, fmt, i_tar.v0, i_tar.v1, i_tar.v2,
+    snprintf(_params, SCH_CMD_MAX_STR_PARAMS, _fmt, i_tar.v0, i_tar.v1, i_tar.v2,
              omega_b_tar.v0, omega_b_tar.v1, omega_b_tar.v2);
     int ret = sim_adcs_set_target(_fmt, _params, 6);
 

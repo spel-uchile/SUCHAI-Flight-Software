@@ -44,10 +44,10 @@
 #endif
 
 /* System debug configurations */
-#define LOG_LEVEL               LOG_LVL_NONE        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
-#define SCH_NAME                "SUCHAI-DEV"         ///< Project code name
-#define SCH_DEVICE_ID           0             ///< Device unique ID
-#define SCH_SW_VERSION          "2.1.5-45-gdadc"      ///< Software version
+#define LOG_LEVEL               LOG_LVL_INFO        ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#define SCH_NAME                "SIMULATOR"         ///< Project code name
+#define SCH_DEVICE_ID           1             ///< Device unique ID
+#define SCH_SW_VERSION          "2.1.5-75-ge7f6"      ///< Software version
 
 /* General system settings */
 #define SCH_CON_ENABLED         0     ///< TaskConsole enabled (0 | 1)
@@ -82,10 +82,10 @@
 #define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_STORAGE_MODE        0    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
-#define SCH_STORAGE_PGUSER      "carlos"
+#define SCH_STORAGE_PGUSER      "javierin"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage

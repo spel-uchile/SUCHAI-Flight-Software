@@ -50,6 +50,7 @@ void cmd_obc_init(void)
     cmd_add("obc_set_tle", obc_set_tle, "%d %n", 2);
     cmd_add("obc_update_tle", obc_update_tle, "", 0);
     cmd_add("obc_prop_tle", obc_prop_tle, "%ld", 1);
+    cmd_add("obc_set_opmode", obc_set_opmode, "%d", 1);
 }
 
 int obc_ident(char* fmt, char* params, int nparams)
@@ -556,5 +557,14 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     LOGI(tag, "getRVForDate: %.06f ms", (getrv_time-init_time)/1000.0);
     LOGI(tag, "obc_prop_tle: %.06f ms", (final_time-init_time)/1000.0);
 
+    return CMD_OK;
+}
+
+int obc_set_opmode(char *fmt, char *params, int nparams)
+{
+    int mode;
+    if(params == NULL || sscanf(params, fmt, &mode) != nparams)
+        return CMD_ERROR;
+    dat_set_system_var(dat_obc_opmode, mode);
     return CMD_OK;
 }

@@ -326,9 +326,11 @@ typedef union fvalue{
     int32_t i;
 } fvalue_t;
 
-#define DAT_OBC_OPMODE_NORMAL   (0) ///< Normal operation
-#define DAT_OBC_OPMODE_WARN     (1) ///< Fail safe operation
-#define DAT_OBC_OPMODE_FAIL     (2) ///< Generalized fail operation
+#define DAT_OBC_OPMODE_NORMAL        (0) ///< Normal operation
+#define DAT_OBC_OPMODE_WARN          (1) ///< Fail safe operation
+#define DAT_OBC_OPMODE_FAIL          (2) ///< Generalized fail operation
+#define DAT_OBC_OPMODE_REF_POINT     (4) ///< Point to vector
+#define DAT_OBC_OPMODE_NADIR_POINT   (5) ///< Point to nadir
 
 /** The repository's name */
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name

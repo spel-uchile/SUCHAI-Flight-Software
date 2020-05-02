@@ -58,7 +58,7 @@ void taskHousekeeping(void *param)
 
         /* 1 second actions */
         dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
-
+        dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_REF_POINT);
         /**
          * Control LOOP
          */
@@ -75,8 +75,19 @@ void taskHousekeeping(void *param)
             cmd_t *cmd_mag = cmd_get_str("sim_adcs_mag");
             cmd_send(cmd_mag);
             // Set target attitude
-            cmd_t *cmd_point = cmd_get_str("sim_adcs_set_target");
-            cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
+            //cmd_t *cmd_point = cmd_get_str("sim_adcs_set_target");
+            //cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
+            int mode;
+            mode = dat_get_system_var(dat_obc_opmode);
+            cmd_t *cmd_point;
+            if(mode == DAT_OBC_OPMODE_REF_POINT)
+            {
+                cmd_point = cmd_get_str("sim_adcs_set_target");
+                cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
+            } else if(mode == DAT_OBC_OPMODE_NADIR_POINT)
+            {
+                cmd_point = cmd_get_str("sim_adcs_set_to_nadir");
+            }
             cmd_send(cmd_point);
             // Do control loop
             cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_do_control");

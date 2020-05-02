@@ -312,4 +312,13 @@ int obc_update_tle(char *fmt, char *params, int nparams);
  */
 int obc_prop_tle(char *fmt, char *params, int nparams);
 
+/**
+ * Set OBC operation mode
+ * @param fmt Str. Parameters format "%d"
+ * @param params Parameters as string <mode>
+ * @param nparams Int. Number of parameters 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_set_opmode(char *fmt, char *params, int nparams);
+
 #endif /* CMD_OBC_H */
