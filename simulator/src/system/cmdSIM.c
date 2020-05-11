@@ -270,9 +270,7 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     vector3_t error_integral;
     vec_cons_mult(att_rot*ctrl_cycle, &torq_dir, &error_integral);
 
-//    Vector<3> ControlTorque = (P_quat_ * (AttitudeRotation * TorqueDirection))
-//                              + (I_quat_ * error_integral)
-//                              + (P_omega_ * (omega_b_tar_ - omega_b_est_));
+//    Vector<3> ControlTorque = (P_quat_ * (AttitudeRotation * TorqueDirection)) + (I_quat_ * error_integral) + (P_omega_ * (omega_b_tar_ - omega_b_est_));
     vector3_t torque_rot;
     vec_cons_mult(att_rot, &torq_dir, &torque_rot); //(AttitudeRotation * TorqueDirection)
     vector3_t P;
@@ -325,11 +323,10 @@ int sim_adcs_set_target(char* fmt, char* params, int nparams)
     quaternion_t q_b2b_now2tar;
     quaternion_t q_i2b_tar; // Target quaternion, inertial to body frame. Calculate
 
-//    if(params == NULL || sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2, &omega_tar.v0, &omega_tar.v1, &omega_tar.v2) != nparams)
-//        return CMD_ERROR;
-    int p = sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2, &omega_tar.v0, &omega_tar.v1, &omega_tar.v2);
-    LOGW(tag, fmt, fmt, i_tar.v0, i_tar.v1, i_tar.v2,
-         omega_tar.v0, omega_tar.v1, omega_tar.v2)
+    if(params == NULL || sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2, &omega_tar.v0, &omega_tar.v1, &omega_tar.v2) != nparams)
+        return CMD_ERROR;
+//    int p = sscanf(params, fmt, &i_tar.v0, &i_tar.v1, &i_tar.v2, &omega_tar.v0, &omega_tar.v1, &omega_tar.v2);
+    LOGW(tag, fmt, i_tar.v0, i_tar.v1, i_tar.v2, omega_tar.v0, omega_tar.v1, omega_tar.v2);
     // Set Z+ [0, 0, 1] as the face to point to
     b_dir.v0 = 0.0; b_dir.v1 = 0.0; b_dir.v2 = 1.0;
     vec_normalize(&b_dir, NULL);
@@ -380,6 +377,7 @@ int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
 
     char *_fmt = "%lf %lf %lf %lf %lf %lf";
     char _params[SCH_CMD_MAX_STR_PARAMS];
+    memset(_params, 0, SCH_CMD_MAX_STR_PARAMS);
     snprintf(_params, SCH_CMD_MAX_STR_PARAMS, _fmt, i_tar.v0, i_tar.v1, i_tar.v2,
              omega_b_tar.v0, omega_b_tar.v1, omega_b_tar.v2);
     int ret = sim_adcs_set_target(_fmt, _params, 6);
