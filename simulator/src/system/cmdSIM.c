@@ -32,8 +32,10 @@ void cmd_sim_init(void)
     cmd_add("sim_adcs_acc", sim_adcs_get_acc, "", 0);
     cmd_add("sim_adcs_mag", sim_adcs_get_mag, "", 0);
     cmd_add("sim_adcs_do_control", sim_adcs_control_torque, "%lf", 1);
+    cmd_add("sim_adcs_mag_moment", sim_adcs_mag_moment, "", 0);
     cmd_add("sim_adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
     cmd_add("sim_adcs_set_to_nadir", sim_adcs_target_nadir, "", 0);
+    cmd_add("sim_adcs_detumbling_mag", sim_adcs_detumbling_mag, "", 0);
     cmd_add("sim_adcs_send_attitude", sim_adcs_send_attitude, "", 0);
 }
 
@@ -311,6 +313,103 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     return CMD_OK;
 }
 
+int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
+{
+    // GLOBALS
+    vector3_t rw_lower_limit;
+    rw_lower_limit.v[0] = 0.0; rw_lower_limit.v[1] = 0.0; rw_lower_limit.v[2] = 0.0;
+    vector3_t select_mag_dir_torque;
+    select_mag_dir_torque.v[0] = 0.0; select_mag_dir_torque.v[1] = 0.0; select_mag_dir_torque.v[2] = 0.0;
+    vector3_t max_mag_am2;
+    max_mag_am2.v[0] = 0.0; max_mag_am2.v[1] = 0.0; max_mag_am2.v[2] = 0.0;
+    vector3_t mag_earth_b_est;
+    mag_earth_b_est.v[0] = 0.0; mag_earth_b_est.v[1] = 0.0; mag_earth_b_est.v[2] = 0.0;
+    matrix3_t I_c;
+    mat_set_diag(&I_c, 0.00, 0.00, 0.00);
+    double nT2T = 0;
+
+    // PARAMETERS
+    vector3_t omega_b_est;  // Current GYRO. Read from ADCS
+    _get_sat_vector(&omega_b_est, dat_ads_acc_x);
+    vector3_t omega_b_tar;
+    _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
+
+//    select_mag_dir_torque_[0] = abs(omega_b_est_[0]) < rw_lower_limit_[0];
+//    select_mag_dir_torque_[1] = abs(omega_b_est_[1]) < rw_lower_limit_[1];
+//    select_mag_dir_torque_[2] = abs(omega_b_est_[2]) < rw_lower_limit_[2];
+//    if (adcs_mode_ == DETUMBLING_MAG){
+//        select_mag_dir_torque_[0] = 1.0;
+//        select_mag_dir_torque_[1] = 1.0;
+//        select_mag_dir_torque_[2] = 1.0;
+//    }
+    select_mag_dir_torque.v[0] = fabs(omega_b_est.v[0]) < rw_lower_limit.v[0];
+    select_mag_dir_torque.v[1] = fabs(omega_b_est.v[1]) < rw_lower_limit.v[1];
+    select_mag_dir_torque.v[2] = fabs(omega_b_est.v[2]) < rw_lower_limit.v[2];
+    int mode = dat_get_system_var(dat_obc_opmode);
+    if (mode == DAT_OBC_OPMODE_DETUMB_MAG)
+    {
+        select_mag_dir_torque.v[0] = 1.0;
+        select_mag_dir_torque.v[1] = 1.0;
+        select_mag_dir_torque.v[2] = 1.0;
+    }
+
+//    Vector<3> error_angular_vel = omega_b_est_ - omega_b_tar_;
+//    Matrix<3, 3> I_c = dynamics_->attitude_->GetInertiaTensor();
+//    Vector<3> control_torque = -1.0*I_c*error_angular_vel;
+//    double inv_norm_torque =  1.0;
+//    if( norm(control_torque) >= 1E-09 ) {
+//        inv_norm_torque = 1.0 / norm(control_torque);
+//    }
+//    control_torque *= inv_norm_torque;
+    vec_cons_mult(-1.0, &omega_b_tar, NULL);
+    vector3_t error_angular_vel;
+    vec_sum(omega_b_est, omega_b_tar, &error_angular_vel);
+    vector3_t control_torque;
+    vec_cons_mult(-1.0, &error_angular_vel, NULL);
+    mat3_vec3_mult(I_c, error_angular_vel, &control_torque);
+    double inv_norm_torque = 1.0;
+    double norm_torque = vec_norm(control_torque);
+    if (norm_torque >= pow(10.0, -9.0))
+    {
+        inv_norm_torque = 1.0 / norm_torque;
+    }
+    vec_cons_mult(inv_norm_torque, &control_torque, NULL);
+
+//    Vector<3> max_torque = outer_product(max_mag_Am2_, nT2T*mag_earth_b_est_);
+//    control_torque[0] *=  select_mag_dir_torque_[0]*abs(max_torque[0]);
+//    control_torque[1] *=  select_mag_dir_torque_[1]*abs(max_torque[1]);
+//    control_torque[2] *=  select_mag_dir_torque_[2]*abs(max_torque[2]);
+    vector3_t nT2T_mag_earth_b_est;
+    vec_cons_mult(nT2T, &mag_earth_b_est, &nT2T_mag_earth_b_est);
+    vector3_t max_torque;
+    vec_outer_product(max_mag_am2, nT2T_mag_earth_b_est, &max_torque);
+    control_torque.v[0] *= select_mag_dir_torque.v[0] * fabs(max_torque.v[0]);
+    control_torque.v[1] *= select_mag_dir_torque.v[1] * fabs(max_torque.v[1]);
+    control_torque.v[2] *= select_mag_dir_torque.v[2] * fabs(max_torque.v[2]);
+
+//    double inv_b_norm2 = 1.0/(pow(nT2T*norm(mag_earth_b_est_), 2.0));
+//    control_mag_moment_ = inv_b_norm2 * outer_product(nT2T * mag_earth_b_est_, control_torque);
+    double inv_b_norm2 = 1.0 / pow(nT2T * vec_norm(mag_earth_b_est), 2.0);
+    vector3_t control_mag_moment_temp, control_mag_moment;
+    vec_outer_product(nT2T_mag_earth_b_est, control_torque, &control_mag_moment_temp);
+    vec_cons_mult(inv_b_norm2, &control_mag_moment_temp, &control_mag_moment);
+
+    LOGI(tag, "CTRL_MAG_MOMENT: %f, %f, %f", control_mag_moment.v0, control_mag_moment.v1, control_mag_moment.v2);
+
+    csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
+    if(packet == NULL)
+        return CMD_FAIL;
+
+    int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
+                       "adcs_set_mag_moment %.06f %.06f %.06f",
+                       control_mag_moment.v0, control_mag_moment.v1, control_mag_moment.v2);
+    packet->length = len;
+    LOGI(tag, "ADCS CMD: (%d) %s", packet->length, packet->data);
+
+    int rc = csp_sendto(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD,
+                        SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
+}
+
 int sim_adcs_set_target(char* fmt, char* params, int nparams)
 {
     double rot;
@@ -374,6 +473,28 @@ int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
     quaternion_t q_i2b_est;
     _get_sat_quaterion(&q_i2b_est, dat_ads_q0);
     quat_frame_conv(&q_i2b_est, &omega_i_tar, &omega_b_tar);
+
+    char *_fmt = "%lf %lf %lf %lf %lf %lf";
+    char _params[SCH_CMD_MAX_STR_PARAMS];
+    memset(_params, 0, SCH_CMD_MAX_STR_PARAMS);
+    snprintf(_params, SCH_CMD_MAX_STR_PARAMS, _fmt, i_tar.v0, i_tar.v1, i_tar.v2,
+             omega_b_tar.v0, omega_b_tar.v1, omega_b_tar.v2);
+    int ret = sim_adcs_set_target(_fmt, _params, 6);
+
+    return ret;
+}
+
+int sim_adcs_detumbling_mag(char* fmt, char* params, int nparams)
+{
+    vector3_t i_tar;
+    _get_sat_vector(&i_tar, dat_ads_pos_x);
+    vec_cons_mult(-1.0, &i_tar, NULL);
+    vec_normalize(&i_tar, NULL);
+
+    vector3_t omega_b_tar;
+    omega_b_tar.v[0] = 0.0;
+    omega_b_tar.v[0] = 0.0;
+    omega_b_tar.v[0] = 0.0;
 
     char *_fmt = "%lf %lf %lf %lf %lf %lf";
     char _params[SCH_CMD_MAX_STR_PARAMS];

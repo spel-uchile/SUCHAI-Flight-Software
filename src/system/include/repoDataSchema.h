@@ -330,7 +330,8 @@ typedef union fvalue{
 #define DAT_OBC_OPMODE_WARN          (1) ///< Fail safe operation
 #define DAT_OBC_OPMODE_FAIL          (2) ///< Generalized fail operation
 #define DAT_OBC_OPMODE_REF_POINT     (4) ///< Point to vector
-#define DAT_OBC_OPMODE_NADIR_POINT   (5) ///< Point to nadir
+#define DAT_OBC_OPMODE_NAD_POINT     (5) ///< Point to nadir
+#define DAT_OBC_OPMODE_DETUMB_MAG    (6) ///< Detumbling
 
 /** The repository's name */
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name

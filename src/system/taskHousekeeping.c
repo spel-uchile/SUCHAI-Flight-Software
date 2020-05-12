@@ -84,9 +84,12 @@ void taskHousekeeping(void *param)
             {
                 cmd_point = cmd_get_str("sim_adcs_set_target");
                 cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
-            } else if(mode == DAT_OBC_OPMODE_NADIR_POINT)
+            } else if(mode == DAT_OBC_OPMODE_NAD_POINT)
             {
                 cmd_point = cmd_get_str("sim_adcs_set_to_nadir");
+            } else if(mode == DAT_OBC_OPMODE_DETUMB_MAG)
+            {
+                cmd_point = cmd_get_str("sim_adcs_detumbling_mag");
             }
             cmd_send(cmd_point);
             // Do control loop
