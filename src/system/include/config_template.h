@@ -86,6 +86,8 @@
 #define SCH_STORAGE_TRIPLE_WR   {{SCH_STORAGE_TRIPLE_WR}}   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 #define SCH_STORAGE_PGUSER      "{{SCH_STORAGE_PGUSER}}"
+#define SCH_STORAGE_PGPASS      "proyectosuchai2020"
+#define SCH_STORAGE_PGHOST      "localhost"
 
 #define SCH_SECTIONS_PER_PAYLOAD 2                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage
