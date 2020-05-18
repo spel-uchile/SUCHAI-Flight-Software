@@ -59,7 +59,7 @@ int storage_init(const char *file)
 #elif SCH_STORAGE_MODE == 2
     sprintf(fs_db_name, "fs_db_%u", SCH_COMM_ADDRESS);
     // Check if databse exist by connecting to its own db
-    sprintf(postgres_conf_s, "user=%s dbname=%s", SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER);
+    sprintf(postgres_conf_s, "user=%s dbname=%s password=%s", SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
