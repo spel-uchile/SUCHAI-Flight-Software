@@ -32,7 +32,7 @@ static const char *tag = "data_storage";
 
 char* fp_table = "flightPlan";
 char fs_db_name[15];
-char postgres_conf_s[30];
+char postgres_conf_s[100];
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
@@ -58,8 +58,8 @@ int storage_init(const char *file)
     }
 #elif SCH_STORAGE_MODE == 2
     sprintf(fs_db_name, "fs_db_%u", SCH_COMM_ADDRESS);
-    // Check if databse exist by connecting to its own db
-    sprintf(postgres_conf_s, "user=%s dbname=%s password=%s", SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER, SCH_STORAGE_PGPASS);
+    // Check if database exist by connecting to its own db
+    sprintf(postgres_conf_s, "host=%s user=%s dbname=%s password=%s", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
@@ -106,7 +106,7 @@ int storage_init(const char *file)
     PQclear(res);
     PQfinish(conn);
 
-    sprintf(postgres_conf_s, "user=%s dbname=%s", SCH_STORAGE_PGUSER, fs_db_name);
+    sprintf(postgres_conf_s, " host=%s user=%s dbname=%s password=%s", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, fs_db_name, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
