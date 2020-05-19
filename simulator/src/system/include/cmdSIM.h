@@ -74,7 +74,7 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams);
  * @param nparams
  * @return
  */
-int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
+int sim_adcs_mag_moment(char* fmt, char* params, int nparams);
 
 /**
  * Set ADCS vector (Intertial frame) and velocity (body frame) targets

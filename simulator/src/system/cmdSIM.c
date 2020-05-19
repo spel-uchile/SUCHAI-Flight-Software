@@ -408,6 +408,14 @@ int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
 
     int rc = csp_sendto(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD,
                         SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
+
+    if(rc != 0)
+    {
+        csp_buffer_free((void *)packet);
+        return CMD_FAIL;
+    }
+
+    return CMD_OK;
 }
 
 int sim_adcs_set_target(char* fmt, char* params, int nparams)
