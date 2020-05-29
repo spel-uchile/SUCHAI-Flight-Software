@@ -180,14 +180,11 @@ int drp_test_system_vars(char *fmt, char *params, int nparams)
 int drp_set_deployed(char *fmt, char *params, int nparams)
 {
     int deployed;
-    if(sscanf(params, fmt, &deployed) == nparams)
+    if(params == NULL || sscanf(params, fmt, &deployed) != nparams)
     {
-        dat_set_system_var(dat_dep_deployed, deployed);
-        return CMD_OK;
+        return CMD_FAIL;
     }
-    else
-    {
-        LOGE(tag, "Error parsing params");
-        return CMD_ERROR;
-    }
+
+    dat_set_system_var(dat_dep_deployed, deployed);
+    return CMD_OK;
 }
