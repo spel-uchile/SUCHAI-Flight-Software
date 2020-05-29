@@ -129,30 +129,28 @@ int fp_delete(char* fmt, char* params, int nparams)
     time_t unixtime;
     int day, month, year, hour, min, sec;
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec) == nparams)
-    {
-        str_time.tm_mday = day;
-        str_time.tm_mon = month-1;
-        str_time.tm_year = year-1900;
-        str_time.tm_hour = hour;
-        str_time.tm_min = min;
-        str_time.tm_sec = sec;
-        str_time.tm_isdst = 0;
-
-        unixtime = mktime(&str_time);
-
-        int rc = dat_del_fp((int)unixtime);
-
-        if(rc==0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec) != nparams)
     {
         LOGW(tag, "fp_del_cmd used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
+
+    str_time.tm_mday = day;
+    str_time.tm_mon = month-1;
+    str_time.tm_year = year-1900;
+    str_time.tm_hour = hour;
+    str_time.tm_min = min;
+    str_time.tm_sec = sec;
+    str_time.tm_isdst = 0;
+
+    unixtime = mktime(&str_time);
+
+    int rc = dat_del_fp((int)unixtime);
+
+    if(rc==0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
 }
 
 int fp_delete_unix(char* fmt, char* params, int nparams)
