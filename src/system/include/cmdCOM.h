@@ -155,6 +155,16 @@ int com_send_tc_frame(char *fmt, char *params, int nparams);
 int com_send_data(char *fmt, char *params, int nparams);
 
 /**
+ * Auxiliary function to send data in one or several frames
+ * @param node CSP destination node.
+ * @param data Buffer to send
+ * @param len Buffer len in bytes
+ * @param type Telemetry type
+ * @return CMD_OK | CMD_FAIL | CMD_ERROR
+ */
+int _com_send_data(int node, void *data, size_t len, int type);
+
+/**
  * Show CSP debug information, currently the route table and interfaces
  * @param fmt Not used
  * @param params Not used

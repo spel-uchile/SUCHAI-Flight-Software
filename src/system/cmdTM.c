@@ -34,46 +34,24 @@ void cmd_tm_init(void)
 
 int tm_send_status(char *fmt, char *params, int nparams)
 {
-    if(params == NULL)
+    //Format: <node>
+    int dest_node;
+    if(params == NULL || sscanf(params, fmt, &dest_node) != nparams)
     {
-        LOGE(tag, "params is null!");
         return CMD_ERROR;
     }
 
-    int dest_node;
-    //Format: <node>
-    if(nparams == sscanf(params, fmt, &dest_node))
+    // Pack status variables to a structure
+    dat_status_t status;
+    dat_status_to_struct(&status);
+    if(log_lvl >= LOG_LVL_DEBUG)
     {
-        com_data_t data;
-        memset(&data, 0, sizeof(data));
-        data.node = (uint8_t)dest_node;
-        data.frame.nframe = 0;
-        data.frame.type = TM_TYPE_STATUS;
-        data.frame.ndata = 1;
-
-        // Pack status variables to a structure
-        dat_status_t status;
-        dat_status_to_struct(&status);
-        if(log_lvl >= LOG_LVL_DEBUG)
-        {
-            LOGD(tag, "Sending system status to node %d", dest_node)
-            dat_print_status(&status);
-        }
-
-        // The total amount of status variables must fit inside a nframe
-        LOGD(tag, "sizeof(status) = %lu", sizeof(status));
-        LOGD(tag, "sizeof(data.nframe) = %lu", sizeof(data.frame));
-        LOGD(tag, "sizeof(data.nframe.data) = %lu", sizeof(data.frame.data));
-        assert(sizeof(status) < sizeof(data.frame.data));
-        memcpy(data.frame.data.data8, &status, sizeof(status));
-
-        return com_send_data("", (char *)&data, 0);
+        LOGD(tag, "Sending system status to node %d", dest_node)
+        dat_print_status(&status);
     }
-    else
-    {
-        LOGW(tag, "Invalid args!");
-        return CMD_FAIL;
-    }
+
+    // Send telemetry
+    return _com_send_data(dest_node, &status, sizeof(status), TM_TYPE_STATUS);
 }
 
 int tm_parse_status(char *fmt, char *params, int nparams)
