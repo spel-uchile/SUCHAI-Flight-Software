@@ -319,14 +319,14 @@ int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
     vector3_t rw_lower_limit;
     rw_lower_limit.v[0] = 0.0; rw_lower_limit.v[1] = 0.0; rw_lower_limit.v[2] = 0.0;
     vector3_t select_mag_dir_torque;
-    select_mag_dir_torque.v[0] = 0.0; select_mag_dir_torque.v[1] = 0.0; select_mag_dir_torque.v[2] = 0.0;
+    select_mag_dir_torque.v[0] = 1.0; select_mag_dir_torque.v[1] = 1.0; select_mag_dir_torque.v[2] = 1.0;
     vector3_t max_mag_am2;
-    max_mag_am2.v[0] = 0.0; max_mag_am2.v[1] = 0.0; max_mag_am2.v[2] = 0.0;
+    max_mag_am2.v[0] = 0.35; max_mag_am2.v[1] = 0.35; max_mag_am2.v[2] = 0.35;
     vector3_t mag_earth_b_est;
     mag_earth_b_est.v[0] = 0.0; mag_earth_b_est.v[1] = 0.0; mag_earth_b_est.v[2] = 0.0;
     matrix3_t I_c;
-    mat_set_diag(&I_c, 0.00, 0.00, 0.00);
-    double nT2T = 0;
+    mat_set_diag(&I_c, 0.035, 0.035, 0.007);
+    double nT2T = 1.0e-9;
 
     // PARAMETERS
     vector3_t omega_b_est;  // Current GYRO. Read from ADCS
