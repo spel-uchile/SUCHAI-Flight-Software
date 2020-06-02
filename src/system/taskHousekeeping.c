@@ -58,7 +58,7 @@ void taskHousekeeping(void *param)
 
         /* 1 second actions */
         dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
-        dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_REF_POINT);
+        dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_DETUMB_MAG);
         /**
          * Control LOOP
          */
@@ -93,8 +93,9 @@ void taskHousekeeping(void *param)
             }
             cmd_send(cmd_point);
             // Do control loop
-            cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_do_control");
-            cmd_add_params_var(cmd_ctrl, _adcs_ctrl_period * 1000);
+            //cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_do_control");
+            //cmd_add_params_var(cmd_ctrl, _adcs_ctrl_period * 1000);
+            cmd_t *cmd_ctrl = cmd_get_str("sim_adcs_mag_moment");
             cmd_send(cmd_ctrl);
             // Send telemetry to ADCS subsystem
             cmd_t *cmd_att = cmd_get_str("sim_adcs_send_attitude");

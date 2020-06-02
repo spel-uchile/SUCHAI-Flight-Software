@@ -323,7 +323,7 @@ int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
     vector3_t max_mag_am2;
     max_mag_am2.v[0] = 0.35; max_mag_am2.v[1] = 0.35; max_mag_am2.v[2] = 0.35;
     vector3_t mag_earth_b_est;
-    mag_earth_b_est.v[0] = 0.0; mag_earth_b_est.v[1] = 0.0; mag_earth_b_est.v[2] = 0.0;
+    _get_sat_vector(&mag_earth_b_est, dat_ads_mag_x);
     matrix3_t I_c;
     mat_set_diag(&I_c, 0.035, 0.035, 0.007);
     double nT2T = 1.0e-9;
