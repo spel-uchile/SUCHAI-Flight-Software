@@ -55,7 +55,6 @@ int fp_set(char *fmt, char *params, int nparams)
         str_time.tm_isdst = 0;
 
         unixtime = mktime(&str_time);
-        strtok(params+next,"\n");
         strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
         int rc = dat_set_fp((int)unixtime, command, args, executions, period);
 
