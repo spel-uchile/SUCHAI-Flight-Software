@@ -159,21 +159,19 @@ int fp_delete_unix(char* fmt, char* params, int nparams)
     time_t unixtime;
     int tmptime;
 
-    if(sscanf(params, fmt, &tmptime) == nparams)
+    if(params == NULL || sscanf(params, fmt, &tmptime) != nparams)
     {
-        unixtime = (time_t)tmptime;
-        int rc = dat_del_fp((int)unixtime);
+        LOGW(tag, "fp_del_cmd_unix used with invalid params! (%s)", params);
+        return CMD_ERROR;
+    }
 
-        if(rc==0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
+    unixtime = (time_t) tmptime;
+    int rc = dat_del_fp((int) unixtime);
+
+    if (rc == 0)
+        return CMD_OK;
     else
-    {
-        LOGW(tag, "fp_del_cmd_unix used with invalid params: %s", params);
         return CMD_FAIL;
-    }
 }
 
 int fp_show(char* fmt, char* params, int nparams)
