@@ -490,9 +490,9 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
                                "SET command=\'%s\', args=\'%s\', executions=%d, periodical=%d;";
 
         #if SCH_STORAGE_MODE == 2
-            char insert_query[300];
-
-            sprintf(insert_query, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
+            char insert_query[SCH_BUFF_MAX_LEN*2];
+            memset(&insert_query, 0, sizeof(insert_query));
+            snprintf(insert_query, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
                     command, args, executions, periodical);
             LOGI(tag, "Flight Plan Postgres Command: %s",  insert_query);
             PGresult *res = PQexec(conn, insert_query);
