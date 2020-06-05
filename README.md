@@ -72,7 +72,7 @@ Linux installation requires the following libraries:
 * cmake
 * pkg-config
 * pthread
-* cunit (libcunit-dev)
+* cunit (libcunit1-dev)
 * sqlite3 (libsqlite3-dev)
 * zmq (libzmq3-dev)
 * unzip

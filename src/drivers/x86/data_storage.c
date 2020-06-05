@@ -30,7 +30,7 @@ static const char *tag = "data_storage";
 
 char* fp_table = "flightPlan";
 char fs_db_name[15];
-char postgres_conf_s[100];
+char postgres_conf_s[SCH_BUFF_MAX_LEN];
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
@@ -57,7 +57,7 @@ int storage_init(const char *file)
 #elif SCH_STORAGE_MODE == 2
     sprintf(fs_db_name, "fs_db_%u", SCH_COMM_ADDRESS);
     // Check if database exist by connecting to its own db
-    sprintf(postgres_conf_s, "host=%s user=%s dbname=%s password=%s", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER, SCH_STORAGE_PGPASS);
+    snprintf(postgres_conf_s, SCH_BUFF_MAX_LEN, "host=%s user=%s dbname=%s password=%s", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
@@ -66,8 +66,9 @@ int storage_init(const char *file)
         return -1;
     }
 
-    char select_exist_db[100];
-    sprintf(select_exist_db, "SELECT datname FROM pg_database "
+    char select_exist_db[SCH_BUFF_MAX_LEN];
+    memset(&select_exist_db, 0, SCH_BUFF_MAX_LEN);
+    snprintf(select_exist_db, SCH_BUFF_MAX_LEN,"SELECT datname FROM pg_database "
                              "WHERE datname = '%s';", fs_db_name);
 
     LOGD(tag, "SQL command: %s", select_exist_db);
@@ -84,8 +85,9 @@ int storage_init(const char *file)
     if ((value_str = PQgetvalue(res, 0, 0)) == NULL)
     {
         //Create database
-        char create_db[100];
-        sprintf(create_db, "CREATE DATABASE %s;", fs_db_name);
+        char create_db[SCH_BUFF_MAX_LEN];
+        memset(&create_db, 0, SCH_BUFF_MAX_LEN);
+        snprintf(create_db, SCH_BUFF_MAX_LEN, "CREATE DATABASE %s;", fs_db_name);
         PQclear(res);
         LOGD(tag, "SQL command: %s", create_db);
         res = PQexec(conn, create_db);
@@ -184,8 +186,9 @@ int storage_table_repo_init(char* table, int drop)
 
     }
 
-    char create_table_string[100];
-    sprintf(create_table_string, "CREATE TABLE IF NOT EXISTS %s("
+    char create_table_string[SCH_BUFF_MAX_LEN];
+    memset(&create_table_string, 0, SCH_BUFF_MAX_LEN);
+    snprintf(create_table_string, SCH_BUFF_MAX_LEN, "CREATE TABLE IF NOT EXISTS %s("
      "idx INTEGER PRIMARY KEY, "
      "name TEXT UNIQUE, "
      "value INT);", table);
@@ -253,8 +256,9 @@ int storage_table_flight_plan_init(int drop)
     }
 #elif  SCH_STORAGE_MODE == 2
     if (drop) {
-        char drop_query[100];
-        sprintf(drop_query, "DROP TABLE IF EXISTS %s", fp_table);
+        char drop_query[SCH_BUFF_MAX_LEN];
+        memset(&drop_query, 0, SCH_BUFF_MAX_LEN);
+        snprintf(drop_query, SCH_BUFF_MAX_LEN, "DROP TABLE IF EXISTS %s", fp_table);
         PGresult *res = PQexec(conn, drop_query);
         if ( PQresultStatus(res) != PGRES_COMMAND_OK ) {
             LOGE(tag, "Drop fp postgres command: %s failed", drop_query)
@@ -293,13 +297,15 @@ int storage_table_payload_init(int drop)
     int i = 0;
     for(i=0; i< last_sensor; ++i)
     {
-        char create_table[300];
-        sprintf(create_table, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
+        char create_table[SCH_BUFF_MAX_LEN*2];
+        memset(&create_table, 0, SCH_BUFF_MAX_LEN*2);
+        snprintf(create_table, SCH_BUFF_MAX_LEN*2, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
         char* tok_sym[30];
         char* tok_var[30];
         char order[50];
         strcpy(order, data_map[i].data_order);
-        char var_names[200];
+        char var_names[SCH_BUFF_MAX_LEN];
+        memset(&var_names, 0, SCH_BUFF_MAX_LEN);
         strcpy(var_names, data_map[i].var_names);
         int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, i);
 
@@ -372,8 +378,9 @@ int storage_repo_get_value_idx(int index, char *table)
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
 #elif SCH_STORAGE_MODE == 2
-    char get_value_query[100];
-    sprintf(get_value_query, "SELECT value FROM %s WHERE idx=%d;", table, index);
+    char get_value_query[SCH_BUFF_MAX_LEN];
+    memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
+    snprintf(get_value_query,SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE idx=%d;", table, index);
     LOGD(tag, "%s",  get_value_query);
     PGresult *res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -390,7 +397,6 @@ int storage_repo_get_value_idx(int index, char *table)
     }
     PQclear(res);
 #endif
-
     return value;
 }
 
@@ -419,8 +425,9 @@ int storage_repo_get_value_str(char *name, char *table)
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
 #elif SCH_STORAGE_MODE == 2
-    char get_value_query[100];
-    sprintf(get_value_query, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
+    char get_value_query[SCH_BUFF_MAX_LEN];
+    memset(&get_value_query, 0, sizeof(get_value_query));
+    snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
     PGresult *res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
@@ -461,8 +468,9 @@ int storage_repo_set_value_idx(int index, int value, char *table)
         return 0;
     }
 #elif SCH_STORAGE_MODE == 2
-    char set_value_query[200];
-    sprintf(set_value_query, "INSERT INTO %s (idx, value) "
+    char set_value_query[SCH_BUFF_MAX_LEN];
+    memset(&set_value_query, 0, sizeof(set_value_query));
+    snprintf(set_value_query,SCH_BUFF_MAX_LEN,"INSERT INTO %s (idx, value) "
                              "VALUES ("
                              "%d, "
                              "%d) "
@@ -492,7 +500,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
         #if SCH_STORAGE_MODE == 2
             char insert_query[SCH_BUFF_MAX_LEN*2];
             memset(&insert_query, 0, sizeof(insert_query));
-            snprintf(insert_query, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
+            snprintf(insert_query,SCH_BUFF_MAX_LEN*2, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
                     command, args, executions, periodical);
             LOGI(tag, "Flight Plan Postgres Command: %s",  insert_query);
             PGresult *res = PQexec(conn, insert_query);
@@ -611,8 +619,9 @@ int storage_flight_plan_erase(int timetodo)
 {
     #if SCH_STORAGE_MODE > 0
         #if SCH_STORAGE_MODE == 2
-            char del_query[100];
-            sprintf(del_query, "DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
+            char del_query[SCH_BUFF_MAX_LEN];
+            memset(&del_query, 0, SCH_BUFF_MAX_LEN);
+            snprintf(del_query, SCH_BUFF_MAX_LEN, "DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
             PGresult *res = PQexec(conn, del_query);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Error in function storage_flight_plan_erase, postgres failed: %s", PQerrorMessage(conn));
@@ -659,8 +668,9 @@ int storage_flight_plan_show_table (void) {
         int row;
         int col;
 
-        char get_value_query[100];
-        sprintf(get_value_query, "SELECT * FROM %s", fp_table);
+        char get_value_query[SCH_BUFF_MAX_LEN];
+        memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
+        snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT * FROM %s", fp_table);
         PGresult *res = PQexec(conn, get_value_query);
         if (PQresultStatus(res) != PGRES_TUPLES_OK) {
             LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
