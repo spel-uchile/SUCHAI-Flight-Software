@@ -168,7 +168,7 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
     n_args = sscanf(params, fmt, &node, &next);
     if(n_args == nparams-1 && next > 1)
     {
-        strncpy(tc_frame, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+        strncpy(tc_frame, params+next, (size_t)COM_FRAME_MAX_LEN-1);
         LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, tc_frame, next);
         // Sending message to node TC port and wait for response
         int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_TC, 1000,
