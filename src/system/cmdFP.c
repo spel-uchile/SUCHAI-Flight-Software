@@ -79,21 +79,20 @@ int fp_set_unix(char *fmt, char *params, int nparams)
     memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
     memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
 
-    if(sscanf(params, fmt, &unixtime, &executions, &periodical, &command, &next) == nparams-1)
-    {
-        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
-        int rc = dat_set_fp(unixtime, command, args, executions, periodical);
-
-        if (rc == 0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &unixtime, &executions, &periodical, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
+
+    strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+    int rc = dat_set_fp(unixtime, command, args, executions, periodical);
+
+    if (rc == 0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
+
 }
 
 int fp_set_dt(char *fmt, char *params, int nparams)
