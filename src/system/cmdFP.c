@@ -103,22 +103,20 @@ int fp_set_dt(char *fmt, char *params, int nparams)
     memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
     memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
 
-    if(sscanf(params, fmt, &seconds, &executions, &periodical, &command, &next) == nparams-1)
-    {
-        time_t current = time(NULL);
-        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
-        int rc = dat_set_fp((int)current+seconds, command, args, executions, periodical);
-
-        if (rc == 0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &seconds, &executions, &periodical, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
         return CMD_FAIL;
     }
+
+    time_t current = time(NULL);
+    strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+    int rc = dat_set_fp((int)current+seconds, command, args, executions, periodical);
+
+    if (rc == 0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
 }
 
 int fp_delete(char* fmt, char* params, int nparams)
