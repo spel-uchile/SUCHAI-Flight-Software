@@ -4,6 +4,7 @@ import os
 import time
 import sys
 import json
+import glob
 
 SCH_TRX_PORT_TM = 9               # ///< Telemetry port
 SCH_TRX_PORT_TC = 10               # ///< Telecommands port
@@ -18,8 +19,8 @@ def get_parameters():
     """
     parser = argparse.ArgumentParser(prog='fs_seqs_executer.py')
 
-    parser.add_argument('--exec_dir', type=str, default="../../build_x86/")
-    parser.add_argument('--path_to_json', type=str, default="seqs/logfile-data-20200618-034256.txt")  # Assume we are on exec dir
+    parser.add_argument('--exec_dir', type=str, default="build_test")
+    parser.add_argument('--path_to_json', type=str, default="seqs")  # Assume we are on exec dir
     parser.add_argument('--log_folder_path', type=str, default="logs") # This folder must exist
     parser.add_argument('--protocol', type=str, default="tcp")
     parser.add_argument('--save_log', type=bool, default=True)
@@ -42,7 +43,7 @@ def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n)
 
     # Execute flight software
     time.sleep(1)
-    exec_cmd = "./SUCHAI_Flight_Software"
+    exec_cmd = "./SUCHAI_Flight_Software_Test"
     prev_dir = os.getcwd()
     # Run flight software sending n_cmds random commands with 1 random parameter
     os.chdir(exec_dir)
@@ -61,27 +62,15 @@ def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n)
 
     # Read JSON report
     with open(path_to_json, 'r') as json_file:
-        data = json.load(json_file)
-        # Start sending sequence by id
-        #for id in id_list:
-        if len(data) != 0 and id_n < len(data):
-            seq = data[id_n]
-            cmds_params_list = seq["cmds"]
-            cmds_l = []
-            params_l = []
-            for cmd_param in cmds_params_list:
-                cmds_l.append(cmd_param["cmd_name"])
-                params_l.append(cmd_param["params"])
+        seq_json = json.load(json_file)
 
-
-    # Start sendind random commands
-    for i in range(len(cmds_l)):
+    # Start sending sequences
+    for seq in seq_json:
         # time.sleep(0.5)  # Give some time to zmqnode threads (writer and reader)
-        cmd = cmds_l[i]
-        params = params_l[i]
-        print("node send:", cmd + " " + params)  # For debugging purposes
-        header = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=55)
-        node.send_message(cmd + " " + params, header)
+        for cmd in seq["cmds"]:
+            print("node send:", cmd["cmd_name"] + " " + cmd["params"])  # For debugging purposes
+            header = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=55)
+            node.send_message(cmd["cmd_name"] + " " + cmd["params"], header)
 
     # Exit SUCHAI process
     hdr = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=56)
@@ -106,10 +95,10 @@ def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n)
 
 
 def execute_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile, id_list):
-    subfolder_name = path_to_json.split('/')[-1].split('.')[0]
-    for id_num in id_list:
-        output_path = log_path + '/' + subfolder_name + '-' + str(id_num) + '.txt'
-        execute_seq(exec_dir, path_to_json, output_path, protocol, print_logfile, id_num)
+    seq_files = sorted(glob.glob(path_to_json+"/*.json"))
+    for seq_file in seq_files:
+        output_file = os.path.join(log_path, os.path.basename(seq_file)+".log")
+        execute_seq(exec_dir, seq_file, output_file, protocol, print_logfile, None)
 
 
 if __name__ == "__main__":
