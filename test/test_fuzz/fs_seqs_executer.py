@@ -4,6 +4,7 @@ import os
 import time
 import sys
 import json
+from proc_info import *
 
 SCH_TRX_PORT_TM = 9               # ///< Telemetry port
 SCH_TRX_PORT_TC = 10               # ///< Telecommands port
@@ -47,9 +48,14 @@ def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n)
     # Run flight software sending n_cmds random commands with 1 random parameter
     os.chdir(exec_dir)
     if print_logfile:
+        init_time = time.time()  # Start measuring execution time of the sequence
         suchai_process = Popen([exec_cmd], stdin=PIPE, stdout=PIPE)
     else:
+        init_time = time.time()  # Start measuring execution time of the sequence
         suchai_process = Popen([exec_cmd], stdin=PIPE)
+
+    proc_pid = suchai_process.pid
+    rm_start, vm_start = get_mem_info(proc_pid)
 
     time.sleep(4)
     os.chdir(prev_dir)
@@ -83,19 +89,29 @@ def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n)
         header = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=55)
         node.send_message(cmd + " " + params, header)
 
+    rm_end, vm_end = get_mem_info(proc_pid)
+
     # Exit SUCHAI process
     hdr = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=56)
     node.send_message("obc_reset", hdr)
 
     # Get SUCHAI process return code
     return_code = suchai_process.wait()
+    end_time = time.time()
 
     if print_logfile:
         # Write log in file
         with open(log_path, 'wb') as logfile:
             for line in suchai_process.stdout:
                 logfile.write(line)
-    print("Return code: ", return_code)  # For debugging purposes
+
+    print("Return code: ", return_code)
+    print("Execution time (s): ", end_time - init_time)
+    print("Memory usage (kb): ", rm_end - rm_start)
+
+    #assert return_code == 0
+    #assert end_time - init_time < 10
+    #assert rm_end - rm_start
 
     node.stop()
 
