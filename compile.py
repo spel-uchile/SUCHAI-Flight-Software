@@ -6,7 +6,7 @@ import src.system.include.configure as configure
 
 available_os = ["LINUX", "FREERTOS"]
 available_archs = ["X86", "GROUNDSTATION", "RPI", "NANOMIND", "ESP32", "AVR32"]
-available_tests = ['test_cmd', 'test_unit', 'test_load', 'test_bug_delay', 'test_sgp4']
+available_tests = ['test_cmd', 'test_unit', 'test_load', 'test_bug_delay', 'test_sgp4', 'test_fuzz']
 available_test_archs = ["X86"]
 available_log_lvl = ["LOG_LVL_NONE", "LOG_LVL_ERROR", "LOG_LVL_WARN", "LOG_LVL_INFO", "LOG_LVL_DEBUG", "LOG_LVL_VERBOSE"]
 
@@ -91,6 +91,9 @@ if __name__ == "__main__":
                     os.chdir("..")
                     print('python3 logs_comparator.py...')
                     result = os.system('python3 logs_comparator.py')
+                elif args.test_type == 'test_fuzz':
+                    os.chdir("..")
+                    os.system('python3 fs_seqs_executer.py')
                 else:
                     result = os.system('./SUCHAI_Flight_Software_Test')
         # Build
