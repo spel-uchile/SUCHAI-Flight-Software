@@ -1,4 +1,6 @@
-from sandbox.csp_zmq.zmqnode import *
+import sys
+sys.path.append("../../sandbox")
+from csp_zmq.zmqnode import *
 
 
 class FuzzCspZmqNode(CspZmqNode):

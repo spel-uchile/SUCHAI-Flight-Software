@@ -18,10 +18,10 @@ def get_parameters():
     """
     parser = argparse.ArgumentParser(prog='fs_seqs_executer.py')
 
-    parser.add_argument('--exec_dir', type=str, default="../../Git/SUCHAI-Master2/build_x86/")
-    parser.add_argument('--path_to_json', type=str, default="../../../../../../home/tamara/Failed-reports/After-Fix-8/Strategy1/logfile-data-20200618-020801.txt")  # Assume we are on exec dir
-    parser.add_argument('--log_folder_path', type=str, default="../../../../../../home/tamara/Desktop/Logs") # This folder must exist
-    parser.add_argument('--protocol', type=str, default="ipc")
+    parser.add_argument('--exec_dir', type=str, default="../../build_x86/")
+    parser.add_argument('--path_to_json', type=str, default="seqs/logfile-data-20200618-034256.txt")  # Assume we are on exec dir
+    parser.add_argument('--log_folder_path', type=str, default="logs") # This folder must exist
+    parser.add_argument('--protocol', type=str, default="tcp")
     parser.add_argument('--save_log', type=bool, default=True)
     parser.add_argument('--id_list', type=list, default=[0, 1])
 
@@ -31,31 +31,28 @@ def get_parameters():
 def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n):
 
     # Run zmqhub.py
-    ex_zmqhub = Popen(["python3", "zmqhub.py", "--ip", "/tmp/suchaifs", "--proto", protocol], stdin=PIPE)
-
-    exec_cmd = "./SUCHAI_Flight_Software"
-
-    prev_dir = os.getcwd()
-
-    # Run flight software sending n_cmds random commands with 1 random parameter
-    os.chdir(exec_dir)
+    ex_zmqhub = Popen(["python3", "../../sandbox/csp_zmq/zmqhub.py", "--ip", "127.0.0.1", "--proto", protocol], stdin=PIPE)
 
     # Send commands to the flight software through zmq
     dest = "1"
     addr = "9"
     port = str(SCH_TRX_PORT_CMD)
-    node = FuzzCspZmqNode(addr, hub_ip="/tmp/suchaifs", proto=protocol)
+    node = FuzzCspZmqNode(addr, hub_ip="127.0.0.1", proto=protocol)
     node.start()
 
     # Execute flight software
     time.sleep(1)
-
+    exec_cmd = "./SUCHAI_Flight_Software"
+    prev_dir = os.getcwd()
+    # Run flight software sending n_cmds random commands with 1 random parameter
+    os.chdir(exec_dir)
     if print_logfile:
         suchai_process = Popen([exec_cmd], stdin=PIPE, stdout=PIPE)
     else:
         suchai_process = Popen([exec_cmd], stdin=PIPE)
 
     time.sleep(4)
+    os.chdir(prev_dir)
 
     # Clean database
     print("node send: drp_ebf 1010")  # For debugging purposes
