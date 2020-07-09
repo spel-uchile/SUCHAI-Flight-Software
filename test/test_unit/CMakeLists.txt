@@ -21,6 +21,7 @@ set(SOURCE_FILES
         ../../src/system/cmdSensors.c
         ../../src/system/utils.c
         ../../src/system/globals.c
+        ../../src/system/lib/mat_utils.c
         src/system/main.c
         )
 
@@ -30,6 +31,7 @@ include_directories(
         ../../src/drivers/x86/include
         ../../src/drivers/x86/libcsp/include
         ../../src/drivers/x86/sgp4/src/c
+        ../../src/system/lib/include
         ../test_cmd/src/system/include
         /usr/include/postgresql
 )

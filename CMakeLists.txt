@@ -15,6 +15,7 @@ set(SOURCE_FILES
         src/os/Linux/osSemphr.c
         src/os/Linux/osThread.c
         src/os/Linux/pthread_queue.c
+        src/lib/math_utils.c
         src/system/globals.c
         src/system/utils.c
         src/system/cmdDRP.c
@@ -41,6 +42,7 @@ set(SOURCE_FILES
         )
 
 include_directories(
+        src/lib/include
         src/system/include/
         src/os/include
         src/drivers/x86/sgp4/src/c
