@@ -25,18 +25,18 @@ static const char* tag = "cmdADCS";
 
 #define ADCS_PORT 7
 
-void cmd_sim_init(void)
+void cmd_adcs_init(void)
 {
-    cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
-    cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
-    cmd_add("sim_adcs_acc", sim_adcs_get_acc, "", 0);
-    cmd_add("sim_adcs_mag", sim_adcs_get_mag, "", 0);
-    cmd_add("sim_adcs_do_control", sim_adcs_control_torque, "%lf", 1);
-    cmd_add("sim_adcs_mag_moment", sim_adcs_mag_moment, "", 0);
-    cmd_add("sim_adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
-    cmd_add("sim_adcs_set_to_nadir", sim_adcs_target_nadir, "", 0);
-    cmd_add("sim_adcs_detumbling_mag", sim_adcs_detumbling_mag, "", 0);
-    cmd_add("sim_adcs_send_attitude", sim_adcs_send_attitude, "", 0);
+    cmd_add("adcs_point", adcs_point, "", 0);
+    cmd_add("adcs_quat", adcs_get_quaternion, "", 0);
+    cmd_add("adcs_acc", adcs_get_acc, "", 0);
+    cmd_add("adcs_mag", adcs_get_mag, "", 0);
+    cmd_add("adcs_do_control", adcs_control_torque, "%lf", 1);
+    cmd_add("adcs_mag_moment", adcs_mag_moment, "", 0);
+    cmd_add("adcs_set_target", adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
+    cmd_add("adcs_set_to_nadir", adcs_target_nadir, "", 0);
+    cmd_add("adcs_detumbling_mag", adcs_detumbling_mag, "", 0);
+    cmd_add("adcs_send_attitude", adcs_send_attitude, "", 0);
 }
 
 static inline void _get_sat_quaterion(quaternion_t *q, dat_system_t index);
@@ -89,7 +89,7 @@ void _set_sat_vector(vector3_t *r, dat_system_t index)
 }
 
 
-int sim_adcs_point(char* fmt, char* params, int nparams)
+int adcs_point(char* fmt, char* params, int nparams)
 {
     csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
     if(packet == NULL)
@@ -116,7 +116,7 @@ int sim_adcs_point(char* fmt, char* params, int nparams)
     return CMD_OK;
 }
 
-int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
+int adcs_get_quaternion(char* fmt, char* params, int nparams)
 {
     char *out_buff = (char *)malloc(COM_FRAME_MAX_LEN);
     char *in_buff = (char *)malloc(COM_FRAME_MAX_LEN);
@@ -151,7 +151,7 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams)
     return CMD_FAIL;
 }
 
-int sim_adcs_get_acc(char* fmt, char* params, int nparams)
+int adcs_get_acc(char* fmt, char* params, int nparams)
 {
     char *out_buff = (char *)malloc(COM_FRAME_MAX_LEN);
     char *in_buff = (char *)malloc(COM_FRAME_MAX_LEN);
@@ -187,7 +187,7 @@ int sim_adcs_get_acc(char* fmt, char* params, int nparams)
     return CMD_FAIL;
 }
 
-int sim_adcs_get_mag(char* fmt, char* params, int nparams)
+int adcs_get_mag(char* fmt, char* params, int nparams)
 {
     char *out_buff = (char *)malloc(COM_FRAME_MAX_LEN);
     char *in_buff = (char *)malloc(COM_FRAME_MAX_LEN);
@@ -223,7 +223,7 @@ int sim_adcs_get_mag(char* fmt, char* params, int nparams)
     return CMD_FAIL;
 }
 
-int sim_adcs_control_torque(char* fmt, char* params, int nparams)
+int adcs_control_torque(char* fmt, char* params, int nparams)
 {
     // GLOBALS
     double ctrl_cycle;
@@ -313,7 +313,7 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     return CMD_OK;
 }
 
-int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
+int adcs_mag_moment(char* fmt, char* params, int nparams)
 {
     // GLOBALS
     vector3_t rw_lower_limit;
@@ -418,7 +418,7 @@ int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
     return CMD_OK;
 }
 
-int sim_adcs_set_target(char* fmt, char* params, int nparams)
+int adcs_set_target(char* fmt, char* params, int nparams)
 {
     double rot;
     vector3_t i_tar;  // Target vector, intertial frame, read as parameter
@@ -463,7 +463,7 @@ int sim_adcs_set_target(char* fmt, char* params, int nparams)
     return CMD_OK;
 }
 
-int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
+int adcs_target_nadir(char* fmt, char* params, int nparams)
 {
     // Get Nadir vector
     vector3_t i_tar;
@@ -487,12 +487,12 @@ int sim_adcs_target_nadir(char* fmt, char* params, int nparams)
     memset(_params, 0, SCH_CMD_MAX_STR_PARAMS);
     snprintf(_params, SCH_CMD_MAX_STR_PARAMS, _fmt, i_tar.v0, i_tar.v1, i_tar.v2,
              omega_b_tar.v0, omega_b_tar.v1, omega_b_tar.v2);
-    int ret = sim_adcs_set_target(_fmt, _params, 6);
+    int ret = adcs_set_target(_fmt, _params, 6);
 
     return ret;
 }
 
-int sim_adcs_detumbling_mag(char* fmt, char* params, int nparams)
+int adcs_detumbling_mag(char* fmt, char* params, int nparams)
 {
     vector3_t i_tar;
     _get_sat_vector(&i_tar, dat_ads_pos_x);
@@ -509,12 +509,12 @@ int sim_adcs_detumbling_mag(char* fmt, char* params, int nparams)
     memset(_params, 0, SCH_CMD_MAX_STR_PARAMS);
     snprintf(_params, SCH_CMD_MAX_STR_PARAMS, _fmt, i_tar.v0, i_tar.v1, i_tar.v2,
              omega_b_tar.v0, omega_b_tar.v1, omega_b_tar.v2);
-    int ret = sim_adcs_set_target(_fmt, _params, 6);
+    int ret = adcs_set_target(_fmt, _params, 6);
 
     return ret;
 }
 
-int sim_adcs_send_attitude(char* fmt, char* params, int nparams)
+int adcs_send_attitude(char* fmt, char* params, int nparams)
 {
     quaternion_t q_est, q_tgt;
     _get_sat_quaterion(&q_est, dat_ads_q0);

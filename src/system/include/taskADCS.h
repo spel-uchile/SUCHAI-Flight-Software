@@ -16,6 +16,6 @@
 
 #include "repoCommand.h"
 
-void taskHousekeeping(void *param);
+void taskADCS(void *param);
 
 #endif //T_ADCS_H

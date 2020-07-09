@@ -177,12 +177,12 @@ typedef struct __attribute__((packed)) dat_status_s {
     int32_t dat_fpl_queue;          ///< Flight plan queue length
 
     /// ADS: Attitude determination system
-    float dat_ads_acc_x;            ///< Gyroscope acceleration value along the x axis
-    float dat_ads_acc_y;            ///< Gyroscope acceleration value along the y axis
-    float dat_ads_acc_z;            ///< Gyroscope acceleration value along the z axis
-    float dat_tgt_acc_x;            ///< Target acceleration value along the x axis
-    float dat_tgt_acc_y;            ///< Target acceleration value along the y axis
-    float dat_tgt_acc_z;            ///< Target acceleration value along the z axis
+    float dat_ads_omega_x;            ///< Gyroscope acceleration value along the x axis
+    float dat_ads_omega_y;            ///< Gyroscope acceleration value along the y axis
+    float dat_ads_omega_z;            ///< Gyroscope acceleration value along the z axis
+    float dat_tgt_omega_x;            ///< Target acceleration value along the x axis
+    float dat_tgt_omega_y;            ///< Target acceleration value along the y axis
+    float dat_tgt_omega_z;            ///< Target acceleration value along the z axis
     float dat_ads_mag_x;            ///< Magnetometer value along the x axis
     float dat_ads_mag_y;            ///< Magnetometer value along the y axis
     float dat_ads_mag_z;            ///< Magnetometer value along the z axis

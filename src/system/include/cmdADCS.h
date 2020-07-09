@@ -11,7 +11,7 @@
 #include "repoCommand.h"
 #include "cmdCOM.h"
 
-void cmd_sim_init(void);
+void cmd_adcs_init(void);
 
 /**
  * Send "adcs_point_to <x> <y> <z>" command to the ADCS system with current
@@ -22,7 +22,7 @@ void cmd_sim_init(void);
  * @param nparams 0
  * @return CMD_OK | CMD_FAIL | CMD_ERROR
  */
-int sim_adcs_point(char* fmt, char* params, int nparams);
+int adcs_point(char* fmt, char* params, int nparams);
 
 /**
  * Read current spacecraft quaternion from the ADCS/STT
@@ -31,7 +31,7 @@ int sim_adcs_point(char* fmt, char* params, int nparams);
  * @param nparams 0
  * @return CMD_OK | CMD_FAIL | CMD_ERROR
  */
-int sim_adcs_get_quaternion(char* fmt, char* params, int nparams);
+int adcs_get_quaternion(char* fmt, char* params, int nparams);
 
 /**
  * Read current accelerations from ADCS
@@ -40,7 +40,7 @@ int sim_adcs_get_quaternion(char* fmt, char* params, int nparams);
  * @param nparams 0
  * @return
  */
-int sim_adcs_get_acc(char* fmt, char* params, int nparams);
+int adcs_get_acc(char* fmt, char* params, int nparams);
 
 /**
  * Read current magnetic sensors from ADCS
@@ -49,7 +49,7 @@ int sim_adcs_get_acc(char* fmt, char* params, int nparams);
  * @param nparams 0
  * @return
  */
-int sim_adcs_get_mag(char* fmt, char* params, int nparams);
+int adcs_get_mag(char* fmt, char* params, int nparams);
 
 /**
  *
@@ -58,7 +58,7 @@ int sim_adcs_get_mag(char* fmt, char* params, int nparams);
  * @param nparams
  * @return
  */
-int sim_adcs_control_torque(char* fmt, char* params, int nparams);
+int adcs_control_torque(char* fmt, char* params, int nparams);
 
 /**
  *
@@ -67,7 +67,7 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams);
  * @param nparams
  * @return
  */
-int sim_adcs_mag_moment(char* fmt, char* params, int nparams);
+int adcs_mag_moment(char* fmt, char* params, int nparams);
 
 /**
  * Set ADCS vector (Intertial frame) and velocity (body frame) targets
@@ -76,7 +76,7 @@ int sim_adcs_mag_moment(char* fmt, char* params, int nparams);
  * @param nparams 6
  * @return CMD_OK | CMD_ERROR | CMD_FAIL
  */
-int sim_adcs_set_target(char* fmt, char* params, int nparams);
+int adcs_set_target(char* fmt, char* params, int nparams);
 
 /**
  * Set ADCS target to Nadir based on current quaternion and position
@@ -86,7 +86,7 @@ int sim_adcs_set_target(char* fmt, char* params, int nparams);
  * @param nparams 0
  * @return CMD_OK | CMD_ERROR | CMD_FAIL
  */
-int sim_adcs_target_nadir(char* fmt, char* params, int nparams);
+int adcs_target_nadir(char* fmt, char* params, int nparams);
 
 /**
  * Set ADCS in detumbling mode
@@ -95,7 +95,7 @@ int sim_adcs_target_nadir(char* fmt, char* params, int nparams);
  * @param nparams 0
  * @return CMD_OK | CMD_ERROR | CMD_FAIL
  */
-int sim_adcs_detumbling_mag(char* fmt, char* params, int nparams);
+int adcs_detumbling_mag(char* fmt, char* params, int nparams);
 
 /**
  * Send current attitude variables to ADCS system. For testing purposes.
@@ -104,6 +104,6 @@ int sim_adcs_detumbling_mag(char* fmt, char* params, int nparams);
  * @param nparams 0
  * @return CMD_OK | CMD_ERROR | CMD_FAIL
  */
-int sim_adcs_send_attitude(char* fmt, char* params, int nparams);
+int adcs_send_attitude(char* fmt, char* params, int nparams);
 
 #endif //_CMDADCS_H
