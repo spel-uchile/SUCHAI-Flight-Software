@@ -21,7 +21,7 @@
 
 #include "cmdADCS.h"
 #include <math.h>
-static const char* tag = "cmdSIM";
+static const char* tag = "cmdADCS";
 
 #define ADCS_PORT 7
 
