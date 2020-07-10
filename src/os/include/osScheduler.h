@@ -18,7 +18,7 @@
 
 #ifdef LINUX
     #include "osThread.h"
-    #include "utils.h"
+    #include "log_utils.h"
 #else
     #include "FreeRTOS.h"
     #include "task.h"

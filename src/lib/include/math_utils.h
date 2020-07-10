@@ -1,9 +1,17 @@
-//
-// Created by kaminari on 09-07-20.
-//
+/**
+ * @file math_utils.h
+ * @author Carlos Gonzalez C - carlgonz@uchile.cl
+ * @author Camilo Rojas M - camrojas@uchile.cl
+ * @author Elias Obreque S - elias.obreque@uchile.cl
+ * @date 2020
+ * @copyright GNU GPL v3
+ *
+ * This header have definitions related mathematical utilities such as matrices, vectors or quaternions,
+ * time formatting, etc.
+ */
 
-#ifndef SUCHAI_FLIGHT_SOFTWARE_MATH_UTILS_H
-#define SUCHAI_FLIGHT_SOFTWARE_MATH_UTILS_H
+#ifndef MATH_UTILS_H
+#define MATH_UTILS_H
 
 #include <math.h>
 #include "config.h"
@@ -185,4 +193,4 @@ void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
  */
 void mat_set_diag(matrix3_t *m, double a, double b, double c);
 
-#endif //SUCHAI_FLIGHT_SOFTWARE_MATH_UTILS_H
+#endif //MATH_UTILS_H

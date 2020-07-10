@@ -28,7 +28,7 @@
 #include "init.h"
 #include "config.h"
 #include "globals.h"
-#include "utils.h"
+#include "log_utils.h"
 
 /* OS includes */
 #include "osThread.h"

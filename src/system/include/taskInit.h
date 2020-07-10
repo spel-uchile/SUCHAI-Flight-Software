@@ -11,7 +11,7 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_TASKINIT_H
 #define SUCHAI_FLIGHT_SOFTWARE_TASKINIT_H
 
-#include "utils.h"
+#include "log_utils.h"
 #include "config.h"
 #include "init.h"
 #include "drivers.h"

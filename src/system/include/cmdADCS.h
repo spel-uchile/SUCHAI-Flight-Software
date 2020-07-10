@@ -10,6 +10,8 @@
 #include "repoData.h"
 #include "repoCommand.h"
 #include "cmdCOM.h"
+#include "math_utils.h"
+#include "log_utils.h"
 
 void cmd_sim_init(void);
 

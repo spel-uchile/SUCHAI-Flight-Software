@@ -16,8 +16,8 @@ set(SOURCE_FILES
         src/os/Linux/osThread.c
         src/os/Linux/pthread_queue.c
         src/lib/math_utils.c
+        src/lib/log_utils.c
         src/system/globals.c
-        src/system/utils.c
         src/system/cmdDRP.c
         src/system/cmdOBC.c
         src/system/cmdCOM.c
@@ -39,7 +39,8 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
-        src/system/include/cmdADCS.h src/system/cmdADCS.c src/system/include/taskADCS.h src/system/taskADCS.c)
+        src/system/cmdADCS.c
+        src/system/taskADCS.c)
 
 include_directories(
         src/lib/include

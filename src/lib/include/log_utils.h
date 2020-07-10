@@ -1,7 +1,7 @@
 /**
- * @file utils.h
+ * @file log_utils.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @author Camilo Roja M - camrojas@uchile.cl
+ * @author Camilo Rojas M - camrojas@uchile.cl
  * @author Elias Obreque S - elias.obreque@uchile.cl
  * @date 2020
  * @copyright GNU GPL v3
@@ -10,8 +10,8 @@
  * time formatting, etc.
  */
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef LOG_UTILS_H
+#define LOG_UTILS_H
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -41,7 +41,7 @@ typedef enum {
 
 // Define default log level
 #ifndef LOG_LEVEL
-    #define LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
+#define LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
 #endif
 
 #define LOGOUT stdout   ///<! Log to stdout
@@ -98,4 +98,4 @@ extern uint8_t log_node;
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-#endif //UTILS_H
+#endif //LOG_UTILS_H

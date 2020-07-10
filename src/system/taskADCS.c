@@ -22,7 +22,7 @@
 
 static const char *tag = "ADCS";
 
-void taskHousekeeping(void *param)
+void taskADCS(void *param)
 {
     LOGI(tag, "Started");
 

@@ -15,7 +15,7 @@
 
 #include "globals.h"
 #include "config.h"
-#include "utils.h"
+#include "log_utils.h"
 
 #include "osQueue.h"
 

@@ -11,7 +11,7 @@
 #ifndef SCH_PERSISTENT_H
 #define SCH_PERSISTENT_H
 
-#include "utils.h"
+#include "log_utils.h"
 #include <stdio.h>
 #include "config.h"
 #include "repoData.h"

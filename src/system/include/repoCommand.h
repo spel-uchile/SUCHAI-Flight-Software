@@ -13,7 +13,7 @@
 
 #include <stdarg.h>
 
-#include "utils.h"
+#include "log_utils.h"
 #include "globals.h"
 
 /* Add files with commands */

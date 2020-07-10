@@ -11,7 +11,7 @@
 #ifndef REPO_DATA_SCHEMA_H
 #define REPO_DATA_SCHEMA_H
 
-#include "utils.h"
+#include "log_utils.h"
 
 /**
  * Struct for storing a single timed command, set to execute in the future.
