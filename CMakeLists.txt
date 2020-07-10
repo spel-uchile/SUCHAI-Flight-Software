@@ -44,7 +44,8 @@ set(SOURCE_FILES
 
 include_directories(
         src/lib/include
-        src/system/include/
+        src/system/include
+        src/lib/include
         src/os/include
         src/drivers/x86/sgp4/src/c
         src/drivers/x86/linenoise

@@ -27,6 +27,7 @@ def get_parameters():
     parser.add_argument('--fp', type=str, default="1")
     parser.add_argument('--hk', type=str, default="1")
     parser.add_argument('--sen', type=str, default="0")
+    parser.add_argument('--adcs', type=str, default="0")
     parser.add_argument('--test', type=str, default="0")
     parser.add_argument('--node', type=str, default="1")
     parser.add_argument('--zmq_in', type=str, default="tcp://127.0.0.1:8001")

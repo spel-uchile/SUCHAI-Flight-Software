@@ -9,6 +9,8 @@
  *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *      Copyright 2020, Diego Ortego Prieto, diortego@dcc.uchile.cl
  *      Copyright 2020, Elias Obreque Sepulveda, elias.obreque@uchile.cl
+ *      Copyright 2020, Javier Morales Rodriguez, javiermoralesr95@gmail.com
+ *      Copyright 2020, Luis Jimenez Verdugo, luis.jimenez@ing.uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

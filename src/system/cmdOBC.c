@@ -405,15 +405,15 @@ int obc_update_status(char *fmt, char *params, int nparams)
 
     value acc_x;
     acc_x.f = gyro_reading.gyro_x;
-    dat_set_system_var(dat_ads_acc_x, acc_x.i);
+    dat_set_system_var(dat_ads_omega_x, acc_x.i);
 
     value acc_y;
     acc_y.f = gyro_reading.gyro_y;
-    dat_set_system_var(dat_ads_acc_y, acc_y.i);
+    dat_set_system_var(dat_ads_omega_y, acc_y.i);
 
     value acc_z;
     acc_z.f = gyro_reading.gyro_z;
-    dat_set_system_var(dat_ads_acc_z, acc_z.i);
+    dat_set_system_var(dat_ads_omega_z, acc_z.i);
 
     value mag_x;
     mag_x.f = hmc_reading.x;

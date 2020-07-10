@@ -48,9 +48,9 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
     DAT_CPY_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
 
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_x);         ///< Gyroscope acceleration value along the x axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_y);         ///< Gyroscope acceleration value along the y axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_acc_z);         ///< Gyroscope acceleration value along the z axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_x);         ///< Gyroscope acceleration value along the x axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_y);         ///< Gyroscope acceleration value along the y axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_z);         ///< Gyroscope acceleration value along the z axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
@@ -113,9 +113,9 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
     DAT_PRINT_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
 
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_x);         ///< Gyroscope acceleration value along the x axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_y);         ///< Gyroscope acceleration value along the y axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_acc_z);         ///< Gyroscope acceleration value along the z axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_x);         ///< Gyroscope acceleration value along the x axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_y);         ///< Gyroscope acceleration value along the y axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_z);         ///< Gyroscope acceleration value along the z axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
