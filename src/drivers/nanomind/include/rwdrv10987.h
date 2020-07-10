@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include "drivers.h"
 #include "globals.h"
-#include "utils.h"
+#include "log_utils.h"
 
 #include "osDelay.h"
 

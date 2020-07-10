@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 #include <stdint.h>
-#include "utils.h"
+#include "log_utils.h"
 #include <stdio.h>
 #include <signal.h>
 #include "asf.h"

@@ -12,7 +12,7 @@
 #include "drivers.h"
 #include "config.h"
 #include "globals.h"
-#include "utils.h"
+#include "log_utils.h"
 
 #include "osDelay.h"
 #include "repoCommand.h"

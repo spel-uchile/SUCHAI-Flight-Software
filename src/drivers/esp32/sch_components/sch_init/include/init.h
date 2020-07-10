@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include "drivers.h"
-#include "utils.h"
+#include "log_utils.h"
 #include "config.h"
 
 /* system includes */

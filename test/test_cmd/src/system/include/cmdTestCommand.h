@@ -15,7 +15,7 @@
 #include <assert.h>
 
 #include "config.h"
-#include "utils.h"
+#include "log_utils.h"
 #include "repoCommand.h"
 
 /* Function definitions */
