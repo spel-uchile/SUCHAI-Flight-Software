@@ -194,7 +194,7 @@ int test_fp_params(char* fmt, char* params,int nparams)
 {
     int num1, num2;
     char str[SCH_CMD_MAX_STR_PARAMS];
-    if(params == NULL || (params, fmt, &num1, &str, &num2) != nparams)
+    if(params == NULL || sscanf(params, fmt, &num1, &str, &num2) != nparams)
     {
         LOGW(tag, "test_fp used with invalid params: %s", params);
         return CMD_ERROR;
