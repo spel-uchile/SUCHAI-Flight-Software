@@ -39,8 +39,7 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
-        src/system/cmdADCS.c
-        src/system/taskADCS.c)
+)
 
 include_directories(
         src/lib/include

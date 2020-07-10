@@ -12,7 +12,7 @@
 #define SUCHAI_FLIGHT_SOFTWARE_INITI_H
 
 #include "config.h"
-#include "utils.h"
+#include "log_utils.h"
 #include <stdio.h>
 #include <signal.h>
 

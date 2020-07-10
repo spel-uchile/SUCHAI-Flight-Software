@@ -49,8 +49,8 @@ set(SOURCE_FILES
         ../../../src/os/Linux/osThread.c
         ../../../src/os/Linux/pthread_queue.c
         ../../../src/lib/math_utils.c
+        ../../../src/lib/log_utils.c
         ../../../src/system/globals.c
-        ../../../src/system/utils.c
         ../../../src/system/cmdDRP.c
         ../../../src/system/cmdOBC.c
         ../../../src/system/cmdCOM.c
