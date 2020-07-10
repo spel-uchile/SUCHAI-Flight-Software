@@ -19,14 +19,15 @@ set(SOURCE_FILES
         ../../src/system/cmdCOM.c
         ../../src/system/cmdTM.c
         ../../src/system/cmdSensors.c
-        ../../src/system/utils.c
+        ../../src/lib/log_utils.c
+        ../../src/lib/math_utils.c
         ../../src/system/globals.c
-        ../../src/system/lib/mat_utils.c
         src/system/main.c
         )
 
 include_directories(
         ../../src/system/include
+        ../../src/lib/include
         ../../src/os/include
         ../../src/drivers/x86/include
         ../../src/drivers/x86/libcsp/include

@@ -30,7 +30,7 @@ set(SOURCE_FILES
 #        ../../src/system/taskConsole.c
 #        ../../src/system/taskCommunications.c
 #        ../../src/system/taskWatchdog.c
-        ../../src/system/utils.c
+        ../../src/lib/log_utils.c
         ../../src/system/globals.c
         src/system/taskTest.c
         src/system/main.c
@@ -38,6 +38,7 @@ set(SOURCE_FILES
 
 include_directories(
         ../../src/system/include
+        ../../src/lib/include
         ../../src/os/include
         ../../src/drivers/x86/include
         ../../src/drivers/x86/libcsp/include

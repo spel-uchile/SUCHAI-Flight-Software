@@ -24,7 +24,7 @@ set(SOURCE_FILES
         ../../src/system/repoDataSchema.c
         ../../src/system/taskDispatcher.c
         ../../src/system/taskExecuter.c
-        ../../src/system/utils.c
+        ../../src/lib/log_utils.c
         ../../src/system/globals.c
         src/system/cmdTestCommand.c
         src/system/taskTest.c
@@ -33,6 +33,7 @@ set(SOURCE_FILES
 
 include_directories(
         ../../src/system/include
+        ../../src/lib/include
         ../../src/os/include
         ../../src/drivers/x86/include
         ../../src/drivers/x86/linenoise
