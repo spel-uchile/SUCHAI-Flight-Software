@@ -33,11 +33,14 @@
 #ifdef SCH_USE_NANOPOWER
 #include "cmdEPS.h"
 #endif
-#ifdef SCH_SEN_ENABLED
+#if SCH_SEN_ENABLED
 #include "cmdSensors.h"
 #endif
 #ifdef SCH_USE_GSSB
 #include "cmdGSSB.h"
+#endif
+#if SCH_ADCS_ENABLED
+#include "cmdADCS.h"
 #endif
 
 
