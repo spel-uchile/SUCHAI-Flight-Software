@@ -1,11 +1,25 @@
-//
-// Created by javier on 09-07-20.
-//
+/**
+ * @file  cmdCOM.h
+ * @author Carlos Gonzalez C carlgonz@uchile.cl
+ * @author Camilo Rojas M - camrojas@uchile.cl
+ * @author Gustavo Diaz H - gustavo.diaz@ing.uchile.cl
+ * @author Elias Obreque S - elias.obreque@uchile.cl
+ * @author Javier Morales R - javiermoralesr95@gmail.com
+ * @author Luis Jimenez V - luis.jimenez@ing.uchile.cl
+ * @date 2020
+ * @copyright GNU Public License.
+ *
+ * This header contains commands related with the ADCS system
+ */
 
 #ifndef _CMDADCS_H
 #define _CMDADCS_H
 
+#include <math.h>
+
+#include "drivers.h"
 #include "csp/csp.h"
+#include "math_utils.h"
 
 #include "repoData.h"
 #include "repoCommand.h"
@@ -34,20 +48,20 @@ int adcs_point(char* fmt, char* params, int nparams);
 int adcs_get_quaternion(char* fmt, char* params, int nparams);
 
 /**
- * Read current accelerations from ADCS
+ * Read gyroscopes. Update values in status variables.
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return
+ * @return CMD_OK | CMD_FAIL | CMD_ERROR
  */
-int adcs_get_acc(char* fmt, char* params, int nparams);
+int adcs_get_omega(char* fmt, char* params, int nparams);
 
 /**
- * Read current magnetic sensors from ADCS
+ * Read magnetic sensors. Update values in status variables.
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return
+ * @return CMD_OK | CMD_FAIL | CMD_ERROR
  */
 int adcs_get_mag(char* fmt, char* params, int nparams);
 
