@@ -58,4 +58,4 @@ link_directories(../../src/drivers/x86/libcsp/lib)
 
 link_libraries(-lm -lcsp -lzmq -lsqlite3 -lpq -lpthread)
 
-add_executable(SUCHAI_Flight_Software ${SOURCE_FILES})
+add_executable(SUCHAI_Flight_Software_Test ${SOURCE_FILES})

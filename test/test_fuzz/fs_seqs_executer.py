@@ -25,12 +25,11 @@ def get_parameters():
     parser.add_argument('--log_folder_path', type=str, default="logs") # This folder must exist
     parser.add_argument('--protocol', type=str, default="tcp")
     parser.add_argument('--save_log', type=bool, default=True)
-    parser.add_argument('--id_list', type=list, default=[0, 1])
 
     return parser.parse_args()
 
 
-def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n):
+def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile):
 
     # Run zmqhub.py
     ex_zmqhub = Popen(["python3", "../../sandbox/csp_zmq/zmqhub.py", "--ip", "127.0.0.1", "--proto", protocol], stdin=PIPE)
@@ -39,84 +38,87 @@ def execute_seq(exec_dir, path_to_json, log_path, protocol, print_logfile, id_n)
     dest = "1"
     addr = "9"
     port = str(SCH_TRX_PORT_CMD)
-    node = FuzzCspZmqNode(addr, hub_ip="127.0.0.1", proto=protocol)
-    node.start()
 
-    # Execute flight software
-    time.sleep(1)
     exec_cmd = "./SUCHAI_Flight_Software_Test"
-    prev_dir = os.getcwd()
-    # Run flight software sending n_cmds random commands with 1 random parameter
-    os.chdir(exec_dir)
-    if print_logfile:
-        init_time = time.time()  # Start measuring execution time of the sequence
-        suchai_process = Popen([exec_cmd], stdin=PIPE, stdout=PIPE)
-    else:
-        init_time = time.time()  # Start measuring execution time of the sequence
-        suchai_process = Popen([exec_cmd], stdin=PIPE)
-
-    proc_pid = suchai_process.pid
-    rm_start, vm_start = get_mem_info(proc_pid)
-
-    time.sleep(4)
-    os.chdir(prev_dir)
-
-    # Clean database
-    print("node send: drp_ebf 1010")  # For debugging purposes
-    header = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=55)
-    node.send_message("drp_ebf 1010", header)
 
     # Read JSON report
     with open(path_to_json, 'r') as json_file:
         seq_json = json.load(json_file)
 
-    # Start sending sequences
+    seq_num = 0
     for seq in seq_json:
+        # Execute flight software
+        node = FuzzCspZmqNode(addr, hub_ip="127.0.0.1", proto=protocol)
+        node.start()
+        time.sleep(1)
+        prev_dir = os.getcwd()
+        # Run flight software sending n_cmds random commands with 1 random parameter
+        os.chdir(exec_dir)
+        if print_logfile:
+            init_time = time.time()  # Start measuring execution time of the sequence
+            suchai_process = Popen([exec_cmd], stdin=PIPE, stdout=PIPE)
+        else:
+            init_time = time.time()  # Start measuring execution time of the sequence
+            suchai_process = Popen([exec_cmd], stdin=PIPE)
+
+        proc_pid = suchai_process.pid
+        rm_start, vm_start = get_mem_info(proc_pid)
+
+        time.sleep(4)
+        os.chdir(prev_dir)
+
+        # Clean database
+        print("node send: drp_ebf 1010")  # For debugging purposes
+        header = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=55)
+        node.send_message("drp_ebf 1010", header)
+
+        # Start sending sequences
         # time.sleep(0.5)  # Give some time to zmqnode threads (writer and reader)
         for cmd in seq["cmds"]:
             print("node send:", cmd["cmd_name"] + " " + cmd["params"])  # For debugging purposes
             header = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=55)
             node.send_message(cmd["cmd_name"] + " " + cmd["params"], header)
 
-    rm_end, vm_end = get_mem_info(proc_pid)
+        rm_end, vm_end = get_mem_info(proc_pid)
 
-    # Exit SUCHAI process
-    hdr = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=56)
-    node.send_message("obc_reset", hdr)
+        # Exit SUCHAI process
+        hdr = CspHeader(src_node=int(addr), dst_node=int(dest), dst_port=int(port), src_port=56)
+        node.send_message("obc_reset", hdr)
 
-    # Get SUCHAI process return code
-    return_code = suchai_process.wait()
-    end_time = time.time()
+        # Get SUCHAI process return code
+        return_code = suchai_process.wait()
+        end_time = time.time()
 
-    if print_logfile:
-        # Write log in file
-        with open(log_path, 'wb') as logfile:
-            for line in suchai_process.stdout:
-                logfile.write(line)
+        if print_logfile:
+            # Write log in file
+            output_file = os.path.join(log_path, str(seq_num) + "-" + os.path.basename(path_to_json).split(".")[0]+".log")
+            with open(output_file, 'wb') as logfile:
+                for line in suchai_process.stdout:
+                    logfile.write(line)
+        seq_num += 1
 
-    print("Return code: ", return_code)
-    print("Execution time (s): ", end_time - init_time)
-    print("Memory usage (kb): ", rm_end - rm_start)
+        print("Return code: ", return_code)
+        print("Execution time (s): ", end_time - init_time)
+        print("Memory usage (kb): ", rm_end - rm_start)
 
-    #assert return_code == 0
-    #assert end_time - init_time < 10
-    #assert rm_end - rm_start
+        #assert return_code == 0
+        #assert end_time - init_time < 10
+        #assert rm_end - rm_start
 
-    node.stop()
-
-    os.chdir(prev_dir)
+        node.stop()
+        os.chdir(prev_dir)
 
     # Kill zmqhub.py
     ex_zmqhub.kill()
 
 
-def execute_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile, id_list):
+def execute_files_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile):
     seq_files = sorted(glob.glob(path_to_json+"/*.json"))
     for seq_file in seq_files:
-        output_file = os.path.join(log_path, os.path.basename(seq_file)+".log")
-        execute_seq(exec_dir, seq_file, output_file, protocol, print_logfile, None)
+        #output_file = os.path.join(log_path, os.path.basename(seq_file)+".log")
+        execute_file_seqs(exec_dir, seq_file, log_path, protocol, print_logfile)
 
 
 if __name__ == "__main__":
     args = get_parameters()
-    execute_seqs(args.exec_dir, args.path_to_json, args.log_folder_path, args.protocol, args.save_log, args.id_list)
+    execute_files_seqs(args.exec_dir, args.path_to_json, args.log_folder_path, args.protocol, args.save_log)
