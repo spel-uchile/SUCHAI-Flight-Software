@@ -16,6 +16,7 @@ set(SOURCE_FILES
         ../../../src/os/Linux/osSemphr.c
         ../../../src/os/Linux/osThread.c
         ../../../src/os/Linux/pthread_queue.c
+        ../../../src/lib/math_utils.c
         ../../../src/system/globals.c
         ../../../src/system/utils.c
         ../../../src/system/cmdDRP.c
@@ -42,7 +43,8 @@ set(SOURCE_FILES
         )
 
 include_directories(
-        ../../../src/system/include/
+        ../../../src/system/include
+        ../../../src/lib/include
         ../../../src/os/include
         ../../../src/drivers/rpi/include
         ../../../src/drivers/rpi/libcsp/include

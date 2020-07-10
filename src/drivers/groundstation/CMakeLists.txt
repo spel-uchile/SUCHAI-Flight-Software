@@ -48,6 +48,7 @@ set(SOURCE_FILES
         ../../../src/os/Linux/osSemphr.c
         ../../../src/os/Linux/osThread.c
         ../../../src/os/Linux/pthread_queue.c
+        ../../../src/lib/math_utils.c
         ../../../src/system/globals.c
         ../../../src/system/utils.c
         ../../../src/system/cmdDRP.c
@@ -91,7 +92,8 @@ include_directories(
         ../../../src/drivers/groundstation/suchai-drivers-bus/lib/libutil
         ../../../src/drivers/groundstation/suchai-drivers-bus/lib/nanopower_client
 
-        ../../../src/system/include/
+        ../../../src/system/include
+        ../../../src/lib/include
         ../../../src/os/include
         ../../../src/drivers/groundstation/include
         ../../../src/drivers/groundstation/libcsp/include
