@@ -1,5 +1,7 @@
 # Nanosatellite Flight Software
 
+### :exclamation: IMPORTANT NOTE: This repostitory has been moved to [GitLab](https://gitlab.com/spel-uchile/suchai-flight-software/)
+
 [![Build Status](https://gitlab.com/spel-uchile/suchai-flight-software/badges/master/pipeline.svg)](https://gitlab.com/spel-uchile/suchai-flight-software/pipelines)
 [![GitHub tag](https://img.shields.io/github/tag/spel-uchile/SUCHAI-Flight-Software.svg)]()
 [![license](https://img.shields.io/github/license/spel-uchile/SUCHAI-Flight-Software.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
