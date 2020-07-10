@@ -166,7 +166,7 @@ int adcs_get_omega(char* fmt, char* params, int nparams)
         omega.v0 = gyro_reading.gyro_x;
         omega.v1 = gyro_reading.gyro_y;
         omega.v2 = gyro_reading.gyro_z;
-        _set_sat_vector(&omega, dat_ads_acc_x);
+        _set_sat_vector(&omega, dat_ads_omega_x);
         return CMD_OK;
     }
     return CMD_FAIL;
@@ -210,7 +210,7 @@ int adcs_control_torque(char* fmt, char* params, int nparams)
     _get_sat_quaterion(&q_i2b_est, dat_ads_q0);
     _get_sat_quaterion(&q_i2b_tar, dat_tgt_q0);
     vector3_t omega_b_est;  // Current GYRO. Read from ADCS
-    _get_sat_vector(&omega_b_est, dat_ads_acc_x);
+    _get_sat_vector(&omega_b_est, dat_ads_omega_x);
     vector3_t omega_b_tar;
     _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
 
@@ -297,7 +297,7 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
     vector3_t mag_earth_b_est;
     _get_sat_vector(&mag_earth_b_est, dat_ads_mag_x);
     vector3_t omega_b_est;  // Current GYRO. Read from ADCS
-    _get_sat_vector(&omega_b_est, dat_ads_acc_x);
+    _get_sat_vector(&omega_b_est, dat_ads_omega_x);
     vector3_t omega_b_tar;
     _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
 
