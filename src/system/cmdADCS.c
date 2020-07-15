@@ -284,11 +284,17 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
 {
     // GLOBALS
     vector3_t rw_lower_limit;
-    rw_lower_limit.v[0] = 0.0; rw_lower_limit.v[1] = 0.0; rw_lower_limit.v[2] = 0.0;
+    rw_lower_limit.v[0] = 0.0;
+    rw_lower_limit.v[1] = 0.0;
+    rw_lower_limit.v[2] = 0.0;
     vector3_t select_mag_dir_torque;
-    select_mag_dir_torque.v[0] = 1.0; select_mag_dir_torque.v[1] = 1.0; select_mag_dir_torque.v[2] = 1.0;
+    select_mag_dir_torque.v[0] = 1.0;
+    select_mag_dir_torque.v[1] = 1.0;
+    select_mag_dir_torque.v[2] = 1.0;
     vector3_t max_mag_am2;
-    max_mag_am2.v[0] = 0.35; max_mag_am2.v[1] = 0.35; max_mag_am2.v[2] = 0.35;
+    max_mag_am2.v[0] = 0.35;
+    max_mag_am2.v[1] = 0.35;
+    max_mag_am2.v[2] = 0.35;
     matrix3_t I_c;
     mat_set_diag(&I_c, 0.035, 0.035, 0.007);
     double nT2T = 1.0e-9;
@@ -301,14 +307,6 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
     vector3_t omega_b_tar;
     _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
 
-//    select_mag_dir_torque_[0] = abs(omega_b_est_[0]) < rw_lower_limit_[0];
-//    select_mag_dir_torque_[1] = abs(omega_b_est_[1]) < rw_lower_limit_[1];
-//    select_mag_dir_torque_[2] = abs(omega_b_est_[2]) < rw_lower_limit_[2];
-//    if (adcs_mode_ == DETUMBLING_MAG){
-//        select_mag_dir_torque_[0] = 1.0;
-//        select_mag_dir_torque_[1] = 1.0;
-//        select_mag_dir_torque_[2] = 1.0;
-//    }
     select_mag_dir_torque.v[0] = fabs(omega_b_est.v[0]) < rw_lower_limit.v[0];
     select_mag_dir_torque.v[1] = fabs(omega_b_est.v[1]) < rw_lower_limit.v[1];
     select_mag_dir_torque.v[2] = fabs(omega_b_est.v[2]) < rw_lower_limit.v[2];
@@ -319,47 +317,33 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
         select_mag_dir_torque.v[1] = 1.0;
         select_mag_dir_torque.v[2] = 1.0;
     }
-
-//    Vector<3> error_angular_vel = omega_b_est_ - omega_b_tar_;
-//    Matrix<3, 3> I_c = dynamics_->attitude_->GetInertiaTensor();
-//    Vector<3> control_torque = -1.0*I_c*error_angular_vel;
-//    double inv_norm_torque =  1.0;
-//    if( norm(control_torque) >= 1E-09 ) {
-//        inv_norm_torque = 1.0 / norm(control_torque);
-//    }
-//    control_torque *= inv_norm_torque;
     vec_cons_mult(-1.0, &omega_b_tar, NULL);
     vector3_t error_angular_vel;
-    vec_sum(omega_b_est, omega_b_tar, &error_angular_vel);
+    vec_sum(omega_b_est, omega_b_tar, &error_angular_vel); //dw = w_b_est - w_b_tar
     vector3_t control_torque;
     vec_cons_mult(-1.0, &error_angular_vel, NULL);
-    mat3_vec3_mult(I_c, error_angular_vel, &control_torque);
+    mat3_vec3_mult(I_c, error_angular_vel, &control_torque); //t = -I * dw
     double inv_norm_torque = 1.0;
     double norm_torque = vec_norm(control_torque);
     if (norm_torque >= pow(10.0, -9.0))
     {
         inv_norm_torque = 1.0 / norm_torque;
     }
-    vec_cons_mult(inv_norm_torque, &control_torque, NULL);
+    vec_cons_mult(inv_norm_torque, &control_torque, NULL); //t = t/||t|| = -I*dw / ||I*dw||
 
-//    Vector<3> max_torque = outer_product(max_mag_Am2_, nT2T*mag_earth_b_est_);
-//    control_torque[0] *=  select_mag_dir_torque_[0]*abs(max_torque[0]);
-//    control_torque[1] *=  select_mag_dir_torque_[1]*abs(max_torque[1]);
-//    control_torque[2] *=  select_mag_dir_torque_[2]*abs(max_torque[2]);
     vector3_t nT2T_mag_earth_b_est;
     vec_cons_mult(nT2T, &mag_earth_b_est, &nT2T_mag_earth_b_est);
     vector3_t max_torque;
-    vec_outer_product(max_mag_am2, nT2T_mag_earth_b_est, &max_torque);
-    control_torque.v[0] *= select_mag_dir_torque.v[0] * fabs(max_torque.v[0]);
+    //bellow method should be named cross product
+    vec_outer_product(max_mag_am2, nT2T_mag_earth_b_est, &max_torque);// t_max = m_max x B_est
+    control_torque.v[0] *= select_mag_dir_torque.v[0] * fabs(max_torque.v[0]);//tx = tx*dirx*|t_max_x|
     control_torque.v[1] *= select_mag_dir_torque.v[1] * fabs(max_torque.v[1]);
     control_torque.v[2] *= select_mag_dir_torque.v[2] * fabs(max_torque.v[2]);
 
-//    double inv_b_norm2 = 1.0/(pow(nT2T*norm(mag_earth_b_est_), 2.0));
-//    control_mag_moment_ = inv_b_norm2 * outer_product(nT2T * mag_earth_b_est_, control_torque);
-    double inv_b_norm2 = 1.0 / pow(nT2T * vec_norm(mag_earth_b_est), 2.0);
+    double inv_b_norm2 = 1.0 / pow(nT2T * vec_norm(mag_earth_b_est), 2.0);//=1/||B_est||**2
     vector3_t control_mag_moment_temp, control_mag_moment;
-    vec_outer_product(nT2T_mag_earth_b_est, control_torque, &control_mag_moment_temp);
-    vec_cons_mult(inv_b_norm2, &control_mag_moment_temp, &control_mag_moment);
+    vec_outer_product(nT2T_mag_earth_b_est, control_torque, &control_mag_moment_temp);//mc* = Bxt
+    vec_cons_mult(inv_b_norm2, &control_mag_moment_temp, &control_mag_moment); //mc =  Bxt / ||B_est||**2
 
     LOGI(tag, "CTRL_MAG_MOMENT: %f, %f, %f", control_mag_moment.v0, control_mag_moment.v1, control_mag_moment.v2);
 
@@ -370,6 +354,42 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
     int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
                        "adcs_set_mag_moment %.06f %.06f %.06f",
                        control_mag_moment.v0, control_mag_moment.v1, control_mag_moment.v2);
+    //Calc PWM duty cycle from magnetic moment
+    uint8_t mtq_duty[3];
+    //Todo: calc based on model
+    double magMoment_control_norm = vec_norm(control_mag_moment);
+    vector3_t magMoment_control_unit;
+    if (magMoment_control_norm >= pow(10.0, -9.0))
+    {
+        vec_cons_mult(100.0 / magMoment_control_norm, &magMoment_control_unit, NULL); //m_hat = m/||m||
+    } else
+    {
+        magMoment_control_unit.v[0] = 0.0;
+        magMoment_control_unit.v[1] = 0.0;
+        magMoment_control_unit.v[2] = 0.0;
+    }
+    mtq_duty[0] = (uint8_t) control_mag_moment.v[0]; //Todo:Check that this value is in the range [0, 100]
+    mtq_duty[1] = (uint8_t) control_mag_moment.v[1];
+    mtq_duty[2] = (uint8_t) control_mag_moment.v[2];
+
+    //Enable MTQ's through PWM commands
+    //Check when the power on cmd should be call
+    cmd_t *cmd_pwm_pwr = cmd_get_str("obc_pwm_pwr");
+    cmd_add_params_str(cmd_pwm_pwr, "1");
+    cmd_send(cmd_pwm_pwr);
+
+    cmd_t *cmd_set_pwm_x = cmd_get_str("obc_set_pwm_duty");
+    cmd_add_params_var(cmd_set_pwm_x, mtq_duty[0], 0);//TODO:Check cmd parameters order
+    cmd_send(cmd_set_pwm_x);
+
+    cmd_t *cmd_set_pwm_y = cmd_get_str("obc_set_pwm_duty");
+    cmd_add_params_var(cmd_set_pwm_y, mtq_duty[1], 1);
+    cmd_send(cmd_set_pwm_y);
+
+    cmd_t *cmd_set_pwm_z = cmd_get_str("obc_set_pwm_duty");
+    cmd_add_params_var(cmd_set_pwm_z, mtq_duty[2], 2);
+    cmd_send(cmd_set_pwm_z);
+
     packet->length = len;
     LOGI(tag, "ADCS CMD: (%d) %s", packet->length, packet->data);
 
