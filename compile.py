@@ -83,6 +83,7 @@ if __name__ == "__main__":
             os.chdir(test_dir)
             os.system('cmake ..')
             result = os.system('make')
+
             # Run the test
             if result == 0:
                 if args.test_type == 'test_cmd':
