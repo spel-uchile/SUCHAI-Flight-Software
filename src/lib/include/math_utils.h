@@ -258,7 +258,7 @@ void _mat_set_diag(double * m, double val, int n_x, int n_y);
 
 void _mat_transpose(double * mat, double * res, int n_i, int n_j);
 
-void _mat_copy(double * mat, double * res, int matx, int maty, int resx, int resy, int pi, int pj);
+void _mat_copy(double * mat, double * res, int matx, int maty, int resx, int resy, int p_i, int p_j);
 
 void eskf_integrate(quaternion_t q, vector3_t omega, double dt, quaternion_t * res);
 

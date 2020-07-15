@@ -287,13 +287,13 @@ void _mat_transpose(double * mat, double * res, int n_x, int n_y)
     }
 }
 
-void _mat_copy(double * mat, double * res, int matx, int maty, int resx, int resy, int pi, int pj)
+void _mat_copy(double * mat, double * res, int matx, int maty, int resx, int resy, int p_i, int p_j)
 {
     int i_mat=0, i_res=0;
     for(int i=0; i < matx; ++i) {
         for(int j=0; j < maty; ++j) {
             i_mat = (matx*i) + j;
-            i_res = ((resx)*(i+pi)) + j + pj;
+            i_res = ((resx)*(i+p_i)) + j + p_j;
             res[i_res] = mat[i_mat];
         }
     }

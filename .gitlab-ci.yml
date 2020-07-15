@@ -35,7 +35,7 @@ configure_docker:
     - cd $HOME/suchai-docker
     - git pull
     - cd suchai-fs
-    - docker build -t suchai-fs .
+    - docker build --no-cache -t suchai-fs .
     - docker system prune -f
   only:
     - master
