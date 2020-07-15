@@ -15,6 +15,7 @@
 
 #include <math.h>
 #include "config.h"
+#include <assert.h>
 
 /**
  * Quaternion structure
@@ -60,6 +61,12 @@ typedef union matrix3 {
     };
 }matrix3_t;
 
+/**
+ * Calculates unit quaternion from a pure vector.
+ * @param axis vector of dimension 3.
+ * @param res equivalent quaternion.
+ */
+void vec_to_quat(vector3_t axis, quaternion_t * res);
 
 /**
  * Calculates equivalent quaternion from a rotation arround an axis.
@@ -106,6 +113,13 @@ void quat_conjugate(quaternion_t *q, quaternion_t *res);
  * @param v_b vector respect to (b) frame
  */
 void quat_frame_conv(quaternion_t *q_rot_a2b, vector3_t *v_a, vector3_t *v_b);
+
+/**
+ * Quaternion to rotation matrix transformation
+ * @param q Input quaternion
+ * @param res 3X3 result transformation matrix
+ */
+void quat_to_dcm(quaternion_t * q, matrix3_t * res);
 
 /**
  * Calculate the inverse of the quaternion q
@@ -178,7 +192,25 @@ void vec_cons_mult(double a, vector3_t *vec, vector3_t *res);
  * @param vec input vector of dimensions
  * @param res
  */
-void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
+void mat_vec_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
+
+/**
+ * Calculates (3x3) matrix product:
+ * res = rhs * lhs
+ * @param lhs left hand (3x3) matrix.
+ * @param rhs right hand (3x3) matrix.
+ * @param res matrix multiplication result (3x3).
+ */
+void mat_mat_mult(matrix3_t lhs, matrix3_t rhs, matrix3_t* res);
+
+/**
+ * Calculates (3x3) matrix sum:
+ * res = rhs + lhs
+ * @param lhs left hand (3x3) matrix.
+ * @param rhs right hand (3x3) matrix.
+ * @param res matrix sum result (3x3).
+ */
+void mat_mat_sum(matrix3_t lhs, matrix3_t rhs, matrix3_t* res);
 
 /**
  * Set a diagonal 3x3 matrix
@@ -192,5 +224,46 @@ void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
  * @param c diagonal value
  */
 void mat_set_diag(matrix3_t *m, double a, double b, double c);
+
+/**
+ * Calculates skew matrix from a 3 dimension vector
+ * @param vec input vector
+ * @param res (3x3) result matrix
+ */
+void mat_skew(vector3_t vec, matrix3_t* res);
+
+/**
+ * Calculates matrix inverse for a (3x3) matrix
+ * @param mat Input (3x3) matrix
+ * @param res Inverse matrix result.
+ */
+void mat_inverse(matrix3_t mat, matrix3_t* res);
+
+/**
+ * Calculates matrix transpose for a (3x3) matrix
+ * @param mat Input (3x3) matrix.
+ * @param res Transpose matrix result.
+ */
+void mat_transpose(matrix3_t* mat, matrix3_t* res);
+
+void _mat_cons_mult(double  a, double * mat, double *res, int n_x, int n_y);
+
+void _mat_vec_mult(double * mat, double * vec, double * res, int n_x, int n_y);
+
+void _mat_mat_mult(double * lhs, double * rhs, double * res, int n_x, int n_y, int n_z);
+
+void _mat_mat_sum(double * lhs, double * rhs, double * res, int n_x, int n_y);
+
+void _mat_set_diag(double * m, double val, int n_x, int n_y);
+
+void _mat_transpose(double * mat, double * res, int n_i, int n_j);
+
+void _mat_copy(double * mat, double * res, int matx, int maty, int resx, int resy, int pi, int pj);
+
+void eskf_integrate(quaternion_t q, vector3_t omega, double dt, quaternion_t * res);
+
+void eskf_compute_error(vector3_t omega, double dt, double P[6][6], double Q[6][6]);
+
+void eskf_update_mag(vector3_t mag_sensor, vector3_t mag_i, double P[6][6], matrix3_t * R, quaternion_t * q, vector3_t * wb);
 
 #endif //MATH_UTILS_H
