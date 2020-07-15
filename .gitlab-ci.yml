@@ -119,3 +119,13 @@ test_sgp4:
     - docker system prune -f
   only:
     - master
+
+test_fuzz:
+  stage: test_linux
+  script:
+    - echo "Testing in Linux"
+    - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_fuzz
+    - docker system prune -f
+  only:
+    - master
