@@ -34,6 +34,7 @@ configure_docker:
     - echo "Configure docker image"
     - cd $HOME/suchai-docker
     - git pull
+    - cd suchai-fs
     - docker build -t suchai-fs .
     - docker system prune -f
   only:
