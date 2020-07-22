@@ -500,9 +500,8 @@ int sim_adcs_detumbling_mag(char* fmt, char* params, int nparams)
     vec_normalize(&i_tar, NULL);
 
     vector3_t omega_b_tar;
-    omega_b_tar.v[0] = 0.0;
-    omega_b_tar.v[0] = 0.0;
-    omega_b_tar.v[0] = 0.0;
+    if(params == NULL || sscanf(params, fmt, &omega_b_tar.v0, &omega_b_tar.v1, &omega_b_tar.v2) != nparams)
+        return CMD_ERROR;
 
     char *_fmt = "%lf %lf %lf %lf %lf %lf";
     char _params[SCH_CMD_MAX_STR_PARAMS];

@@ -90,6 +90,7 @@ void taskHousekeeping(void *param)
             } else if(mode == DAT_OBC_OPMODE_DETUMB_MAG)
             {
                 cmd_point = cmd_get_str("sim_adcs_detumbling_mag");
+                cmd_add_params_var(cmd_point, 0.0, 0.0, 0.0);
             }
             cmd_send(cmd_point);
             // Do control loop
