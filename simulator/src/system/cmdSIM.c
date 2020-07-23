@@ -35,7 +35,7 @@ void cmd_sim_init(void)
     cmd_add("sim_adcs_mag_moment", sim_adcs_mag_moment, "", 0);
     cmd_add("sim_adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
     cmd_add("sim_adcs_set_to_nadir", sim_adcs_target_nadir, "", 0);
-    cmd_add("sim_adcs_detumbling_mag", sim_adcs_detumbling_mag, "", 0);
+    cmd_add("sim_adcs_detumbling_mag", sim_adcs_detumbling_mag, "%lf %lf %lf", 3);
     cmd_add("sim_adcs_send_attitude", sim_adcs_send_attitude, "", 0);
 }
 
