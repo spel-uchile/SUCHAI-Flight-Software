@@ -18,4 +18,6 @@
 
 void taskADCS(void *param);
 
+void eskf_estimate(void);
+
 #endif //T_ADCS_H
