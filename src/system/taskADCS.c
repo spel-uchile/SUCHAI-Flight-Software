@@ -26,14 +26,15 @@ void taskADCS(void *param)
 {
     LOGI(tag, "Started");
 
-    portTick delay_ms    = 1000;            //Task period in [ms]
+    portTick delay_ms  = 10;            //Task period in [ms]
 
     unsigned int elapsed_sec = 1;           // Seconds counter
-    unsigned int _adcs_ctrl_period = 1;     // ADCS control period in seconds
-    unsigned int _10sec_check = 10;         // 10[s] condition
-    unsigned int _01min_check = 1*60;       // 05[m] condition
-    unsigned int _05min_check = 5*60;       // 05[m] condition
-    unsigned int _1hour_check = 60*60;      // 01[h] condition
+    unsigned int elapsed_msec = 1;
+    unsigned int _adcs_ctrl_period = 1000;     // ADCS control period in seconds
+    unsigned int _10sec_check = 10*1000;         // 10[s] condition
+    unsigned int _01min_check = 1*60*1000;       // 05[m] condition
+    unsigned int _05min_check = 5*60*1000;       // 05[m] condition
+    unsigned int _1hour_check = 60*60*1000;      // 01[h] condition
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
@@ -55,14 +56,42 @@ void taskADCS(void *param)
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
-        elapsed_sec += delay_ms / 1000; //Update seconds counts
+        elapsed_msec += delay_ms;
+
+        /**
+         * Estimate Loop
+         */
+        if (elapsed_msec % 10) {
+
+            double P[6][6];
+            double dt = (double) elapsed_msec / 1000.0
+            eskf_predict_state((void*)P, dt)
+
+            if(elapsed_msec % 100) {
+                // Update magnetic
+                matrix3_t R;
+                // TODO: get value from magsensor
+                vector3_t mag_sensor = {0.33757741, 0.51358994, 0.78883893};
+                // TODO: get value from magnetic model
+                vector3_t mag_i = {6723.12366721, 10229.07189747, 15710.68799647};
+
+                quaternion_t q_est;
+                _get_sat_quaterion(&q_est, dat_ads_q0);
+
+                vector3_t w;
+                _get_sat_vector(&w, dat_ads_acc_x);
+
+                // TODO: call function separately with its own mesuerement freq
+                eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
+            }
+        }
 
         /* 1 second actions */
         dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
         /**
          * Control LOOP
          */
-        if ((elapsed_sec % _adcs_ctrl_period) == 0)
+        if ((elapsed_msec % _adcs_ctrl_period) == 0)
         {
             cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
             cmd_add_params_str(cmd_tle_prop, "0");
@@ -109,7 +138,7 @@ void taskADCS(void *param)
         }
 
         /* 1 hours actions */
-        if((elapsed_sec % _1hour_check) == 0)
+        if((elapsed_msec % _1hour_check) == 0)
         {
             LOGD(tag, "1 hour check");
             cmd_t *cmd_1h = cmd_get_str("drp_add_hrs_alive");
@@ -119,13 +148,13 @@ void taskADCS(void *param)
     }
 }
 
-void eskf_estimate()
+void eskf_predict_state(double* P, double dt)
 {
     LOGI(tag, "Kalman Estimate")
     // Predict Nominal
     quaternion_t q;
-    // TODO: get from accelerometer
-    vector3_t w ={0.1002623,  -0.10142402,  0.20332787};
+    // TODO: get from gyros
+    vector3_t w = {0.1002623,  -0.10142402,  0.20332787};
     vector3_t wb;
     vector3_t diffw;
     _get_sat_quaterion(&q, dat_ads_q0);
@@ -133,8 +162,6 @@ void eskf_estimate()
     _get_sat_vector(&wb, dat_ads_ombias_x);
 
     quaternion_t q_est;
-    // TODO: get real time step from clock
-    double dt = 0.1;
     vec_cons_mult(-1.0, &wb, NULL);
     vec_sum(w, wb, &diffw);
     eskf_integrate(q, diffw, dt, &q_est);
@@ -142,18 +169,9 @@ void eskf_estimate()
 //    _set_sat_vector(&omega, dat_ads_omega_x);
 
     // Predict Error
-    double P[6][6];
+
     _mat_set_diag(P, 1.0,6, 6);
     double Q[6][6];
     _mat_set_diag(Q, 1.0,6, 6);
     eskf_compute_error(diffw, dt, P, Q);
-
-    matrix3_t R;
-    // TODO: get value from magsensor
-    vector3_t mag_sensor = {0.33757741, 0.51358994, 0.78883893};
-    // TODO: get value from magnetic model
-    vector3_t mag_i = {6723.12366721, 10229.07189747, 15710.68799647};
-
-    // TODO: call function separately with its own mesuerement freq
-    eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
 }
