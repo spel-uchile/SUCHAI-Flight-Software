@@ -710,3 +710,51 @@ int set_machine_state(machine_action_t action, unsigned int step, int nsamples)
     }
     return 0;
 }
+
+void _get_sat_quaterion(quaternion_t *q,  dat_system_t index)
+{
+    int i;
+    for(i=0; i<4; i++)
+    {
+        assert(index+i < dat_system_last_var);
+        value v;
+        v.i = dat_get_system_var(index+i);
+        q->q[i] = (double)v.f;
+    }
+}
+
+void _set_sat_quaterion(quaternion_t *q,  dat_system_t index)
+{
+    int i;
+    for(i=0; i<4; i++)
+    {
+        assert(index+i < dat_system_last_var);
+        value v;
+        v.f = (float)q->q[i];
+        dat_set_system_var(index+i, v.i);
+    }
+}
+
+void _get_sat_vector(vector3_t *r, dat_system_t index)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        assert(index+i < dat_system_last_var);
+        value v;
+        v.i = dat_get_system_var(index+i);
+        r->v[i] = (double)v.f;
+    }
+}
+
+void _set_sat_vector(vector3_t *r, dat_system_t index)
+{
+    int i;
+    for(i=0; i<3; i++)
+    {
+        assert(index+i < dat_system_last_var);
+        value v;
+        v.f = (float)r->v[i];
+        dat_set_system_var(index+i, v.i);
+    }
+}

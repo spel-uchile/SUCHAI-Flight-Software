@@ -19,11 +19,6 @@
 
 #define SCH_DRP_MAGIC (1010)    ///< Magic number to execute critical commands
 
-typedef union sensors_value{
-    float f;
-    int32_t i;
-} value;
-
 /**
  * Register data repository (DRP) commands in the system
  */
