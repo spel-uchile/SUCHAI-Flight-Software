@@ -38,55 +38,6 @@ void cmd_sim_init(void)
     cmd_add("adcs_send_attitude", sim_adcs_send_attitude, "", 0);
 }
 
-static inline void _get_sat_quaterion(quaternion_t *q, dat_system_t index);
-void _get_sat_quaterion(quaternion_t *q,  dat_system_t index)
-{
-  int i;
-  for(i=0; i<4; i++)
-  {
-    assert(index+i < dat_system_last_var);
-    value v;
-    v.i = dat_get_system_var(index+i);
-    q->q[i] = (double)v.f;
-  }
-}
-static inline void _set_sat_quaterion(quaternion_t *q,  dat_system_t index);
-void _set_sat_quaterion(quaternion_t *q,  dat_system_t index)
-{
-  int i;
-  for(i=0; i<4; i++)
-  {
-    assert(index+i < dat_system_last_var);
-    value v;
-    v.f = (float)q->q[i];
-    dat_set_system_var(index+i, v.i);
-  }
-}
-static inline void _get_sat_vector(vector3_t *r, dat_system_t index);
-void _get_sat_vector(vector3_t *r, dat_system_t index)
-{
-    int i;
-    for(i=0; i<3; i++)
-    {
-        assert(index+i < dat_system_last_var);
-        value v;
-        v.i = dat_get_system_var(index+i);
-        r->v[i] = (double)v.f;
-    }
-}
-static inline void _set_sat_vector(vector3_t *r, dat_system_t index);
-void _set_sat_vector(vector3_t *r, dat_system_t index)
-{
-    int i;
-    for(i=0; i<3; i++)
-    {
-        assert(index+i < dat_system_last_var);
-        value v;
-        v.f = (float)r->v[i];
-        dat_set_system_var(index+i, v.i);
-    }
-}
-
 
 int sim_adcs_point(char* fmt, char* params, int nparams)
 {

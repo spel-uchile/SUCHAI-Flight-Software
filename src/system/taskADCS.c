@@ -61,13 +61,14 @@ void taskADCS(void *param)
         /**
          * Estimate Loop
          */
-        if (elapsed_msec % 10) {
+        if (elapsed_msec % 10 == 0) {
 
             double P[6][6];
-            double dt = (double) elapsed_msec / 1000.0
-            eskf_predict_state((void*)P, dt)
+            double dt = (double) elapsed_msec / 1000.0;
+            eskf_predict_state((double*)P, dt);
 
-            if(elapsed_msec % 100) {
+            if(elapsed_msec % 100 == 0)
+            {
                 // Update magnetic
                 matrix3_t R;
                 // TODO: get value from magsensor
@@ -79,7 +80,7 @@ void taskADCS(void *param)
                 _get_sat_quaterion(&q_est, dat_ads_q0);
 
                 vector3_t w;
-                _get_sat_vector(&w, dat_ads_acc_x);
+                _get_sat_vector(&w, dat_ads_omega_x);
 
                 // TODO: call function separately with its own mesuerement freq
                 eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
@@ -153,13 +154,12 @@ void eskf_predict_state(double* P, double dt)
     LOGI(tag, "Kalman Estimate")
     // Predict Nominal
     quaternion_t q;
-    // TODO: get from gyros
-    vector3_t w = {0.1002623,  -0.10142402,  0.20332787};
-    vector3_t wb;
+//    vector3_t w = {0.1002623,  -0.10142402,  0.20332787};
+    vector3_t w;
+    vector3_t wb = {0.0, 0.0, 0.0};
     vector3_t diffw;
     _get_sat_quaterion(&q, dat_ads_q0);
-//    _get_sat_vector(&w, dat_ads_acc_x);
-    _get_sat_vector(&wb, dat_ads_ombias_x);
+    _get_sat_vector(&w, dat_ads_omega_x);
 
     quaternion_t q_est;
     vec_cons_mult(-1.0, &wb, NULL);
@@ -169,7 +169,6 @@ void eskf_predict_state(double* P, double dt)
 //    _set_sat_vector(&omega, dat_ads_omega_x);
 
     // Predict Error
-
     _mat_set_diag(P, 1.0,6, 6);
     double Q[6][6];
     _mat_set_diag(Q, 1.0,6, 6);
