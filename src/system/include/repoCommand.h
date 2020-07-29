@@ -39,7 +39,7 @@
 #ifdef SCH_USE_GSSB
 #include "cmdGSSB.h"
 #endif
-#if SCH_ADCS_ENABLED
+#if SCH_ADCS_ENABLED  && defined(NANOMIND)
 #include "cmdADCS.h"
 #endif
 

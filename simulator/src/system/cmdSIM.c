@@ -20,23 +20,22 @@
  */
 
 #include "cmdSIM.h"
-#include <math.h>
 static const char* tag = "cmdSIM";
 
 #define ADCS_PORT 7
 
 void cmd_sim_init(void)
 {
-    cmd_add("sim_adcs_point", sim_adcs_point, "", 0);
-    cmd_add("sim_adcs_quat", sim_adcs_get_quaternion, "", 0);
-    cmd_add("sim_adcs_acc", sim_adcs_get_acc, "", 0);
-    cmd_add("sim_adcs_mag", sim_adcs_get_mag, "", 0);
-    cmd_add("sim_adcs_do_control", sim_adcs_control_torque, "%lf", 1);
-    cmd_add("sim_adcs_mag_moment", sim_adcs_mag_moment, "", 0);
-    cmd_add("sim_adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
-    cmd_add("sim_adcs_set_to_nadir", sim_adcs_target_nadir, "", 0);
-    cmd_add("sim_adcs_detumbling_mag", sim_adcs_detumbling_mag, "%lf %lf %lf", 3);
-    cmd_add("sim_adcs_send_attitude", sim_adcs_send_attitude, "", 0);
+    cmd_add("adcs_point", sim_adcs_point, "", 0);
+    cmd_add("adcs_quat", sim_adcs_get_quaternion, "", 0);
+    cmd_add("adcs_acc", sim_adcs_get_acc, "", 0);
+    cmd_add("adcs_mag", sim_adcs_get_mag, "", 0);
+    cmd_add("adcs_do_control", sim_adcs_control_torque, "%lf", 1);
+    cmd_add("adcs_mag_moment", sim_adcs_mag_moment, "", 0);
+    cmd_add("adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
+    cmd_add("adcs_set_to_nadir", sim_adcs_target_nadir, "", 0);
+    cmd_add("adcs_detumbling_mag", sim_adcs_detumbling_mag, "%lf %lf %lf", 3);
+    cmd_add("adcs_send_attitude", sim_adcs_send_attitude, "", 0);
 }
 
 static inline void _get_sat_quaterion(quaternion_t *q, dat_system_t index);
@@ -170,9 +169,9 @@ int sim_adcs_get_acc(char* fmt, char* params, int nparams)
         rc = sscanf(in_buff, "%lf %lf %lf", &acc.v0, &acc.v1, &acc.v2);
         if(rc == 3)
         {
-            _set_sat_vector(&acc, dat_ads_acc_x);
+            _set_sat_vector(&acc, dat_ads_omega_x);
             vector3_t tmp;
-            _get_sat_vector(&tmp, dat_ads_acc_x);
+            _get_sat_vector(&tmp, dat_ads_omega_x);
             LOGI(tag, "SAT_ACC: %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
             free(out_buff);
             free(in_buff);
@@ -243,9 +242,9 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     _get_sat_quaterion(&q_i2b_est, dat_ads_q0);
     _get_sat_quaterion(&q_i2b_tar, dat_tgt_q0);
     vector3_t omega_b_est;  // Current GYRO. Read from ADCS
-    _get_sat_vector(&omega_b_est, dat_ads_acc_x);
+    _get_sat_vector(&omega_b_est, dat_ads_omega_x);
     vector3_t omega_b_tar;
-    _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
+    _get_sat_vector(&omega_b_tar, dat_tgt_omega_x);
 
 //    libra::Quaternion q_b2i_est = q_i2b_est_.conjugate(); //body frame to inertial frame
 //    libra::Quaternion q_i2b_now2tar = q_b2i_est * q_i2b_tar_;//q_i2b_tar_ = qi2b_est * qi2b_now2tar：クオータニオンによる2回転は積であらわされる。
@@ -276,14 +275,14 @@ int sim_adcs_control_torque(char* fmt, char* params, int nparams)
     vector3_t torque_rot;
     vec_cons_mult(att_rot, &torq_dir, &torque_rot); //(AttitudeRotation * TorqueDirection)
     vector3_t P;
-    mat3_vec3_mult(P_quat, torque_rot, &P);  //P_quat_ * (AttitudeRotation * TorqueDirection)
+    mat_vec_mult(P_quat, torque_rot, &P);  //P_quat_ * (AttitudeRotation * TorqueDirection)
     vector3_t I;
-    mat3_vec3_mult(I_quat, error_integral, &I); //I_quat_ * error_integral
+    mat_vec_mult(I_quat, error_integral, &I); //I_quat_ * error_integral
     vector3_t omega_b;
     vector3_t P_o;
     vec_cons_mult(-1.0, &omega_b_est, NULL);
     vec_sum(omega_b_tar, omega_b_est, &omega_b);
-    mat3_vec3_mult(P_omega, omega_b, &P_o); //P_omega_ * (omega_b_tar_ - omega_b_est_);
+    mat_vec_mult(P_omega, omega_b, &P_o); //P_omega_ * (omega_b_tar_ - omega_b_est_);
 
     vector3_t control_torque_tmp, control_torque;
     vec_sum(P, I, &control_torque_tmp);
@@ -330,9 +329,9 @@ int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
 
     // PARAMETERS
     vector3_t omega_b_est;  // Current GYRO. Read from ADCS
-    _get_sat_vector(&omega_b_est, dat_ads_acc_x);
+    _get_sat_vector(&omega_b_est, dat_ads_omega_x);
     vector3_t omega_b_tar;
-    _get_sat_vector(&omega_b_tar, dat_tgt_acc_x);
+    _get_sat_vector(&omega_b_tar, dat_tgt_omega_x);
 
 //    select_mag_dir_torque_[0] = abs(omega_b_est_[0]) < rw_lower_limit_[0];
 //    select_mag_dir_torque_[1] = abs(omega_b_est_[1]) < rw_lower_limit_[1];
@@ -366,7 +365,7 @@ int sim_adcs_mag_moment(char* fmt, char* params, int nparams)
     vec_sum(omega_b_est, omega_b_tar, &error_angular_vel);
     vector3_t control_torque;
     vec_cons_mult(-1.0, &error_angular_vel, NULL);
-    mat3_vec3_mult(I_c, error_angular_vel, &control_torque);
+    mat_vec_mult(I_c, error_angular_vel, &control_torque);
     double inv_norm_torque = 1.0;
     double norm_torque = vec_norm(control_torque);
     if (norm_torque >= pow(10.0, -9.0))
@@ -453,7 +452,7 @@ int sim_adcs_set_target(char* fmt, char* params, int nparams)
     quat_mult(&q_i2b_est, &q_b2b_now2tar, &q_i2b_tar); //Calculate quaternion after rotation
 
     _set_sat_quaterion(&q_i2b_tar, dat_tgt_q0);
-    _set_sat_vector(&omega_tar, dat_tgt_acc_x);
+    _set_sat_vector(&omega_tar, dat_tgt_omega_x);
 
     //TODO: Remove this print
     quaternion_t _q;

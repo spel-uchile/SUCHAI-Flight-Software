@@ -12,7 +12,12 @@
 #ifndef _CMDSIM_H
 #define _CMDSIM_H
 
+#include <math.h>
+
 #include "csp/csp.h"
+
+#include "log_utils.h"
+#include "math_utils.h"
 
 #include "repoData.h"
 #include "repoCommand.h"

@@ -82,9 +82,9 @@ typedef enum dat_system {
     dat_ads_omega_x,              ///< Gyroscope acceleration value along the x axis
     dat_ads_omega_y,              ///< Gyroscope acceleration value along the y axis
     dat_ads_omega_z,              ///< Gyroscope acceleration value along the z axis
-    dat_tgt_acc_x,                ///< Target acceleration value along the x axis
-    dat_tgt_acc_y,                ///< Target acceleration value along the y axis
-    dat_tgt_acc_z,                ///< Target acceleration value along the z axis
+    dat_tgt_omega_x,                ///< Target acceleration value along the x axis
+    dat_tgt_omega_y,                ///< Target acceleration value along the y axis
+    dat_tgt_omega_z,                ///< Target acceleration value along the z axis
     dat_ads_mag_x,                ///< Magnetometer value along the x axis
     dat_ads_mag_y,                ///< Magnetometer value along the y axis
     dat_ads_mag_z,                ///< Magnetometer value along the z axis

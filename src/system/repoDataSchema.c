@@ -51,9 +51,9 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_x);       ///< Gyroscope acceleration value along the x axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_y);       ///< Gyroscope acceleration value along the y axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_z);       ///< Gyroscope acceleration value along the z axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_acc_x);         ///< Target acceleration value along the x axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_acc_y);         ///< Target acceleration value along the y axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_acc_z);         ///< Target acceleration value along the z axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_omega_x);         ///< Target acceleration value along the x axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_omega_y);         ///< Target acceleration value along the y axis
+    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_omega_z);         ///< Target acceleration value along the z axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
     DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
@@ -126,9 +126,9 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_x);         ///< Gyroscope acceleration value along the x axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_y);         ///< Gyroscope acceleration value along the y axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_z);         ///< Gyroscope acceleration value along the z axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_acc_x);         ///< Target acceleration value along the x axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_acc_y);         ///< Target acceleration value along the y axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_acc_z);         ///< Target acceleration value along the z axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_omega_x);         ///< Target acceleration value along the x axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_omega_y);         ///< Target acceleration value along the y axis
+    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_omega_z);         ///< Target acceleration value along the z axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
     DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
