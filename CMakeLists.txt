@@ -4,17 +4,17 @@ project(SUCHAI_Flight_Software)
 set(CMAKE_C_STANDARD 99)
 
 set(SOURCE_FILES
-        src/drivers/x86/sgp4/src/c/SGP4.c
-        src/drivers/x86/sgp4/src/c/TLE.c
-        src/drivers/x86/linenoise/linenoise.c
-        src/drivers/x86/data_storage.c
-        src/drivers/x86/init.c
-        src/os/Linux/osDelay.c
-        src/os/Linux/osQueue.c
-        src/os/Linux/osScheduler.c
-        src/os/Linux/osSemphr.c
-        src/os/Linux/osThread.c
-        src/os/Linux/pthread_queue.c
+        src/drivers/simulator/sgp4/src/c/SGP4.c
+        src/drivers/simulator/sgp4/src/c/TLE.c
+        src/drivers/simulator/linenoise/linenoise.c
+        src/drivers/simulator/data_storage.c
+        src/drivers/simulator/init.c
+        src/os/sim/osDelay.c
+        src/os/sim/osQueue.c
+        src/os/sim/osScheduler.c
+        src/os/sim/osSemphr.c
+        src/os/sim/osThread.c
+        src/os/sim/pthread_queue.c
         src/lib/math_utils.c
         src/lib/log_utils.c
         src/system/globals.c
@@ -39,22 +39,21 @@ set(SOURCE_FILES
         src/system/taskInit.c
         src/system/taskWatchdog.c
         src/system/main.c
-)
+        )
 
 include_directories(
-        src/lib/include
         src/system/include
         src/lib/include
         src/os/include
-        src/drivers/x86/sgp4/src/c
-        src/drivers/x86/linenoise
-        src/drivers/x86/include
-        src/drivers/x86/libcsp/include
+        src/drivers/simulator/sgp4/src/c
+        src/drivers/simulator/linenoise
+        src/drivers/simulator/include
+        src/drivers/simulator/libcsp/include
         /usr/include/postgresql
 )
 
 link_directories(
-        src/drivers/x86/libcsp/lib
+        src/drivers/simulator/libcsp/lib
 )
 
 link_libraries(-lm -lcsp -lzmq -lsqlite3 -lpq -lpthread)

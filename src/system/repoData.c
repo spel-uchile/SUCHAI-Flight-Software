@@ -27,7 +27,7 @@
 
 static const char *tag = "repoData";
 char* table = "flightPlan";
-#ifdef AVR32
+#if defined(AVR32) || defined(SIMULATOR)
 time_t sec = 0;
 #endif
 
@@ -433,7 +433,7 @@ int dat_show_fp (void)
 
 time_t dat_get_time(void)
 {
-#ifdef AVR32
+#if defined(AVR32) || defined(SIMULATOR)
     return sec;
 #else
     return time(NULL);
@@ -461,6 +461,8 @@ int dat_set_time(int new_time)
     timestamp_t timestamp = {(uint32_t)new_time, 0};
     clock_set_time(&timestamp);
     return 0;
+#elif defined(SIMULATOR)
+    sec = (time_t)new_time;
 #elif defined(LINUX)
     // TODO: This needs to be tested on a raspberry LINUX system, to see if the
     //  sudo call asks for permissions or not

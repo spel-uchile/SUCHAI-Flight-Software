@@ -86,6 +86,16 @@ int obc_reset(char *fmt, char *params, int nparams);
 int obc_get_os_memory(char *fmt, char *params, int nparams);
 
 /**
+ * Set current OS tick.
+ * @warning Only useful in simulation environment
+ * @param fmt "%d"
+ * @param params "<tick_ms>"
+ * @param nparams 1
+ * @return CMD_OK | CMD_ERROR
+ */
+int obc_set_tick(char* fmt, char* params,int nparams);
+
+/**
  * Set the system time only if is not running Linux
  *
  * @param fmt Str. Parameters format "%d"
@@ -301,5 +311,14 @@ int obc_update_tle(char *fmt, char *params, int nparams);
  * CMD_ERROR in case of parameter errors.
  */
 int obc_prop_tle(char *fmt, char *params, int nparams);
+
+/**
+ * Set OBC operation mode
+ * @param fmt Str. Parameters format "%d"
+ * @param params Parameters as string <mode>
+ * @param nparams Int. Number of parameters 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int obc_set_opmode(char *fmt, char *params, int nparams);
 
 #endif /* CMD_OBC_H */

@@ -1,7 +1,7 @@
 /**
  * @file drivers.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2020
+ * @date 2019
  * @copyright GNU GPL v3
  *
  * Include all platform specific drivers.
