@@ -83,6 +83,7 @@ if __name__ == "__main__":
             os.chdir(test_dir)
             os.system('cmake ..')
             result = os.system('make')
+
             # Run the test
             if result == 0:
                 if args.test_type == 'test_cmd':
@@ -94,7 +95,7 @@ if __name__ == "__main__":
                     result = os.system('python3 logs_comparator.py')
                 elif args.test_type == 'test_fuzz':
                     os.chdir("..")
-                    os.system('python3 fs_seqs_executer.py')
+                    result = os.system('python3 fs_seqs_executer.py')
                 else:
                     result = os.system('./SUCHAI_Flight_Software_Test')
         # Build
