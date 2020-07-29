@@ -25,9 +25,15 @@
 #include "config.h"
 #include "globals.h"
 #include "log_utils.h"
+#include "math_utils.h"
 #include "data_storage.h"
 #include "osSemphr.h"
-#include <repoDataSchema.h>
+#include "repoDataSchema.h"
+
+typedef union sensors_value{
+    float f;
+    int32_t i;
+} value;
 
 typedef enum machine_action {
     ACT_PAUSE= 0,
@@ -260,5 +266,15 @@ void get_value_string(char* ret_string, char* c_type, char* buff);
  * @return
  */
 int get_sizeof_type(char* c_type);
+
+/**
+ * Auxiliary function to read/set vectors and queaternions.
+ * These functions only read/set 3 (vector) or 4 (quaternions)
+ * variables starting from the given index.
+ */
+void _get_sat_quaterion(quaternion_t *q,  dat_system_t index);
+void _set_sat_quaterion(quaternion_t *q,  dat_system_t index);
+void _get_sat_vector(vector3_t *r, dat_system_t index);
+void _set_sat_vector(vector3_t *r, dat_system_t index);
 
 #endif // DATA_REPO_H
