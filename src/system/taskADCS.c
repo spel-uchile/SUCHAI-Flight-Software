@@ -53,6 +53,9 @@ void taskADCS(void *param)
     cmd_send(tle_u);
     dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_DETUMB_MAG);
 
+    double P[6][6];
+    _mat_set_diag(P, 1.0,6, 6);
+
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
@@ -62,8 +65,6 @@ void taskADCS(void *param)
          * Estimate Loop
          */
         if (elapsed_msec % 10 == 0) {
-
-            double P[6][6];
             double dt = (double) elapsed_msec / 1000.0;
             eskf_predict_state((double*)P, dt);
 
@@ -84,6 +85,8 @@ void taskADCS(void *param)
 
                 // TODO: call function separately with its own mesuerement freq
                 eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
+                _set_sat_quaterion(&q_est, dat_ads_q0);
+                _set_sat_vector(&w, dat_ads_omega_x);
             }
         }
 
@@ -166,10 +169,9 @@ void eskf_predict_state(double* P, double dt)
     vec_sum(w, wb, &diffw);
     eskf_integrate(q, diffw, dt, &q_est);
     _set_sat_quaterion(&q_est, dat_ads_q0);
-//    _set_sat_vector(&omega, dat_ads_omega_x);
+//    _set_sat_vector(&w, dat_ads_omega_x);
 
     // Predict Error
-    _mat_set_diag(P, 1.0,6, 6);
     double Q[6][6];
     _mat_set_diag(Q, 1.0,6, 6);
     eskf_compute_error(diffw, dt, P, Q);
