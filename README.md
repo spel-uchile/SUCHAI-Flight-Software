@@ -1,5 +1,7 @@
 # Nanosatellite Flight Software
 
+### :exclamation: IMPORTANT NOTE: This repository has been moved to [GitLab](https://gitlab.com/spel-uchile/suchai-flight-software/)
+
 [![Build Status](https://gitlab.com/spel-uchile/suchai-flight-software/badges/master/pipeline.svg)](https://gitlab.com/spel-uchile/suchai-flight-software/pipelines)
 [![GitHub tag](https://img.shields.io/github/tag/spel-uchile/SUCHAI-Flight-Software.svg)]()
 [![license](https://img.shields.io/github/license/spel-uchile/SUCHAI-Flight-Software.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
@@ -72,7 +74,7 @@ Linux installation requires the following libraries:
 * cmake
 * pkg-config
 * pthread
-* cunit (libcunit-dev)
+* cunit (libcunit1-dev)
 * sqlite3 (libsqlite3-dev)
 * zmq (libzmq3-dev)
 * unzip
@@ -120,16 +122,50 @@ messages between zmq_hub interfaces, we required a ZMQ Forwarder Device (Proxy)
 running in background. To start the ZMQ Forwarder server:
 
 ```bash
-cd sandbox
-python minzmqhub.py
+cd sandbox/csp_zmq
+python3 zmqhub.py
 ```
 
 It is possible to change the default ports (8001, 8002) and activate a monitor 
 socket (8003) that will print all messages to ```stout``` using:
 
 ```bash
-cd sandbox
-python minzmqhub.py [-i IN_PORT] [-o OUT_PORT] [-m MON_PORT] [--mon]
+cd sandbox/csp_zmq
+python3 zmqhub.py [-h] [-i IN_PORT] [-o OUT_PORT] [-m MON_PORT] [--mon] [--con]
+```
+
+A test ZMQ CSP Node is also available as an example, so it is possible to test
+the communication between the node and the SUCHAI Flight Software. Run the
+example node ```zmqnode.py``` using:
+
+```bash
+cd sandbox/csp_zmq
+python3 zmqnode.py
+```
+
+Default parameters should work directly, but it is possible to set the ports and
+```zmqhub.py``` ip address to connect to remote nodes through TCP/IP.
+
+```bash
+cd sandbox/csp_zmq
+python3 zmqnode.py [-n NODE] [-d IP] [-i IN_PORT] [-o OUT_PORT] [--nmon] [--ncon]
+```
+
+Now you can try to send a command to the Flight Software from the example ZMQ
+CSP Node, for example the `com_ping` to the node `1` (Flight Software node) on port `10` (csp ping).
+
+```bash
+cd sandbox/csp_zmq
+python3 zmqnode.py 
+Namespace(in_port='8001', ip='localhost', ncon=True, nmon=True, node=9, out_port='8002')
+Reader started!
+Writer started!
+<node> <port> <message>: 1 10 com_ping
+<node> <port> <message>: b'\x00\xca\x9d\x82'
+829dca00
+2191378944
+Header S 1, D 9, Dp 55, Sp 10, Pr 2, HMAC False XTEA False RDP False CRC32 False
+b'\xc8' S 1, D 9, Dp 55, Sp 10, Pr 2, HMAC False XTEA False RDP False CRC32 False
 ```
 
 Refs:

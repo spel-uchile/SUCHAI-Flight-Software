@@ -26,13 +26,14 @@ set(SOURCE_FILES
         ../../src/system/taskDispatcher.c
         ../../src/system/taskExecuter.c
         ../../src/system/globals.c
-        ../../src/system/utils.c
+        ../../src/lib/log_utils.c
         src/system/taskTest.c
         src/system/main.c
         )
 
 include_directories(
         ../../src/system/include
+        ../../src/lib/include
         ../../src/os/include
         ../../src/drivers/x86/include
         ../../src/drivers/x86/linenoise

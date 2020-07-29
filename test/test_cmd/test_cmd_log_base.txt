@@ -48,9 +48,9 @@
 	dat_com_bcn_period: 0
 	dat_fpl_last: 0
 	dat_fpl_queue: 0
-	dat_ads_acc_x: 0.000000
-	dat_ads_acc_y: 0.000000
-	dat_ads_acc_z: 0.000000
+	dat_ads_omega_x: 0.000000
+	dat_ads_omega_y: 0.000000
+	dat_ads_omega_z: 0.000000
 	dat_ads_mag_x: 0.000000
 	dat_ads_mag_y: 0.000000
 	dat_ads_mag_z: 0.000000
@@ -98,9 +98,9 @@
 	dat_com_bcn_period: 0
 	dat_fpl_last: 0
 	dat_fpl_queue: 0
-	dat_ads_acc_x: 0.000000
-	dat_ads_acc_y: 0.000000
-	dat_ads_acc_z: 0.000000
+	dat_ads_omega_x: 0.000000
+	dat_ads_omega_y: 0.000000
+	dat_ads_omega_z: 0.000000
 	dat_ads_mag_x: 0.000000
 	dat_ads_mag_y: 0.000000
 	dat_ads_mag_z: 0.000000

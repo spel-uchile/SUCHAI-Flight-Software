@@ -18,7 +18,7 @@
 #include "drivers.h"
 #include "config.h"
 
-#include "os/os.h"
+#include "osDelay.h"
 #include "repoCommand.h"
 #include "repoData.h"
 

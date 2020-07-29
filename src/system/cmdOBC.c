@@ -417,15 +417,15 @@ int obc_update_status(char *fmt, char *params, int nparams)
 
     value acc_x;
     acc_x.f = gyro_reading.gyro_x;
-    dat_set_system_var(dat_ads_acc_x, acc_x.i);
+    dat_set_system_var(dat_ads_omega_x, acc_x.i);
 
     value acc_y;
     acc_y.f = gyro_reading.gyro_y;
-    dat_set_system_var(dat_ads_acc_y, acc_y.i);
+    dat_set_system_var(dat_ads_omega_y, acc_y.i);
 
     value acc_z;
     acc_z.f = gyro_reading.gyro_z;
-    dat_set_system_var(dat_ads_acc_z, acc_z.i);
+    dat_set_system_var(dat_ads_omega_z, acc_z.i);
 
     value mag_x;
     mag_x.f = hmc_reading.x;
@@ -468,7 +468,7 @@ int obc_set_tle(char *fmt, char *params, int nparams)
     //----------------------------------------------------------------------
     //1 42788U 17036Z   20054.20928660  .00001463  00000-0  64143-4 0  9996
     //2 42788  97.3188 111.6825 0013081  74.6084 285.6598 15.23469130148339
-    if(params != NULL && sscanf(params, fmt, &line_n, &next) != nparams-1)
+    if(params == NULL || sscanf(params, fmt, &line_n, &next) != nparams-1)
     {
         LOGE(tag, "Error parsing parameters!");
         return CMD_ERROR;

@@ -204,14 +204,12 @@ static void com_receive_tm(csp_packet_t *packet)
     cmd_t *cmd_parse_tm;
     com_frame_t *frame = (com_frame_t *)packet->data;
 
-#ifdef LINUX
     frame->nframe = csp_ntoh16(frame->nframe);
     frame->type = csp_ntoh16(frame->type);
     frame->ndata = csp_ntoh32(frame->ndata);
     int i = 0;
     for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
         frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
-#endif
 
     LOGI(tag, "Received: %d bytes", packet->length);
     LOGI(tag, "Frame   : %d", frame->nframe);
@@ -220,6 +218,7 @@ static void com_receive_tm(csp_packet_t *packet)
 
     if(frame->type == TM_TYPE_STATUS)
     {
+        //TODO: update tm_parse_status to process several frames
         cmd_parse_tm = cmd_get_str("tm_parse_status");
         cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
         cmd_send(cmd_parse_tm);

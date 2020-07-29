@@ -346,11 +346,14 @@ int cmd_repo_init(void)
     cmd_com_init();
     cmd_tm_init();
 #endif
-#ifdef SCH_SEN_ENABLED
+#if SCH_SEN_ENABLED
     cmd_sensors_init();
 #endif
 #ifdef SCH_USE_GSSB
     cmd_gssb_init();
+#endif
+#if SCH_ADCS_ENABLED
+    cmd_adcs_init()
 #endif
 
     int n_cmd;

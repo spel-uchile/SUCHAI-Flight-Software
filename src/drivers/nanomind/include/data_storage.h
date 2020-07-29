@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "drivers.h"
-#include "utils.h"
+#include "log_utils.h"
 #include "config.h"
 #include "globals.h"
 #include "repoData.h"

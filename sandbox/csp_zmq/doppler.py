@@ -6,8 +6,8 @@ from zmqnode import CspZmqNode, CspHeader, threaded
 
 class DopplerNode(CspZmqNode):
 
-    def __init__(self, this_node, radio_node, predict_ip="127.0.0.1", predict_port="4532", hub_ip="localhost", in_port="8001", out_port="8002", monitor=False, console=True):
-        CspZmqNode.__init__(self, this_node, hub_ip, in_port, out_port, monitor, console)
+    def __init__(self, this_node, radio_node, predict_ip="127.0.0.1", predict_port="4532", hub_ip="localhost", in_port="8001", out_port="8002", reader=False, writer=True):
+        CspZmqNode.__init__(self, this_node, hub_ip, in_port, out_port, reader, writer)
         self.predict_ip = predict_ip
         self.predict_port = predict_port
         self.radio_node = radio_node

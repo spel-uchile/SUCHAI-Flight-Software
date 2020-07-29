@@ -12,7 +12,7 @@
 #define CMD_CONSOLE_H
 
 
-#include "utils.h"
+#include "log_utils.h"
 #include "repoCommand.h"
 
 /**

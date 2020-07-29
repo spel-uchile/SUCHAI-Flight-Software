@@ -15,8 +15,9 @@ set(SOURCE_FILES
         src/os/sim/osSemphr.c
         src/os/sim/osThread.c
         src/os/sim/pthread_queue.c
+        src/lib/math_utils.c
+        src/lib/log_utils.c
         src/system/globals.c
-        src/system/utils.c
         src/system/cmdDRP.c
         src/system/cmdOBC.c
         src/system/cmdCOM.c
@@ -41,7 +42,8 @@ set(SOURCE_FILES
         )
 
 include_directories(
-        src/system/include/
+        src/system/include
+        src/lib/include
         src/os/include
         src/drivers/simulator/sgp4/src/c
         src/drivers/simulator/linenoise

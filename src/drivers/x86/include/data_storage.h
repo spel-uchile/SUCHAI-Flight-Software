@@ -11,7 +11,7 @@
 #ifndef SCH_PERSISTENT_H
 #define SCH_PERSISTENT_H
 
-#include "utils.h"
+#include "log_utils.h"
 #include <stdio.h>
 #include "config.h"
 #include "repoData.h"
@@ -19,8 +19,6 @@
 #if SCH_STORAGE_MODE == 1
     #include <sqlite3.h>
 #elif SCH_STORAGE_MODE == 2
-    // TODO: Implement Flight Plan to remove sqlite dependency in STORAGE_MODE 2
-    #include <sqlite3.h>
     #include <libpq-fe.h>
 #endif
 

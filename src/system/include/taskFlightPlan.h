@@ -12,7 +12,7 @@
 #ifndef T_FLIGHTPLAN_H
 #define T_FLIGHTPLAN_H
 
-#include <utils.h>
+#include <log_utils.h>
 #include <stdlib.h>
 #include <time.h>
 

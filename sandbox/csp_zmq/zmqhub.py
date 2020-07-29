@@ -1,19 +1,21 @@
 import re
 import sys
+import os
 import zmq
 import argparse
 from random import randint
 
-sys.path.append("../csp_zmq")
+sys.path.append(os.path.abspath("csp_zmq"))
 print(sys.path)
 
 from zmqnode import CspZmqNode
 from zmqnode import threaded
 from zmqnode import CspHeader
 
+
 class CspZmqHub(CspZmqNode):
 
-    def __init__(self, in_port="8002", out_port="8001", mon_port="8003", monitor=True, console=False):
+    def __init__(self, ip="localhost", in_port="8002", out_port="8001", mon_port="8003", reader=True, writer=False, proto="tcp"):
         """
         CSP ZMQ HUB
         Is a PUB-SUB proxy that allow to interconnect a set of publisher and subscriber nodes.
@@ -22,10 +24,10 @@ class CspZmqHub(CspZmqNode):
         :param in_port: input port, XSUB socket. (Should match nodes output port, PUB sockets)
         :param out_port: output port, XPUB socket. (Should match nodes input port, SUB sockets)
         :param mon_port: monitor port, internal PUB-SUB socket.
-        :param monitor: activate monitor
-        :param console: activate console
+        :param reader: activate monitor
+        :param writer: activate console
         """
-        CspZmqNode.__init__(self, None, 'localhost', mon_port, in_port, monitor, console)
+        CspZmqNode.__init__(self, None, ip, mon_port, in_port, reader, writer, proto)
         self.mon_port_hub = mon_port
         self.out_port_hub = out_port
         self.in_port_hub = in_port
@@ -62,8 +64,9 @@ class CspZmqHub(CspZmqNode):
         # Create sockets
         xpub_out = self._context.socket(zmq.XPUB)
         xsub_in = self._context.socket(zmq.XSUB)
-        xpub_out.bind('tcp://*:{}'.format(self.out_port_hub))
-        xsub_in.bind('tcp://*:{}'.format(self.in_port_hub))
+        hub_ip = "*" if self._proto == "tcp" else self.hub_ip
+        xpub_out.bind('{}://{}:{}'.format(self._proto, hub_ip, self.out_port_hub))
+        xsub_in.bind('{}://{}:{}'.format(self._proto, hub_ip, self.in_port_hub))
 
         s_mon = None
         if self.monitor:
@@ -99,8 +102,10 @@ def get_parameters():
     parser.add_argument("-i", "--in_port", default="8002", help="Input port")
     parser.add_argument("-o", "--out_port", default="8001", help="Output port")
     parser.add_argument("-m", "--mon_port", default="8003", help="Monitor port")
+    parser.add_argument("-d", "--ip", default="localhost", help="Hub IP address")
+    parser.add_argument("-p", "--proto", default="tcp", help="Monitor port")
     parser.add_argument("--mon", action="store_true", help="Enable monitor socket")
-    parser.add_argument("--con", action="store_true", help="Enable console task")
+    parser.add_argument("--wrt", action="store_true", help="Enable console task")
 
     return parser.parse_args()
 
@@ -109,7 +114,7 @@ if __name__ == "__main__":
     # Get arguments
     args = get_parameters()
     print(args)
-    zmqhub = CspZmqHub(args.in_port, args.out_port, args.mon_port, args.mon, args.con)
+    zmqhub = CspZmqHub(args.ip, args.in_port, args.out_port, args.mon_port, args.mon, args.wrt, args.proto)
     zmqhub.start()
 
 

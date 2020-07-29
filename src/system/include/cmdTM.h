@@ -12,7 +12,7 @@
 #define CMDTM_H
 
 #include "config.h"
-#include "utils.h"
+#include "log_utils.h"
 
 #include "repoCommand.h"
 #include "repoData.h"

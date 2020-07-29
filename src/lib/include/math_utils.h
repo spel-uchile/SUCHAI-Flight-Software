@@ -1,102 +1,21 @@
 /**
- * @file utils.h
+ * @file math_utils.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @author Camilo Roja M - camrojas@uchile.cl
+ * @author Camilo Rojas M - camrojas@uchile.cl
  * @author Elias Obreque S - elias.obreque@uchile.cl
  * @date 2020
  * @copyright GNU GPL v3
  *
- * This header have definitions related with general utilities such as logging,
+ * This header have definitions related mathematical utilities such as matrices, vectors or quaternions,
  * time formatting, etc.
  */
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef MATH_UTILS_H
+#define MATH_UTILS_H
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <time.h>
-#include <errno.h>
-#include <assert.h>
 #include <math.h>
-
 #include "config.h"
-#include "os/os.h"
-#include "osSemphr.h"
-
-#include "csp/csp.h"
-
-/**
- * @brief Log level
- *
- */
-typedef enum {
-    LOG_LVL_NONE,       /*!< No log output */
-    LOG_LVL_ERROR,      /*!< Critical errors, software module can not recover on its own */
-    LOG_LVL_WARN,       /*!< Error conditions from which recovery measures have been taken */
-    LOG_LVL_INFO,       /*!< Information messages which describe normal flow of events */
-    LOG_LVL_DEBUG,      /*!< Extra information which is not necessary for normal use (values, pointers, sizes, etc). */
-    LOG_LVL_VERBOSE     /*!< Bigger chunks of debugging information, or frequent messages which can potentially flood the output. */
-} log_level_t;
-
-// Define default log level
-#ifndef LOG_LEVEL
-    #define LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
-#endif
-
-#define LOGOUT stdout   ///<! Log to stdout
-//#define LOGOUT stderr   ///<! Log to stderr
-
-#define LF   "\n"       ///< Use LF terminated log strings
-#define CRLF "\r\n"     ///< USE CRLF terminated log strings
-
-extern osSemaphore log_mutex;  ///< Sync logging functions, require initialization
-
-/**
- * Init logging system, specifically shared mutex
- * Set the log level and node to send logs. If node = -1, then print to stdout,
- * else send logs to another node using CSP
- * @param level Log level
- * @param node CSP node to send logs. Set to -1 to use stdout.
- * @return Int. CSP_SEMAPHORE_OK(1) or CSP_SEMAPHORE_ERROR(2)
- */
-int log_init(log_level_t level, int node);
-
-/**
- * Set the log level and node to send logs. If node = -1, then print to stdout,
- * else send logs to another node using CSP
- * @param level Log level
- * @param node CSP node to send logs. Set to -1 to use stdout.
- */
-void log_set(log_level_t level, int node);
-
-void log_print(const char *lvl, const char *tag, const char *msg, ...);
-void log_send(const char *lvl, const char *tag, const char *msg, ...);
-
-extern void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
-extern log_level_t log_lvl;
-extern uint8_t log_node;
-
-/// Logging functions @see log_level_t
-#define LOGE(tag, msg, ...) if(log_lvl >= LOG_LVL_ERROR)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("ERROR", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGW(tag, msg, ...) if(log_lvl >= LOG_LVL_WARN)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("WARN ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGI(tag, msg, ...) if(log_lvl >= LOG_LVL_INFO)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("INFO ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGD(tag, msg, ...) if(log_lvl >= LOG_LVL_DEBUG)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("DEBUG", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGV(tag, msg, ...) if(log_lvl >= LOG_LVL_VERBOSE) {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("VERB ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGR(tag, msg, ...)                                {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_print   ("REMOT", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-
-/// Assert functions
-#define clean_errno() (errno == 0 ? "None" : strerror(errno))
-#define _log_error(T, M, ...) LOGE(T, "(%s:%d: errno: %s) " M, __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)
-#define assertf(A, T, M, ...) if(!(A)) {_log_error(T, M, ##__VA_ARGS__); assert(A); }
-
-/// Debug buffer content
-#define print_buff(buf, size) {int i; printf("["); for(i=0; i<size; i++) printf("0x%02X, ", buf[i]); printf("]\n");}
-#define print_buff16(buf16, size) {int i; printf("["); for(i=0; i<size; i++) printf("0x%04X, ", buf16[i]); printf("]\n");}
-
-/// Defines to string
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
+#include <assert.h>
 
 /**
  * Quaternion structure
@@ -106,16 +25,17 @@ extern uint8_t log_node;
 typedef union quaternion {
     double q[4];      ///< Quaternion as array
     struct {
-          double q0; ///< Quaternion i
-          double q1; ///< Quaternion j
-          double q2; ///< Quaternion k
-          double q3; ///< Quaternion scalar
-      };
+        double q0; ///< Quaternion i
+        double q1; ///< Quaternion j
+        double q2; ///< Quaternion k
+        double q3; ///< Quaternion scalar
+    };
     struct {
-      double vec[3]; ///< Quaternion vector
-      double scalar;  ///< Quaternion scalar
+        double vec[3]; ///< Quaternion vector
+        double scalar;  ///< Quaternion scalar
     };
 }quaternion_t;
+
 
 /**
  * 3D vector structure
@@ -140,6 +60,13 @@ typedef union matrix3 {
         double row2[3];
     };
 }matrix3_t;
+
+/**
+ * Calculates unit quaternion from a pure vector.
+ * @param axis vector of dimension 3.
+ * @param res equivalent quaternion.
+ */
+void vec_to_quat(vector3_t axis, quaternion_t * res);
 
 /**
  * Calculates equivalent quaternion from a rotation arround an axis.
@@ -186,6 +113,13 @@ void quat_conjugate(quaternion_t *q, quaternion_t *res);
  * @param v_b vector respect to (b) frame
  */
 void quat_frame_conv(quaternion_t *q_rot_a2b, vector3_t *v_a, vector3_t *v_b);
+
+/**
+ * Quaternion to rotation matrix transformation
+ * @param q Input quaternion
+ * @param res 3X3 result transformation matrix
+ */
+void quat_to_dcm(quaternion_t * q, matrix3_t * res);
 
 /**
  * Calculate the inverse of the quaternion q
@@ -258,7 +192,25 @@ void vec_cons_mult(double a, vector3_t *vec, vector3_t *res);
  * @param vec input vector of dimensions
  * @param res
  */
-void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
+void mat_vec_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
+
+/**
+ * Calculates (3x3) matrix product:
+ * res = rhs * lhs
+ * @param lhs left hand (3x3) matrix.
+ * @param rhs right hand (3x3) matrix.
+ * @param res matrix multiplication result (3x3).
+ */
+void mat_mat_mult(matrix3_t lhs, matrix3_t rhs, matrix3_t* res);
+
+/**
+ * Calculates (3x3) matrix sum:
+ * res = rhs + lhs
+ * @param lhs left hand (3x3) matrix.
+ * @param rhs right hand (3x3) matrix.
+ * @param res matrix sum result (3x3).
+ */
+void mat_mat_sum(matrix3_t lhs, matrix3_t rhs, matrix3_t* res);
 
 /**
  * Set a diagonal 3x3 matrix
@@ -273,4 +225,45 @@ void mat3_vec3_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
  */
 void mat_set_diag(matrix3_t *m, double a, double b, double c);
 
-#endif //UTILS_H
+/**
+ * Calculates skew matrix from a 3 dimension vector
+ * @param vec input vector
+ * @param res (3x3) result matrix
+ */
+void mat_skew(vector3_t vec, matrix3_t* res);
+
+/**
+ * Calculates matrix inverse for a (3x3) matrix
+ * @param mat Input (3x3) matrix
+ * @param res Inverse matrix result.
+ */
+void mat_inverse(matrix3_t mat, matrix3_t* res);
+
+/**
+ * Calculates matrix transpose for a (3x3) matrix
+ * @param mat Input (3x3) matrix.
+ * @param res Transpose matrix result.
+ */
+void mat_transpose(matrix3_t* mat, matrix3_t* res);
+
+void _mat_cons_mult(double  a, double * mat, double *res, int n_x, int n_y);
+
+void _mat_vec_mult(double * mat, double * vec, double * res, int n_x, int n_y);
+
+void _mat_mat_mult(double * lhs, double * rhs, double * res, int n_x, int n_y, int n_z);
+
+void _mat_mat_sum(double * lhs, double * rhs, double * res, int n_x, int n_y);
+
+void _mat_set_diag(double * m, double val, int n_x, int n_y);
+
+void _mat_transpose(double * mat, double * res, int n_i, int n_j);
+
+void _mat_copy(double * mat, double * res, int matx, int maty, int resx, int resy, int p_i, int p_j);
+
+void eskf_integrate(quaternion_t q, vector3_t omega, double dt, quaternion_t * res);
+
+void eskf_compute_error(vector3_t omega, double dt, double P[6][6], double Q[6][6]);
+
+void eskf_update_mag(vector3_t mag_sensor, vector3_t mag_i, double P[6][6], matrix3_t * R, quaternion_t * q, vector3_t * wb);
+
+#endif //MATH_UTILS_H

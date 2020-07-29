@@ -1,0 +1,155 @@
+
+
+--------- FLIGHT SOFTWARE START ---------
+	 Version: 2.1.5-78-ge422
+	 Device : 0 (SUCHAI-DEV)
+-----------------------------------------
+
+[INFO ][1594400025][main] Creating basic tasks...
+[INFO ][1594400025][Dispatcher] Started
+[WARN] (invoker) Failed to assign task priority, try as root
+[INFO ][1594400025][Executer] Started
+[WARN] (receiver) Failed to assign task priority, try as root
+[INFO ][1594400025][WDT] Started
+[WARN] (watchdog) Failed to assign task priority, try as root
+[WARN] (init) Failed to assign task priority, try as root
+[INFO ][1594400025][osScheduler] Linux scheduler: waiting threads
+[INFO ][1594400025][taskInit] Initialising CSP...
+[1;32mINIT ZMQHUB: pub(tx): [tcp://127.0.0.1:8002], sub(rx): [tcp://127.0.0.1:8001], rx filters: 1
+[0;0m[1;32mRX ZMQHUB started
+[0;0m[INFO ][1594400025][taskInit] Route table
+1/5 LOOP
+0/0 ZMQHUB
+[INFO ][1594400025][taskInit] Interfaces
+LOOP      tx: 00000 rx: 00000 txe: 00000 rxe: 00000
+          drop: 00000 autherr: 00000 frame: 00000
+          txb: 0 (0.0B) rxb: 0 (0.0B) MTU: 0
+
+ZMQHUB    tx: 00000 rx: 00000 txe: 00000 rxe: 00000
+          drop: 00000 autherr: 00000 frame: 00000
+          txb: 0 (0.0B) rxb: 0 (0.0B) MTU: 1024
+
+[WARN] (console) Failed to assign task priority, try as root
+[INFO ][1594400025][Console] Started
+Index Name                    Params
+    0 obc_ident
+    1 obc_debug %d
+    2 obc_reset
+    3 obc_get_mem
+    4 obc_set_time %d
+    5 obc_get_time %d
+    6 obc_reset_wdt
+    7 obc_system %s
+    8 obc_set_pwm_duty %d %d
+    9 obc_set_pwm_freq %d %f
+   10 obc_pwm_pwr %d
+   11 obc_get_sensors
+   12 obc_update_status
+   13 obc_get_tle
+   14 obc_set_tle %d %n
+   15 obc_update_tle
+   16 obc_prop_tle %ld
+   17 drp_ebf %d
+   18 drp_get_vars[WARN] (housekeeping) Failed to assign task priority, try as root
+
+   19 drp_set_var %d %d
+   20 drp_add_hrs_alive %d
+   21 drp_clear_gnd_wdt
+   22 drp_test_system_vars
+   23 drp_set_deployed %d
+   24 test %s
+   25 help
+   26 log_set %d %d
+   27 fp_set_cmd %d %d %d %d %d %d %d %d %s %n
+   28 fp_set_cmd_unix %d %d %d %s %n 
+   29 fp_set_cmd_dt %d %d %d %s %n
+   30 fp_del_cmd %d %d %d %d %d %d
+   31 fp_del_cmd_unix %d
+   32 fp_show
+   33 fp_reset
+   34 fp_test_params %d %s %d
+   35 com_ping %d
+   36 com_send_rpt %d %s
+   37 com_send_cmd %d %n
+   38 com_send_tc %d %n
+   39 com_send_data %p
+   40 com_debug
+   41 com_set_node %d
+   42 com_get_node
+   43 tm_parse_status
+   44 tm_get_last %u
+   45 tm_send_status %d
+   46 tm_send_last %u %u
+   47 tm_send_all %u %u
+   48 tm_send_from %u %u %u
+   49 tm_set_ack %u %u
+   50 set_state %u %u %d
+   51 init_dummy_sensor
+[INFO ][1594400025][Console] 
+______________________________________________________________________________
+                     ___ _   _  ___ _  _   _   ___ 
+                    / __| | | |/ __| || | /_\ |_ _|
+                    \__ \ |_| | (__| __ |/ _ \ | | 
+                    |___/\___/ \___|_||_/_/ \_\___|
+______________________________________________________________________________
+
+
+[WARN] (comm) Failed to assign task priority, try as root
+[WARN] (flightplan) Failed to assign task priority, try as root
+[INFO] Canceling thread 139698188199680
+[INFO ][1594400025][FlightPlan] Started
+[INFO ][1594400025][Housekeeping] Started
+[INFO ][1594400025][Communications] Started
+[1;32mBinding socket 0x5640ef593930 to port 32
+[0;0m[0;35mGET: 0x7f0e088c9010 0x7f0e088c9010
+[0;0m[0;35mGET: 0x7f0e088c9130 0x7f0e088c9130
+[0;0m[1;31mAttempt to allocate too large block 298
+[0;0m[1;33mRX ZMQHUB: Failed to get csp_buffer(298)
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 12 VIA: ZMQHUB
+[0;0m[0;35mGET: 0x7f0e088c9250 0x7f0e088c9250
+[0;0m[0;35mGET: 0x7f0e088c9370 0x7f0e088c9370
+[0;0m[0;35mGET: 0x7f0e088c9490 0x7f0e088c9490
+[0;0m[0;35mGET: 0x7f0e088c95b0 0x7f0e088c95b0
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 197 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 80 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 57 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 117 VIA: ZMQHUB
+[0;0m[0;35mGET: 0x7f0e088c96d0 0x7f0e088c96d0
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 56, Pr 2, Fl 0x00, Sz 9 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7f0e088c9130
+[0;0m[0;35mGET: 0x7f0e088c97f0 0x7f0e088c97f0
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7f0e088c97f0
+[0;0m[INFO ][1594400029][Executer] Running the command: drp_ebf...
+[WARN ][1594400029][repoCmd] Command not found: gssb_get_temp
+[ERROR][1594400029][repoCmd] Error parsing command!
+[0;35mFREE: 0x7f0e088c9250
+[0;0m[0;35mGET: 0x7f0e088c9910 0x7f0e088c9910
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7f0e088c9910
+[0;0m[0;35mFREE: 0x7f0e088c9370
+[0;0m[0;35mGET: 0x7f0e088c9a30 0x7f0e088c9a30
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7f0e088c9a30
+[0;0m[INFO ][1594400030][Executer] Command result: 1
+[INFO ][1594400030][Executer] Running the command: fp_test_params...
+[WARN ][1594400030][cmdFlightPlan] test_fp used with invalid params: 4908005218085203654 6XA wq I"l(uj;0 1988576945857204598 858134485
+[INFO ][1594400030][Executer] Command result: -1
+[WARN ][1594400030][repoCmd] Command not found: gssb_msp_cal_temp
+[ERROR][1594400030][repoCmd] Error parsing command!
+[0;35mFREE: 0x7f0e088c9490
+[0;0m[0;35mGET: 0x7f0e088c9b50 0x7f0e088c9b50
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7f0e088c9b50
+[0;0m[0;35mFREE: 0x7f0e088c95b0
+[0;0m[0;35mGET: 0x7f0e088c9c70 0x7f0e088c9c70
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7f0e088c9c70
+[0;0m[INFO ][1594400030][Executer] Running the command: fp_del_cmd_unix...
+[INFO ][1594400030][Executer] Command result: 1
+[0;35mFREE: 0x7f0e088c96d0
+[0;0m[0;35mGET: 0x7f0e088c9d90 0x7f0e088c9d90
+[0;0m[0;32mOUT: S 1, D 9, Dp 56, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7f0e088c9d90
+[0;0m[INFO ][1594400030][Executer] Running the command: obc_reset...
+Resetting system NOW!!

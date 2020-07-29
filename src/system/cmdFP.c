@@ -44,30 +44,28 @@ int fp_set(char *fmt, char *params, int nparams)
     memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
     memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &executions, &period, &command, &next) == nparams-1)
-    {
-        str_time.tm_mday = day;
-        str_time.tm_mon = month-1;
-        str_time.tm_year = year-1900;
-        str_time.tm_hour = hour;
-        str_time.tm_min = min;
-        str_time.tm_sec = sec;
-        str_time.tm_isdst = 0;
-
-        unixtime = mktime(&str_time);
-        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
-        int rc = dat_set_fp((int)unixtime, command, args, executions, period);
-
-        if (rc == 0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &executions, &period, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
+
+    str_time.tm_mday = day;
+    str_time.tm_mon = month-1;
+    str_time.tm_year = year-1900;
+    str_time.tm_hour = hour;
+    str_time.tm_min = min;
+    str_time.tm_sec = sec;
+    str_time.tm_isdst = 0;
+
+    unixtime = mktime(&str_time);
+    strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+    int rc = dat_set_fp((int)unixtime, command, args, executions, period);
+
+    if (rc == 0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
 }
 
 int fp_set_unix(char *fmt, char *params, int nparams)
@@ -79,21 +77,20 @@ int fp_set_unix(char *fmt, char *params, int nparams)
     memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
     memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
 
-    if(sscanf(params, fmt, &unixtime, &executions, &periodical, &command, &next) == nparams-1)
-    {
-        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
-        int rc = dat_set_fp(unixtime, command, args, executions, periodical);
-
-        if (rc == 0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &unixtime, &executions, &periodical, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
+
+    strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+    int rc = dat_set_fp(unixtime, command, args, executions, periodical);
+
+    if (rc == 0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
+
 }
 
 int fp_set_dt(char *fmt, char *params, int nparams)
@@ -104,22 +101,20 @@ int fp_set_dt(char *fmt, char *params, int nparams)
     memset(command, 0, SCH_CMD_MAX_STR_PARAMS);
     memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
 
-    if(sscanf(params, fmt, &seconds, &executions, &periodical, &command, &next) == nparams-1)
-    {
-        time_t current = time(NULL);
-        strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
-        int rc = dat_set_fp((int)current+seconds, command, args, executions, periodical);
-
-        if (rc == 0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &seconds, &executions, &periodical, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
         return CMD_FAIL;
     }
+
+    time_t current = time(NULL);
+    strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+    int rc = dat_set_fp((int)current+seconds, command, args, executions, periodical);
+
+    if (rc == 0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
 }
 
 int fp_delete(char* fmt, char* params, int nparams)
@@ -129,30 +124,28 @@ int fp_delete(char* fmt, char* params, int nparams)
     time_t unixtime;
     int day, month, year, hour, min, sec;
 
-    if(sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec) == nparams)
-    {
-        str_time.tm_mday = day;
-        str_time.tm_mon = month-1;
-        str_time.tm_year = year-1900;
-        str_time.tm_hour = hour;
-        str_time.tm_min = min;
-        str_time.tm_sec = sec;
-        str_time.tm_isdst = 0;
-
-        unixtime = mktime(&str_time);
-
-        int rc = dat_del_fp((int)unixtime);
-
-        if(rc==0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec) != nparams)
     {
         LOGW(tag, "fp_del_cmd used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
+
+    str_time.tm_mday = day;
+    str_time.tm_mon = month-1;
+    str_time.tm_year = year-1900;
+    str_time.tm_hour = hour;
+    str_time.tm_min = min;
+    str_time.tm_sec = sec;
+    str_time.tm_isdst = 0;
+
+    unixtime = mktime(&str_time);
+
+    int rc = dat_del_fp((int)unixtime);
+
+    if(rc==0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
 }
 
 int fp_delete_unix(char* fmt, char* params, int nparams)
@@ -160,21 +153,19 @@ int fp_delete_unix(char* fmt, char* params, int nparams)
     time_t unixtime;
     int tmptime;
 
-    if(sscanf(params, fmt, &tmptime) == nparams)
+    if(params == NULL || sscanf(params, fmt, &tmptime) != nparams)
     {
-        unixtime = (time_t)tmptime;
-        int rc = dat_del_fp((int)unixtime);
+        LOGW(tag, "fp_del_cmd_unix used with invalid params! (%s)", params);
+        return CMD_ERROR;
+    }
 
-        if(rc==0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
+    unixtime = (time_t) tmptime;
+    int rc = dat_del_fp((int) unixtime);
+
+    if (rc == 0)
+        return CMD_OK;
     else
-    {
-        LOGW(tag, "fp_del_cmd_unix used with invalid params: %s", params);
         return CMD_FAIL;
-    }
 }
 
 int fp_show(char* fmt, char* params, int nparams)
@@ -203,15 +194,13 @@ int test_fp_params(char* fmt, char* params,int nparams)
 {
     int num1, num2;
     char str[SCH_CMD_MAX_STR_PARAMS];
-    if(sscanf(params, fmt, &num1, &str, &num2) == nparams)
-    {
-        printf("The parameters are: %d ; %s ; %d \n",num1, str ,num2);
-        return CMD_OK;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &num1, &str, &num2) != nparams)
     {
         LOGW(tag, "test_fp used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
+
+    printf("The parameters are: %d ; %s ; %d \n",num1, str ,num2);
+    return CMD_OK;
 }
 

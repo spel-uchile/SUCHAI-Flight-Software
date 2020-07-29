@@ -9,6 +9,8 @@
  * @author Ignacio Ibanez A
  * @author Diego Ortego P
  * @author Elias Obreque S
+ * @author Javier Morales R
+ * @author Luis Jimenez V
  *
  * @date 2020
  * @copyright GNU GPL v3
@@ -28,7 +30,7 @@
 #include "init.h"
 #include "config.h"
 #include "globals.h"
-#include "utils.h"
+#include "log_utils.h"
 
 /* OS includes */
 #include "osThread.h"

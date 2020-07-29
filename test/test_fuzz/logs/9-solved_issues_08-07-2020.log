@@ -1,0 +1,203 @@
+
+
+--------- FLIGHT SOFTWARE START ---------
+	 Version: 2.1.5-78-ge422
+	 Device : 0 (SUCHAI-DEV)
+-----------------------------------------
+
+[INFO ][1594400091][main] Creating basic tasks...
+[INFO ][1594400091][Dispatcher] Started
+[WARN] (invoker) Failed to assign task priority, try as root
+[WARN] (receiver) Failed to assign task priority, try as root
+[INFO ][1594400091][Executer] Started
+[WARN] (watchdog) Failed to assign task priority, try as root
+[WARN] (init) Failed to assign task priority, try as root
+[INFO ][1594400091][osScheduler] Linux scheduler: waiting threads
+[INFO ][1594400091][WDT] Started
+[INFO ][1594400091][taskInit] Initialising CSP...
+[1;32mINIT ZMQHUB: pub(tx): [tcp://127.0.0.1:8002], sub(rx): [tcp://127.0.0.1:8001], rx filters: 1
+[0;0m[1;32mRX ZMQHUB started
+[0;0m[INFO ][1594400091][taskInit] Route table
+1/5 LOOP
+0/0 ZMQHUB
+[INFO ][1594400091][taskInit] Interfaces
+LOOP      tx: 00000 rx: 00000 txe: 00000 rxe: 00000
+          drop: 00000 autherr: 00000 frame: 00000
+          txb: 0 (0.0B) rxb: 0 (0.0B) MTU: 0
+
+ZMQHUB    tx: 00000 rx: 00000 txe: 00000 rxe: 00000
+          drop: 00000 autherr: 00000 frame: 00000
+          txb: 0 (0.0B) rxb: 0 (0.0B) MTU: 1024
+
+[INFO ][1594400091][Console] Started
+Index Name                    Params
+    0 obc_ident
+    1 obc_debug %d
+    2 obc_reset
+    3 obc_get_mem
+    4 obc_set_time %d
+    5 obc_get_time %d
+    6 obc_reset_wdt
+    7 obc_system %s
+    8 obc_set_pwm_duty %d %d
+    9 obc_set_pwm_freq %d %f
+   10 obc_pwm_pwr %d
+   11 obc_get_sensors
+   12 obc_update_status
+   13 obc_get_tle
+   14 obc_set_tle %d %n
+   15 obc_update_tle
+   16 obc_prop_tle %ld
+   17 drp_ebf %d
+   18 drp_get_vars
+   19 drp_set_var %d %d
+   20 drp_add_hrs_alive %d
+   21 drp_clear_gnd_wdt
+   22 drp_test_system_vars
+   23 drp_set_deployed %d
+   24 test %s
+   25 help
+   26 log_set %d %d
+   27 fp_set_cmd %d %d %d %d %d %d %d %d %s %n
+   28 fp_set_cmd_unix %d %d %d %s %n 
+   29 fp_set_cmd_dt %d %d %d %s %n
+   30 fp_del_cmd %d %d %d %d %d %d
+   31 fp_del_cmd_unix %d
+   32 fp_show
+   33 fp_reset
+   34 fp_test_params %d %s %d
+   35 com_ping %d
+   36 com_send_rpt %d %s
+   37 com_send_cmd %d %n
+   38 com_send_tc %d %n
+   39 com_send_data %p
+   40 com_debug
+   41 com_set_node %d
+   42 com_get_node
+   43 tm_parse_status
+   44 tm_get_last %u
+   45 tm_send_status %d
+   46 tm_send_last %u %u
+   47 tm_send_all %u %u
+   48 tm_send_from %u %u %u
+   49 tm_set_ack %u %u
+   50 set_state %u %u %d
+   51 init_dummy_sensor
+[INFO ][1594400091][Console] 
+______________________________________________________________________________
+                     ___ _   _  ___ _  _   _   ___ 
+                    / __| | | |/ __| || | /_\ |_ _|
+                    \__ \ |_| | (__| __ |/ _ \ | | 
+                    |___/\___/ \___|_||_/_/ \_\___|
+______________________________________________________________________________
+
+
+[WARN] (console) Failed to assign task priority, try as root
+[INFO ][1594400091][Housekeeping] Started
+[WARN] (housekeeping) Failed to assign task priority, try as root
+[INFO ][1594400091][Communications] Started
+[1;32mBinding socket 0x55877c379930 to port 32
+[0;0m[WARN] (comm) Failed to assign task priority, try as root
+[0;35mGET: 0x7ff16eae0010 0x7ff16eae0010
+[0;0m[INFO ][1594400091][FlightPlan] Started
+[WARN] (flightplan) Failed to assign task priority, try as root
+[INFO] Canceling thread 140674859243264
+[0;35mGET: 0x7ff16eae0130 0x7ff16eae0130
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 12 VIA: ZMQHUB
+[0;0m[0;35mGET: 0x7ff16eae0250 0x7ff16eae0250
+[0;0m[0;35mGET: 0x7ff16eae0370 0x7ff16eae0370
+[0;0m[0;35mGET: 0x7ff16eae0490 0x7ff16eae0490
+[0;0m[0;35mGET: 0x7ff16eae05b0 0x7ff16eae05b0
+[0;0m[0;35mGET: 0x7ff16eae06d0 0x7ff16eae06d0
+[0;0m[0;35mGET: 0x7ff16eae07f0 0x7ff16eae07f0
+[0;0m[0;35mGET: 0x7ff16eae0910 0x7ff16eae0910
+[0;0m[0;35mGET: 0x7ff16eae0a30 0x7ff16eae0a30
+[0;0m[0;35mGET: 0x7ff16eae0b50 0x7ff16eae0b50
+[0;0m[0;35mGET: 0x7ff16eae0c70 0x7ff16eae0c70
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 60 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 117 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 226 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 105 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 110 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 180 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 137 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 16 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 38 VIA: ZMQHUB
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 55, Pr 2, Fl 0x00, Sz 11 VIA: ZMQHUB
+[0;0m[0;35mGET: 0x7ff16eae0d90 0x7ff16eae0d90
+[0;0m[0;32mINP: S 9, D 1, Dp 12, Sp 56, Pr 2, Fl 0x00, Sz 9 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae0130
+[0;0m[0;35mGET: 0x7ff16eae0eb0 0x7ff16eae0eb0
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae0eb0
+[0;0m[INFO ][1594400095][Executer] Running the command: drp_ebf...
+[WARN ][1594400095][repoCmd] Command not found: gssb_update_status
+[ERROR][1594400095][repoCmd] Error parsing command!
+[0;35mFREE: 0x7ff16eae0250
+[0;0m[0;35mGET: 0x7ff16eae0fd0 0x7ff16eae0fd0
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae0fd0
+[0;0m[0;35mFREE: 0x7ff16eae0370
+[0;0m[0;35mGET: 0x7ff16eae10f0 0x7ff16eae10f0
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae10f0
+[0;0m[0;35mFREE: 0x7ff16eae0490
+[0;0m[0;35mGET: 0x7ff16eae1210 0x7ff16eae1210
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae1210
+[0;0m[0;35mFREE: 0x7ff16eae05b0
+[0;0m[0;35mGET: 0x7ff16eae1330 0x7ff16eae1330
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae1330
+[0;0m[WARN ][1594400096][repoCmd] Command not found: gssb_get_burn_config
+[ERROR][1594400096][repoCmd] Error parsing command!
+[0;35mFREE: 0x7ff16eae06d0
+[0;0m[0;35mGET: 0x7ff16eae1450 0x7ff16eae1450
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae1450
+[0;0m[WARN ][1594400096][repoCmd] Command not found: gssb_fss_get_sun
+[ERROR][1594400096][repoCmd] Error parsing command!
+[0;35mFREE: 0x7ff16eae07f0
+[0;0m[0;35mGET: 0x7ff16eae1570 0x7ff16eae1570
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae1570
+[0;0m[0;35mFREE: 0x7ff16eae0910
+[0;0m[0;35mGET: 0x7ff16eae1690 0x7ff16eae1690
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae1690
+[0;0m[INFO ][1594400096][Executer] Command result: 1
+[INFO ][1594400096][Executer] Running the command: drp_set_deployed...
+[0;35mFREE: 0x7ff16eae0a30
+[0;0m[0;35mGET: 0x7ff16eae17b0 0x7ff16eae17b0
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae17b0
+[0;0m[0;35mFREE: 0x7ff16eae0b50
+[0;0m[0;35mGET: 0x7ff16eae18d0 0x7ff16eae18d0
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae18d0
+[0;0m[WARN ][1594400096][repoCmd] Command not found: eps_get_hk
+[ERROR][1594400096][repoCmd] Error parsing command!
+[0;35mFREE: 0x7ff16eae0c70
+[0;0m[0;35mGET: 0x7ff16eae19f0 0x7ff16eae19f0
+[0;0m[0;32mOUT: S 1, D 9, Dp 55, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[0;35mFREE: 0x7ff16eae19f0
+[0;0m[INFO ][1594400096][Executer] Command result: 1
+[INFO ][1594400096][Executer] Running the command: com_get_node...
+TRX Node: 5
+[INFO ][1594400096][Executer] Command result: 1
+[INFO ][1594400096][Executer] Running the command: tm_get_last...
+[INFO ][1594400096][Executer] Command result: 0
+[INFO ][1594400096][Executer] Running the command: tm_send_from...
+[INFO ][1594400096][Executer] Command result: -1
+[INFO ][1594400096][Executer] Running the command: fp_set_cmd_unix...
+[WARN ][1594400096][cmdFlightPlan] fp_set_cmd used with invalid params: (null)
+[INFO ][1594400096][Executer] Command result: -1
+[INFO ][1594400096][Executer] Running the command: drp_add_hrs_alive...
+[INFO ][1594400096][Executer] Command result: 1
+[0;35mFREE: 0x7ff16eae0d90
+[0;0m[0;35mGET: 0x7ff16eae1b10 0x7ff16eae1b10
+[0;0m[0;32mOUT: S 1, D 9, Dp 56, Sp 12, Pr 2, Fl 0x00, Sz 1 VIA: ZMQHUB
+[0;0m[INFO ][1594400097][Executer] Running the command: obc_reset...
+Resetting system NOW!!
+[0;35mFREE: 0x7ff16eae1b10
+[0;0m

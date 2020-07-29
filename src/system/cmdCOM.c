@@ -168,7 +168,7 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
     n_args = sscanf(params, fmt, &node, &next);
     if(n_args == nparams-1 && next > 1)
     {
-        strncpy(tc_frame, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
+        strncpy(tc_frame, params+next, (size_t)COM_FRAME_MAX_LEN-1);
         LOGV(tag, "Parsed %d: %d, %s (%d))", n_args, node, tc_frame, next);
         // Sending message to node TC port and wait for response
         int rc = csp_transaction(1, (uint8_t)node, SCH_TRX_PORT_TC, 1000,
@@ -216,6 +216,55 @@ int com_send_data(char *fmt, char *params, int nparams)
         LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
         return CMD_FAIL;
     }
+}
+
+int _com_send_data(int node, void *data, size_t len, int type)
+{
+    int rc_conn = 0;
+    int rc_send = 0;
+    int nframe = 0;
+
+    // New connection
+    csp_conn_t *conn;
+    conn = csp_connect(CSP_PRIO_NORM, node, SCH_TRX_PORT_TM, 500, CSP_O_NONE);
+    assert(conn != NULL);
+
+    // Send one or more frames
+    while(len > 0)
+    {
+        // Create packet and frame
+        csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
+        packet->length = sizeof(com_frame_t);
+        com_frame_t *frame = (com_frame_t *)(packet->data);
+        frame->nframe = csp_hton16(nframe++);
+        frame->type = csp_hton16(type);
+        frame->ndata = csp_hton32(0);
+        size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;
+        memcpy(frame->data.data8, data, sent);
+        // Fix data endianness
+        int i;
+        for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
+            frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
+
+        // Send packet
+        rc_send = csp_send(conn, packet, 500);
+        if(rc_send == 0)
+        {
+            csp_buffer_free(packet);
+            LOGE(tag, "Error sending frame! (%d)", rc_send);
+            break;
+        }
+
+        // Process more data
+        len -= sent;
+    }
+
+    // Close connection
+    rc_conn = csp_close(conn);
+    if(rc_conn != CSP_ERR_NONE)
+        LOGE(tag, "Error closing connection! (%d)", rc_conn);
+
+    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_FAIL;
 }
 
 int com_debug(char *fmt, char *params, int nparams)

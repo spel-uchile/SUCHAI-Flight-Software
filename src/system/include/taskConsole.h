@@ -15,7 +15,7 @@
 
 #include "config.h"
 #include "globals.h"
-#include "utils.h"
+#include "log_utils.h"
 #ifdef LINUX
 #include "linenoise.h"
 #endif

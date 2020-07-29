@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "CUnit/Basic.h"
+#include "math_utils.h"
 #include "cmdFP.h"
 #include "cmdOBC.h"
 #include "repoCommand.h"

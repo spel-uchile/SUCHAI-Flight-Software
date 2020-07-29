@@ -5,28 +5,24 @@
 The flight plan module consists of a table named flightPlan.
 This table follows the following standard:
 
-   | `time` | `command` | `arguments` | `executions` | `periodical` |
-   | ------ |---------- | ----------- | ------------ | ------------ | 
-   | (int)  | (string)  | (string)    | (int)        | (int)        | 
+   | `time` | `executions` | `periodical` | `command` | `arguments` |
+   | ------ |------------- | ------------ | --------- | ----------- |
+   | (int)  | (int)        | (int)        | (string)  | (string)    |
 
 Where the attributes are:
 
-- `time` : The time value of when the command will be first executed, this time is saved in the 
+- `time`: The time value of when the command will be first executed, this time is saved in the 
 table as UNIX TIME.
-
-- `command` : The name of the command to be executed.
-
-- `arguments` : The arguments needed by the command to be executed, separated by spaces.
-
-- `executions` : The amount of times the command will be executed back to back.
-
-- `periodical` : If the command should execute periodically, this value is the unix time period for that
+- `periodical`: If the command should execute periodically, this value is the unix time period for that
+- `executions`: The amount of times the command will be executed back to back.
+- `command`: The name of the command to be executed.
+- `arguments`: The arguments needed by the command to be executed, separated by spaces.
 cycle. If the command isn't meant to execute multiple times, this value is 0.
 
 In LINUX database implementations of the flight plan storage, the`time` column serves as the primary 
 key for the table.
 
-The taskFlightPlan module checks the flight plan table periodically to see if a command can be executed.
+The `taskFlightPlan` module checks the flight plan table periodically (1 second) to see if a command can be executed.
 
 Commands only execute when the system time and their `time` values match.
 
@@ -53,13 +49,13 @@ it as trash information forever as well.
 
 The flight plan is saved using the following scheme of bits:
 
-`timetodo(uint32_t)`
-`executions(uint32_t)` 
-`periodical(uint32_t)` 
-`name_length(uint32_t)` 
-`args_length(uint32_t)` 
-`name(char*SCH_CMD_MAX_STR_NAME)` 
-`args(char*SCH_CMD_MAX_STR_PARAMS)`
+- `timetodo(uint32_t)`
+- `executions(uint32_t)` 
+- `periodical(uint32_t)` 
+- `name_length(uint32_t)` 
+- `args_length(uint32_t)` 
+- `name(char*SCH_CMD_MAX_STR_NAME)` 
+- `args(char*SCH_CMD_MAX_STR_PARAMS)`
 
 In that order.
 
@@ -86,55 +82,65 @@ static int max_command_size = sizeof(uint32_t)+sizeof(numbers_container_t)+sizeo
 #### Adding a command to the flight plan
 
 - Command : `fp_set_cmd`
-
-- Parameters : `<day> <month> <year> <hour> <min> <sec> <command> <arguments> <executions> <periodical>`
-
-- Function : Set a `<command>` with its `<arguments>` in a certain date and time to be executed 
+  - Parameters : `<day> <month> <year> <hour> <min> <sec> <executions> <periodical> <command> <arguments> `
+  - Function : Set a `<command>` with its `<arguments>` in a certain date and time to be executed 
 `<executions>` times every `<periodical>` seconds, or only `<executions>` times if `<periodical>` is 0.
 
-- If the command to set requires no arguments, `<arguments>` can be the string `null`.
+- Command : `fp_set_cmd_unix`
+  - Parameters : `<unix_time> <executions> <periodical> <command> <arguments> `
+  - Function : Set a `<command>` with its `<arguments>` in a certain UNIX Time to be executed 
+`<executions>` times every `<periodical>` seconds, or only `<executions>` times if `<periodical>` is 0.
 
-- If the command to set requires more han one argument, `<arguments>` is the string of them 
-separated by commas instead of spaces.
+- Command : `fp_set_cmd_dt`
+  - Parameters : `<period> <executions> <periodical> <command> <arguments> `
+  - Function : Set a `<command>` with its `<arguments>` in `<period>` seconds from now to be executed 
+`<executions>` times every `<periodical>` seconds, or only `<executions>` times if `<periodical>` is 0.
 
-For the next examples we assume that the time is 17:00 and the date is 26/12/2017 (December 26th, 2017)
+##### Notes:
+- If the command to set requires no arguments, `<arguments>` can be left empty.
+- All characters following the space (` `) after the `command` field are considered command arguments  
 
-- Example : To set the command ping (that has the number 10 for argument) everyday at 6am 
-we need to write the line `fp_set_cmd 27 12 2017 06 00 00 ping 10 1 86400`
+##### Examples: 
+For the next examples we assume that the time is 17:00 and the date is 26/12/2017 (December 26th, 2017) or 1514307600 in UNIX Time.
 
-- Example : To set the command help (help has not arguments) at 8pm we need to write
-the line `fp_set_cmd 26 12 2017 20 00 00 help null 1 0`
+- Example 1: To set the command `com_ping` (that has the number `10` as argument) everyday (`86400` s) at 6am 
+we need to write the line `fp_set_cmd 27 12 2017 06 00 00 1 86400 com_ping 10`
 
-- Example : To set the command send (that has a integer and a string for arguments) at 7pm we 
-need to write the line `fp_set_cmd 26 12 2017 19 00 00 send 10,hola 1 0`
+- Example 2: To set the command `help` (`help` has not arguments) at 8pm in UNIX Time (`1514318400`) we need to write
+the line `fp_set_cmd_unix 1514318400 1 0 help`
+
+- Example 3: To set the command `com_send_cmd <node> <command>` to node `1` with command `tm_send_status 1` (that is an integer and a string as arguments) in `30` seconds from now 
+need to write the line `fp_set_cmd_dt 30 1 0 com_send_cmd 1 tm_send_status 1`
 
 #### Deleting a command from the flight plan
 
 - Command : `fp_del_cmd`
+  - Parameters : `<day> <month> <year> <hour> <min> <sec>`
+  - Function : Delete the command to be executed in the given time and date.
+  
+- Command : `fp_del_cmd_unix`
+  - Parameters : `<unix_time>`
+  - Function : Delete the command to be executed in the given UNIX Time.
 
-- Parameters : `<day> <month> <year> <hour> <min> <sec>`
-
-- Function : Delete the command to be executed in the given time and date.
-
+##### Example
 For the next examples we assume that the table has the commands set in the above section
 
-- Example : To delete the ping command ping from the table we need to write the 
+- Example 1: To delete the `com_ping` command from the table we need to write the 
 line `fp_del_cmd 27 12 2017 06 00 00`
+
+- Example 2: To delete the `help` command from the table using the UNIX Time we need to write the 
+line `fp_del_cmd_unix  1514318400`
 
 #### Printing the flight plan table
 
 - Command : `fp_show`
-
-- Parameters : This command has not parameters
-
-- Function : Print the flight plan table, if the flight plan table is empty it prints nothing 
+ - Parameters : This command has not parameters
+ - Function : Print the flight plan table, if the flight plan table is empty it prints nothing 
 (A `Flight plan table empty` message prints to the `INFO` log).
 
 #### Resetting the flight plan
 
 - Command : `fp_reset`
-
-- Parameters : This command has not parameters
-
-- Function : Drops the table and creates a new and empty table for the fight plan.
+ - Parameters : This command has not parameters
+ - Function : Drops the table and creates a new and empty table for the fight plan. This action cannot be undone.
 

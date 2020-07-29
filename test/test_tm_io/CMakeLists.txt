@@ -35,6 +35,7 @@ set(SOURCE_FILES
 
 include_directories(
         ../../src/system/include
+        ../../src/lib/include
         ../../src/os/include
         ../../src/drivers/x86/include
         ../../src/drivers/x86/libcsp/include

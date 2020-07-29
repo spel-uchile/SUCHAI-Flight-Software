@@ -86,7 +86,7 @@ void taskInit(void *param)
 
     LOGD(tag, "Creating client tasks ...");
     int t_ok;
-    int n_threads = 5;
+    int n_threads = 6;
     os_thread thread_id[n_threads];
 
     /* Creating clients tasks */
@@ -108,6 +108,10 @@ void taskInit(void *param)
 #endif
 #if SCH_SEN_ENABLED
     t_ok = osCreateTask(taskSensors,"sensors", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[4]));
+    if(t_ok != 0) LOGE(tag, "Task sensors not created!");
+#endif
+#if SCH_ADCS_ENABLED
+    t_ok = osCreateTask(taskADCS,"adcs", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[5]));
     if(t_ok != 0) LOGE(tag, "Task sensors not created!");
 #endif
 
