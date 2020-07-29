@@ -18,4 +18,6 @@
 
 void taskADCS(void *param);
 
+void eskf_predict_state(double* P, double dt);
+
 #endif //T_ADCS_H
