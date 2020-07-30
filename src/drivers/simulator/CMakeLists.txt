@@ -16,7 +16,8 @@ set(SOURCE_FILES
         ../../../src/os/sim/osThread.c
         ../../../src/os/sim/pthread_queue.c
         ../../../src/system/globals.c
-        ../../../src/system/utils.c
+        ../../../src/lib/log_utils.c
+        ../../../src/lib/math_utils.c
         ../../../src/system/cmdDRP.c
         ../../../src/system/cmdOBC.c
         ../../../src/system/cmdCOM.c
@@ -37,12 +38,14 @@ set(SOURCE_FILES
         ../../../src/system/taskSensors.c
         ../../../src/system/taskInit.c
         ../../../src/system/taskWatchdog.c
+        ../../../src/system/taskADCS.c
         ../../../src/system/main.c
         ../../../simulator/src/system/cmdSIM.c
         )
 
 include_directories(
         ../../../src/system/include/
+        ../../../src/lib/include/
         ../../../simulator/src/system/include/
         ../../../src/os/include
         ../../../src/drivers/simulator/include
