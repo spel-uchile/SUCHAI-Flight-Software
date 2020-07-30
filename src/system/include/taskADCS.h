@@ -14,6 +14,8 @@
 #include "osQueue.h"
 #include "osDelay.h"
 
+#include "math_utils.h"
+
 #include "repoCommand.h"
 
 void taskADCS(void *param);

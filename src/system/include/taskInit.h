@@ -33,6 +33,9 @@
 #if SCH_SEN_ENABLED
 #include "taskSensors.h"
 #endif
+#if SCH_ADCS_ENABLED
+#include "taskADCS.h"
+#endif
 
 void taskInit(void *param);
 void init_communications(void);
