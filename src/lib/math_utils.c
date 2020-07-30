@@ -221,7 +221,7 @@ void mat_inverse(matrix3_t mat, matrix3_t* res)
     double I = (a*e -b*d);
     double detmat = a*A + b*B + c*C;
 
-    assert(abs(detmat) >= 1E-25);
+    assert(fabs(detmat) >= 1E-25);
 
     res->m[0][0] = A/detmat; res->m[0][1] = D/detmat, res->m[0][2] = G/detmat;
     res->m[1][0] = B/detmat; res->m[1][1] = E/detmat, res->m[1][2] = H/detmat;
