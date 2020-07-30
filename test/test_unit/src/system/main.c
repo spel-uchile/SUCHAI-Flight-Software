@@ -300,6 +300,81 @@ void testQUATERNION(void)
     CU_ASSERT_DOUBLE_EQUAL(new_vec.v2, -1.8235294117647058, 1e-6);
 }
 
+
+/** SUIT 5 **/
+/* Test matrices.
+ */
+
+int init_suite_mat(void)
+{
+    return 0;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite_mat(void)
+{
+    return 0;
+}
+
+void check_values(double* list, double* ref, int length)
+{
+    for(int i =0; i < length; ++i)
+    {
+        CU_ASSERT_DOUBLE_EQUAL(list[i], ref[i], 1e-6);
+    }
+}
+
+void testMatrices(void)
+{
+    /*
+    * Testing 3x3 matrices
+    */
+    matrix3_t A = {0.34197022, 0.4621773 , 0.61930235, 0.53479301, 0.19789368,
+    0.82224241, 0.26827125, 0.30458023, 0.33275187};
+    matrix3_t B = {0.53577991, 0.07315265, 0.95531149, 0.69947871, 0.49924559,
+                   0.97280217, 0.44754281, 0.71025288, 0.74547963};
+    vector3_t v = {0.8134576 , 0.05684925, 0.83800431};
+    matrix3_t I;
+    mat_set_diag(&I, 1.0, 1.0, 1.0);
+    matrix3_t res;
+    vector3_t resv;
+
+    // Refs
+    matrix3_t sumAB = {0.87775013, 0.53532995, 1.57461384, 1.23427171, 0.69713927,
+                       1.79504459, 0.71581406, 1.01483311, 1.07823151};
+    matrix3_t mulAB = {0.78366827, 0.69561729, 1.23797245, 0.79294244, 0.72191912,
+                       1.31637028, 0.50570244, 0.40802307, 0.80063866};
+    matrix3_t At = {0.34197022, 0.53479301, 0.26827125, 0.4621773 , 0.19789368,
+                    0.30458023, 0.61930235, 0.82224241, 0.33275187};
+    matrix3_t Ainv = {-7.51060729,  1.41745058, 10.47582009,  1.73456389, -2.13001898,
+                      2.03506727,  4.46749152,  0.80690881, -7.30334774};
+    vector3_t Av = {0.82343075, 1.13532423, 0.51438995};
+
+    // Test identity
+    mat_mat_mult(A, I, &res);
+    check_values((double*)res.m, (double*)A.m, 9);
+    // Test sum
+    mat_mat_sum(A, B, &res);
+    check_values((double*)res.m, (double*)sumAB.m, 9);
+    // Test mul
+    mat_mat_mult(A, B, &res);
+    check_values((double*)res.m, (double*)mulAB.m, 9);
+    // Test transpose
+    mat_transpose(&A, &res);
+    check_values((double*)res.m, (double*)At.m, 9);
+    // Test inverse
+    mat_inverse(A, &res);
+    check_values((double*)res.m, (double*)Ainv.m, 9);
+    matrix3_t resaux;
+    mat_mat_mult(A, res, &resaux);
+    check_values((double*)resaux.m, (double*)I.m, 9);
+    // Test matrix vector multiplication
+    mat_vec_mult(A, v, &resv);
+    check_values((double*)resv.v, (double*)Av.v, 3);
+}
+
 /* The main() function for setting up and running the tests.
  * Returns a CUE_SUCCESS on successful running, another
  * CUnit error code on failure.
@@ -361,7 +436,7 @@ int main()
     }
 
     /*
-     * SUITE 4: Quaternions in utils.c
+     * SUITE 4: Quaternions in math_utils.c
      */
     pSuite = CU_add_suite("Suite quaternions", init_suite4, clean_suite4);
     if (NULL == pSuite) {
@@ -374,6 +449,22 @@ int main()
         CU_cleanup_registry();
         return CU_get_error();
     }
+
+    /*
+    * SUITE 5: Matrices math_utils.c
+    */
+    pSuite = CU_add_suite("Suite matrices", init_suite_mat, clean_suite_mat);
+    if (NULL == pSuite) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /* add the tests to the suite */
+    if ((NULL == CU_add_test(pSuite, "test of matrices", testMatrices))){
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
 
     /* Run all tests using the CUnit Basic interface */
     CU_basic_set_mode(CU_BRM_VERBOSE);
