@@ -244,7 +244,7 @@ int _com_send_data(int node, void *data, size_t len, int type)
         // Fix data endianness
         int i;
         for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
-            frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
+            frame->data.data32[i] = csp_hton32(frame->data.data32[i]);
 
         // Send packet
         rc_send = csp_send(conn, packet, 500);
