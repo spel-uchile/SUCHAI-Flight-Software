@@ -69,6 +69,7 @@ void taskADCS(void *param)
         if (elapsed_msec % 10 == 0) {
             double dt = (double) elapsed_msec / 1000.0;
             eskf_predict_state((double*) P, (double*) Q, dt);
+            send_p_and_q(P, Q);
 
             if(elapsed_msec % 100 == 0)
             {
@@ -80,6 +81,7 @@ void taskADCS(void *param)
 
                 quaternion_t q_est;
                 _get_sat_quaterion(&q_est, dat_ads_q0);
+                quaternion_t q_est_no_eskf = q_est;
 
                 vector3_t w;
                 _get_sat_vector(&w, dat_ads_omega_x);
@@ -88,6 +90,7 @@ void taskADCS(void *param)
                 eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
                 _set_sat_quaterion(&q_est, dat_ads_q0);
                 _set_sat_vector(&w, dat_ads_omega_x);
+                send_eskf_quat(q_est_no_eskf, q_est);
             }
         }
 
@@ -177,7 +180,7 @@ void eskf_predict_state(double* P, double* Q, double dt)
     eskf_compute_error(diffw, dt, P, Q);
 }
 
-int send_q_and_p(double P[6][6], double Q[6][6])
+int send_p_and_q(double P[6][6], double Q[6][6])
 {
     csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
     if(packet == NULL)
