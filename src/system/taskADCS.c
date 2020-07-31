@@ -54,6 +54,8 @@ void taskADCS(void *param)
     dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_DETUMB_MAG);
 
     double P[6][6];
+    double Q[6][6];
+    matrix3_t R;
     _mat_set_diag(P, 1.0,6, 6);
 
     while(1)
@@ -66,12 +68,11 @@ void taskADCS(void *param)
          */
         if (elapsed_msec % 10 == 0) {
             double dt = (double) elapsed_msec / 1000.0;
-            eskf_predict_state((double*)P, dt);
+            eskf_predict_state((double*) P, (double*) Q, dt);
 
             if(elapsed_msec % 100 == 0)
             {
                 // Update magnetic
-                matrix3_t R;
                 // TODO: get value from magsensor
                 vector3_t mag_sensor = {0.33757741, 0.51358994, 0.78883893};
                 // TODO: get value from magnetic model
@@ -152,7 +153,7 @@ void taskADCS(void *param)
     }
 }
 
-void eskf_predict_state(double* P, double dt)
+void eskf_predict_state(double* P, double* Q, double dt)
 {
     LOGI(tag, "Kalman Estimate")
     // Predict Nominal
@@ -172,7 +173,56 @@ void eskf_predict_state(double* P, double dt)
 //    _set_sat_vector(&w, dat_ads_omega_x);
 
     // Predict Error
-    double Q[6][6];
     _mat_set_diag(Q, 1.0,6, 6);
     eskf_compute_error(diffw, dt, P, Q);
+}
+
+int send_q_and_p(double P[6][6], double Q[6][6])
+{
+    csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
+    if(packet == NULL)
+        return CMD_FAIL;
+
+    int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
+                       "adcs_set_eskf_params %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+                       P[0][0], P[1][1], P[2][2], P[3][3], P[4][4], P[5][5],
+                       Q[0][0], Q[1][1], Q[2][2], Q[3][3], Q[4][4], Q[5][5]);
+    packet->length = len;
+    LOGI(tag, "OBC ESKF PARAMS: (%d) %s", packet->length, packet->data);
+
+    int rc = csp_sendto(CSP_PRIO_NORM, 7, SCH_TRX_PORT_CMD,
+                        SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
+
+    if(rc != 0)
+    {
+        csp_buffer_free((void *)packet);
+        return CMD_FAIL;
+    }
+
+    return CMD_OK;
+}
+
+int send_eskf_quat(quaternion_t q_est_no_eskf, quaternion_t q_est_eskf)
+{
+    csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
+    if(packet == NULL)
+        return CMD_FAIL;
+
+    int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
+                       "adcs_set_eskf_quaternion %lf %lf %lf %lf %lf %lf %lf %lf",
+                       q_est_no_eskf.q0, q_est_no_eskf.q1, q_est_no_eskf.q2, q_est_no_eskf.q3,
+                       q_est_eskf.q0, q_est_eskf.q1, q_est_eskf.q2, q_est_eskf.q3);
+    packet->length = len;
+    LOGI(tag, "OBC ESKF QUAT: (%d) %s", packet->length, packet->data);
+
+    int rc = csp_sendto(CSP_PRIO_NORM, 7, SCH_TRX_PORT_CMD,
+                        SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
+
+    if(rc != 0)
+    {
+        csp_buffer_free((void *)packet);
+        return CMD_FAIL;
+    }
+
+    return CMD_OK;
 }

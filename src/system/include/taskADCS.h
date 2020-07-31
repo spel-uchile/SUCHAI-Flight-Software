@@ -20,6 +20,10 @@
 
 void taskADCS(void *param);
 
-void eskf_predict_state(double* P, double dt);
+void eskf_predict_state(double* P, double* Q, double dt);
+
+int send_q_and_p(double P[6][6], double Q[6][6]);
+
+int send_eskf_quat(quaternion_t q_est_no_eskf, quaternion_t q_est_eskf);
 
 #endif //T_ADCS_H
