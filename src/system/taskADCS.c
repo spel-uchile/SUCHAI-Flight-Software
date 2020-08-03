@@ -26,11 +26,10 @@ void taskADCS(void *param)
 {
     LOGI(tag, "Started");
 
-    portTick delay_ms  = 10;            //Task period in [ms]
+    portTick delay_ms  = 10;                     //Task period in [ms]
 
-    unsigned int elapsed_sec = 1;           // Seconds counter
-    unsigned int elapsed_msec = 1;
-    unsigned int _adcs_ctrl_period = 1000;     // ADCS control period in seconds
+    unsigned int elapsed_msec = 0;               // milliseconds counter
+    unsigned int _adcs_ctrl_period = 1000;       // ADCS control period in milliseconds
     unsigned int _10sec_check = 10*1000;         // 10[s] condition
     unsigned int _01min_check = 1*60*1000;       // 05[m] condition
     unsigned int _05min_check = 5*60*1000;       // 05[m] condition
@@ -66,7 +65,7 @@ void taskADCS(void *param)
         /**
          * Estimate Loop
          */
-        if (elapsed_msec % 10 == 0) {
+        if (elapsed_msec % 10 == 0 && elapsed_msec > 10000) {
             double dt = (double) elapsed_msec / 1000.0;
             eskf_predict_state((double*) P, (double*) Q, dt);
             send_p_and_q(P, Q);
