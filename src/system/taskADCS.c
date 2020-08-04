@@ -65,14 +65,20 @@ void taskADCS(void *param)
         /**
          * Estimate Loop
          */
-        if (elapsed_msec % 10 == 0 && elapsed_msec > 10000) {
+        if (((elapsed_msec % 10) == 0) && (elapsed_msec > 10000)) {
             double dt = (double) elapsed_msec / 1000.0;
+            // Update attitude
+            cmd_t *cmd_stt = cmd_get_str("adcs_quat");
+            cmd_send(cmd_stt);
+            cmd_t *cmd_acc = cmd_get_str("adcs_acc");
+            cmd_send(cmd_acc);
+            cmd_t *cmd_mag = cmd_get_str("adcs_mag");
+            cmd_send(cmd_mag);
             eskf_predict_state((double*) P, (double*) Q, dt);
             send_p_and_q(P, Q);
 
-            if(elapsed_msec % 100 == 0)
+            if(((elapsed_msec % 100) == 0))
             {
-                // Update magnetic
                 // TODO: get value from magsensor
                 vector3_t mag_sensor = {0.33757741, 0.51358994, 0.78883893};
                 // TODO: get value from magnetic model
@@ -126,6 +132,7 @@ void taskADCS(void *param)
             } else if(mode == DAT_OBC_OPMODE_DETUMB_MAG)
             {
                 cmd_point = cmd_get_str("adcs_detumbling_mag");
+                cmd_add_params_var(cmd_point, 0.0, 0.0, 0.0);
             }
             cmd_send(cmd_point);
             // Do control loop
