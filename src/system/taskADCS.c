@@ -99,6 +99,10 @@ void taskADCS(void *param)
                 eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
                 _set_sat_quaterion(&q_est, dat_ads_q0);
                 _set_sat_vector(&w, dat_ads_omega_x);
+
+                // Send telemetry to ADCS subsystem
+                cmd_t *cmd_att = cmd_get_str("adcs_send_attitude");
+                cmd_send(cmd_att);
             }
         }
 
