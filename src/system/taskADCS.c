@@ -74,19 +74,23 @@ void taskADCS(void *param)
             cmd_send(cmd_acc);
             cmd_t *cmd_mag = cmd_get_str("adcs_mag");
             cmd_send(cmd_mag);
+            cmd_t *cmd_mag_model = cmd_get_str("adcs_mag_model");
+            cmd_send(cmd_mag_model);
             eskf_predict_state((double*) P, (double*) Q, dt);
             send_p_and_q(P, Q);
 
             if(((elapsed_msec % 100) == 0))
             {
                 // TODO: get value from magsensor
-                vector3_t mag_sensor = {0.33757741, 0.51358994, 0.78883893};
+                // vector3_t mag_sensor = {0.33757741, 0.51358994, 0.78883893};
+                vector3_t mag_sensor;
+                _get_sat_vector(&mag_sensor, dat_ads_mag_x);
                 // TODO: get value from magnetic model
-                vector3_t mag_i = {6723.12366721, 10229.07189747, 15710.68799647};
-
+                // vector3_t mag_i = {6723.12366721, 10229.07189747, 15710.68799647};
+                vector3_t mag_i;
+                _get_sat_vector(&mag_i, dat_mag_model_x);
                 quaternion_t q_est;
                 _get_sat_quaterion(&q_est, dat_ads_q0);
-                quaternion_t q_est_no_eskf = q_est;
 
                 vector3_t w;
                 _get_sat_vector(&w, dat_ads_omega_x);
@@ -95,7 +99,6 @@ void taskADCS(void *param)
                 eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
                 _set_sat_quaterion(&q_est, dat_ads_q0);
                 _set_sat_vector(&w, dat_ads_omega_x);
-                send_eskf_quat(q_est_no_eskf, q_est);
             }
         }
 
@@ -198,31 +201,6 @@ int send_p_and_q(double P[6][6], double Q[6][6])
                        Q[0][0], Q[1][1], Q[2][2], Q[3][3], Q[4][4], Q[5][5]);
     packet->length = len;
     LOGI(tag, "OBC ESKF PARAMS: (%d) %s", packet->length, packet->data);
-
-    int rc = csp_sendto(CSP_PRIO_NORM, 7, SCH_TRX_PORT_CMD,
-                        SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);
-
-    if(rc != 0)
-    {
-        csp_buffer_free((void *)packet);
-        return CMD_FAIL;
-    }
-
-    return CMD_OK;
-}
-
-int send_eskf_quat(quaternion_t q_est_no_eskf, quaternion_t q_est_eskf)
-{
-    csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
-    if(packet == NULL)
-        return CMD_FAIL;
-
-    int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
-                       "adcs_set_eskf_quaternion %lf %lf %lf %lf %lf %lf %lf %lf",
-                       q_est_no_eskf.q0, q_est_no_eskf.q1, q_est_no_eskf.q2, q_est_no_eskf.q3,
-                       q_est_eskf.q0, q_est_eskf.q1, q_est_eskf.q2, q_est_eskf.q3);
-    packet->length = len;
-    LOGI(tag, "OBC ESKF QUAT: (%d) %s", packet->length, packet->data);
 
     int rc = csp_sendto(CSP_PRIO_NORM, 7, SCH_TRX_PORT_CMD,
                         SCH_TRX_PORT_CMD, CSP_O_NONE, packet, 100);

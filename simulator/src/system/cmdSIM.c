@@ -30,6 +30,7 @@ void cmd_sim_init(void)
     cmd_add("adcs_quat", sim_adcs_get_quaternion, "", 0);
     cmd_add("adcs_acc", sim_adcs_get_acc, "", 0);
     cmd_add("adcs_mag", sim_adcs_get_mag, "", 0);
+    cmd_add("adcs_mag_model", sim_adcs_get_mag_model, "", 0);
     cmd_add("adcs_do_control", sim_adcs_control_torque, "%lf", 1);
     cmd_add("adcs_mag_moment", sim_adcs_mag_moment, "", 0);
     cmd_add("adcs_set_target", sim_adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
@@ -160,6 +161,42 @@ int sim_adcs_get_mag(char* fmt, char* params, int nparams)
             vector3_t tmp;
             _get_sat_vector(&tmp, dat_ads_mag_x);
             LOGI(tag, "SAT_MAG: %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
+            free(out_buff);
+            free(in_buff);
+            return CMD_OK;
+        }
+        LOGE(tag, "Error reading values!")
+    }
+    LOGE(tag, "csp_transaction failed! (%d)", rc);
+
+    free(out_buff);
+    free(in_buff);
+    return CMD_FAIL;
+}
+
+int sim_adcs_get_mag_model(char* fmt, char* params, int nparams)
+{
+    char *out_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    char *in_buff = (char *)malloc(COM_FRAME_MAX_LEN);
+    memset(out_buff, 0, COM_FRAME_MAX_LEN);
+    memset(in_buff, 0, COM_FRAME_MAX_LEN);
+
+    int len = snprintf(out_buff, COM_FRAME_MAX_LEN, "adcs_get_mag_model 0");
+
+    int rc = csp_transaction(CSP_PRIO_NORM, ADCS_PORT, SCH_TRX_PORT_CMD, 100,
+                             out_buff, COM_FRAME_MAX_LEN, in_buff, COM_FRAME_MAX_LEN);
+
+    if(rc == COM_FRAME_MAX_LEN)
+    {
+        LOGI(tag, "MAG MODEL: %s", in_buff);
+        vector3_t mag_model;
+        rc = sscanf(in_buff, "%lf %lf %lf", &mag_model.v0, &mag_model.v1, &mag_model.v2);
+        if(rc == 3)
+        {
+            _set_sat_vector(&mag_model, dat_mag_model_x);
+            vector3_t tmp;
+            _get_sat_vector(&tmp, dat_mag_model_x);
+            LOGI(tag, "SAT_MAG_MODEL: %lf, %lf, %lf", tmp.v0, tmp.v1, tmp.v2);
             free(out_buff);
             free(in_buff);
             return CMD_OK;

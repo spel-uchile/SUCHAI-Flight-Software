@@ -70,6 +70,15 @@ int sim_adcs_get_mag(char* fmt, char* params, int nparams);
  * @param nparams
  * @return
  */
+int sim_adcs_get_mag_model(char* fmt, char* params, int nparams);
+
+/**
+ *
+ * @param fmt
+ * @param params
+ * @param nparams
+ * @return
+ */
 int sim_adcs_control_torque(char* fmt, char* params, int nparams);
 
 /**

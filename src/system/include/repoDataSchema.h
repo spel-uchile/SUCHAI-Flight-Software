@@ -88,6 +88,9 @@ typedef enum dat_system {
     dat_ads_mag_x,                ///< Magnetometer value along the x axis
     dat_ads_mag_y,                ///< Magnetometer value along the y axis
     dat_ads_mag_z,                ///< Magnetometer value along the z axis
+    dat_mag_model_x,
+    dat_mag_model_y,
+    dat_mag_model_z,
     dat_ads_pos_x,                ///< Satellite orbit position x (ECI)
     dat_ads_pos_y,                ///< Satellite orbit position y (ECI)
     dat_ads_pos_z,                ///< Satellite orbit position z (ECI)
@@ -186,6 +189,9 @@ typedef struct __attribute__((packed)) dat_status_s {
     float dat_ads_mag_x;            ///< Magnetometer value along the x axis
     float dat_ads_mag_y;            ///< Magnetometer value along the y axis
     float dat_ads_mag_z;            ///< Magnetometer value along the z axis
+    float dat_mag_model_x;
+    float dat_mag_model_y;
+    float dat_mag_model_z;
     float dat_ads_pos_x;            ///< Satellite orbit position x (ECI)
     float dat_ads_pos_y;            ///< Satellite orbit position y (ECI)
     float dat_ads_pos_z;            ///< Satellite orbit position z (ECI)
