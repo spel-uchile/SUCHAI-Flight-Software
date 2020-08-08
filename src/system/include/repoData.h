@@ -212,12 +212,11 @@ int dat_show_time(int format);
 int dat_add_payload_sample(void* data, int payload);
 
 /**
- * TODO: Change variable name from delay to offset??
  * Gets a data struct from the payload table.
  *
  * @param data Pointer to the struct where the values will be stored
  * @param payload Payload id to get
- * @param delay Delay of the recent value
+ * @param offset Offset from the recent value
  * @return 0 if OK, -1 if and error occurred
  */
 int dat_get_recent_payload_sample(void* data, int payload, int offset);

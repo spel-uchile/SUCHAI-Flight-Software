@@ -22,7 +22,10 @@
 
 static const char *tag = "data_storage";
 
-#if SCH_STORAGE_MODE == 1
+#if SCH_STORAGE_MODE == 0
+    static uint8_t *db = NULL;  // Memory section for all payloads
+    static uint8_t **storage_addresses;  // Storage pointers to payload memory sections
+#elif SCH_STORAGE_MODE == 1
     static sqlite3 *db = NULL;
 #elif SCH_STORAGE_MODE == 2
     PGconn *conn = NULL;
@@ -127,6 +130,19 @@ int storage_table_repo_init(char* table, int drop)
     char *err_msg;
     char *sql;
     int rc;
+
+#if SCH_STORAGE_MODE == 0
+    // Init payload memory
+    db = (uint8_t *)malloc(SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*last_sensor);
+    memset(db, 0, SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*last_sensor);
+    // Init payload sections pointers storage
+    storage_addresses = (uint8_t **)malloc(SCH_SECTIONS_PER_PAYLOAD*last_sensor*sizeof(uint8_t *));
+    int i;
+    // Save the starting address corresponding to each payload memory section
+    for (i = 0; i < SCH_SECTIONS_PER_PAYLOAD*last_sensor; i++)
+        storage_addresses[i] = db + i * SCH_SIZE_PER_SECTION;
+    return 0;
+#endif
 
 #if SCH_STORAGE_MODE == 1
 
@@ -288,7 +304,14 @@ int storage_table_flight_plan_init(int drop)
 int storage_table_payload_init(int drop)
 {
 
+#if SCH_STORAGE_MODE == 0
+    if(drop)
+        if(db != NULL)
+            free(db);
+    db = malloc(SCH_SECTIONS_PER_PAYLOAD*SCH_SIZE_PER_SECTION*last_sensor);
+#endif
 #if SCH_STORAGE_MODE > 0
+    // FIXME: Handle drop = True
     if(drop)
     {
 
@@ -745,7 +768,30 @@ int storage_set_payload_data(int index, void* data, int payload)
         LOGE(tag, "Payload id: %d greater than maximum id: %d", payload, last_sensor);
         return -1;
     }
-// TODO: Implement payload data for RAM, STORAGE_MODE 0
+
+#if SCH_STORAGE_MODE == 0
+    int payloads_per_section = SCH_SIZE_PER_SECTION/data_map[payload].size;
+
+    int payload_section = index/payloads_per_section;
+    int index_in_section = index%payloads_per_section;
+    int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + payload_section;
+
+    uint8_t *add;
+    add = storage_addresses[section_index] + index_in_section*data_map[payload].size;
+
+    if((payload_section >= SCH_SECTIONS_PER_PAYLOAD) || (index_in_section*data_map[payload].size >= SCH_SIZE_PER_SECTION))
+    {
+        LOGE(tag, "Payload address: %p is out of bounds", add);
+        return -1;
+    }
+
+    LOGI(tag, "Writing in address: %p, %d bytes\n", add, data_map[payload].size);
+    void *des = memcpy(add, data, data_map[payload].size);
+    if(des == NULL){
+        return -1;
+    }
+    return 0;
+#endif
 #if SCH_STORAGE_MODE > 0
     char* tok_sym[30];
     char* tok_var[30];
@@ -812,7 +858,31 @@ int storage_set_payload_data(int index, void* data, int payload)
 
 int storage_get_payload_data(int index, void* data, int payload)
 {
-// TODO: Implement payload data for RAM, STORAGE_MODE 0
+    if(payload >= last_sensor)
+    {
+        LOGE(tag, "payload id: %d greater than maximum id: %d", payload, last_sensor);
+        return -1;
+    }
+
+#if SCH_STORAGE_MODE == 0
+    int payloads_per_section = SCH_SIZE_PER_SECTION/data_map[payload].size;
+
+    int payload_section = index/payloads_per_section;
+    int index_in_section = index%payloads_per_section;
+    int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + payload_section;
+
+    uint8_t *add;
+    add = storage_addresses[section_index] + index_in_section*data_map[payload].size;
+
+    if((payload_section >= SCH_SECTIONS_PER_PAYLOAD) || (index_in_section*data_map[payload].size >= SCH_SIZE_PER_SECTION))
+    {
+        LOGE(tag, "Payload address: %p is out of bounds", add);
+        return -1;
+    }
+
+    LOGI(tag, "Reading in address: %p, %d bytes\n", add, data_map[payload].size);
+    memcpy(data, add, data_map[payload].size);
+#endif
 #if SCH_STORAGE_MODE > 0
     char* tok_sym[30];
     char* tok_var[30];
@@ -896,7 +966,11 @@ int storage_get_payload_data(int index, void* data, int payload)
 
 int storage_close(void)
 {
-    #if SCH_STORAGE_MODE == 1
+#if SCH_STORAGE_MODE == 0
+    free(storage_addresses);
+    free(db);
+#endif
+#if SCH_STORAGE_MODE > 0
         if(db != NULL)
         {
             LOGD(tag, "Closing database");

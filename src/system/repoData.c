@@ -67,7 +67,6 @@ void dat_repo_init(void)
     }
 
     LOGD(tag, "Initializing data repositories buffers...")
-    /* TODO: Setup external memories */
 #if (SCH_STORAGE_MODE == 0)
     {
         // Reset variables (we do not have persistent storage here)
@@ -87,6 +86,10 @@ void dat_repo_init(void)
             data_base[i].executions = 0;
             data_base[i].periodical = 0;
         }
+
+        //Init payloads repo
+        int rc = storage_table_payload_init(0);
+        assertf(rc==0, tag, "Unable to create payload repo");
     }
 #elif (SCH_STORAGE_MODE > 0)
     {
@@ -109,6 +112,7 @@ void dat_repo_init(void)
     }
 #endif
 
+//FIXME: Remove or check if this code is necessary
 //    /* TODO: Initialize custom variables */
 //    LOGD(tag, "Initializing system variables values...")
 ////    dat_set_system_var(dat_obc_hrs_alive, 0);
@@ -123,6 +127,7 @@ void dat_repo_init(void)
 
 void dat_repo_close(void)
 {
+//FIXME: Use STORAGE_MODE=0 should also free memory
 #if SCH_STORAGE_MODE != 0
     {
         storage_close();
@@ -529,6 +534,7 @@ int dat_add_payload_sample(void* data, int payload)
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
+//FIXME: use STORAGE_MODE
 #if defined(LINUX) || defined(NANOMIND)
     ret = storage_set_payload_data(index, data, payload);
 #else
@@ -557,7 +563,8 @@ int dat_get_recent_payload_sample(void* data, int payload, int offset)
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-    //TODO: Is this conditional required?
+//FIXME: Is this conditional required?
+//FIXME: Use STORAGE_MODE
 #if defined(LINUX) || defined(NANOMIND)
     if(index-1-offset >= 0) {
         ret = storage_get_payload_data(index-1-offset, data, payload);
@@ -584,6 +591,7 @@ int dat_delete_memory_sections(void)
     }
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+//FIXME: Use STORAGE_MODE
 #ifdef NANOMIND
     ret = storage_delete_memory_sections();
 #else

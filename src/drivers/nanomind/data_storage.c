@@ -49,6 +49,7 @@ int storage_init(const char *file)
 //        return -1;
 
     /* Init storage addresses */
+    //FIXME: According to repoData->dat_repo_init this code should be in storage_table_payload_init function
     int payload_tables_amount = SCH_SECTIONS_PER_PAYLOAD*last_sensor;
     storage_addresses_payloads = malloc(payload_tables_amount*sizeof(uint32_t));
     int sections_for_fp = (SCH_FP_MAX_ENTRIES*max_command_size)/SCH_SIZE_PER_SECTION + 1;
@@ -93,6 +94,7 @@ int storage_repo_get_value_idx(int index, char *table)
 
 int storage_repo_get_value_str(char *name, char *table)
 {
+    // FIXME: return -1 if not implemented?
     return 0;
 }
 
