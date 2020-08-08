@@ -22,12 +22,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include <string.h>
 #include "CUnit/Basic.h"
 #include "math_utils.h"
-#include "cmdFP.h"
-#include "cmdOBC.h"
 #include "repoCommand.h"
 #include "data_storage.h"
 
@@ -198,19 +195,30 @@ int init_suite_repodata(void)
  */
 int clean_suite_repodata(void)
 {
+    dat_repo_close();
     return 0;
 }
 
 //Test of drp_test_system_vars
-void testSYSVARS(void)
+void test_system_vars(void)
 {
-    int result;
-    result = drp_test_system_vars("", "", 0);
-    CU_ASSERT(CMD_OK == result);
+    int var_index;
+    int var;
+    int init_value;
+    int test_value = 85;
+
+    for (var_index = 0; var_index < dat_system_last_var; var_index++)
+    {
+        init_value = dat_get_system_var((dat_system_t) var_index);
+        dat_set_system_var((dat_system_t) var_index, test_value);
+        var = dat_get_system_var((dat_system_t) var_index);
+        dat_set_system_var((dat_system_t) var_index, init_value);
+        CU_ASSERT_EQUAL(var, test_value)
+    }
 }
 
 //Test of dat_set_system_var
-void testDATSET_SYSVAR(void)
+void test_set_system_vars_fault_tolerant(void)
 {
     int rand_ind = rand() % dat_system_last_var;
     int rand_val = rand();
@@ -249,7 +257,7 @@ void testDATSET_SYSVAR(void)
 }
 
 //Test of dat_get_system_var
-void testDATGET_SYSVAR(void)
+void test_get_system_vars_fault_tolerant(void)
 {
     int rand_ind = rand() % dat_system_last_var;
     int rand_val = rand();
@@ -286,6 +294,76 @@ void testDATGET_SYSVAR(void)
         }
     }
 }
+
+void test_payload_data(void)
+{
+    init_suite_repodata();
+
+    int rc, i;
+    int n_test = 10;
+    int time_test = 1596853407;
+    uint32_t uint_test = (uint32_t)rand();
+    int32_t int_test = (int32_t)rand();
+    float float_test = 3.14159265358979323846;
+
+    // Push N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        temp_data_t data_temp;
+        data_temp.timestamp = time_test+i;
+        data_temp.obc_temp_1 = float_test;
+        data_temp.obc_temp_2 = float_test;
+        data_temp.obc_temp_3 = float_test;
+        rc = dat_add_payload_sample(&data_temp, temp_sensors);
+        CU_ASSERT_EQUAL(rc, 0);
+
+        eps_data_t data_eps;
+        data_eps.timestamp = time_test+i;
+        data_eps.cursun = uint_test;
+        data_eps.cursys = uint_test;
+        data_eps.vbatt = uint_test;
+        data_eps.temp1 = int_test;
+        data_eps.temp2 = int_test;
+        data_eps.temp3 = int_test;
+        data_eps.temp4 = int_test;
+        data_eps.temp5 = int_test;
+        data_eps.temp6 = int_test;
+        dat_add_payload_sample(&data_eps, eps_sensors);
+        CU_ASSERT_EQUAL(rc, 0);
+    }
+
+    // Test storage payload index
+    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_temp), n_test);
+    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_eps), n_test);
+
+    // Read N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        temp_data_t data_temp;
+        rc = dat_get_recent_payload_sample(&data_temp, temp_sensors, n_test-i);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data_temp.timestamp, time_test+i);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_1, float_test, 1e-10);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_2, float_test, 1e-10);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_3, float_test, 1e-10);
+
+        eps_data_t data_eps;
+        dat_add_payload_sample(&data_eps, eps_sensors);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data_eps.timestamp, time_test+i);
+        CU_ASSERT_EQUAL(data_eps.cursun, uint_test);
+        CU_ASSERT_EQUAL(data_eps.cursys, uint_test);
+        CU_ASSERT_EQUAL(data_eps.vbatt, uint_test);
+        CU_ASSERT_EQUAL(data_eps.temp1, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp2, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp3, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp4, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp5, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp6, int_test);
+    }
+}
+
+
 
 /** SUIT 4 **/
 /* The suite initialization function.
@@ -467,9 +545,11 @@ int main()
     }
 
     /* add the tests to the suite */
-    if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", testSYSVARS)) ||
-            (NULL == CU_add_test(pSuite, "test of dat_set_system_var", testDATSET_SYSVAR)) ||
-            (NULL == CU_add_test(pSuite, "test of dat_get_system_var", testDATGET_SYSVAR))){
+    if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", test_system_vars)) ||
+            (NULL == CU_add_test(pSuite, "test of dat_set_system_var", test_set_system_vars_fault_tolerant)) ||
+            (NULL == CU_add_test(pSuite, "test of dat_get_system_var", test_get_system_vars_fault_tolerant)) ||
+            (NULL == CU_add_test(pSuite, "test of payload storage", test_payload_data)))
+    {
         CU_cleanup_registry();
         return CU_get_error();
     }

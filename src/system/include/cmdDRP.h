@@ -83,16 +83,6 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams);
 int drp_clear_gnd_wdt(char *fmt, char *params, int nparams);
 
 /**
- * Tests the data repository functioning, sets a value for every system status
- * variable and reads it back, comparing it with the set value.
- * @param fmt Str. Parameters format ""
- * @param params Str. Parameters as string ""
- * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int drp_test_system_vars(char *fmt, char *params, int nparams);
-
-/**
  * Set the variable `dat_dep_deployed` to a given value. This variable is used
  * to determine if the satellite was deployed. If not, then the satellite
  * must execute deployment routines. If deployed, deployment routines are

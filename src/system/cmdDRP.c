@@ -33,7 +33,6 @@ void cmd_drp_init(void)
     cmd_add("drp_set_var", drp_update_sys_var_idx, "%d %d", 2);
     cmd_add("drp_add_hrs_alive", drp_update_hours_alive, "%d", 1);
     cmd_add("drp_clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
-    cmd_add("drp_test_system_vars", drp_test_system_vars, "", 0);
     cmd_add("drp_set_deployed", drp_set_deployed, "%d", 1);
 }
 
@@ -151,30 +150,6 @@ int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
 {
     dat_set_system_var(dat_obc_sw_wdt, 0);
     return CMD_OK;
-}
-
-int drp_test_system_vars(char *fmt, char *params, int nparams)
-{
-    int var_index;
-    int var;
-    int init_value;
-    int test_value = 85;
-    int return_value = CMD_OK;
-
-    for (var_index = 0; var_index < dat_system_last_var; var_index++)
-    {
-        init_value = dat_get_system_var((dat_system_t) var_index);
-        dat_set_system_var((dat_system_t) var_index, test_value);
-        var = dat_get_system_var((dat_system_t) var_index);
-        dat_set_system_var((dat_system_t) var_index, init_value);
-        LOGV(tag, "Variable:%d, value: %d, expected %d", var, var, test_value);
-        if (var != test_value)
-        {
-            return_value = CMD_FAIL;
-        }
-    }
-
-    return return_value;
 }
 
 int drp_set_deployed(char *fmt, char *params, int nparams)
