@@ -970,7 +970,7 @@ int storage_close(void)
     free(storage_addresses);
     free(db);
 #endif
-#if SCH_STORAGE_MODE > 0
+#if SCH_STORAGE_MODE == 1
         if(db != NULL)
         {
             LOGD(tag, "Closing database");
@@ -983,7 +983,8 @@ int storage_close(void)
             LOGW(tag, "Attempting to close a NULL pointer database");
             return -1;
         }
-    #endif
+#endif
+//FIXME: Handle case storage mode == 2
     return 0;
 }
 
