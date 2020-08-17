@@ -26,7 +26,7 @@ void taskFlightPlan(void *param)
 {
 
     LOGI(tag, "Started");
-    char command[SCH_CMD_MAX_STR_PARAMS];
+    char command[SCH_CMD_MAX_STR_NAME];
     char args[SCH_CMD_MAX_STR_PARAMS];
     int executions;
     int period;
