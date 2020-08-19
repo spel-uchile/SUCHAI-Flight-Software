@@ -221,7 +221,16 @@ void mat_inverse(matrix3_t mat, matrix3_t* res)
     double I = (a*e -b*d);
     double detmat = a*A + b*B + c*C;
 
-    assert(fabs(detmat) >= 1E-25);
+    //assert(fabs(detmat) >= 1E-25);
+    if(fabs(detmat) < 1E-15)
+    {
+        res->m[0][0] = 1.0; res->m[0][1] = 0.0, res->m[0][2] = 0.0;
+        res->m[1][0] = 0.0; res->m[1][1] = 1.0, res->m[1][2] = 0.0;
+        res->m[2][0] = 0.0; res->m[2][1] = 0.0, res->m[2][2] = 1.0;
+
+        LOGW("math_utils", "Sing. matrix");
+        return;
+    }
 
     res->m[0][0] = A/detmat; res->m[0][1] = D/detmat, res->m[0][2] = G/detmat;
     res->m[1][0] = B/detmat; res->m[1][1] = E/detmat, res->m[1][2] = H/detmat;
@@ -378,6 +387,7 @@ void eskf_update_mag(vector3_t mag_sensor, vector3_t mag_i, double P[6][6], matr
 {
     // Magnetic Jacobian
     vec_normalize(&mag_i, NULL);
+    vec_normalize(&mag_sensor, NULL);
     matrix3_t rwb;
     quat_to_dcm(q, &rwb);
     vector3_t mag_b;

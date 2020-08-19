@@ -16,6 +16,7 @@
 #include <math.h>
 #include "config.h"
 #include <assert.h>
+#include "log_utils.h"
 
 /**
  * Quaternion structure
