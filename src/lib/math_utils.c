@@ -301,8 +301,8 @@ void _mat_copy(double * mat, double * res, int matx, int maty, int resx, int res
     int i_mat=0, i_res=0;
     for(int i=0; i < matx; ++i) {
         for(int j=0; j < maty; ++j) {
-            i_mat = (matx*i) + j;
-            i_res = ((resx)*(i+p_i)) + j + p_j;
+            i_mat = (maty*i) + j;
+            i_res = ((resy)*(i+p_i)) + j + p_j;
             res[i_res] = mat[i_mat];
         }
     }
