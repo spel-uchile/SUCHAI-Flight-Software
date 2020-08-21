@@ -343,17 +343,17 @@ void eskf_compute_error(vector3_t omega, double dt, double P[6][6], double Q[6][
     matrix3_t rwb, temp;
     quat_to_dcm(&dq_omegadt, &rwb);
     mat_transpose(&rwb, &temp);
-    _mat_copy(temp.m, F, 3, 3, 6, 6, 0, 0);
+    _mat_copy((double*) temp.m, (double*) F, 3, 3, 6, 6, 0, 0);
     // F12
     double diag_val = -1.0*dt;
     mat_set_diag(&temp, diag_val, diag_val, diag_val);
-    _mat_copy(temp.m, F, 3, 3, 6, 6, 0, 3);
+    _mat_copy((double*) temp.m, (double*) F, 3, 3, 6, 6, 0, 3);
 //    //F21
     mat_set_diag(&temp, 0.0, 0.0, 0.0);
-    _mat_copy(temp.m, F, 3,3,6,6, 3, 0);
+    _mat_copy((double*) temp.m, (double*) F, 3,3,6,6, 3, 0);
 //    //F22
     mat_set_diag(&temp, 1.0, 1.0, 1.0);
-    _mat_copy(temp.m, F,3,3,6,6, 3, 3);
+    _mat_copy((double*) temp.m, (double*) F,3,3,6,6, 3, 3);
 
     // update Q
     for(int i=0; i<2; ++i) {
@@ -361,26 +361,26 @@ void eskf_compute_error(vector3_t omega, double dt, double P[6][6], double Q[6][
             if (i == 0 && j == 0) {
                 double val = pow(std_rn_w, 2) * pow(dt, 2);
                 mat_set_diag(&temp, val, val, val);
-                _mat_copy(temp.m, Q, 3,3,6,6, 0, 0);
+                _mat_copy((double*) temp.m, (double*) Q, 3,3,6,6, 0, 0);
             } else if (i == 1 && j == 1) {
                 double val = pow(std_rw_w, 2) * dt;
                 mat_set_diag(&temp, val, val, val);
-                _mat_copy(temp.m, Q, 3,3,6,6, 3, 3);
+                _mat_copy((double*) temp.m, (double*) Q, 3,3,6,6, 3, 3);
             } else {
                 mat_set_diag(&temp, 0.0, 0.0, 0.0);
-                _mat_copy(temp.m, Q, 3,3,6,6, i*3, j*3);
+                _mat_copy((double*) temp.m, (double*) Q, 3,3,6,6, i*3, j*3);
             }
         }
     }
 
     // update P
     double  Ft[6][6];
-    _mat_transpose(F, Ft, 6,6 );
+    _mat_transpose((double*) F, (double*) Ft, 6,6 );
     double FP[6][6];
-    _mat_mat_mult(F, P, FP,6,6,6);
+    _mat_mat_mult((double*) F, (double*) P, (double*) FP,6,6,6);
     double FPFt[6][6];
-    _mat_mat_mult(FP, Ft, FPFt, 6,6,6);
-    _mat_mat_sum(FPFt, Q, P, 6, 6);
+    _mat_mat_mult((double*) FP, (double*) Ft, (double*) FPFt, 6,6,6);
+    _mat_mat_sum((double*) FPFt, (double*) Q, (double*) P, 6, 6);
 }
 
 void eskf_update_mag(vector3_t mag_sensor, vector3_t mag_i, double P[6][6], matrix3_t *R, quaternion_t * q, vector3_t * wb)

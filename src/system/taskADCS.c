@@ -55,7 +55,7 @@ void taskADCS(void *param)
     double P[6][6];
     double Q[6][6];
     matrix3_t R;
-    _mat_set_diag(P, 1.0,6, 6);
+    _mat_set_diag((double*) P, 1.0,6, 6);
 
     while(1)
     {
@@ -190,7 +190,7 @@ void eskf_predict_state(double* P, double* Q, double dt)
 
     // Predict Error
     _mat_set_diag(Q, 1.0,6, 6);
-    eskf_compute_error(diffw, dt, P, Q);
+    eskf_compute_error(diffw, dt,(double (*)[6]) P, (double (*)[6]) Q);
 }
 
 int send_p_and_q(double P[6][6], double Q[6][6])
