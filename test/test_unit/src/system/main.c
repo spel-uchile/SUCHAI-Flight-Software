@@ -29,60 +29,24 @@
 #include "cmdFP.h"
 #include "cmdOBC.h"
 #include "repoCommand.h"
+#include "data_storage.h"
 
-/* The suite initialization function.
- * Resets the flight plan
- * Returns zero on success, non-zero otherwise.
- */
-int init_suite1(void)
-{
-    dat_repo_init();
-    fp_reset("", "", 1);
-    return 0;
-}
-
-/* The suite cleanup function.
- * Returns zero on success, non-zero otherwise.
- */
-int clean_suite1(void)
-{
-    return 0;
-}
-
+/** SUIT 2: Command repository **/
 /* The suite initialization function.
  * Initializes
  */
-int init_suite2(void)
+int init_suite_repocmd(void)
 {
-    cmd_repo_init();
-    return 0;
+    int result = cmd_repo_init();
+    return result == CMD_OK ? 0 : -1;
 }
 
 /* The suite cleanup function.
  * Returns zero on success, non-zero otherwise.
  */
-int clean_suite2(void)
+int clean_suite_repocmd(void)
 {
-    return 0;
-}
-
-/* The suite initialization function.
- * Initializes
- */
-int init_suite3(void)
-{
-    dat_repo_init();
-    cmd_repo_init();
-    drp_execute_before_flight("%d", "1010", 1);
-    srand(time(NULL));
-    return 0;
-}
-
-/* The suite cleanup function.
- * Returns zero on success, non-zero otherwise.
- */
-int clean_suite3(void)
-{
+    cmd_repo_close();
     return 0;
 }
 
@@ -140,38 +104,124 @@ void testParseCommands(void)
     free(cmd);
 }
 
-// Test of fp_set.
-void testFPSET(void)
+/** SUIT 1: Flight Plan **/
+/* The suite initialization function.
+ * Resets the flight plan
+ * Returns zero on success, non-zero otherwise.
+ */
+int init_suite_fp(void)
 {
-    char* fmt = "%d %d %d %d %d %d %d %d %s %n";
-    char* params = "26 01 2020 12 35 00 1 0 helloworld 1 2 3 3 4";
-    int nparams = 10;
     int result;
-    result = fp_set(fmt, params, nparams);
-    CU_ASSERT(CMD_OK == result);
+    dat_repo_init();
+    result = dat_reset_fp();
+    return result;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite_fp(void)
+{
+    int result;
+    result = dat_reset_fp();
+    dat_repo_close();
+    return result;
+}
+
+// Test of fp_set.
+void test_fp_set(void)
+{
+    int i, result, exec, period;
+    char cmd[SCH_CMD_MAX_STR_NAME];
+    char args[SCH_CMD_MAX_STR_PARAMS];
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+    memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
+
+    // Set flight plan values
+    for(i=0; i<10; i++)
+    {
+        result = dat_set_fp(i, "test_cmd", "arg1 arg2 arg3", i, i);
+        CU_ASSERT_EQUAL(result, 0);
+    }
+
+    //dat_show_fp();
+
+    // Read and test flight plan values
+    for(i=0; i<10; i++)
+    {
+        result = dat_get_fp(i, cmd, args, &exec, &period);
+        CU_ASSERT_EQUAL(result, 0)
+        CU_ASSERT_STRING_EQUAL(cmd, "test_cmd");
+        CU_ASSERT_STRING_EQUAL(args, "arg1 arg2 arg3");
+        //printf("(%d, %d), (%d, %d)\n", exec,i,period,i);
+        CU_ASSERT_EQUAL(exec, i);
+        CU_ASSERT_EQUAL(period, i);
+    }
 }
 
 //Test of fp_delete
-void testFPDELETE(void)
+void test_fp_delete(void)
 {
-    char* fmt = "%d %d %d %d %d %d";
-    char* params = "26 01 2020 12 35 00";
-    int nparams = 6;
-    int result;
-    result = fp_delete(fmt, params, nparams);
-    CU_ASSERT_EQUAL(CMD_OK, result);
+    int i, result, exec, period;
+    char cmd[SCH_CMD_MAX_STR_NAME];
+    char args[SCH_CMD_MAX_STR_PARAMS];
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+    memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
+
+    // Delete entries and check a deleted entry cannot be read
+    for(i=0; i<10; i++)
+    {
+        result = dat_del_fp(i);
+        CU_ASSERT_EQUAL(result, 0);
+        result = dat_get_fp(i, cmd, args, &exec, &period);
+        CU_ASSERT_EQUAL(result, -1);
+    }
+}
+
+
+
+/** SUIT 3: Data repository **/
+/* The suite initialization function.
+ * Initializes
+ */
+int init_suite_repodata(void)
+{
+    dat_repo_init();
+    cmd_repo_init();
+    drp_execute_before_flight("%d", "1010", 1);
+    srand(time(NULL));
+    return 0;
+}
+
+/* The suite cleanup function.
+ * Returns zero on success, non-zero otherwise.
+ */
+int clean_suite_repodata(void)
+{
+    dat_repo_close();
+    return 0;
 }
 
 //Test of drp_test_system_vars
-void testSYSVARS(void)
+void test_system_vars(void)
 {
-    int result;
-    result = drp_test_system_vars("", "", 0);
-    CU_ASSERT(CMD_OK == result);
+    int var_index;
+    int var;
+    int init_value;
+    int test_value = 85;
+
+    for (var_index = 0; var_index < dat_system_last_var; var_index++)
+    {
+        init_value = dat_get_system_var((dat_system_t) var_index);
+        dat_set_system_var((dat_system_t) var_index, test_value);
+        var = dat_get_system_var((dat_system_t) var_index);
+        dat_set_system_var((dat_system_t) var_index, init_value);
+        CU_ASSERT_EQUAL(var, test_value)
+    }
 }
 
 //Test of dat_set_system_var
-void testDATSET_SYSVAR(void)
+void test_set_system_vars_fault_tolerant(void)
 {
     int rand_ind = rand() % dat_system_last_var;
     int rand_val = rand();
@@ -210,7 +260,7 @@ void testDATSET_SYSVAR(void)
 }
 
 //Test of dat_get_system_var
-void testDATGET_SYSVAR(void)
+void test_get_system_vars_fault_tolerant(void)
 {
     int rand_ind = rand() % dat_system_last_var;
     int rand_val = rand();
@@ -248,11 +298,81 @@ void testDATGET_SYSVAR(void)
     }
 }
 
+void test_payload_data(void)
+{
+    init_suite_repodata();
+
+    int rc, i;
+    int n_test = 10;
+    int time_test = 1596853407;
+    uint32_t uint_test = (uint32_t)rand();
+    int32_t int_test = (int32_t)rand();
+    float float_test = 3.14159265358979323846;
+
+    // Push N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        temp_data_t data_temp;
+        data_temp.timestamp = time_test+i;
+        data_temp.obc_temp_1 = float_test;
+        data_temp.obc_temp_2 = float_test;
+        data_temp.obc_temp_3 = float_test;
+        rc = dat_add_payload_sample(&data_temp, temp_sensors);
+        CU_ASSERT_EQUAL(rc, 0);
+
+        eps_data_t data_eps;
+        data_eps.timestamp = time_test+i;
+        data_eps.cursun = uint_test;
+        data_eps.cursys = uint_test;
+        data_eps.vbatt = uint_test;
+        data_eps.temp1 = int_test;
+        data_eps.temp2 = int_test;
+        data_eps.temp3 = int_test;
+        data_eps.temp4 = int_test;
+        data_eps.temp5 = int_test;
+        data_eps.temp6 = int_test;
+        dat_add_payload_sample(&data_eps, eps_sensors);
+        CU_ASSERT_EQUAL(rc, 0);
+    }
+
+    // Test storage payload index
+    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_temp), n_test);
+    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_eps), n_test);
+
+    // Read N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        temp_data_t data_temp;
+        rc = dat_get_recent_payload_sample(&data_temp, temp_sensors, n_test-i);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data_temp.timestamp, time_test+i);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_1, float_test, 1e-10);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_2, float_test, 1e-10);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_3, float_test, 1e-10);
+
+        eps_data_t data_eps;
+        dat_add_payload_sample(&data_eps, eps_sensors);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data_eps.timestamp, time_test+i);
+        CU_ASSERT_EQUAL(data_eps.cursun, uint_test);
+        CU_ASSERT_EQUAL(data_eps.cursys, uint_test);
+        CU_ASSERT_EQUAL(data_eps.vbatt, uint_test);
+        CU_ASSERT_EQUAL(data_eps.temp1, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp2, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp3, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp4, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp5, int_test);
+        CU_ASSERT_EQUAL(data_eps.temp6, int_test);
+    }
+}
+
+
+
 /** SUIT 4 **/
 /* The suite initialization function.
  * Initializes
  */
-int init_suite4(void)
+int init_suite_quat(void)
 {
     return 0;
 }
@@ -260,7 +380,7 @@ int init_suite4(void)
 /* The suite cleanup function.
  * Returns zero on success, non-zero otherwise.
  */
-int clean_suite4(void)
+int clean_suite_quat(void)
 {
     return 0;
 }
@@ -373,6 +493,23 @@ void testMatrices(void)
     // Test matrix vector multiplication
     mat_vec_mult(A, v, &resv);
     check_values((double*)resv.v, (double*)Av.v, 3);
+    // Test _mat_copy function;
+    double res_copy[3][6];
+    matrix3_t ref_copy_1 = {0.0, 1.0, 2.0, 6.0, 7.0, 8.0, 12.0, 13.0, 14.0};
+    matrix3_t ref_copy_2 = { 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 15.0, 16.0, 17.0};
+    _mat_copy((double*) ref_copy_1.m, (double*) res_copy, 3, 3, 3, 6, 0,0);
+    _mat_copy((double*) ref_copy_2.m, (double*) res_copy, 3, 3, 3, 6, 0,3);
+    for( int i=0; i < 18; ++i ) {
+        CU_ASSERT_DOUBLE_EQUAL(((double*)res_copy)[i], (double)i, 1e-6);
+    }
+    double res_copy2[6][3];
+    matrix3_t ref_copy2_1 = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    matrix3_t ref_copy2_2 = { 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0};
+    _mat_copy((double*) ref_copy2_1.m, (double*) res_copy2, 3, 3, 6, 3, 0,0);
+    _mat_copy((double*) ref_copy2_2.m, (double*) res_copy2, 3, 3, 6, 3, 3,0);
+    for( int i=0; i < 18; ++i ) {
+        CU_ASSERT_DOUBLE_EQUAL(((double*)res_copy2)[i], (double)i, 1e-6);
+    }
 }
 
 /* The main() function for setting up and running the tests.
@@ -387,26 +524,26 @@ int main()
     if (CUE_SUCCESS != CU_initialize_registry())
         return CU_get_error();
 
-    /*
+    /**
      * SUITE 1: Flight Plan unit tests
      */
-    pSuite = CU_add_suite("Suite Flight Plan", init_suite1, clean_suite1);
-    if (NULL == pSuite) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
+//    pSuite = CU_add_suite("Suite Flight Plan", init_suite_fp, clean_suite_fp);
+//    if (NULL == pSuite) {
+//        CU_cleanup_registry();
+//        return CU_get_error();
+//    }
+//
+//    /* add the tests to the suite */
+//    if ((NULL == CU_add_test(pSuite, "test of fpset()", test_fp_set))
+//           || (NULL == CU_add_test(pSuite, "test of fpdelete()", test_fp_delete))){
+//        CU_cleanup_registry();
+//        return CU_get_error();
+//    }
 
-    /* add the tests to the suite */
-    if ((NULL == CU_add_test(pSuite, "test of fpset()", testFPSET))
-           || (NULL == CU_add_test(pSuite, "test of fpdelete()", testFPDELETE))){
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    /*
+    /**
      * SUITE 2: Repo command unit tests
      */
-    pSuite = CU_add_suite("Suite repo command", init_suite2, clean_suite2);
+    pSuite = CU_add_suite("Suite repo command", init_suite_repocmd, clean_suite_repocmd);
     if (NULL == pSuite) {
         CU_cleanup_registry();
         return CU_get_error();
@@ -418,27 +555,29 @@ int main()
         return CU_get_error();
     }
 
-    /*
+    /**
      * SUITE 3: Repo data unit tests
      */
-    pSuite = CU_add_suite("Suite repo data", init_suite3, clean_suite3);
-    if (NULL == pSuite) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
+//    pSuite = CU_add_suite("Suite repo data", init_suite_repodata, clean_suite_repodata);
+//    if (NULL == pSuite) {
+//        CU_cleanup_registry();
+//        return CU_get_error();
+//    }
+//
+//    /* add the tests to the suite */
+//    if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", test_system_vars)) ||
+//            (NULL == CU_add_test(pSuite, "test of dat_set_system_var", test_set_system_vars_fault_tolerant)) ||
+//            (NULL == CU_add_test(pSuite, "test of dat_get_system_var", test_get_system_vars_fault_tolerant)) ||
+//            (NULL == CU_add_test(pSuite, "test of payload storage", test_payload_data)))
+//    {
+//        CU_cleanup_registry();
+//        return CU_get_error();
+//    }
 
-    /* add the tests to the suite */
-    if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", testSYSVARS)) ||
-            (NULL == CU_add_test(pSuite, "test of dat_set_system_var", testDATSET_SYSVAR)) ||
-            (NULL == CU_add_test(pSuite, "test of dat_get_system_var", testDATGET_SYSVAR))){
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    /*
+    /**
      * SUITE 4: Quaternions in math_utils.c
      */
-    pSuite = CU_add_suite("Suite quaternions", init_suite4, clean_suite4);
+    pSuite = CU_add_suite("Suite quaternions", init_suite_quat, clean_suite_quat);
     if (NULL == pSuite) {
         CU_cleanup_registry();
         return CU_get_error();
@@ -450,7 +589,7 @@ int main()
         return CU_get_error();
     }
 
-    /*
+    /**
     * SUITE 5: Matrices math_utils.c
     */
     pSuite = CU_add_suite("Suite matrices", init_suite_mat, clean_suite_mat);

@@ -7,8 +7,8 @@ set(SOURCE_FILES
         ../../src/drivers/x86/sgp4/src/c/TLE.c
         ../../src/drivers/x86/sgp4/src/c/SGP4.c
         ../../src/drivers/x86/data_storage.c
-        ../../src/os/Linux/osSemphr.c
-        ../../src/os/Linux/osDelay.c
+        ../../src/os/sim/osSemphr.c
+        ../../src/os/sim/osDelay.c
         ../../src/system/repoData.c
         ../../src/system/repoDataSchema.c
         ../../src/system/repoCommand.c
