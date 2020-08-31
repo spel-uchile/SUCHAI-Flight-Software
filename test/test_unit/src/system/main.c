@@ -510,6 +510,55 @@ void testMatrices(void)
     for( int i=0; i < 18; ++i ) {
         CU_ASSERT_DOUBLE_EQUAL(((double*)res_copy2)[i], (double)i, 1e-6);
     }
+    /**
+     *  Test kalman filter
+     */
+    // Test eskf_integrate function
+    quaternion_t q0 = {0.04508641, 0.0609227, 0.09221962, 0.99285003};
+    vector3_t w = {0.0823145, -0.1157819,  0.20184002};
+    double dt = 0.1;
+    quaternion_t q1_ref = {0.05031784, 0.05509505, 0.10172045, 0.99201089};
+    quaternion_t q1_est;
+
+    eskf_integrate(q0, w, dt, &q1_est);
+    check_values((double*) q1_est.q, (double*) q1_ref.q, 4);
+    // Test eskf_compute_error
+    /* assuming
+    std_rw_w = 0.001;
+    std_rn_w = 0.001;
+    std_rn_mag = 0.0001;
+     */
+
+    double P0[6][6] = {0.99945866 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 ,
+                       0.0 , 0.99952494 , 0.0 , 0.0 , 0.0 , 0.0 ,
+                       0.0 , 0.0 , 0.99979822 , 0.0 , 0.0 , 0.0 ,
+                       0.0 , 0.0 , 0.0 , 1.000001 , 0.0 , 0.0 ,
+                       0.0 , 0.0 , 0.0 , 0.0 , 1.000001 , 0.0 ,
+                       0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 1.000001};
+    double Q0[6][6] =  {1.e-08, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+                        0.e+00, 1.e-08, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+                        0.e+00, 0.e+00, 1.e-08, 0.e+00, 0.e+00, 0.e+00,
+                        0.e+00, 0.e+00, 0.e+00, 1.e-07, 0.e+00, 0.e+00,
+                        0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e-07, 0.e+00,
+                        0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e-07};
+
+    double P1_ref[6][6] = {0.99891762, 0.0, 0.0, 0.0, 0.0, 0.0,
+                           0.0, 0.99905011, 0.0, 0.0, 0.0, 0.0,
+                           0.0, 0.0, 0.99959648, 0.0, 0.0, 0.0,
+                           0.0, 0.0, 0.0, 1.0000002, 0.0, 0.0,
+                           0.0, 0.0, 0.0, 0.0, 1.0000002, 0.0,
+                           0.0, 0.0, 0.0, 0.0, 0.0, 1.0000002};
+    double Q1_ref[6][6] = {1.e-08, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+                           0.e+00, 1.e-08, 0.e+00, 0.e+00, 0.e+00, 0.e+00,
+                           0.e+00, 0.e+00, 1.e-08, 0.e+00, 0.e+00, 0.e+00,
+                           0.e+00, 0.e+00, 0.e+00, 1.e-07, 0.e+00, 0.e+00,
+                           0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e-07, 0.e+00,
+                           0.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e-07};
+    eskf_compute_error(w, dt, P0, Q0);
+
+    check_values((double*) P0, (double*) P1_ref, 36);
+//    check_values((double*) Q1_est, (double*) Q1_ref, 36);
+//    eskf_compute_error(vector3_t omega, double dt, double P[6][6], double Q[6][6])
 }
 
 /* The main() function for setting up and running the tests.

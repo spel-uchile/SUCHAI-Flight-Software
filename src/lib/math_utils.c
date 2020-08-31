@@ -3,7 +3,7 @@
 
 const double std_rw_w = 0.001;
 const double std_rn_w = 0.001;
-const double std_rn_mag = 0.001;
+const double std_rn_mag = 0.0001;
 
 void quat_sum(quaternion_t *q1, quaternion_t *q2, quaternion_t *res)
 {
