@@ -71,9 +71,10 @@ void taskADCS(void *param)
          * Estimate Loop
          */
         if (((elapsed_msec % 10) == 0) && (elapsed_msec > 10000)) {
-//            double dt = (double) elapsed_msec / 1000.0;
+            tf = (double) elapsed_msec / 1000.0;
             // TODO: Fix delta time calculation
-            double dt = 0.1;
+            double dt = tf - t0;
+            t0 = tf;
             // Update attitude
             cmd_t *cmd_stt = cmd_get_str("adcs_quat");
             cmd_send(cmd_stt);
