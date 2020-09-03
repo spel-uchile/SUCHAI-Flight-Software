@@ -58,9 +58,18 @@ void taskADCS(void *param)
     _mat_set_diag((double*) P, 1.0,6, 6);
     vector3_t wb0 = {0.0,0.0,0.0};
     _set_sat_vector(&wb0, dat_ads_omega_bias_x);
+    quaternion_t q0 = {0.0,0.0,0.0,1.0};
+    _set_sat_quaterion(&q0, dat_ads_q0);
 
     double t0 = 0.0;
     double tf = 0.0;
+
+    cmd_t *cmd_acc = cmd_get_str("adcs_acc");
+    cmd_send(cmd_acc);
+    cmd_t *cmd_mag = cmd_get_str("adcs_mag");
+    cmd_send(cmd_mag);
+    cmd_t *cmd_mag_model = cmd_get_str("adcs_mag_model");
+    cmd_send(cmd_mag_model);
 
     while(1)
     {
@@ -114,52 +123,52 @@ void taskADCS(void *param)
         /**
          * Control LOOP
          */
-        if ((elapsed_msec % _adcs_ctrl_period) == 0)
-        {
-            cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
-            cmd_add_params_str(cmd_tle_prop, "0");
-            cmd_send(cmd_tle_prop);
-            // Update attitude
-            cmd_t *cmd_stt = cmd_get_str("adcs_quat");
-            cmd_send(cmd_stt);
-            cmd_t *cmd_acc = cmd_get_str("adcs_acc");
-            cmd_send(cmd_acc);
-            cmd_t *cmd_mag = cmd_get_str("adcs_mag");
-            cmd_send(cmd_mag);
-            // Set target attitude
-            //cmd_t *cmd_point = cmd_get_str("sim_adcs_set_target");
-            //cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
-            int mode;
-            mode = dat_get_system_var(dat_obc_opmode);
-            cmd_t *cmd_point;
-            if(mode == DAT_OBC_OPMODE_REF_POINT)
-            {
-                cmd_point = cmd_get_str("adcs_set_target");
-                cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
-            } else if(mode == DAT_OBC_OPMODE_NAD_POINT)
-            {
-                cmd_point = cmd_get_str("adcs_set_to_nadir");
-            } else if(mode == DAT_OBC_OPMODE_DETUMB_MAG)
-            {
-                cmd_point = cmd_get_str("adcs_detumbling_mag");
-                cmd_add_params_var(cmd_point, 0.0, 0.0, 0.0);
-            }
-            cmd_send(cmd_point);
-            // Do control loop
-            cmd_t *cmd_ctrl;
-            if(mode == DAT_OBC_OPMODE_DETUMB_MAG)
-            {
-                cmd_ctrl = cmd_get_str("adcs_mag_moment");
-            } else
-            {
-                cmd_ctrl = cmd_get_str("adcs_do_control");
-                cmd_add_params_var(cmd_ctrl, _adcs_ctrl_period * 1000);
-            }
-            cmd_send(cmd_ctrl);
-            // Send telemetry to ADCS subsystem
-            cmd_t *cmd_att = cmd_get_str("adcs_send_attitude");
-            cmd_send(cmd_att);
-        }
+//        if ((elapsed_msec % _adcs_ctrl_period) == 0)
+//        {
+//            cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
+//            cmd_add_params_str(cmd_tle_prop, "0");
+//            cmd_send(cmd_tle_prop);
+//            // Update attitude
+////            cmd_t *cmd_stt = cmd_get_str("adcs_quat");
+////            cmd_send(cmd_stt);
+//            cmd_t *cmd_acc = cmd_get_str("adcs_acc");
+//            cmd_send(cmd_acc);
+//            cmd_t *cmd_mag = cmd_get_str("adcs_mag");
+//            cmd_send(cmd_mag);
+//            // Set target attitude
+//            //cmd_t *cmd_point = cmd_get_str("sim_adcs_set_target");
+//            //cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
+//            int mode;
+//            mode = dat_get_system_var(dat_obc_opmode);
+//            cmd_t *cmd_point;
+//            if(mode == DAT_OBC_OPMODE_REF_POINT)
+//            {
+//                cmd_point = cmd_get_str("adcs_set_target");
+//                cmd_add_params_var(cmd_point, 1.0, 1.0, 1.0, 0.01, 0.01, 0.01);
+//            } else if(mode == DAT_OBC_OPMODE_NAD_POINT)
+//            {
+//                cmd_point = cmd_get_str("adcs_set_to_nadir");
+//            } else if(mode == DAT_OBC_OPMODE_DETUMB_MAG)
+//            {
+//                cmd_point = cmd_get_str("adcs_detumbling_mag");
+//                cmd_add_params_var(cmd_point, 0.0, 0.0, 0.0);
+//            }
+//            cmd_send(cmd_point);
+//            // Do control loop
+//            cmd_t *cmd_ctrl;
+//            if(mode == DAT_OBC_OPMODE_DETUMB_MAG)
+//            {
+//                cmd_ctrl = cmd_get_str("adcs_mag_moment");
+//            } else
+//            {
+//                cmd_ctrl = cmd_get_str("adcs_do_control");
+//                cmd_add_params_var(cmd_ctrl, _adcs_ctrl_period * 1000);
+//            }
+//            cmd_send(cmd_ctrl);
+//            // Send telemetry to ADCS subsystem
+//            cmd_t *cmd_att = cmd_get_str("adcs_send_attitude");
+//            cmd_send(cmd_att);
+//        }
 
         /* 1 hours actions */
         if((elapsed_msec % _1hour_check) == 0)
