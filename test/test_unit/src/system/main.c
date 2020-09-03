@@ -559,7 +559,18 @@ void testMatrices(void)
 
     check_values((double*) P0, (double*) P1_ref, 36);
     check_values((double*) Q0, (double*) Q1_ref, 36);
-//    eskf_compute_error(vector3_t omega, double dt, double P[6][6], double Q[6][6])
+
+    vector3_t mag_sensor = {0.96991122, -0.02342596, 0.24232924};
+    vector3_t mag_i = {6736.01551293, 10015.46057679, 15874.16456818};
+    vector3_t wb = {0.0, 0.0, 0.0};
+    matrix3_t R;
+
+    quaternion_t q1_est_ref = {0.02408763, -0.29324446, 0.32261486, 0.89963722};
+    vector3_t wb1_est_ref = {0.01408961, 0.06672719, -0.04994908};
+    eskf_update_mag(mag_sensor, mag_i, P0, &R, &q1_est, &wb);
+
+    check_values((double*) q1_est.q, (double*) q1_est_ref.q, 4);
+    check_values((double*) wb.v, (double*) wb1_est_ref.v, 3);
 }
 
 /* The main() function for setting up and running the tests.

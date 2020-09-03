@@ -56,6 +56,11 @@ void taskADCS(void *param)
     double Q[6][6];
     matrix3_t R;
     _mat_set_diag((double*) P, 1.0,6, 6);
+    vector3_t wb0 = {0.0,0.0,0.0};
+    _set_sat_vector(&wb0, dat_ads_omega_bias_x);
+
+    double t0 = 0.0;
+    double tf = 0.0;
 
     while(1)
     {
@@ -66,7 +71,9 @@ void taskADCS(void *param)
          * Estimate Loop
          */
         if (((elapsed_msec % 10) == 0) && (elapsed_msec > 10000)) {
-            double dt = (double) elapsed_msec / 1000.0;
+//            double dt = (double) elapsed_msec / 1000.0;
+            // TODO: Fix delta time calculation
+            double dt = 0.1;
             // Update attitude
             cmd_t *cmd_stt = cmd_get_str("adcs_quat");
             cmd_send(cmd_stt);
@@ -81,24 +88,19 @@ void taskADCS(void *param)
 
             if(((elapsed_msec % 100) == 0))
             {
-                // TODO: get value from magsensor
-                // vector3_t mag_sensor = {0.33757741, 0.51358994, 0.78883893};
                 vector3_t mag_sensor;
                 _get_sat_vector(&mag_sensor, dat_ads_mag_x);
-                // TODO: get value from magnetic model
-                // vector3_t mag_i = {6723.12366721, 10229.07189747, 15710.68799647};
                 vector3_t mag_i;
                 _get_sat_vector(&mag_i, dat_mag_model_x);
                 quaternion_t q_est;
                 _get_sat_quaterion(&q_est, dat_ads_q0);
 
-                vector3_t w;
-                _get_sat_vector(&w, dat_ads_omega_x);
+                vector3_t wb;
+                _get_sat_vector(&wb, dat_ads_omega_bias_x);
 
-                // TODO: call function separately with its own mesuerement freq
-                eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &w);
+                eskf_update_mag(mag_sensor, mag_i, P, &R, &q_est, &wb);
                 _set_sat_quaterion(&q_est, dat_ads_q0);
-                _set_sat_vector(&w, dat_ads_omega_x);
+                _set_sat_vector(&wb, dat_ads_omega_bias_x);
 
                 // Send telemetry to ADCS subsystem
                 cmd_t *cmd_att = cmd_get_str("adcs_send_attitude");
@@ -176,21 +178,22 @@ void eskf_predict_state(double* P, double* Q, double dt)
     quaternion_t q;
 //    vector3_t w = {0.1002623,  -0.10142402,  0.20332787};
     vector3_t w;
-    vector3_t wb = {0.0, 0.0, 0.0};
+    vector3_t wb;
     vector3_t diffw;
     _get_sat_quaterion(&q, dat_ads_q0);
     _get_sat_vector(&w, dat_ads_omega_x);
+    _get_sat_vector(&wb, dat_ads_omega_bias_x);
 
     quaternion_t q_est;
     vec_cons_mult(-1.0, &wb, NULL);
     vec_sum(w, wb, &diffw);
-    eskf_integrate(q, diffw, dt, &q_est);
+    eskf_integrate(q, w, dt, &q_est);
     _set_sat_quaterion(&q_est, dat_ads_q0);
 //    _set_sat_vector(&w, dat_ads_omega_x);
 
     // Predict Error
     _mat_set_diag(Q, 1.0,6, 6);
-    eskf_compute_error(diffw, dt,(double (*)[6]) P, (double (*)[6]) Q);
+    eskf_compute_error(w, dt,(double (*)[6]) P, (double (*)[6]) Q);
 }
 
 int send_p_and_q(double P[6][6], double Q[6][6])
