@@ -79,14 +79,12 @@ void taskADCS(void *param)
         /**
          * Estimate Loop
          */
-        if (((elapsed_msec % 10) == 0) && (elapsed_msec > 10000)) {
+        if (((elapsed_msec % 10) == 0) ) {
             tf = (double) elapsed_msec / 1000.0;
             // TODO: Fix delta time calculation
             double dt = tf - t0;
             t0 = tf;
-            // Update attitude
-            cmd_t *cmd_stt = cmd_get_str("adcs_quat");
-            cmd_send(cmd_stt);
+
             cmd_t *cmd_acc = cmd_get_str("adcs_acc");
             cmd_send(cmd_acc);
             cmd_t *cmd_mag = cmd_get_str("adcs_mag");
@@ -123,8 +121,14 @@ void taskADCS(void *param)
         /**
          * Control LOOP
          */
-//        if ((elapsed_msec % _adcs_ctrl_period) == 0)
-//        {
+        if ((elapsed_msec % _adcs_ctrl_period) == 0)
+        {
+//            cmd_t *cmd_acc = cmd_get_str("adcs_acc");
+//            cmd_send(cmd_acc);
+//            cmd_t *cmd_mag = cmd_get_str("adcs_mag");
+//            cmd_send(cmd_mag);
+//            cmd_t *cmd_mag_model = cmd_get_str("adcs_mag_model");
+//            cmd_send(cmd_mag_model);
 //            cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
 //            cmd_add_params_str(cmd_tle_prop, "0");
 //            cmd_send(cmd_tle_prop);
@@ -168,7 +172,7 @@ void taskADCS(void *param)
 //            // Send telemetry to ADCS subsystem
 //            cmd_t *cmd_att = cmd_get_str("adcs_send_attitude");
 //            cmd_send(cmd_att);
-//        }
+        }
 
         /* 1 hours actions */
         if((elapsed_msec % _1hour_check) == 0)
