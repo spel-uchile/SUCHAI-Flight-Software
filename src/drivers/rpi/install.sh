@@ -12,5 +12,5 @@ fi
 # Download sgp4
 echo "Installing SGP4..."
 if [ ! -d "./sgp4" ]; then
-  git clone https://github.com/spel-uchile/sgp4.git
+  git clone https://gitlab.com/spel-uchile/sgp4.git
 fi
