@@ -97,6 +97,14 @@ int console_read(char *buffer, int len)
     return -1;
 #else
     char *s = fgets(buffer, len, stdin);
+    // Clean CR and LF character to be compatible with
+    // linenoise behaviour
+    int i;
+    for(i=0; i<len; i++)
+    {
+        if(s[i] == '\n' || s[i] == '\r')
+            s[i] = 0;
+    }
     return (s != NULL) ? 0 : -1;
 #endif
 }
