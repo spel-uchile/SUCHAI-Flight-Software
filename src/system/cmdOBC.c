@@ -523,12 +523,15 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
         ts = (uint64_t) dat_get_time();
 
     portTick init_time = osTaskGetTickCount();
-    getRVForDate(&tle, ts*1000, r, v);
+    double diff = (double)ts - (double)tle.epoch/1000.0;
+    diff /= 60.0;
+    getRV(&tle,diff,r,v);
+    // getRVForDate(&tle, ts*1000, r, v);
     portTick getrv_time = osTaskGetTickCount();
 
+    LOGD(tag, "T : %.6f - %.6f = %.6f", (double)ts, tle.epoch/1000.0, diff);
     LOGD(tag, "R : (%.4f, %.4f, %.4f)", r[0], r[1], r[2]);
     LOGD(tag, "V : (%.4f, %.4f, %.4f)", v[0], v[1], v[2]);
-    LOGD(tag, "T : %ld", ts);
     LOGD(tag, "Er: %d", tle.rec.error);
 
     if(tle.sgp4Error != 0)
