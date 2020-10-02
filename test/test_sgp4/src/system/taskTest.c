@@ -29,7 +29,7 @@ int _test_tle_prop(char *fmt, char *params, int nparams)
 {
     double r[3];  // Sat position in ECI frame
     double v[3];  // Sat velocity in ECI frame
-    uint64_t ts = 0;
+    int ts = 0;
     FILE *file;
     char filename[SCH_BUFF_MAX_LEN];
 
@@ -37,7 +37,9 @@ int _test_tle_prop(char *fmt, char *params, int nparams)
         //return CMD_ERROR;
 
     if(ts == 0)
-        ts = (uint64_t) dat_get_time();
+        ts = (int) dat_get_time();
+
+    double ts_mili = 1000.0 * (double) ts;
 
     file = fopen(filename, "a");
     assert(!(file == NULL));
@@ -46,8 +48,9 @@ int _test_tle_prop(char *fmt, char *params, int nparams)
     portTick init_time = osTaskGetTickCount();
     double diff = (double)ts - (double)tle.epoch/1000.0;
     diff /= 60.0;
-    getRV(&tle,diff,r,v);
-    //getRVForDate(&tle, ts*1000, r, v);
+    getRVForDate(&tle,  ts_mili, r, v);
+//    getRV(&tle,diff,r,v);
+    getRVForDate(&tle, ts*1000, r, v);
     portTick getrv_time = osTaskGetTickCount();
 
     LOGD(tag, "T : %.6f - %.6f = %.6f", (double)ts, tle.epoch/1000.0, diff);

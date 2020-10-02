@@ -500,8 +500,8 @@ int obc_update_tle(char *fmt, char *params, int nparams)
         return CMD_FAIL;
     }
 
-    LOGD(tag, "Updated to epoch %ld (%d)", tle.epoch/1000, (int)(tle.epoch/1000));
-    dat_set_system_var(dat_ads_tle_epoch, (int)(tle.epoch/1000));
+    LOGV(tag, "Updated to epoch %.8f (%d)", tle.epoch, (int)(tle.epoch/1000.0));
+    dat_set_system_var(dat_ads_tle_epoch, (int)(tle.epoch/1000.0));
 
     //TODO: Remove time measurement in future revisions
     portTick final_time = osTaskGetTickCount();
@@ -514,24 +514,28 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
 {
     double r[3];  // Sat position in ECI frame
     double v[3];  // Sat velocity in ECI frame
-    uint64_t ts = 0;
+    int ts=0;
 
     if(params != NULL && sscanf(params, fmt, &ts) != nparams)
         return CMD_ERROR;
 
     if(ts == 0)
-        ts = (uint64_t) dat_get_time();
+        ts = dat_get_time();
+
+    double ts_mili = 1000.0 * (double) ts;
 
     portTick init_time = osTaskGetTickCount();
     double diff = (double)ts - (double)tle.epoch/1000.0;
     diff /= 60.0;
-    getRV(&tle,diff,r,v);
-    // getRVForDate(&tle, ts*1000, r, v);
+
+
+//    getRV(&tle,diff,r,v);
+    getRVForDate(&tle, ts_mili, r, v);
     portTick getrv_time = osTaskGetTickCount();
 
-    LOGD(tag, "T : %.6f - %.6f = %.6f", (double)ts, tle.epoch/1000.0, diff);
-    LOGD(tag, "R : (%.4f, %.4f, %.4f)", r[0], r[1], r[2]);
-    LOGD(tag, "V : (%.4f, %.4f, %.4f)", v[0], v[1], v[2]);
+    LOGD(tag, "T : %.8f - %.8f = %.8f", ts_mili/1000.0, tle.epoch/1000.0, diff);
+    LOGD(tag, "R : (%.8f, %.8f, %.8f)", r[0], r[1], r[2]);
+    LOGD(tag, "V : (%.8f, %.8f, %.8f)", v[0], v[1], v[2]);
     LOGD(tag, "Er: %d", tle.rec.error);
 
     if(tle.sgp4Error != 0)
