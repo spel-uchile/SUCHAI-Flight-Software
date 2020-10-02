@@ -500,7 +500,7 @@ int obc_update_tle(char *fmt, char *params, int nparams)
         return CMD_FAIL;
     }
 
-    LOGV(tag, "Updated to epoch %ld (%d)", tle.epoch, (int)(tle.epoch));
+    LOGV(tag, "Updated to epoch %f (%d)", tle.epoch, (int)(tle.epoch));
     dat_set_system_var(dat_ads_tle_epoch, (int)(tle.epoch));
 
     //TODO: Remove time measurement in future revisions
@@ -514,7 +514,7 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
 {
     double r[3];  // Sat position in ECI frame
     double v[3];  // Sat velocity in ECI frame
-    time_t ts;
+    int ts=0;
 
     if(params != NULL && sscanf(params, fmt, &ts) != nparams)
         return CMD_ERROR;
@@ -522,14 +522,19 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     if(ts == 0)
         ts = dat_get_time();
 
-    portTick init_time = osTaskGetTickCount();
-    getRVForDate(&tle, ts*1000, r, v);
-    portTick getrv_time = osTaskGetTickCount();
+    double ts_mili = 1000.0 * (double) ts;
 
-    LOGV(tag, "R : (%.4f, %.4f, %.4f)", r[0], r[1], r[2]);
-    LOGV(tag, "V : (%.4f, %.4f, %.4f)", v[0], v[1], v[2]);
-    LOGV(tag, "T : %d", ts);
-    LOGV(tag, "Er: %d", tle.rec.error);
+    LOGI(tag, "ts size: %d", sizeof(ts))
+    LOGI(tag, "ts_double size: %d", sizeof(ts_mili))
+    LOGI(tag, "ts value is : %ld", ts);
+    LOGI(tag, "ts*1000 value is : %ld", ts*1000);
+    LOGI(tag, "ts_mili value is : %f", ts_mili);
+
+    getRVForDate(&tle,  ts_mili, r, v);
+
+    LOGI(tag, "R : (%.4f, %.4f, %.4f)", r[0], r[1], r[2]);
+    LOGI(tag, "V : (%.4f, %.4f, %.4f)", v[0], v[1], v[2]);
+
 
     if(tle.sgp4Error != 0)
         return CMD_FAIL;
@@ -539,11 +544,5 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     dat_set_system_var(dat_ads_pos_y, pos[1].i);
     dat_set_system_var(dat_ads_pos_z, pos[2].i);
     dat_set_system_var(dat_ads_tle_last, (int)ts);
-
-    //TODO: Remove time measurement in future revisions
-    portTick final_time = osTaskGetTickCount();
-    LOGI(tag, "getRVForDate: %.06f ms", (getrv_time-init_time)/1000.0);
-    LOGI(tag, "obc_prop_tle: %.06f ms", (final_time-init_time)/1000.0);
-
     return CMD_OK;
 }
