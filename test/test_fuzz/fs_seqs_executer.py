@@ -30,7 +30,15 @@ def get_parameters():
 
 
 def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile):
-
+    """
+    Executes all sequences of a file.
+    :param exec_dir: Execution directory. String.
+    :param path_to_json: File path. String.
+    :param log_path: Path where to save logs. String.
+    :param protocol: Protocol used to send commands to the fs. String.
+    :param print_logfile: Saves log file. Boolean.
+    :return:
+    """
     # Run zmqhub.py
     ex_zmqhub = Popen(["python3", "../../sandbox/csp_zmq/zmqhub.py", "--ip", "127.0.0.1", "--proto", protocol], stdin=PIPE)
 
