@@ -355,6 +355,9 @@ int cmd_repo_init(void)
 #if SCH_ADCS_ENABLED  && defined(NANOMIND)
     cmd_adcs_init();
 #endif
+#ifdef SCH_USE_RW
+    cmd_rw_init();
+#endif
 
     int n_cmd;
     int last_cmd_index = cmd_index;

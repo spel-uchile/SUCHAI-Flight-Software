@@ -42,6 +42,9 @@
 #if SCH_ADCS_ENABLED  && defined(NANOMIND)
 #include "cmdADCS.h"
 #endif
+#ifdef SCH_USE_RW
+#include "cmdRW.h"
+#endif
 
 
 /* Macros */
