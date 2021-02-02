@@ -49,7 +49,7 @@ include_directories(
         ../../../src/drivers/rpi/include
         ../../../src/drivers/rpi/libcsp/include
         ../../../src/drivers/rpi/linenoise
-        ../../../src/drivers/x86/sgp4/src/c
+        ../../../src/drivers/rpi/sgp4/src/c
         /usr/include/postgresql
 )
 
