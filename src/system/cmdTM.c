@@ -51,7 +51,7 @@ int tm_send_status(char *fmt, char *params, int nparams)
     }
 
     // Send telemetry
-    return _com_send_data(dest_node, &status, sizeof(status), TM_TYPE_STATUS);
+    return _com_send_data(dest_node, &status, sizeof(status), TM_TYPE_STATUS, 0);
 }
 
 int tm_parse_status(char *fmt, char *params, int nparams)
@@ -103,8 +103,10 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         }
 
         LOGI(tag, "Sending %d structs of payload %d", data.frame.ndata, (int)payload);
-        com_send_data("", (char *)&data, 0);
-
+        _com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata);
+        LOGI(tag, "Frame   : %d", data.frame.nframe);
+        LOGI(tag, "Type    : %d", (data.frame.type));
+        LOGI(tag, "Samples : %d", (data.frame.ndata));
         print_buff(data.frame.data.data8, payload_size*structs_per_frame);
     }
 }
