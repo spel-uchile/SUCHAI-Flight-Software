@@ -16,9 +16,9 @@
 #include <csp/interfaces/csp_if_zmqhub.h>
 #include <csp/interfaces/csp_if_kiss.h>
 #include <csp/drivers/usart.h>
+#include "csp_if_i2c_uart.h"
 
 #include "i2c.h"
-
 #include "TLE.h"
 
 #endif

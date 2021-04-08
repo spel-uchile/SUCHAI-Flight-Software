@@ -4,6 +4,7 @@ project(SUCHAI_Flight_Software_RPi)
 set(CMAKE_C_STANDARD 99)
 
 set(SOURCE_FILES
+        ../../../src/drivers/rpi/libcsp/src/interfaces/csp_if_i2c_uart.c
         ../../../src/drivers/rpi/sgp4/src/c/TLE.c
         ../../../src/drivers/rpi/sgp4/src/c/SGP4.c
         ../../../src/drivers/rpi/linenoise/linenoise.c
@@ -50,6 +51,7 @@ include_directories(
         ../../../src/drivers/rpi/libcsp/include
         ../../../src/drivers/rpi/linenoise
         ../../../src/drivers/rpi/sgp4/src/c
+        ../../../src/drivers/rpi/libcsp/src/interfaces
         /usr/include/postgresql
 )
 
