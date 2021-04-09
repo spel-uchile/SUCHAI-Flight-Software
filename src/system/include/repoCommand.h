@@ -41,6 +41,7 @@
 #endif
 #if SCH_ADCS_ENABLED  && defined(NANOMIND)
 #include "cmdADCS.h"
+#include "cmdRW.h"
 #endif
 
 

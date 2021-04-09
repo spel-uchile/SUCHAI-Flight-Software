@@ -19,8 +19,8 @@
 
 #include "osDelay.h"
 
-#define OBC_ADDR 0x10
-#define BIuC_ADDR 0x11
+// #define OBC_ADDR 0x10
+#define BIuC_ADDR 0x30
 
 #define SAMPLE_SPEED_CODE_MOTOR1 21
 #define SAMPLE_CURRENT_CODE_MOTOR1 22

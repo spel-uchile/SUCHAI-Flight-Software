@@ -26,6 +26,7 @@ set(SOURCE_FILES
         src/system/cmdEPS.c
         src/system/cmdConsole.c
         src/system/cmdSensors.c
+        src/system/cmdRW.c
         src/system/repoCommand.c
         src/system/repoData.c
         src/system/repoDataSchema.c
