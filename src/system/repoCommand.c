@@ -355,7 +355,7 @@ int cmd_repo_init(void)
 #if SCH_ADCS_ENABLED  && defined(NANOMIND)
     cmd_adcs_init();
 #endif
-#ifdef SCH_USE_RW
+#ifdef SCH_USE_RW     && defined(NANOMIND)
     cmd_rw_init();
 #endif
 

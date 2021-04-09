@@ -43,7 +43,7 @@
 #include "cmdADCS.h"
 #include "cmdRW.h"
 #endif
-#ifdef SCH_USE_RW
+#ifdef SCH_USE_RW 	  && defined(NANOMIND)
 #include "cmdRW.h"
 #endif
 
