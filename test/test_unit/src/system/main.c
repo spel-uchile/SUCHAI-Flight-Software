@@ -150,7 +150,7 @@ void test_fp_set(void)
         CU_ASSERT_EQUAL(result, 0)
         CU_ASSERT_STRING_EQUAL(cmd, "test_cmd");
         CU_ASSERT_STRING_EQUAL(args, "arg1 arg2 arg3");
-        printf("(%d, %d), (%d, %d)\n", exec,i,period,0);
+        //printf("(%d, %d), (%d, %d)\n", exec,i,period,0);
         CU_ASSERT_EQUAL(exec, i);
         CU_ASSERT_EQUAL(period, 0);
     }
