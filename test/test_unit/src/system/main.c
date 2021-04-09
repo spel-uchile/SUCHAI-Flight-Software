@@ -137,7 +137,7 @@ void test_fp_set(void)
     // Set flight plan values
     for(i=0; i<10; i++)
     {
-        result = dat_set_fp(i, "test_cmd", "arg1 arg2 arg3", i, i);
+        result = dat_set_fp(i, "test_cmd", "arg1 arg2 arg3", i, 0);
         CU_ASSERT_EQUAL(result, 0);
     }
 
@@ -150,9 +150,9 @@ void test_fp_set(void)
         CU_ASSERT_EQUAL(result, 0)
         CU_ASSERT_STRING_EQUAL(cmd, "test_cmd");
         CU_ASSERT_STRING_EQUAL(args, "arg1 arg2 arg3");
-        //printf("(%d, %d), (%d, %d)\n", exec,i,period,i);
+        printf("(%d, %d), (%d, %d)\n", exec,i,period,0);
         CU_ASSERT_EQUAL(exec, i);
-        CU_ASSERT_EQUAL(period, i);
+        CU_ASSERT_EQUAL(period, 0);
     }
 }
 
@@ -601,5 +601,3 @@ int main()
 
     return CU_get_error();
 }
-
-
