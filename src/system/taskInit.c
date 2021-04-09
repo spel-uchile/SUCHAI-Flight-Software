@@ -138,7 +138,7 @@ void init_communications(void)
     csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
 #endif //GROUNDSTATION
 
-#if defined(X86) || defined(RPI) || defined(GROUNDSTATION)
+#if defined(X86) || defined(GROUNDSTATION)
     /* Set ZMQ interface as a default route*/
     uint8_t addr = (uint8_t)SCH_COMM_ADDRESS;
     uint8_t *rxfilter = &addr;
@@ -149,7 +149,13 @@ void init_communications(void)
                                               SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN,
                                               &csp_if_zmqhub);
     csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
-#endif //X86||RPI||GROUNDSTATION
+#endif //X86||GROUNDSTATION
+
+#ifdef RPI
+    csp_i2c_uart_init(SCH_COMM_ADDRESS, 0, 115200);
+    csp_rtable_set(8, 2, &csp_if_i2c_uart, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C to TRX node
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c_uart, CSP_NODE_MAC); // Rest of the traffic to I2C using node i2c address
+#endif
 
 #ifdef NANOMIND
     //csp_set_model("A3200");

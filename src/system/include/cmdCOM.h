@@ -160,9 +160,10 @@ int com_send_data(char *fmt, char *params, int nparams);
  * @param data Buffer to send
  * @param len Buffer len in bytes
  * @param type Telemetry type
+ * @param n_data Number of struct of data in the buffer
  * @return CMD_OK | CMD_FAIL | CMD_ERROR
  */
-int _com_send_data(int node, void *data, size_t len, int type);
+int _com_send_data(int node, void *data, size_t len, int type, int n_data);
 
 /**
  * Show CSP debug information, currently the route table and interfaces

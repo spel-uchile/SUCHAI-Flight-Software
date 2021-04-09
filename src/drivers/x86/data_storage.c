@@ -109,7 +109,7 @@ int storage_init(const char *file)
     PQclear(res);
     PQfinish(conn);
 
-    sprintf(postgres_conf_s, " host=%s user=%s dbname=%s password=%s", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, fs_db_name, SCH_STORAGE_PGPASS);
+    sprintf(postgres_conf_s, " host=%s user=%s dbname=%s password=%s sslmode=disable", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, fs_db_name, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
@@ -451,6 +451,7 @@ int storage_repo_get_value_str(char *name, char *table)
     char get_value_query[SCH_BUFF_MAX_LEN];
     memset(&get_value_query, 0, sizeof(get_value_query));
     snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
+    LOGD(tag, get_value_query);
     PGresult *res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
@@ -573,7 +574,7 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
             sprintf(get_value_query, "SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
             PGresult *res = PQexec(conn, get_value_query);
             if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-                LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
+                LOGE(tag, "command storage_flight_plan_get failed: %s", PQerrorMessage(conn));
                 PQclear(res);
                 return -1;
             }
@@ -696,7 +697,7 @@ int storage_flight_plan_show_table (void) {
         snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT * FROM %s", fp_table);
         PGresult *res = PQexec(conn, get_value_query);
         if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-            LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
+            LOGE(tag, "command storage_flight_plan_show_table failed: %s", PQerrorMessage(conn));
             PQclear(res);
             return -1;
         }

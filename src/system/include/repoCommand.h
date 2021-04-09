@@ -43,6 +43,9 @@
 #include "cmdADCS.h"
 #include "cmdRW.h"
 #endif
+#ifdef SCH_USE_RW
+#include "cmdRW.h"
+#endif
 
 
 /* Macros */

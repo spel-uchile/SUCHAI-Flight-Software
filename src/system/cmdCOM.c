@@ -218,7 +218,7 @@ int com_send_data(char *fmt, char *params, int nparams)
     }
 }
 
-int _com_send_data(int node, void *data, size_t len, int type)
+int _com_send_data(int node, void *data, size_t len, int type, int n_data)
 {
     int rc_conn = 0;
     int rc_send = 0;
@@ -236,15 +236,18 @@ int _com_send_data(int node, void *data, size_t len, int type)
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
         packet->length = sizeof(com_frame_t);
         com_frame_t *frame = (com_frame_t *)(packet->data);
-        frame->nframe = csp_hton16(nframe++);
-        frame->type = csp_hton16(type);
-        frame->ndata = csp_hton32(0);
+        frame->nframe = nframe++;
+        frame->type = type;
+        frame->ndata = n_data;
+//        frame->nframe = csp_hton16(nframe++);
+//        frame->type = csp_hton16(type);
+//        frame->ndata = csp_hton32(0);
         size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;
         memcpy(frame->data.data8, data, sent);
         // Fix data endianness
-        int i;
-        for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
-            frame->data.data32[i] = csp_hton32(frame->data.data32[i]);
+//        int i;
+//        for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
+//            frame->data.data32[i] = csp_hton32(frame->data.data32[i]);
 
         // Send packet
         rc_send = csp_send(conn, packet, 500);

@@ -95,7 +95,9 @@ void dat_repo_init(void)
     {
         //Init storage system
         int rc;
-        rc = storage_init(SCH_STORAGE_FILE);
+        char fs_db_file[sizeof(SCH_STORAGE_FILE) + 10];
+        sprintf(fs_db_file, "%s.%u.db",SCH_STORAGE_FILE, SCH_COMM_ADDRESS);
+        rc = storage_init(fs_db_file);
         assertf(rc==0, tag, "Unable to create non-volatile data repository");
 
         //Init system repo
