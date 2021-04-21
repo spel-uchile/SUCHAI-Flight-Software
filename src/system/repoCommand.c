@@ -352,10 +352,10 @@ int cmd_repo_init(void)
 #ifdef SCH_USE_GSSB
     cmd_gssb_init();
 #endif
-#if SCH_ADCS_ENABLED  && defined(NANOMIND)
+#if SCH_ADCS_ENABLED
     cmd_adcs_init();
 #endif
-#ifdef SCH_USE_RW     && defined(NANOMIND)
+#ifdef SCH_USE_RW
     cmd_rw_init();
 #endif
 
