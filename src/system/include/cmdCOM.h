@@ -166,6 +166,29 @@ int com_send_data(char *fmt, char *params, int nparams);
 int _com_send_data(int node, void *data, size_t len, int type, int n_data);
 
 /**
+ * Auxiliary function to convert an array of 32bit values to network (big) endian.
+ * Applies htonl (csp_hton32) to each element of the array. This function
+ * does not create a copy, so modifies the passed array in-memory.
+ * Do not check buffer boundaries.
+ *
+ * @param buff Pointer to a 32 bit values array. Do not create a copy
+ * @param len Number of elements in buff.
+ */
+void _hton32_buff(uint32_t *buff, int len);
+
+/**
+ * Auxiliary function to convert an array of 32bit values to host endian.
+ * Applies ntohl (csp_ntoh32) to each element of the array. This function
+ * does not create a copy, so modifies the passed array in-memory.
+ * Do not check buffer boundaries.
+ *
+ * @param buff Pointer to a 32 bit values array. Do not create a copy
+ * @param len Number of elements in buff.
+ */
+void _ntoh32_buff(uint32_t *buff, int len);
+
+
+/**
  * Show CSP debug information, currently the route table and interfaces
  * @param fmt Not used
  * @param params Not used

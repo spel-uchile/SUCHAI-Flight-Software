@@ -236,12 +236,9 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
         packet->length = sizeof(com_frame_t);
         com_frame_t *frame = (com_frame_t *)(packet->data);
-        frame->nframe = nframe++;
-        frame->type = type;
-        frame->ndata = n_data;
-//        frame->nframe = csp_hton16(nframe++);
-//        frame->type = csp_hton16(type);
-//        frame->ndata = csp_hton32(0);
+        frame->nframe = csp_hton16((uint16_t)nframe++);
+        frame->type = csp_hton16((uint16_t)type);
+        frame->ndata = csp_hton32((uint32_t)n_data);
         size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;
         memcpy(frame->data.data8, data, sent);
         // Fix data endianness
@@ -268,6 +265,20 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
         LOGE(tag, "Error closing connection! (%d)", rc_conn);
 
     return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_FAIL;
+}
+
+void _hton32_buff(uint32_t *buff, int len)
+{
+    int i;
+    for(i=0; i<len; i++)
+        buff[i] = csp_hton32(buff[i]);
+}
+
+void _ntoh32_buff(uint32_t *buff, int len)
+{
+    int i;
+    for(i=0; i<len; i++)
+        buff[i] = csp_ntoh32(buff[i]);
 }
 
 int com_debug(char *fmt, char *params, int nparams)

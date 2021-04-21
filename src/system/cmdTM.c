@@ -50,6 +50,10 @@ int tm_send_status(char *fmt, char *params, int nparams)
         dat_print_status(&status);
     }
 
+    // Fix data endianness
+    assert(sizeof(status)%sizeof(uint32_t) == 0);
+    _hton32_buff((uint32_t *)(&status), sizeof(status)/sizeof(uint32_t));
+
     // Send telemetry
     return _com_send_data(dest_node, &status, sizeof(status), TM_TYPE_STATUS, 0);
 }
@@ -60,6 +64,11 @@ int tm_parse_status(char *fmt, char *params, int nparams)
         return CMD_ERROR;
 
     dat_status_t *status = (dat_status_t *)params;
+
+    // Fix data endianness
+    assert(sizeof(dat_status_t)%sizeof(uint32_t) == 0);
+    _ntoh32_buff((uint32_t *)status, sizeof(dat_status_t)/sizeof(uint32_t));
+
     dat_print_status(status);
 
     return CMD_OK;
