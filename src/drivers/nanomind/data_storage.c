@@ -354,13 +354,13 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
         return -1;
 
     // If the command is periodical, a copy is made set to execute later
-    if (*periodical > 0)
+    /*if (*periodical > 0)
     {
         rc = storage_flight_plan_set(timetodo+*periodical, command, args, *executions, *periodical);
 
         if (rc != 0)
             return -1;
-    }
+    }*/
 
     return 0;
 }

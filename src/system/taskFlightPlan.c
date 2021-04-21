@@ -52,11 +52,22 @@ void taskFlightPlan(void *param)
 
         // Send the command for N execution
         dat_set_system_var(dat_fpl_last, (int) elapsed_sec);
-        for(i=0; i < executions; i++)
+
+        /*If command has to be executed again, set it in flight plan for next execution*/
+        if (period>0 && executions>0) {
+            dat_set_fp((int)elapsed_sec + period, command, args, executions - 1, period);
+        }
+
+        /*If command has to be executed*/
+        cmd_t *new_cmd = cmd_get_str(command);
+        cmd_add_params_str(new_cmd, args);
+        cmd_send(new_cmd);
+
+        /*for(i=0; i < executions; i++)
         {
             cmd_t *new_cmd = cmd_get_str(command);
             cmd_add_params_str(new_cmd, args);
             cmd_send(new_cmd);
-        }
+        }*/
     }
 }
