@@ -343,10 +343,10 @@ typedef union fvalue{
 #define DAT_CPY_SYSTEM_VAR_F(st, var) {fvalue_t v; v.i = (float)dat_get_system_var(var); st->var = v.f;}
 
 /** Print the name and value of a integer system status variable */
-#define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %lu\n", #var, (unsigned long)st->var)
+#define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %lu\n\r", #var, (unsigned long)st->var)
 
 /** Print the name and vale of a float system status variable */
-#define DAT_PRINT_SYSTEM_VAR_F(st, var) printf("\t%s: %f\n", #var, st->var)
+#define DAT_PRINT_SYSTEM_VAR_F(st, var) printf("\t%s: %f\n\r", #var, st->var)
 
 /**
  * Copies the status repository's field values to another dat_status_t struct.

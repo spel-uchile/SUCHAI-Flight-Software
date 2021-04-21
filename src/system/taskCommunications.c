@@ -72,12 +72,12 @@ void taskCommunications(void *param)
             switch (csp_conn_dport(conn))
             {
                 case SCH_TRX_PORT_TC:
-                    /* Process incoming TC */
-                    com_receive_tc(packet);
-                    csp_buffer_free(packet);
                     // Create a response packet and send
                     rep_ok = csp_buffer_clone(rep_ok_tmp);
                     csp_send(conn, rep_ok, 1000);
+                    /* Process incoming TC */
+                    com_receive_tc(packet);
+                    csp_buffer_free(packet);
                     break;
 
                 case SCH_TRX_PORT_TM:
@@ -204,9 +204,9 @@ static void com_receive_tm(csp_packet_t *packet)
     cmd_t *cmd_parse_tm;
     com_frame_t *frame = (com_frame_t *)packet->data;
 
-//    frame->nframe = csp_ntoh16(frame->nframe);
-//    frame->type = csp_ntoh16(frame->type);
-//    frame->ndata = csp_ntoh32(frame->ndata);
+    frame->nframe = csp_ntoh16(frame->nframe);
+    frame->type = csp_ntoh16(frame->type);
+    frame->ndata = csp_ntoh32(frame->ndata);
 //    int i = 0;
 //    for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
 //        frame->data.data32[i] = csp_ntoh32(frame->data.data32[i]);
@@ -219,9 +219,12 @@ static void com_receive_tm(csp_packet_t *packet)
     if(frame->type == TM_TYPE_STATUS)
     {
         //TODO: update tm_parse_status to process several frames
-        cmd_parse_tm = cmd_get_str("tm_parse_status");
-        cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
-        cmd_send(cmd_parse_tm);
+        if(frame->nframe == 0)
+        {
+            cmd_parse_tm = cmd_get_str("tm_parse_status");
+            cmd_add_params_raw(cmd_parse_tm, frame->data.data8, sizeof(frame->data));
+            cmd_send(cmd_parse_tm);
+        }
     }
     else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor)
     {

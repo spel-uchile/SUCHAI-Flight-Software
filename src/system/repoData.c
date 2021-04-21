@@ -516,7 +516,7 @@ int dat_show_time(int format)
     {
         char buffer[80];
         strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
-        printf(buffer);
+        printf("%s", buffer);
     }
     if(format >= 1)
     {
