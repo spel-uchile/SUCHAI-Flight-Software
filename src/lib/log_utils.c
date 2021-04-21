@@ -43,6 +43,9 @@ void log_send(const char *lvl, const char *tag, const char *msg, ...)
     if(packet == NULL)
         return;
 
+    // Clean the buffer (csp buffers are reused and contain trash)
+    memset(packet->data, 0, SCH_BUFF_MAX_LEN);
+
     // Format message with variadic arguments
     va_list args;
     va_start(args, msg);
@@ -50,7 +53,7 @@ void log_send(const char *lvl, const char *tag, const char *msg, ...)
     va_end(args);
 
     // Make sure its is a null terminating string
-    packet->length = len;
+    packet->length = (uint16_t)len;
     packet->data[len] = '\0';
 
     // Sending message without connection nor reply.
