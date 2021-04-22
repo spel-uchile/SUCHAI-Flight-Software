@@ -22,17 +22,18 @@
 
 static const char *tag = "data_storage";
 
-#if SCH_STORAGE_MODE == 1
+#if SCH_STORAGE_MODE == 0
+    static uint8_t *db = NULL;  // Memory section for all payloads
+    static uint8_t **storage_addresses;  // Storage pointers to payload memory sections
+#elif SCH_STORAGE_MODE == 1
     static sqlite3 *db = NULL;
 #elif SCH_STORAGE_MODE == 2
-    // TODO: Implement Flight Plan to remove sqlite dependency in STORAGE_MODE 2
-    static sqlite3 *db = NULL;
     PGconn *conn = NULL;
 #endif
 
 char* fp_table = "flightPlan";
 char fs_db_name[15];
-char postgres_conf_s[30];
+char postgres_conf_s[SCH_BUFF_MAX_LEN];
 
 static int dummy_callback(void *data, int argc, char **argv, char **names);
 
@@ -58,8 +59,8 @@ int storage_init(const char *file)
     }
 #elif SCH_STORAGE_MODE == 2
     sprintf(fs_db_name, "fs_db_%u", SCH_COMM_ADDRESS);
-    // Check if databse exist by connecting to its own db
-    sprintf(postgres_conf_s, "user=%s dbname=%s", SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER);
+    // Check if database exist by connecting to its own db
+    snprintf(postgres_conf_s, SCH_BUFF_MAX_LEN, "host=%s user=%s dbname=%s password=%s", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
@@ -68,8 +69,9 @@ int storage_init(const char *file)
         return -1;
     }
 
-    char select_exist_db[100];
-    sprintf(select_exist_db, "SELECT datname FROM pg_database "
+    char select_exist_db[SCH_BUFF_MAX_LEN];
+    memset(&select_exist_db, 0, SCH_BUFF_MAX_LEN);
+    snprintf(select_exist_db, SCH_BUFF_MAX_LEN,"SELECT datname FROM pg_database "
                              "WHERE datname = '%s';", fs_db_name);
 
     LOGD(tag, "SQL command: %s", select_exist_db);
@@ -86,8 +88,9 @@ int storage_init(const char *file)
     if ((value_str = PQgetvalue(res, 0, 0)) == NULL)
     {
         //Create database
-        char create_db[100];
-        sprintf(create_db, "CREATE DATABASE %s;", fs_db_name);
+        char create_db[SCH_BUFF_MAX_LEN];
+        memset(&create_db, 0, SCH_BUFF_MAX_LEN);
+        snprintf(create_db, SCH_BUFF_MAX_LEN, "CREATE DATABASE %s;", fs_db_name);
         PQclear(res);
         LOGD(tag, "SQL command: %s", create_db);
         res = PQexec(conn, create_db);
@@ -106,7 +109,7 @@ int storage_init(const char *file)
     PQclear(res);
     PQfinish(conn);
 
-    sprintf(postgres_conf_s, "user=%s dbname=%s", SCH_STORAGE_PGUSER, fs_db_name);
+    sprintf(postgres_conf_s, " host=%s user=%s dbname=%s password=%s sslmode=disable", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, fs_db_name, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);
 
     if (PQstatus(conn) == CONNECTION_BAD) {
@@ -127,6 +130,19 @@ int storage_table_repo_init(char* table, int drop)
     char *err_msg;
     char *sql;
     int rc;
+
+#if SCH_STORAGE_MODE == 0
+    // Init payload memory
+    db = (uint8_t *)malloc(SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*last_sensor);
+    memset(db, 0, SCH_SIZE_PER_SECTION*SCH_SECTIONS_PER_PAYLOAD*last_sensor);
+    // Init payload sections pointers storage
+    storage_addresses = (uint8_t **)malloc(SCH_SECTIONS_PER_PAYLOAD*last_sensor*sizeof(uint8_t *));
+    int i;
+    // Save the starting address corresponding to each payload memory section
+    for (i = 0; i < SCH_SECTIONS_PER_PAYLOAD*last_sensor; i++)
+        storage_addresses[i] = db + i * SCH_SIZE_PER_SECTION;
+    return 0;
+#endif
 
 #if SCH_STORAGE_MODE == 1
 
@@ -186,8 +202,9 @@ int storage_table_repo_init(char* table, int drop)
 
     }
 
-    char create_table_string[100];
-    sprintf(create_table_string, "CREATE TABLE IF NOT EXISTS %s("
+    char create_table_string[SCH_BUFF_MAX_LEN];
+    memset(&create_table_string, 0, SCH_BUFF_MAX_LEN);
+    snprintf(create_table_string, SCH_BUFF_MAX_LEN, "CREATE TABLE IF NOT EXISTS %s("
      "idx INTEGER PRIMARY KEY, "
      "name TEXT UNIQUE, "
      "value INT);", table);
@@ -252,8 +269,34 @@ int storage_table_flight_plan_init(int drop)
     {
         LOGD(tag, "Table %s created successfully", fp_table);
         sqlite3_free(sql);
-        return 0;
     }
+#elif  SCH_STORAGE_MODE == 2
+    if (drop) {
+        char drop_query[SCH_BUFF_MAX_LEN];
+        memset(&drop_query, 0, SCH_BUFF_MAX_LEN);
+        snprintf(drop_query, SCH_BUFF_MAX_LEN, "DROP TABLE IF EXISTS %s", fp_table);
+        PGresult *res = PQexec(conn, drop_query);
+        if ( PQresultStatus(res) != PGRES_COMMAND_OK ) {
+            LOGE(tag, "Drop fp postgres command: %s failed", drop_query)
+            PQclear(res);
+        }
+    }
+
+    char * create_fp_query = "CREATE TABLE IF NOT EXISTS flightPlan("
+                              "time int PRIMARY KEY , "
+                              "command text, args text , "
+                              "executions int , "
+                              "periodical int );";
+
+    PGresult *res = PQexec(conn, create_fp_query);
+    if ( PQresultStatus(res) != PGRES_COMMAND_OK ) {
+        LOGE(tag, "create fp postgres command: %s failed", create_fp_query)
+        PQclear(res);
+        return -1;
+    }
+
+    PQclear(res);
+    return 0;
 #endif
     return 0;
 }
@@ -263,22 +306,65 @@ int storage_table_flight_plan_init(int drop)
 int storage_table_payload_init(int drop)
 {
 
+#if SCH_STORAGE_MODE == 0
+    if(drop)
+        if(db != NULL)
+            free(db);
+    db = malloc(SCH_SECTIONS_PER_PAYLOAD*SCH_SIZE_PER_SECTION*last_sensor);
+#endif
+
 #if SCH_STORAGE_MODE > 0
+    // FIXME: Handle drop = True
     if(drop)
     {
-
+        char* err_msg;
+        char* sql;
+        int rc;
+        int i;
+        for(i=0; i< last_sensor; ++i)
+        {
+#if SCH_STORAGE_MODE ==1
+            sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s",  data_map[i].table);
+            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            if (rc != SQLITE_OK )
+            {
+                LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", fp_table, err_msg, sql);
+                sqlite3_free(err_msg);
+                sqlite3_free(sql);
+            }
+            else
+            {
+                LOGD(tag, "Table %s drop successfully", data_map[i].table);
+                sqlite3_free(sql);
+            }
+#elif SCH_STORAGE_MODE==2
+            sql = malloc(SCH_BUFF_MAX_LEN);
+            memset(sql, 0, SCH_BUFF_MAX_LEN);
+            sprintf(sql,"DROP TABLE IF EXISTS %s",  data_map[i].table);
+            PGresult *res = PQexec(conn, sql);
+            if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+                LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", sql, PQerrorMessage(conn));
+            } else {
+                LOGD(tag, "Table %s drop successfully", data_map[i].table);
+            }
+            free(sql);
+            PQclear(res);
+#endif
+        }
     }
 
     int i = 0;
     for(i=0; i< last_sensor; ++i)
     {
-        char create_table[300];
-        sprintf(create_table, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
+        char create_table[SCH_BUFF_MAX_LEN*2];
+        memset(&create_table, 0, SCH_BUFF_MAX_LEN*2);
+        snprintf(create_table, SCH_BUFF_MAX_LEN*2, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
         char* tok_sym[30];
         char* tok_var[30];
         char order[50];
         strcpy(order, data_map[i].data_order);
-        char var_names[200];
+        char var_names[SCH_BUFF_MAX_LEN];
+        memset(&var_names, 0, SCH_BUFF_MAX_LEN);
         strcpy(var_names, data_map[i].var_names);
         int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, i);
 
@@ -351,8 +437,9 @@ int storage_repo_get_value_idx(int index, char *table)
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
 #elif SCH_STORAGE_MODE == 2
-    char get_value_query[100];
-    sprintf(get_value_query, "SELECT value FROM %s WHERE idx=%d;", table, index);
+    char get_value_query[SCH_BUFF_MAX_LEN];
+    memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
+    snprintf(get_value_query,SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE idx=%d;", table, index);
     LOGD(tag, "%s",  get_value_query);
     PGresult *res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
@@ -369,7 +456,6 @@ int storage_repo_get_value_idx(int index, char *table)
     }
     PQclear(res);
 #endif
-
     return value;
 }
 
@@ -398,8 +484,10 @@ int storage_repo_get_value_str(char *name, char *table)
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
 #elif SCH_STORAGE_MODE == 2
-    char get_value_query[100];
-    sprintf(get_value_query, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
+    char get_value_query[SCH_BUFF_MAX_LEN];
+    memset(&get_value_query, 0, sizeof(get_value_query));
+    snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
+    LOGD(tag, get_value_query);
     PGresult *res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
@@ -440,8 +528,9 @@ int storage_repo_set_value_idx(int index, int value, char *table)
         return 0;
     }
 #elif SCH_STORAGE_MODE == 2
-    char set_value_query[200];
-    sprintf(set_value_query, "INSERT INTO %s (idx, value) "
+    char set_value_query[SCH_BUFF_MAX_LEN];
+    memset(&set_value_query, 0, sizeof(set_value_query));
+    snprintf(set_value_query,SCH_BUFF_MAX_LEN,"INSERT INTO %s (idx, value) "
                              "VALUES ("
                              "%d, "
                              "%d) "
@@ -463,98 +552,167 @@ int storage_repo_set_value_idx(int index, int value, char *table)
 
 int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical)
 {
-    // TODO: Implement Flight Plan in Postgres
     #if SCH_STORAGE_MODE > 0
+        char * insert_query_template =  "INSERT INTO %s (time, command, args, executions, periodical) "
+                               "VALUES (%d, \'%s\', \'%s\', %d, %d) ON CONFLICT (time) DO UPDATE "
+                               "SET command=\'%s\', args=\'%s\', executions=%d, periodical=%d;";
+
+        #if SCH_STORAGE_MODE == 2
+            char insert_query[SCH_BUFF_MAX_LEN*2];
+            memset(&insert_query, 0, sizeof(insert_query));
+            snprintf(insert_query,SCH_BUFF_MAX_LEN*2, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
+                    command, args, executions, periodical);
+            LOGI(tag, "Flight Plan Postgres Command: %s",  insert_query);
+            PGresult *res = PQexec(conn, insert_query);
+            if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+                LOGE(tag, "Flight Plan Postgres Command INSERT failed: %s", PQerrorMessage(conn));
+                PQclear(res);
+                return -1;
+            }
+            PQclear(res);
+
+        #elif SCH_STORAGE_MODE == 1
         char *err_msg;
-        char *sql = sqlite3_mprintf(
-                "INSERT OR REPLACE INTO %s (time, command, args, executions, periodical)\n VALUES (%d, \"%s\", \"%s\", %d, %d);",
-                fp_table, timetodo, command, args, executions, periodical);
+            char *sql = sqlite3_mprintf(
+                    "INSERT OR REPLACE INTO %s (time, command, args, executions, periodical)\n VALUES (%d, \"%s\", \"%s\", %d, %d);",
+                    fp_table, timetodo, command, args, executions, periodical);
 
-        /* Execute SQL statement */
-        int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+            /* Execute SQL statement */
+            int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
 
-        if (rc != SQLITE_OK)
-        {
-            LOGE(tag, "SQL error: %s", err_msg);
-            sqlite3_free(err_msg);
-            sqlite3_free(sql);
-            return -1;
-        }
-        else
-        {
-            LOGV(tag, "Inserted (%d, %s, %s, %d, %d) in %s", timetodo, command, args, executions, periodical, fp_table);
-            sqlite3_free(err_msg);
-            sqlite3_free(sql);
-            return 0;
-        }
+            if (rc != SQLITE_OK)
+            {
+                LOGE(tag, "SQL error: %s", err_msg);
+                sqlite3_free(err_msg);
+                sqlite3_free(sql);
+                return -1;
+            }
+            else
+            {
+                LOGV(tag, "Inserted (%d, %s, %s, %d, %d) in %s", timetodo, command, args, executions, periodical, fp_table);
+                sqlite3_free(err_msg);
+                sqlite3_free(sql);
+                return 0;
+            }
+        #endif
     #endif
     return 0;
 }
 
 int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical)
 {
-    // TODO: Implement Flight Plan in Postgres
     #if SCH_STORAGE_MODE > 0
-        char **results;
-        char *err_msg;
-        int row;
-        int col;
+        #if SCH_STORAGE_MODE == 2
+            int row;
+            int col;
 
-        char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
+            char get_value_query[100];
+            sprintf(get_value_query, "SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
+            PGresult *res = PQexec(conn, get_value_query);
+            if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+                LOGE(tag, "command storage_flight_plan_get failed: %s", PQerrorMessage(conn));
+                PQclear(res);
+                return -1;
+            }
 
-        sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
+            row = PQntuples(res);
+            col = PQnfields(res);
 
-        if(row==0 || col==0)
-        {
-            sqlite3_free(sql);
-            LOGV(tag, "SQL error: %s", err_msg);
-            sqlite3_free(err_msg);
-            sqlite3_free_table(results);
-            return -1;
-        }
-        else
-        {
-            strcpy(command, results[6]);
-            strcpy(args,results[7]);
-            *executions = atoi(results[8]);
-            *periodical = atoi(results[9]);
+            if(row==0 || col==0)
+            {
+                PQclear(res);
+                return -1;
+            }
+
+            strcpy(command, PQgetvalue(res, 0, 1));
+            strcpy(args, PQgetvalue(res, 0, 2));
+            *executions = atoi(PQgetvalue(res, 0, 3));
+            *periodical = atoi(PQgetvalue(res, 0, 4));
 
             storage_flight_plan_erase(timetodo);
 
-            /*if (atoi(results[9]) > 0)
-                storage_flight_plan_set(timetodo+*periodical,results[6],results[7],*executions,*periodical);*/
+            if (*periodical > 0)
+                storage_flight_plan_set(timetodo+*periodical, command, args,*executions,*periodical);
 
-            sqlite3_free(sql);
+            PQclear(res);
             return 0;
-        }
+
+        #elif SCH_STORAGE_MODE == 1
+            char **results;
+            char *err_msg;
+            int row;
+            int col;
+
+            char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
+
+            sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
+
+            if(row==0 || col==0)
+            {
+                sqlite3_free(sql);
+                LOGV(tag, "SQL error: %s", err_msg);
+                sqlite3_free(err_msg);
+                sqlite3_free_table(results);
+                return -1;
+            }
+            else
+            {
+                strcpy(command, results[6]);
+                strcpy(args,results[7]);
+                *executions = atoi(results[8]);
+                *periodical = atoi(results[9]);
+
+                storage_flight_plan_erase(timetodo);
+
+                //if (atoi(results[9]) > 0)
+                    //storage_flight_plan_set(timetodo+*periodical,results[6],results[7],*executions,*periodical);
+
+                sqlite3_free(sql);
+                return 0;
+            }
+        #endif
     #endif
     return 0;
 }
 
 int storage_flight_plan_erase(int timetodo)
 {
-    // TODO: Implement Flight Plan in Postgres
     #if SCH_STORAGE_MODE > 0
-        char *err_msg;
-        char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
-
-        /* Execute SQL statement */
-        int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
-
-        if (rc != SQLITE_OK)
-        {
-            LOGE(tag, "SQL error: %s", err_msg);
-            sqlite3_free(err_msg);
-            sqlite3_free(sql);
-            return -1;
-        }
-        else
-        {
-            LOGV(tag, "Command in time %d, table %s was deleted", timetodo, fp_table);
-            sqlite3_free(err_msg);
-            sqlite3_free(sql);
+        #if SCH_STORAGE_MODE == 2
+            char del_query[SCH_BUFF_MAX_LEN];
+            memset(&del_query, 0, SCH_BUFF_MAX_LEN);
+            snprintf(del_query, SCH_BUFF_MAX_LEN, "DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
+            PGresult *res = PQexec(conn, del_query);
+            if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+                LOGE(tag, "Error in function storage_flight_plan_erase, postgres failed: %s", PQerrorMessage(conn));
+                PQclear(res);
+                return -1;
+            }
+            PQclear(res);
             return 0;
-        }
+
+        #elif SCH_STORAGE_MODE ==1
+            char *err_msg;
+            char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
+
+            /* Execute SQL statement */
+            int rc = sqlite3_exec(db, sql, dummy_callback, 0, &err_msg);
+
+            if (rc != SQLITE_OK)
+            {
+                LOGE(tag, "SQL error: %s", err_msg);
+                sqlite3_free(err_msg);
+                sqlite3_free(sql);
+                return -1;
+            }
+            else
+            {
+                LOGV(tag, "Command in time %d, table %s was deleted", timetodo, fp_table);
+                sqlite3_free(err_msg);
+                sqlite3_free(sql);
+                return 0;
+            }
+        #endif
     #endif
     return 0;
 }
@@ -565,16 +723,23 @@ int storage_flight_plan_reset(void)
 }
 
 int storage_flight_plan_show_table (void) {
-    // TODO: Implement Flight Plan in Postgres
     #if SCH_STORAGE_MODE > 0
-        char **results;
-        char *err_msg;
+        #if SCH_STORAGE_MODE == 2
         int row;
         int col;
-        char *sql = sqlite3_mprintf("SELECT * FROM %s", fp_table);
 
-        // execute statement
-        sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
+        char get_value_query[SCH_BUFF_MAX_LEN];
+        memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
+        snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT * FROM %s", fp_table);
+        PGresult *res = PQexec(conn, get_value_query);
+        if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+            LOGE(tag, "command storage_flight_plan_show_table failed: %s", PQerrorMessage(conn));
+            PQclear(res);
+            return -1;
+        }
+
+        row = PQntuples(res);
+        col = PQnfields(res);
 
         if(row==0 || col==0)
         {
@@ -584,18 +749,51 @@ int storage_flight_plan_show_table (void) {
 
         LOGI(tag, "Flight plan table");
         int i;
-        for (i = 0; i < (col*row + 5); i++)
+        for (i = 0; i < (col*row); i++)
         {
-            if (i%col == 0 && i!=0)
+            if (i%col == 0)
             {
-                time_t timef = atoi(results[i]);
+                time_t timef = atoi(PQgetvalue(res, i/col, i%col));
                 printf("%s\t",ctime(&timef));
                 continue;
             }
-            printf("%s\t", results[i]);
+            printf("%s\t", PQgetvalue(res, i/col, i%col));
             if ((i + 1) % col == 0)
                 printf("\n");
         }
+
+        #elif SCH_STORAGE_MODE == 1
+
+            char **results;
+            char *err_msg;
+            int row;
+            int col;
+            char *sql = sqlite3_mprintf("SELECT * FROM %s", fp_table);
+
+            // execute statement
+            sqlite3_get_table(db, sql, &results,&row,&col,&err_msg);
+
+            if(row==0 || col==0)
+            {
+                LOGI(tag, "Flight plan table empty");
+                return 0;
+            }
+
+            LOGI(tag, "Flight plan table");
+            int i;
+            for (i = 0; i < (col*row + 5); i++)
+            {
+                if (i%col == 0 && i!=0)
+                {
+                    time_t timef = atoi(results[i]);
+                    printf("%s\t",ctime(&timef));
+                    continue;
+                }
+                printf("%s\t", results[i]);
+                if ((i + 1) % col == 0)
+                    printf("\n");
+            }
+        #endif
     #endif
     return 0;
 }
@@ -607,7 +805,30 @@ int storage_set_payload_data(int index, void* data, int payload)
         LOGE(tag, "Payload id: %d greater than maximum id: %d", payload, last_sensor);
         return -1;
     }
-// TODO: Implement payload data for RAM, STORAGE_MODE 0
+
+#if SCH_STORAGE_MODE == 0
+    int payloads_per_section = SCH_SIZE_PER_SECTION/data_map[payload].size;
+
+    int payload_section = index/payloads_per_section;
+    int index_in_section = index%payloads_per_section;
+    int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + payload_section;
+
+    uint8_t *add;
+    add = storage_addresses[section_index] + index_in_section*data_map[payload].size;
+
+    if((payload_section >= SCH_SECTIONS_PER_PAYLOAD) || (index_in_section*data_map[payload].size >= SCH_SIZE_PER_SECTION))
+    {
+        LOGE(tag, "Payload address: %p is out of bounds", add);
+        return -1;
+    }
+
+    LOGI(tag, "Writing in address: %p, %d bytes\n", add, data_map[payload].size);
+    void *des = memcpy(add, data, data_map[payload].size);
+    if(des == NULL){
+        return -1;
+    }
+    return 0;
+#endif
 #if SCH_STORAGE_MODE > 0
     char* tok_sym[30];
     char* tok_var[30];
@@ -674,7 +895,31 @@ int storage_set_payload_data(int index, void* data, int payload)
 
 int storage_get_payload_data(int index, void* data, int payload)
 {
-// TODO: Implement payload data for RAM, STORAGE_MODE 0
+    if(payload >= last_sensor)
+    {
+        LOGE(tag, "payload id: %d greater than maximum id: %d", payload, last_sensor);
+        return -1;
+    }
+
+#if SCH_STORAGE_MODE == 0
+    int payloads_per_section = SCH_SIZE_PER_SECTION/data_map[payload].size;
+
+    int payload_section = index/payloads_per_section;
+    int index_in_section = index%payloads_per_section;
+    int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + payload_section;
+
+    uint8_t *add;
+    add = storage_addresses[section_index] + index_in_section*data_map[payload].size;
+
+    if((payload_section >= SCH_SECTIONS_PER_PAYLOAD) || (index_in_section*data_map[payload].size >= SCH_SIZE_PER_SECTION))
+    {
+        LOGE(tag, "Payload address: %p is out of bounds", add);
+        return -1;
+    }
+
+    LOGI(tag, "Reading in address: %p, %d bytes\n", add, data_map[payload].size);
+    memcpy(data, add, data_map[payload].size);
+#endif
 #if SCH_STORAGE_MODE > 0
     char* tok_sym[30];
     char* tok_var[30];
@@ -756,9 +1001,18 @@ int storage_get_payload_data(int index, void* data, int payload)
     return 0;
 }
 
+int storage_delete_memory_sections(void)
+{
+    storage_table_payload_init(1);
+}
+
 int storage_close(void)
 {
-    #if SCH_STORAGE_MODE > 0
+#if SCH_STORAGE_MODE == 0
+    free(storage_addresses);
+    free(db);
+#endif
+#if SCH_STORAGE_MODE == 1
         if(db != NULL)
         {
             LOGD(tag, "Closing database");
@@ -771,7 +1025,8 @@ int storage_close(void)
             LOGW(tag, "Attempting to close a NULL pointer database");
             return -1;
         }
-    #endif
+#endif
+//FIXME: Handle case storage mode == 2
     return 0;
 }
 
