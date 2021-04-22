@@ -340,10 +340,11 @@ int storage_table_payload_init(int drop)
             memset(sql, 0, SCH_BUFF_MAX_LEN);
             sprintf(sql,"DROP TABLE IF EXISTS %s",  data_map[i].table);
             PGresult *res = PQexec(conn, sql);
-            if (PQresultStatus(res) != PGRES_COMMAND_OK)
+            if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", sql, PQerrorMessage(conn));
-            else
+            } else {
                 LOGD(tag, "Table %s drop successfully", data_map[i].table);
+            }
             free(sql);
             PQclear(res);
 #endif
