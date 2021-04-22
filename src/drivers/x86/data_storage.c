@@ -310,11 +310,44 @@ int storage_table_payload_init(int drop)
             free(db);
     db = malloc(SCH_SECTIONS_PER_PAYLOAD*SCH_SIZE_PER_SECTION*last_sensor);
 #endif
+
 #if SCH_STORAGE_MODE > 0
     // FIXME: Handle drop = True
     if(drop)
     {
-
+        char* err_msg;
+        char* sql;
+        int rc;
+        int i;
+        for(i=0; i< last_sensor; ++i)
+        {
+#if SCH_STORAGE_MODE ==1
+            sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s",  data_map[i].table);
+            rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            if (rc != SQLITE_OK )
+            {
+                LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", fp_table, err_msg, sql);
+                sqlite3_free(err_msg);
+                sqlite3_free(sql);
+            }
+            else
+            {
+                LOGD(tag, "Table %s drop successfully", data_map[i].table);
+                sqlite3_free(sql);
+            }
+#elif SCH_STORAGE_MODE==2
+            sql = malloc(SCH_BUFF_MAX_LEN);
+            memset(sql, 0, SCH_BUFF_MAX_LEN);
+            sprintf(sql,"DROP TABLE IF EXISTS %s",  data_map[i].table);
+            PGresult *res = PQexec(conn, sql);
+            if (PQresultStatus(res) != PGRES_COMMAND_OK)
+                LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", sql, PQerrorMessage(conn));
+            else
+                LOGD(tag, "Table %s drop successfully", data_map[i].table);
+            free(sql);
+            PQclear(res);
+#endif
+        }
     }
 
     int i = 0;
@@ -963,6 +996,11 @@ int storage_get_payload_data(int index, void* data, int payload)
 
 #endif
     return 0;
+}
+
+int storage_delete_memory_sections(void)
+{
+    storage_table_payload_init(1);
 }
 
 int storage_close(void)
