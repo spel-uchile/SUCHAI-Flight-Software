@@ -54,7 +54,7 @@ void taskFlightPlan(void *param)
         dat_set_system_var(dat_fpl_last, (int) elapsed_sec);
 
         /*If command has to be executed again, set it in flight plan for next execution*/
-        if (period>0 && executions>0) {
+        if (period>0 && executions>1) {
             dat_set_fp((int)elapsed_sec + period, command, args, executions - 1, period);
         }
 
