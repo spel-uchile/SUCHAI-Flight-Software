@@ -33,6 +33,12 @@ void taskHousekeeping(void *param)
     unsigned int _01min_check = 1*60;       //05[m] condition
     unsigned int _05min_check = 5*60;       //05[m] condition
     unsigned int _1hour_check = 60*60;      //01[h] condition
+    /*Get OBC beacon period*/
+    unsigned int com_bcn_period = dat_get_system_var(dat_com_bcn_period);
+    unsigned int obc_bcn_offset = dat_get_system_var(dat_obc_bcn_offset);
+    unsigned int _obc_bcn_period = com_bcn_period + obc_bcn_offset;
+    printf("Com bcn period: %u\n", com_bcn_period);
+    printf("OBC bcn offset: %u\n", obc_bcn_offset);
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
@@ -65,10 +71,6 @@ void taskHousekeeping(void *param)
                 cmd_add_params_str(cmd_tle_prop, "0");
                 cmd_send(cmd_tle_prop);
             }
-            cmd_t *cmd_tm_send_status;
-            cmd_tm_send_status = cmd_get_str("tm_send_status");
-            cmd_add_params_str(cmd_tm_send_status, "10");
-            cmd_send(cmd_tm_send_status)
         }
 
         /* 1 minute actions */
@@ -105,6 +107,14 @@ void taskHousekeeping(void *param)
             cmd_t *cmd_1h = cmd_get_str("drp_add_hrs_alive");
             cmd_add_params_var(cmd_1h, 1); // Add 1hr
             cmd_send(cmd_1h);
+        }
+
+        /* Send OBC beacon */
+        if ((elapsed_sec % _obc_bcn_period) == 0){
+            cmd_t *cmd_tm_send_status;
+            cmd_tm_send_status = cmd_get_str("tm_send_status");
+            cmd_add_params_str(cmd_tm_send_status, "10");
+            cmd_send(cmd_tm_send_status);
         }
     }
 }
