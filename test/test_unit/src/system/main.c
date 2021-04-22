@@ -304,32 +304,32 @@ void test_payload_data(void)
     int time_test = 1596853407;
     uint32_t uint_test = (uint32_t)rand();
     int32_t int_test = (int32_t)rand();
-    float float_test = 3.14159265358979323846;
+    float float_test = ((float)rand()/(float)(RAND_MAX)) * 1.0;
 
     // Push N data samples to the storage system
     for(i=0; i<n_test; i++)
     {
         temp_data_t data_temp;
         data_temp.timestamp = time_test+i;
-        data_temp.obc_temp_1 = float_test;
-        data_temp.obc_temp_2 = float_test;
-        data_temp.obc_temp_3 = float_test;
+        data_temp.obc_temp_1 = float_test+i;
+        data_temp.obc_temp_2 = float_test+i;
+        data_temp.obc_temp_3 = float_test+i;
         rc = dat_add_payload_sample(&data_temp, temp_sensors);
-        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT(rc > 0);
 
         eps_data_t data_eps;
         data_eps.timestamp = time_test+i;
-        data_eps.cursun = uint_test;
-        data_eps.cursys = uint_test;
-        data_eps.vbatt = uint_test;
-        data_eps.temp1 = int_test;
-        data_eps.temp2 = int_test;
-        data_eps.temp3 = int_test;
-        data_eps.temp4 = int_test;
-        data_eps.temp5 = int_test;
-        data_eps.temp6 = int_test;
-        dat_add_payload_sample(&data_eps, eps_sensors);
-        CU_ASSERT_EQUAL(rc, 0);
+        data_eps.cursun = uint_test+i;
+        data_eps.cursys = uint_test+i;
+        data_eps.vbatt = uint_test+i;
+        data_eps.temp1 = int_test+i;
+        data_eps.temp2 = int_test+i;
+        data_eps.temp3 = int_test+i;
+        data_eps.temp4 = int_test+i;
+        data_eps.temp5 = int_test+i;
+        data_eps.temp6 = int_test+i;
+        rc = dat_add_payload_sample(&data_eps, eps_sensors);
+        CU_ASSERT(rc > 0);
     }
 
     // Test storage payload index
@@ -340,26 +340,29 @@ void test_payload_data(void)
     for(i=0; i<n_test; i++)
     {
         temp_data_t data_temp;
-        rc = dat_get_recent_payload_sample(&data_temp, temp_sensors, n_test-i);
+        rc = dat_get_recent_payload_sample(&data_temp, temp_sensors, n_test-i-1);
         CU_ASSERT_EQUAL(rc, 0);
+        printf("timestamp: %d\n", data_temp.timestamp);
+        printf("obc_temp_1: %f\n", data_temp.obc_temp_1);
         CU_ASSERT_EQUAL(data_temp.timestamp, time_test+i);
-        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_1, float_test, 1e-10);
-        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_2, float_test, 1e-10);
-        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_3, float_test, 1e-10);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_1, float_test+i, 1e-6);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_2, float_test+i, 1e-6);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_3, float_test+i, 1e-6);
 
         eps_data_t data_eps;
-        dat_add_payload_sample(&data_eps, eps_sensors);
+        //dat_add_payload_sample(&data_eps, eps_sensors);
+        rc = dat_get_recent_payload_sample(&data_eps, eps_sensors, n_test-i-1);
         CU_ASSERT_EQUAL(rc, 0);
         CU_ASSERT_EQUAL(data_eps.timestamp, time_test+i);
-        CU_ASSERT_EQUAL(data_eps.cursun, uint_test);
-        CU_ASSERT_EQUAL(data_eps.cursys, uint_test);
-        CU_ASSERT_EQUAL(data_eps.vbatt, uint_test);
-        CU_ASSERT_EQUAL(data_eps.temp1, int_test);
-        CU_ASSERT_EQUAL(data_eps.temp2, int_test);
-        CU_ASSERT_EQUAL(data_eps.temp3, int_test);
-        CU_ASSERT_EQUAL(data_eps.temp4, int_test);
-        CU_ASSERT_EQUAL(data_eps.temp5, int_test);
-        CU_ASSERT_EQUAL(data_eps.temp6, int_test);
+        CU_ASSERT_EQUAL(data_eps.cursun, uint_test+i);
+        CU_ASSERT_EQUAL(data_eps.cursys, uint_test+i);
+        CU_ASSERT_EQUAL(data_eps.vbatt, uint_test+i);
+        CU_ASSERT_EQUAL(data_eps.temp1, int_test+i);
+        CU_ASSERT_EQUAL(data_eps.temp2, int_test+i);
+        CU_ASSERT_EQUAL(data_eps.temp3, int_test+i);
+        CU_ASSERT_EQUAL(data_eps.temp4, int_test+i);
+        CU_ASSERT_EQUAL(data_eps.temp5, int_test+i);
+        CU_ASSERT_EQUAL(data_eps.temp6, int_test+i);
     }
 }
 

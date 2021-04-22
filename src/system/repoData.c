@@ -593,12 +593,8 @@ int dat_delete_memory_sections(void)
     }
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-//FIXME: Use STORAGE_MODE
-#ifdef NANOMIND
+    //Free memory or drop databases
     ret = storage_delete_memory_sections();
-#else
-    ret=0;
-#endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 #if SCH_FP_ENABLED

@@ -7,6 +7,6 @@ else
     cd -
 fi
 
-cd suchai-docker/avr32-toolchain-3.4.2
+cd suchai-docker/suchai-fs/avr32-toolchain-3.4.2
 ./install-avr32.sh 3.4.3.820 6.1.3.1475 $HOME/.local
 cd -
