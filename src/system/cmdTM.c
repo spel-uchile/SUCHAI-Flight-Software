@@ -112,6 +112,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         }
 
         LOGI(tag, "Sending %d structs of payload %d", data.frame.ndata, (int)payload);
+        _hton32_buff(data.frame.data.data32, sizeof(data.frame.data.data8)/ sizeof(uint32_t));
         _com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata);
         LOGI(tag, "Frame   : %d", data.frame.nframe);
         LOGI(tag, "Type    : %d", (data.frame.type));

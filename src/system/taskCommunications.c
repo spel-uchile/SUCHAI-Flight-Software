@@ -234,6 +234,9 @@ static void com_receive_tm(csp_packet_t *packet)
 
         //FIXME: Use a command to add payloads to database
         //Save ndata payload samples to data storage
+
+        _ntoh32_buff(frame->data.data32, sizeof(frame->data.data8)/ sizeof(uint32_t));
+
         assert(frame->ndata*data_map[payload].size <= COM_FRAME_MAX_LEN);
         for(j=0; j < frame->ndata; j++)
         {
