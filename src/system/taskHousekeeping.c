@@ -65,6 +65,10 @@ void taskHousekeeping(void *param)
                 cmd_add_params_str(cmd_tle_prop, "0");
                 cmd_send(cmd_tle_prop);
             }
+            cmd_t *cmd_tm_send_status;
+            cmd_tm_send_status = cmd_get_str("tm_send_status");
+            cmd_add_params_str(cmd_tm_send_status, "10");
+            cmd_send(cmd_tm_send_status)
         }
 
         /* 1 minute actions */
