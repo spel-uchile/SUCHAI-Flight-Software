@@ -72,7 +72,8 @@ typedef enum dat_system {
     dat_com_tx_pwr,               ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
     dat_com_baud,                 ///< Baudrate [bps]
     dat_com_mode,                 ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-    dat_com_bcn_period,           ///< Number of seconds between beacon packets
+    dat_com_bcn_period,           ///< Number of seconds between trx beacon packets
+    dat_obc_bcn_offset,           ///< Number of seconds between obc beacon packets
 
     /// FPL: Flight plan related variables
     dat_fpl_last,                 ///< Last executed flight plan (unix time)
@@ -171,6 +172,7 @@ typedef struct __attribute__((packed)) dat_status_s {
     uint32_t dat_com_baud;          ///< Baudrate [bps]
     uint32_t dat_com_mode;          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
     uint32_t dat_com_bcn_period;    ///< Number of seconds between beacon packets
+    uint32_t dat_obc_bcn_offset;    ///< Number of seconds between obc beacon packets
 
     /// FPL: flight plant related variables
     int32_t dat_fpl_last;           ///< Last executed flight plan (unix time)

@@ -40,15 +40,15 @@ void cmd_obc_init(void)
     cmd_add("obc_get_time", obc_get_time, "%d", 1);
     cmd_add("obc_reset_wdt", obc_reset_wdt, "", 0);
     cmd_add("obc_system", obc_system, "%s", 1);
-    cmd_add("obc_set_pwm_duty", obc_set_pwm_duty, "%d %d", 2);
-    cmd_add("obc_set_pwm_freq", obc_set_pwm_freq, "%d %f", 2);
-    cmd_add("obc_pwm_pwr", obc_pwm_pwr, "%d", 1);
     cmd_add("obc_get_sensors", obc_get_sensors, "", 0);
     cmd_add("obc_update_status", obc_update_status, "", 0);
     cmd_add("obc_get_tle", obc_get_tle, "", 0);
     cmd_add("obc_set_tle", obc_set_tle, "%d %n", 2);
     cmd_add("obc_update_tle", obc_update_tle, "", 0);
     cmd_add("obc_prop_tle", obc_prop_tle, "%ld", 1);
+    cmd_add("mtt_set_duty", obc_set_pwm_duty, "%d %d", 2);
+    cmd_add("mtt_set_freq", obc_set_pwm_freq, "%d %f", 2);
+    cmd_add("mtt_set_pwr", obc_pwm_pwr, "%d", 1);
 }
 
 int obc_ident(char* fmt, char* params, int nparams)

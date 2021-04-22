@@ -81,7 +81,8 @@
 #define SCH_TX_PWR              0                  /// Default TX power [0|1|2|3]
 #define SCH_TX_BCN_PERIOD       60                 /// Default beacon period in seconds
 #define SCH_TX_FREQ             437250000          /// Default TRX freq in Hz
-#define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200
+#define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200]
+#define SCH_OBC_BCN_OFFSET      30                 /// OBC beacon period offset
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        {{SCH_STORAGE}}    ///< Status repository location. (0) RAM, (1) Single external.

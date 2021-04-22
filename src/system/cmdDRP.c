@@ -53,8 +53,10 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
                 dat_set_system_var(var, 0);
             }
 
-            // Set all status variables default values
+            //TODO: Set all status variables default values
             dat_set_system_var(dat_rtc_date_time, (int)time(NULL));
+            dat_set_system_var(dat_com_bcn_period, SCH_TX_BCN_PERIOD);
+            dat_set_system_var(dat_obc_bcn_offset, SCH_OBC_BCN_OFFSET);
             // dat_set_system_var(dat_custom, default_value);
 
             // Delete memory sections

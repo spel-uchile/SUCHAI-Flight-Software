@@ -24,8 +24,8 @@ static const char *tag = "cmdTM";
 void cmd_tm_init(void)
 {
     cmd_add("tm_parse_status", tm_parse_status, "", 0);
-    cmd_add("tm_get_last", tm_get_last, "%u", 1);
     cmd_add("tm_send_status", tm_send_status, "%d", 1);
+    cmd_add("tm_get_last", tm_get_last, "%u", 1);
     cmd_add("tm_send_last", tm_send_last, "%u %u", 2);
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
     cmd_add("tm_send_from", tm_send_from, "%u %u %u", 3);
