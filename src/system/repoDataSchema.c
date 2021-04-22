@@ -44,6 +44,7 @@ void dat_status_to_struct(dat_status_t *status)
     DAT_CPY_SYSTEM_VAR(status, dat_com_baud);          ///< Baudrate [bps]
     DAT_CPY_SYSTEM_VAR(status, dat_com_mode);          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
     DAT_CPY_SYSTEM_VAR(status, dat_com_bcn_period);    ///< Number of seconds between beacon packets
+    DAT_CPY_SYSTEM_VAR(status, dat_obc_bcn_offset);    ///< Number of seconds between obc beacon packets
 
     DAT_CPY_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
     DAT_CPY_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
@@ -119,6 +120,7 @@ void dat_print_status(dat_status_t *status)
     DAT_PRINT_SYSTEM_VAR(status, dat_com_baud);          ///< Baudrate [bps]
     DAT_PRINT_SYSTEM_VAR(status, dat_com_mode);          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
     DAT_PRINT_SYSTEM_VAR(status, dat_com_bcn_period);    ///< Number of seconds between beacon packets
+    DAT_PRINT_SYSTEM_VAR(status, dat_obc_bcn_offset);    ///< Number of seconds between obc beacon packets
 
     DAT_PRINT_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
     DAT_PRINT_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length

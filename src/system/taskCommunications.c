@@ -81,15 +81,15 @@ void taskCommunications(void *param)
                     break;
 
                 case SCH_TRX_PORT_TM:
+                    // Create a response packet and send
+                    rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    csp_send(conn, rep_ok, 1000);
                     #ifdef SCH_RESEND_TM_NODE
                     tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
                     #endif
                     // Process TM packet
                     com_receive_tm(packet);
                     csp_buffer_free(packet);
-                    // Create a response packet and send
-                    rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    csp_send(conn, rep_ok, 1000);
                     #ifdef SCH_RESEND_TM_NODE
                     // Resend a copy of the packet to another node
                     assert(tmp_packet != NULL);
@@ -120,12 +120,12 @@ void taskCommunications(void *param)
                     break;
 
                 case SCH_TRX_PORT_CMD:
-                    /* Command port, executes console commands */
-                    com_receive_cmd(packet);
-                    csp_buffer_free(packet);
                     // Create a response packet and send
                     rep_ok = csp_buffer_clone(rep_ok_tmp);
                     csp_send(conn, rep_ok, 1000);
+                    /* Command port, executes console commands */
+                    com_receive_cmd(packet);
+                    csp_buffer_free(packet);
                     break;
 
                 case SCH_TRX_PORT_DBG:
