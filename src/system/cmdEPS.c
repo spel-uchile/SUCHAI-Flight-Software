@@ -35,6 +35,8 @@ void cmd_eps_init(void)
     cmd_add("eps_get_config", eps_get_config, "", 0);
     cmd_add("eps_set_heater", eps_set_heater, "%d %d", 2);
     cmd_add("eps_update_status", eps_update_status_vars, "", 0);
+    cmd_add("eps_set_output", eps_set_output, "%d %d", 2);
+    cmd_add("eps_set_output_all", eps_set_output_all, "%d", 1);
 #endif
 }
 
@@ -131,6 +133,49 @@ int eps_update_status_vars(char *fmt, char *params, int nparams)
         return CMD_FAIL;
     }
     return CMD_OK;
+}
+
+int eps_set_output(char *fmt, char *params, int nparams)
+{
+    unsigned int channel, mode;
+    // "<channel> <mode>"
+    if(params == NULL || sscanf(params, fmt, &channel, &mode) != nparams)
+    {
+        LOGE(tag, "Error parsing parameters!");
+        return CMD_ERROR;
+    }
+    if(channel > 7){
+        LOGE(tag, "Error parsing parameters: channel > 7 (%d)!", channel);
+        return CMD_ERROR;
+    }
+    mode = mode == 0 ? 0 : 1; // Mode is 0 -> OFF or > 0 = 1 -> ON
+
+    int rc = eps_output_set_single((uint8_t)channel, (uint8_t)mode, 0);
+    if(rc > 0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
+}
+
+int eps_set_output_all(char *fmt, char *params, int nparams)
+{
+    unsigned int mode;
+    uint8_t mask;
+    // "<on/off>"
+    if(params == NULL || sscanf(params, fmt, &mode) != nparams)
+    {
+        LOGE(tag, "Error parsing parameters!");
+        return CMD_ERROR;
+    }
+
+    mode = mode == 0 ? 0 : 1; // Mode is 0 -> OFF or > 0 = 1 -> ON
+    mask = mode ? 0xFF : 0x00; // Mode 1 -> All outputs on, else all outputs off
+
+    int rc = eps_output_set(mask);
+    if(rc > 0)
+        return CMD_OK;
+    else
+        return CMD_FAIL;
 }
 
 #endif //SCH_USE_NANOPOWER
