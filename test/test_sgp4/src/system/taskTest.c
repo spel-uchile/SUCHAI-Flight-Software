@@ -49,8 +49,6 @@ int _test_tle_prop(char *fmt, char *params, int nparams)
     double diff = (double)ts - (double)tle.epoch/1000.0;
     diff /= 60.0;
     getRVForDate(&tle,  ts_mili, r, v);
-//    getRV(&tle,diff,r,v);
-    getRVForDate(&tle, ts*1000, r, v);
     portTick getrv_time = osTaskGetTickCount();
 
     LOGD(tag, "T : %.6f - %.6f = %.6f", (double)ts, tle.epoch/1000.0, diff);
