@@ -94,22 +94,43 @@ void dat_repo_init(void);
 void dat_repo_close(void);
 
 /**
- * Sets an int field in the status repository to a new value.
+ * Sets a status/config variable by index
  *
- * @param index Enum index of the field to set
- * @param value Integer value to set the variable to
+ * @param index Index of the variable to set
+ * @param value Value to set
  */
 void dat_set_system_var(dat_system_t index, int value);
 void _dat_set_system_var(dat_system_t index, int value);  //Auxiliary function for testing
+void dat_set_config_var(int index, int value);
 
 /**
- * Returns an int field's value inside the status repository.
+ * Sets a status/config variable by index by name
  *
- * @param index Enum index of the field to get
+ * @param name Variable name
+ * @param value Value to set
+ */
+void dat_set_system_var_name(char *name, int value);
+void dat_set_config_var_name(char *name, int value);
+
+/**
+ * Returns status/config variable by index
+ *
+ * @param index Index of the variable to set
  * @return The field's value
  */
 int dat_get_system_var(dat_system_t index);
 int _dat_get_system_var(dat_system_t index);  //Auxiliary function for testing
+int dat_get_config_var(int index);
+
+/**
+ * Returns status/config variable by name
+ *
+ * @param index Index of the variable to set
+ * @return The field's value
+ */
+int dat_get_status_var_name(char *name);
+int dat_get_config_var_name(char *name);
+
 
 /**
  * Gets an executable command from the flight plan repo.

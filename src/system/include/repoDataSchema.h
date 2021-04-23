@@ -25,6 +25,42 @@ typedef struct __attribute__((packed)) fp_entry {
 } fp_entry_t;
 
 /**
+ * A 32 bit variable that can be interpreted as int, uint or float
+ */
+typedef union value32_u{
+    int32_t i;
+    uint32_t u;
+    float f;
+} value32_t;
+
+/**
+ * A system variable (status or config) with a name, type and value
+ */
+typedef struct __attribute__((packed)) dat_sys_var {
+    char name[25];      ///< Variable name (max 25 chars)
+    char type;          ///< Variable type (u: uint, i: int, f: float)
+    value32_t value;    ///< Variable value
+} dat_sys_var_t;
+
+#define DAT_STATUS_MAX 50
+/**
+ * List of status variables
+ * Status variables are updated by the software itself not by ground operators
+ */
+static dat_sys_var_t dat_status_list[DAT_STATUS_MAX] = {
+        {"obc_op_mode", 'u', 0},
+};
+
+#define DAT_CONFIG_MAX 50
+/**
+ * List of configuration variables
+ * Configuration variables are updated by ground operators
+ */
+static dat_sys_var_t dat_config_list[DAT_STATUS_MAX] = {
+        {"obc_op_mode", 'u', 0},
+};
+
+/**
  * Enum constants for dynamically identifying system status fields at execution time.
  *
  * Also permits adding new status variables cheaply, by generalizing both the
