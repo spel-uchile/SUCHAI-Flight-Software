@@ -37,8 +37,6 @@ void taskHousekeeping(void *param)
     unsigned int com_bcn_period = dat_get_system_var(dat_com_bcn_period);
     unsigned int obc_bcn_offset = dat_get_system_var(dat_obc_bcn_offset);
     unsigned int _obc_bcn_period = com_bcn_period + obc_bcn_offset;
-    printf("Com bcn period: %u\n", com_bcn_period);
-    printf("OBC bcn offset: %u\n", obc_bcn_offset);
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
@@ -111,6 +109,9 @@ void taskHousekeeping(void *param)
 
         /* Send OBC beacon */
         if ((elapsed_sec % _obc_bcn_period) == 0){
+            com_bcn_period = dat_get_system_var(dat_com_bcn_period);
+            obc_bcn_offset = dat_get_system_var(dat_obc_bcn_offset);
+            _obc_bcn_period = com_bcn_period + obc_bcn_offset;
             cmd_t *cmd_tm_send_status;
             cmd_tm_send_status = cmd_get_str("tm_send_status");
             cmd_add_params_str(cmd_tm_send_status, "10");
