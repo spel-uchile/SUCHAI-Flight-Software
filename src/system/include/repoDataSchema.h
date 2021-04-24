@@ -48,6 +48,48 @@ typedef struct __attribute__((packed)) dat_sys_var {
  * Status variables are updated by the software itself not by ground operators
  */
 static dat_sys_var_t dat_status_list[DAT_STATUS_MAX] = {
+        {"obc_last_reset", 'u', 0},
+        {"obc_hrs_alive", 'u', 0},
+        {"obc_hrs_wo_reset", 'u', 0},
+        {"obc_reset_counter", 'u', 0},
+        {"obc_sw_wdt", 'u', 0},
+        {"obc_temp_1", 'f', 0},
+        {"obc_temp_2", 'f', 0},
+        {"obc_temp_3", 'f', 0},
+        {"dep_deployed", 'u', 0},
+        {"dep_ant_deployed", 'u', 0},
+        {"dep_date_time", 'u', 0},
+        {"com_count_tm", 'u', 0},
+        {"com_count_tc", 'u', 0},
+        {"com_last_tc", 'u', 0},
+        {"fpl_last", 'u', 0},
+        {"fpl_queue", 'u', 0},
+        {"ads_omega_x", 'f', 0},
+        {"ads_omega_y", 'f', 0},
+        {"ads_omega_z", 'f', 0},
+        {"ads_mag_x", 'f', 0},
+        {"ads_mag_y", 'f', 0},
+        {"ads_mag_z", 'f', 0},
+        {"ads_pos_x", 'f', 0},
+        {"ads_pos_y", 'f', 0},
+        {"ads_pos_z", 'f', 0},
+        {"ads_tle_epoch", 'u', 0},
+        {"ads_tle_last", 'u', 0},
+        {"ads_q0", 'f', 0},
+        {"ads_q1", 'f', 0},
+        {"ads_q2", 'f', 0},
+        {"ads_q3", 'f', 0},
+        {"eps_vbatt", 'u', 0},
+        {"eps_cur_sun", 'u', 0},
+        {"eps_cur_sys", 'u', 0},
+        {"eps_temp_bat0", 'u', 0},
+        {"drp_temp", 'u', 0},
+        {"drp_ads", 'u', 0},
+        {"drp_eps", 'u', 0},
+        {"drp_lang", 'u', 0},
+        {"drp_mach_action", 'u', 0},
+        {"drp_mach_state", 'u', 0},
+        {"drp_mach_left", 'u', 0},
 };
 
 #define DAT_CONFIG_MAX 50
@@ -406,26 +448,27 @@ typedef union fvalue{
 #define DAT_PRINT_SYSTEM_VAR_F(st, var) printf("\t%s: %f\n\r", #var, st->var)
 
 /**
- * Copies the status repository's field values to another dat_status_t struct.
- *
- * This function can be useful for debugging status fields with @c dat_print_status .
- *
- * And for packing the fields prior to sending them using libcsp in @c tm_send_status .
- *
- * @see dat_print_status
- * @see tm_send_status
+ * Copies the status repository's values to list of values.
+ * This function can be useful to pack and transmit the status variables
+ * @warning @varlist and @status must point to reserved memory spaces
  *
  * @param status dat_status_t *. Pointer to destination structure
  */
-void dat_status_to_struct(dat_status_t *status);
+void dat_status_to_list(value32_t *varlist, dat_sys_var_t *status, int nvars);
 
 /**
- * Print the names and values of a system status struct's fields.
+ * Copies a list of status values to a list of status variables.
+ * This function can be useful to pack and transmit the status variables
+ * @warning @varlist and @status must point to reserved memory spaces
  *
- * @seealso dat_status_to_struct
- *
- * @param status Pointer to a status variables struct
+ * @param status dat_status_t *. Pointer to destination structure
  */
-void dat_print_status(dat_status_t *status);
+void dat_status_from_list(value32_t *varlist, dat_sys_var_t *status, dat_sys_var_t *reference, int nvars);
+
+/**
+ * Print the names and values of a system status variable list.
+ * @param status Pointer to a status variables list
+ */
+void dat_print_status(dat_sys_var_t *status, int nvars);
 
 #endif //REPO_DATA_SCHEMA_H

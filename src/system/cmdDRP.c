@@ -80,11 +80,7 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
 int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
-
-    dat_status_t status;
-    dat_status_to_struct(&status);
-    dat_print_status(&status);
-
+    dat_print_status(dat_status_list, DAT_STATUS_MAX);
     return CMD_OK;
 }
 
