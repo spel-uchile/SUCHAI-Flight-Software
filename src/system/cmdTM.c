@@ -42,20 +42,19 @@ int tm_send_status(char *fmt, char *params, int nparams)
     }
 
     // Pack status variables to a structure
-    dat_status_t status;
-    dat_status_to_struct(&status);
+    value32_t status_buff[DAT_STATUS_MAX];
+    dat_status_to_list(status_buff, dat_status_list, DAT_STATUS_MAX);
     if(log_lvl >= LOG_LVL_DEBUG)
     {
         LOGD(tag, "Sending system status to node %d", dest_node)
-        dat_print_status(&status);
+        dat_print_status(dat_status_list, DAT_STATUS_MAX);
     }
 
     // Fix data endianness
-    assert(sizeof(status)%sizeof(uint32_t) == 0);
-    _hton32_buff((uint32_t *)(&status), sizeof(status)/sizeof(uint32_t));
+    _hton32_buff((uint32_t *)(status_buff), sizeof(status_buff));
 
     // Send telemetry
-    return _com_send_data(dest_node, &status, sizeof(status), TM_TYPE_STATUS, 0);
+    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, DAT_STATUS_MAX);
 }
 
 int tm_parse_status(char *fmt, char *params, int nparams)
@@ -63,13 +62,17 @@ int tm_parse_status(char *fmt, char *params, int nparams)
     if(params == NULL)
         return CMD_ERROR;
 
-    dat_status_t *status = (dat_status_t *)params;
-
+    // We receive a full frame with a list of status variables
+    com_frame_t *frame = (com_frame_t *)params;
+    value32_t *status_buff = (value32_t *)frame->data.data32;
     // Fix data endianness
-    assert(sizeof(dat_status_t)%sizeof(uint32_t) == 0);
-    _ntoh32_buff((uint32_t *)status, sizeof(dat_status_t)/sizeof(uint32_t));
-
-    dat_print_status(status);
+    _ntoh32_buff((uint32_t *)status_buff, frame->ndata);
+    // Create a temporal status variables list
+    dat_sys_var_t *status_list = malloc(sizeof(dat_sys_var_t)*frame->ndata);
+    dat_status_from_list(status_buff, status_list, dat_status_list, frame->ndata);
+    // Finally print the status variables and free the temporal buffer
+    dat_print_status(status_list, frame->ndata);
+    free(status_list);
 
     return CMD_OK;
 }
