@@ -48,7 +48,6 @@ typedef struct __attribute__((packed)) dat_sys_var {
  * Status variables are updated by the software itself not by ground operators
  */
 static dat_sys_var_t dat_status_list[DAT_STATUS_MAX] = {
-        {"obc_op_mode", 'u', 0},
 };
 
 #define DAT_CONFIG_MAX 50
@@ -57,7 +56,27 @@ static dat_sys_var_t dat_status_list[DAT_STATUS_MAX] = {
  * Configuration variables are updated by ground operators
  */
 static dat_sys_var_t dat_config_list[DAT_STATUS_MAX] = {
-        {"obc_op_mode", 'u', 0},
+        {"obc_op_mode", 'i', 0},          ///< C: General operation mode
+        {"rtc_date_time", 'i', 0},        ///< C: RTC current unix time
+        {"com_freq", 'u', 0},             ///< C: Communications frequency [Hz]
+        {"com_tx_pwr", 'u', 0},           ///< C: TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
+        {"com_baud", 'u', 0},             ///< C: Baudrate [bps]
+        {"com_mode", 'u', 0},             ///< C: Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
+        {"com_bcn_period", 'u', 0},       ///< C: Number of seconds between trx beacon packets
+        {"obc_bcn_offset", 'u', 0},       ///< C: Number of seconds between obc beacon packets
+        {"tgt_omega_x", 'f', 0},          ///< C: Target acceleration value along the x axis
+        {"tgt_omega_y", 'f', 0},          ///< C: Target acceleration value along the y axis
+        {"tgt_omega_z", 'f', 0},          ///< C: Target acceleration value along the z axis
+        {"tgt_q0", 'f', 0},               ///< C: Target quaternion (Inertial to body)
+        {"tgt_q1", 'f', 0},               ///< C: Target quaternion (Inertial to body)
+        {"tgt_q2", 'f', 0},               ///< C: Target quaternion (Inertial to body)
+        {"tgt_q3", 'f', 0},               ///< C: Target quaternion (Inertial to body)
+        {"drp_ack_temp", 'u', 0},         ///<C: Temperature data acknowledge
+        {"drp_ack_ads", 'u', 0},          ///<C: ADS data index acknowledge
+        {"drp_ack_eps", 'u', 0},          ///<C: EPS data index acknowledge
+        {"drp_ack_lang", 'u', 0},         ///<C: Langmuir data index acknowledge
+        {"drp_mach_step", 'i', 0},        ///< C:
+        {"drp_mach_payloads", 'u', 0},    ///< C:
 };
 
 /**
