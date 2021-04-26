@@ -47,21 +47,22 @@ void dat_print_status(dat_sys_var_t *status, int nvars)
 {
     assert(status != NULL);
     int i;
+    printf("address, name, value, type\n");
     for(i=0; i<nvars; i++)
     {
         dat_sys_var_t var = status[i];
         switch (var.type) {
             case 'u':
-                printf("%s: %d\n", var.name, var.value.u);
+                printf("%d, %s, %u, %d\n", var.address, var.name, var.value.u, var.is_status);
                 break;
             case 'i':
-                printf("%s: %d\n", var.name, var.value.i);
+                printf("%d, %s, %d, %d\n", var.address, var.name, var.value.i, var.is_status);
                 break;
             case 'f':
-                printf("%s: %.6f\n", var.name, var.value.f);
+                printf("%d, %s, %.6f, %d\n", var.address, var.name, var.value.f, var.is_status);
                 break;
             default:
-                printf("%s: %#X\n", var.name, var.value.u);
+                printf("%d, %s, %#X, %d\n", var.address, var.name, var.value.u, var.is_status);
         }
     }
 }

@@ -96,10 +96,11 @@ void dat_repo_close(void);
 /**
  * Sets a status/config variable by index
  *
- * @param index Index of the variable to set
+ * @param index Index or address of the variable to set
  * @param value Value to set
+ * @return 0 if OK, -1 in case of error
  */
-void dat_set_system_var(dat_system_t index, int value);
+int dat_set_system_var(dat_status_address_t index, value32_t value)
 void _dat_set_system_var(dat_system_t index, int value);  //Auxiliary function for testing
 void dat_set_config_var(int index, int value);
 

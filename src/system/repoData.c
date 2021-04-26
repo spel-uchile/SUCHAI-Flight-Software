@@ -191,7 +191,7 @@ int _dat_get_system_var(dat_system_t index)
     return value;
 }
 
-void dat_set_system_var(dat_system_t index, int value)
+int dat_set_system_var(dat_status_address_t index, value32_t value)
 {
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
@@ -206,11 +206,11 @@ void dat_set_system_var(dat_system_t index, int value)
         #endif
     //Uses external memory
 #else
-    storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
+    storage_repo_set_value_idx(index, value.i, DAT_REPO_SYSTEM);
     //Uses tripled writing
 #if SCH_STORAGE_TRIPLE_WR == 1
-    storage_repo_set_value_idx(index + dat_system_last_var, value, DAT_REPO_SYSTEM);
-    storage_repo_set_value_idx(index + dat_system_last_var * 2, value, DAT_REPO_SYSTEM);
+    storage_repo_set_value_idx(index + dat_status_last_addresss, value.i, DAT_REPO_SYSTEM);
+    storage_repo_set_value_idx(index + dat_status_last_addresss*2, value.i, DAT_REPO_SYSTEM);
 #endif
 #endif
 
@@ -218,24 +218,7 @@ void dat_set_system_var(dat_system_t index, int value)
     osSemaphoreGiven(&repo_data_sem);
 }
 
-/*void dat_set_config_var(int index, int value) {
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    //Uses internal memory
-#if SCH_STORAGE_MODE == 0
-    DAT_SYSTEM_VAR_BUFF[index] = value;
-        //Uses tripled writing
-        #if SCH_STORAGE_TRIPLE_WR == 1
-            DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var] = value;
-            DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var * 2] = value;
-        #endif
-#endif
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
-}*/
-
-int dat_get_system_var(dat_system_t index)
+value32_t dat_get_system_var(dat_status_address_t index)
 {
     int value_1 = 0;
     int value_2 = 0;

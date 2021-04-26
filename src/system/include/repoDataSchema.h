@@ -25,170 +25,6 @@ typedef struct __attribute__((packed)) fp_entry {
 } fp_entry_t;
 
 /**
- * A 32 bit variable that can be interpreted as int, uint or float
- */
-typedef union value32_u{
-    int32_t i;
-    uint32_t u;
-    float f;
-} value32_t;
-
-/**
- * A system variable (status or config) with a name, type and value
- */
-typedef struct __attribute__((packed)) dat_sys_var {
-    char name[25];      ///< Variable name (max 25 chars)
-    char type;          ///< Variable type (u: uint, i: int, f: float)
-    value32_t value;    ///< Variable value
-} dat_sys_var_t;
-
-/**
- * List of status variables
- * Status variables are updated by the software itself not by ground operators
- */
-#define DAT_OBC_LAST_RESET "obc_last_reset"
-#define DAT_OBC_HRS_ALIVE "obc_hrs_alive"
-#define DAT_OBC_HRS_WO_RESET "obc_hrs_wo_reset"
-#define DAT_OBC_RESET_COUNTER "obc_reset_counter"
-#define DAT_OBC_SW_WDT "obc_sw_wdt"
-#define DAT_OBC_TEMP_1 "obc_temp_1"
-#define DAT_OBC_TEMP_2 "obc_temp_2"
-#define DAT_OBC_TEMP_3 "obc_temp_3"
-#define DAT_DEP_DEPLOYED "dep_deployed"
-#define DAT_DEP_ANT_DEPLOYED "dep_ant_deployed"
-#define DAT_DEP_DATE_TIME "dep_date_time"
-#define DAT_COM_COUNT_TM "com_count_tm"
-#define DAT_COM_COUNT_TC "com_count_tc"
-#define DAT_COM_LAST_TC "com_last_tc"
-#define DAT_FPL_LAST "fpl_last"
-#define DAT_FPL_QUEUE "fpl_queue"
-#define DAT_ADS_OMEGA_X "ads_omega_x"
-#define DAT_ADS_OMEGA_Y "ads_omega_y"
-#define DAT_ADS_OMEGA_Z "ads_omega_z"
-#define DAT_ADS_MAG_X "ads_mag_x"
-#define DAT_ADS_MAG_Y "ads_mag_y"
-#define DAT_ADS_MAG_Z "ads_mag_z"
-#define DAT_ADS_POS_X "ads_pos_x"
-#define DAT_ADS_POS_Y "ads_pos_y"
-#define DAT_ADS_POS_Z "ads_pos_z"
-#define DAT_ADS_TLE_EPOCH "ads_tle_epoch"
-#define DAT_ADS_TLE_LAST "ads_tle_last"
-#define DAT_ADS_Q_0 "ads_q0"
-#define DAT_ADS_Q_1 "ads_q1"
-#define DAT_ADS_Q_2 "ads_q2"
-#define DAT_ADS_Q_3 "ads_q3"
-#define DAT_EPS_VBATT "eps_vbatt"
-#define DAT_EPS_CUR_SUN "eps_cur_sun"
-#define DAT_EPS_CUR_SYS "eps_cur_sys"
-#define DAT_EPS_TEMP_BAT_0 "eps_temp_bat0"
-#define DAT_DRP_TEMP "drp_temp"
-#define DAT_DRP_ADS "drp_ads"
-#define DAT_DRP_EPS "drp_eps"
-#define DAT_DRP_LANG "drp_lang"
-#define DAT_DRP_MACH_ACTION "drp_mach_action"
-#define DAT_DRP_MACH_STATE "drp_mach_state"
-#define DAT_DRP_MACH_LEFT "drp_mach_left"
-
-static const dat_sys_var_t dat_status_list[] = {
-        {DAT_OBC_LAST_RESET, 'u', -1},      ///< Last reset source
-        {DAT_OBC_HRS_ALIVE, 'u', 0},       ///< Hours since first boot
-        {DAT_OBC_HRS_WO_RESET, 'u', 0},    ///< Hours since last reset
-        {DAT_OBC_RESET_COUNTER, 'u', 0},   ///< Number of reset since first boot
-        {DAT_OBC_SW_WDT, 'u', 0},          ///< Software watchdog timer counter
-        {DAT_OBC_TEMP_1, 'f', -1},          ///< Temperature value of the first sensor
-        {DAT_OBC_TEMP_2, 'f', -1},          ///< Temperature value of the second sensor
-        {DAT_OBC_TEMP_3, 'f', -1},          ///< Temperature value of the gyroscope
-        {DAT_DEP_DEPLOYED, 'u', 1},        ///< Was the satellite deployed?
-        {DAT_DEP_ANT_DEPLOYED, 'u', 1},    ///< Was the antenna deployed?
-        {DAT_DEP_DATE_TIME, 'u', -1},       ///< Antenna deployment unix time
-        {DAT_COM_COUNT_TM, 'u', 0},        ///< Number of Telemetries sent
-        {DAT_COM_COUNT_TC, 'u', 0},        ///< Number of received Telecommands
-        {DAT_COM_LAST_TC, 'u', -1},         ///< Unix time of the last received Telecommand
-        {DAT_FPL_LAST, 'u', 0},            ///< Last executed flight plan (unix time)
-        {DAT_FPL_QUEUE, 'u', 0},           ///< Flight plan queue length
-        {DAT_ADS_OMEGA_X, 'f', -1},         ///< Gyroscope acceleration value along the x axis
-        {DAT_ADS_OMEGA_Y, 'f', -1},         ///< Gyroscope acceleration value along the y axis
-        {DAT_ADS_OMEGA_Z, 'f', -1},         ///< Gyroscope acceleration value along the z axis
-        {DAT_ADS_MAG_X, 'f', -1},           ///< Magnetometer value along the x axis
-        {DAT_ADS_MAG_Y, 'f', -1},           ///< Magnetometer value along the y axis
-        {DAT_ADS_MAG_Z, 'f', -1},           ///< Magnetometer value along the z axis
-        {DAT_ADS_POS_X, 'f', -1},           ///< Satellite orbit position x (ECI)
-        {DAT_ADS_POS_Y, 'f', -1},           ///< Satellite orbit position y (ECI)
-        {DAT_ADS_POS_Z, 'f', -1},           ///< Satellite orbit position z (ECI)
-        {DAT_ADS_TLE_EPOCH, 'u', -1},       ///< Current TLE epoch, 0 if TLE is invalid
-        {DAT_ADS_TLE_LAST, 'u', -1},        ///< Last time position was propagated
-        {DAT_ADS_Q_0, 'f', -1},             ///< Attitude quaternion (Inertial to body)
-        {DAT_ADS_Q_1, 'f', -1},             ///< Attitude quaternion (Inertial to body)
-        {DAT_ADS_Q_2, 'f', -1},             ///< Attitude quaternion (Inertial to body)
-        {DAT_ADS_Q_3, 'f', -1},             ///< Attitude quaternion (Inertial to body)
-        {DAT_EPS_VBATT, 'u', -1},           ///< Voltage of the battery [mV]
-        {DAT_EPS_CUR_SUN, 'u', -1},         ///< Current from boost converters [mA]
-        {DAT_EPS_CUR_SYS, 'u', -1},         ///< Current from the battery [mA]
-        {DAT_EPS_TEMP_BAT_0, 'u', -1},      ///< Battery temperature sensor
-        {DAT_DRP_TEMP, 'u', 0},            ///< Temperature data index
-        {DAT_DRP_ADS, 'u', 0},             ///< ADS data index
-        {DAT_DRP_EPS, 'u', 0},             ///< EPS data index
-        {DAT_DRP_LANG, 'u', 0},            ///< Langmuir data index
-        {DAT_DRP_MACH_ACTION, 'u', 0},     ///<
-        {DAT_DRP_MACH_STATE, 'u', 0},      ///<
-        {DAT_DRP_MACH_LEFT, 'u', 0},       ///<
-};
-///< The dat_status_last_var constant serves for looping through all status variables
-static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_status_list[0]);
-
-/**
- * List of configuration variables
- * Configuration variables are updated by ground operators
- */
-#define DAT_OBC_OP_MODE "obc_op_mode"
-#define DAT_RTC_DATE_TIME "rtc_date_time"
-#define DAT_COM_FREQ "com_freq"
-#define DAT_COM_TX_PWR "com_tx_pwr"
-#define DAT_COM_BAUD "com_baud"
-#define DAT_COM_MODE "com_mode"
-#define DAT_COM_BCN_PERIOD "com_bcn_period"
-#define DAT_OBC_BCN_OFFSET "obc_bcn_offset"
-#define DAT_TGT_OMEGA_X "tgt_omega_x"
-#define DAT_TGT_OMEGA_Y "tgt_omega_y"
-#define DAT_TGT_OMEGA_Z "tgt_omega_z"
-#define DAT_TGT_Q_0 "tgt_q0"
-#define DAT_TGT_Q_1 "tgt_q1"
-#define DAT_TGT_Q_2 "tgt_q2"
-#define DAT_TGT_Q_3 "tgt_q3"
-#define DAT_DRP_ACK_TEMP "drp_ack_temp"
-#define DAT_DRP_ACK_ADS "drp_ack_ads"
-#define DAT_DRP_ACK_EPS "drp_ack_eps"
-#define DAT_DRP_ACK_LANG "drp_ack_lang"
-#define DAT_DRP_MACH_STEP "drp_mach_step"
-#define DAT_DRP_MACH_PAYLOADS "drp_mach_payloads"
-
-static const dat_sys_var_t dat_config_list[] = {
-        {DAT_OBC_OP_MODE, 'i', 0},         ///< General operation mode
-        {DAT_RTC_DATE_TIME, 'i', 0},       ///< RTC current unix time
-        {DAT_COM_FREQ, 'u', SCH_TX_FREQ},            ///< Communications frequency [Hz]
-        {DAT_COM_TX_PWR, 'u', SCH_TX_PWR},          ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-        {DAT_COM_BAUD, 'u', SCH_TX_BAUD},            ///< Baudrate [bps]
-        {DAT_COM_MODE, 'u', 0},            ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-        {DAT_COM_BCN_PERIOD, 'u', SCH_TX_BCN_PERIOD},      ///< Number of seconds between trx beacon packets
-        {DAT_OBC_BCN_OFFSET, 'u', SCH_OBC_BCN_OFFSET},      ///< Number of seconds between obc beacon packets
-        {DAT_TGT_OMEGA_X, 'f', 0},         ///< Target acceleration value along the x axis
-        {DAT_TGT_OMEGA_Y, 'f', 0},         ///< Target acceleration value along the y axis
-        {DAT_TGT_OMEGA_Z, 'f', 0},         ///< Target acceleration value along the z axis
-        {DAT_TGT_Q_0, 'f', 0},             ///< Target quaternion (Inertial to body)
-        {DAT_TGT_Q_1, 'f', 0},             ///< Target quaternion (Inertial to body)
-        {DAT_TGT_Q_2, 'f', 0},             ///< Target quaternion (Inertial to body)
-        {DAT_TGT_Q_3, 'f', 0},             ///< Target quaternion (Inertial to body)
-        {DAT_DRP_ACK_TEMP, 'u', 0},        ///< Temperature data acknowledge
-        {DAT_DRP_ACK_ADS, 'u', 0},         ///< ADS data index acknowledge
-        {DAT_DRP_ACK_EPS, 'u', 0},         ///< EPS data index acknowledge
-        {DAT_DRP_ACK_LANG, 'u', 0},        ///< Langmuir data index acknowledge
-        {DAT_DRP_MACH_STEP, 'i', 0},       ///<
-        {DAT_DRP_MACH_PAYLOADS, 'u', 0},   ///<
-};
-///< The dat_config_last_var constant serves for looping through all status variables
-static const int dat_config_last_var = sizeof(dat_config_list) / sizeof(dat_config_list[0]);
-
-/**
  * Enum constants for dynamically identifying system status fields at execution time.
  *
  * Also permits adding new status variables cheaply, by generalizing both the
@@ -208,7 +44,7 @@ static const int dat_config_last_var = sizeof(dat_config_list) / sizeof(dat_conf
  * @seealso dat_set_system_var
  * @seealso dat_get_system_var
  */
-typedef enum dat_system {
+typedef enum dat_status_address_enum {
     /// OBC: On board computer related variables.
     dat_obc_opmode = 0,           ///< General operation mode
     dat_obc_last_reset,           ///< Last reset source
@@ -247,9 +83,9 @@ typedef enum dat_system {
     dat_ads_omega_x,              ///< Gyroscope acceleration value along the x axis
     dat_ads_omega_y,              ///< Gyroscope acceleration value along the y axis
     dat_ads_omega_z,              ///< Gyroscope acceleration value along the z axis
-    dat_tgt_omega_x,                ///< Target acceleration value along the x axis
-    dat_tgt_omega_y,                ///< Target acceleration value along the y axis
-    dat_tgt_omega_z,                ///< Target acceleration value along the z axis
+    dat_tgt_omega_x,              ///< Target acceleration value along the x axis
+    dat_tgt_omega_y,              ///< Target acceleration value along the y axis
+    dat_tgt_omega_z,              ///< Target acceleration value along the z axis
     dat_ads_mag_x,                ///< Magnetometer value along the x axis
     dat_ads_mag_y,                ///< Magnetometer value along the y axis
     dat_ads_mag_z,                ///< Magnetometer value along the z axis
@@ -258,14 +94,14 @@ typedef enum dat_system {
     dat_ads_pos_z,                ///< Satellite orbit position z (ECI)
     dat_ads_tle_epoch,            ///< Current TLE epoch, 0 if TLE is invalid
     dat_ads_tle_last,             ///< Las time position was propagated
-    dat_ads_q0,                  ///< Attitude quaternion (Inertial to body)
-    dat_ads_q1,                  ///< Attitude quaternion (Inertial to body)
-    dat_ads_q2,                  ///< Attitude quaternion (Inertial to body)
-    dat_ads_q3,                  ///< Attitude quaternion (Inertial to body)
-    dat_tgt_q0,                  ///< Target quaternion (Inertial to body)
-    dat_tgt_q1,                  ///< Target quaternion (Inertial to body)
-    dat_tgt_q2,                  ///< Target quaternion (Inertial to body)
-    dat_tgt_q3,                  ///< Target quaternion (Inertial to body)
+    dat_ads_q0,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_q1,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_q2,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_q3,                   ///< Attitude quaternion (Inertial to body)
+    dat_tgt_q0,                   ///< Target quaternion (Inertial to body)
+    dat_tgt_q1,                   ///< Target quaternion (Inertial to body)
+    dat_tgt_q2,                   ///< Target quaternion (Inertial to body)
+    dat_tgt_q3,                   ///< Target quaternion (Inertial to body)
 
     /// EPS: Energy power system
     dat_eps_vbatt,                ///< Voltage of the battery [mV]
@@ -280,123 +116,118 @@ typedef enum dat_system {
     dat_drp_lang,                 ///< Langmuir data index
 
     /// Memory: Current send acknowledge data
-    dat_drp_ack_temp,                 ///< Temperature data acknowledge
-    dat_drp_ack_ads,                  ///< ADS data index acknowledge
-    dat_drp_ack_eps,                  ///< EPS data index acknowledge
-    dat_drp_ack_lang,                 ///< Langmuir data index acknowledge
+    dat_drp_ack_temp,             ///< Temperature data acknowledge
+    dat_drp_ack_ads,              ///< ADS data index acknowledge
+    dat_drp_ack_eps,              ///< EPS data index acknowledge
+    dat_drp_ack_lang,             ///< Langmuir data index acknowledge
 
     /// Sample Machine: Current state of sample machine
-    dat_drp_mach_action,
-    dat_drp_mach_state,
-    dat_drp_mach_step,
-    dat_drp_mach_payloads,
-    dat_drp_mach_left,
+    dat_drp_mach_action,          ///<
+    dat_drp_mach_state,           ///<
+    dat_drp_mach_step,            ///<
+    dat_drp_mach_payloads,        ///<
+    dat_drp_mach_left,            ///<
 
-    /// Add custom status variables here
+    /// Add a new status variables address here
     //dat_custom,                 ///< Variable description
 
     /// LAST ELEMENT: DO NOT EDIT
-    dat_system_last_var           ///< Dummy element, the amount of status variables
-} dat_system_t;
+    dat_status_last_addresss           ///< Dummy element, the amount of status variables
+} dat_status_address_t;
 
 /**
- * Struct storing all system status variables.
- *
- * After adding a new field, a new enum constant of the same name must be added
- * to dat_system_t above.
- *
- * @see dat_system_t
+ * A 32 bit variable that can be interpreted as int, uint or float
  */
-typedef struct __attribute__((packed)) dat_status_s {
-    /// OBC: on board computer related variables.
-    int32_t dat_obc_opmode;         ///< General operation mode
-    int32_t dat_obc_last_reset;     ///< Last reset source
-    int32_t dat_obc_hrs_alive;      ///< Hours since first boot
-    int32_t dat_obc_hrs_wo_reset;   ///< Hours since last reset
-    int32_t dat_obc_reset_counter;  ///< Number of reset since first boot
-    int32_t dat_obc_sw_wdt;         ///< Software watchdog timer counter
-    float dat_obc_temp_1;           ///< Temperature value of the first sensor
-    float dat_obc_temp_2;           ///< Temperature value of the second sensor
-    float dat_obc_temp_3;           ///< Temperature value of the gyroscope
+typedef union value32_u{
+    int32_t i;
+    uint32_t u;
+    float f;
+} value32_t;
 
-    /// DEP: deployment related variables.
-    int32_t dat_dep_deployed;       ///< Was the satellite deployed?
-    int32_t dat_dep_ant_deployed;   ///< Was the antenna deployed?
-    int32_t dat_dep_date_time;      ///< Antenna deployment unix time
+#define DAT_IS_CONFIG 0
+#define DAT_IS_STATUS 1
+/**
+ * A system variable (status or config) with a name, type and value
+ */
+typedef struct __attribute__((packed)) dat_sys_var {
+    uint16_t address;   ///< Variable address or index (in the data storage)
+    char name[24];      ///< Variable name (max 24 chars)
+    char type;          ///< Variable type (u: uint, i: int, f: float)
+    uint8_t is_status;  ///< Variable is status or is config
+    value32_t value;  ///< Variable default value
+} dat_sys_var_t;
 
-    /// RTC: related variables
-    int32_t dat_rtc_date_time;      ///< RTC current unix time
-
-    /// COM: communications system variables.
-    int32_t dat_com_count_tm;       ///< Number of Telemetries sent
-    int32_t dat_com_count_tc;       ///< Number of received Telecommands
-    int32_t dat_com_last_tc;        ///< Unix time of the last received Telecommand
-    uint32_t dat_com_freq;          ///< Communications frequency [Hz]
-    uint32_t dat_com_tx_pwr;        ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-    uint32_t dat_com_baud;          ///< Baudrate [bps]
-    uint32_t dat_com_mode;          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-    uint32_t dat_com_bcn_period;    ///< Number of seconds between beacon packets
-    uint32_t dat_obc_bcn_offset;    ///< Number of seconds between obc beacon packets
-
-    /// FPL: flight plant related variables
-    int32_t dat_fpl_last;           ///< Last executed flight plan (unix time)
-    int32_t dat_fpl_queue;          ///< Flight plan queue length
-
-    /// ADS: Attitude determination system
-    float dat_ads_omega_x;            ///< Gyroscope acceleration value along the x axis
-    float dat_ads_omega_y;            ///< Gyroscope acceleration value along the y axis
-    float dat_ads_omega_z;            ///< Gyroscope acceleration value along the z axis
-    float dat_tgt_omega_x;            ///< Target acceleration value along the x axis
-    float dat_tgt_omega_y;            ///< Target acceleration value along the y axis
-    float dat_tgt_omega_z;            ///< Target acceleration value along the z axis
-    float dat_ads_mag_x;            ///< Magnetometer value along the x axis
-    float dat_ads_mag_y;            ///< Magnetometer value along the y axis
-    float dat_ads_mag_z;            ///< Magnetometer value along the z axis
-    float dat_ads_pos_x;            ///< Satellite orbit position x (ECI)
-    float dat_ads_pos_y;            ///< Satellite orbit position y (ECI)
-    float dat_ads_pos_z;            ///< Satellite orbit position z (ECI)
-    int32_t dat_ads_tle_epoch;      ///< Current TLE epoch, 0 if TLE is invalid
-    int32_t  dat_ads_tle_last;      ///< Las time position was propagated
-    float dat_ads_q0;               ///< Attitude quaternion (Inertial to body)
-    float dat_ads_q1;               ///< Attitude quaternion (Inertial to body)
-    float dat_ads_q2;               ///< Attitude quaternion (Inertial to body)
-    float dat_ads_q3;               ///< Attitude quaternion (Inertial to body)
-    float dat_tgt_q0;               ///< Target quaternion (Inertial to body)
-    float dat_tgt_q1;               ///< Target quaternion (Inertial to body)
-    float dat_tgt_q2;               ///< Target quaternion (Inertial to body)
-    float dat_tgt_q3;               ///< Target quaternion (Inertial to body)
-
-    /// EPS: Energy power system
-    uint32_t dat_eps_vbatt;         ///< Voltage of battery [mV]
-    uint32_t dat_eps_cur_sun;       ///< Current from boost converters [mA]
-    uint32_t dat_eps_cur_sys;       ///< Current out of battery [mA]
-    uint32_t dat_eps_temp_bat0;     ///< Battery temperature sensor
-
-    /// Memory: Current payload memory address
-    uint32_t dat_drp_temp;          ///< Temperature data index
-    uint32_t dat_drp_ads;           ///< ADS data index
-    uint32_t dat_drp_eps;           ///< EPS data index
-    uint32_t dat_drp_lang;          ///< Langmuir data index
-
-    /// Memory: Current send acknowledge data
-    uint32_t dat_drp_ack_temp;      ///< Temperature data acknowledge
-    uint32_t dat_drp_ack_ads;       ///< ADS data index acknowledge
-    uint32_t dat_drp_ack_eps;       ///< EPS data index acknowledge
-    uint32_t dat_drp_ack_lang;      ///< Langmuir data index acknowledge
-
-    /// Sample Machine:
-    uint32_t dat_drp_mach_action;
-    uint32_t dat_drp_mach_state;
-    int32_t dat_drp_mach_step;
-    uint32_t dat_drp_mach_payloads;
-    int32_t dat_drp_mach_left;
-
-    /// Add custom status variables here
-    //uint32_t dat_custom;          ///< Variable description
-
-    /// LAST ELEMENT: DO NOT EDIT
-    int32_t dat_system_last_var;    ///< Dummy element
-} dat_status_t;
+/**
+ * List of status variables with address, name, type and default values
+ * This list is useful to decide how to store and send the status variables
+ */
+static const dat_sys_var_t dat_status_list[] = {
+        {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, -1},         ///< Last reset source
+        {dat_obc_hrs_alive,     "obc_hrs_alive",     'u', DAT_IS_STATUS, 0},          ///< Hours since first boot
+        {dat_obc_hrs_wo_reset,  "obc_hrs_wo_reset",  'u', DAT_IS_STATUS, 0},          ///< Hours since last reset
+        {dat_obc_reset_counter, "obc_reset_counter", 'u', DAT_IS_STATUS, 0},          ///< Number of reset since first boot
+        {dat_obc_sw_wdt,        "obc_sw_wdt",        'u', DAT_IS_STATUS, 0},          ///< Software watchdog timer counter
+        {dat_obc_temp_1,        "obc_temp_1",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the first sensor
+        {dat_obc_temp_2,        "obc_temp_2",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the second sensor
+        {dat_obc_temp_3,        "obc_temp_3",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the gyroscope
+        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 1},          ///< Was the satellite deployed?
+        {dat_dep_ant_deployed,  "dep_ant_deployed",  'u', DAT_IS_STATUS, 1},          ///< Was the antenna deployed?
+        {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, -1},         ///< Antenna deployment unix time
+        {dat_com_count_tm,      "com_count_tm",      'u', DAT_IS_STATUS, 0},          ///< Number of Telemetries sent
+        {dat_com_count_tc,      "com_count_tc",      'u', DAT_IS_STATUS, 0},          ///< Number of received Telecommands
+        {dat_com_last_tc,       "com_last_tc",       'u', DAT_IS_STATUS, -1},         ///< Unix time of the last received Telecommand
+        {dat_fpl_last,          "fpl_last",          'u', DAT_IS_STATUS, 0},          ///< Last executed flight plan (unix time)
+        {dat_fpl_queue,         "fpl_queue",         'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
+        {dat_ads_omega_x,       "ads_omega_x",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the x axis
+        {dat_ads_omega_y,       "ads_omega_y",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the y axis
+        {dat_ads_omega_z,       "ads_omega_z",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the z axis
+        {dat_ads_mag_x,         "ads_mag_x",         'f', DAT_IS_STATUS, -1},         ///< Magnetometer value along the x axis
+        {dat_ads_mag_y,         "ads_mag_y",         'f', DAT_IS_STATUS, -1},         ///< Magnetometer value along the y axis
+        {dat_ads_mag_z,         "ads_mag_z",         'f', DAT_IS_STATUS, -1},         ///< Magnetometer value along the z axis
+        {dat_ads_pos_x,         "ads_pos_x",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position x (ECI)
+        {dat_ads_pos_y,         "ads_pos_y",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position y (ECI)
+        {dat_ads_pos_z,         "ads_pos_z",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position z (ECI)
+        {dat_ads_tle_epoch,     "ads_tle_epoch",     'u', DAT_IS_STATUS, -1},         ///< Current TLE epoch, 0 if TLE is invalid
+        {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, -1},         ///< Last time position was propagated
+        {dat_ads_q0,            "ads_q0",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
+        {dat_ads_q1,            "ads_q1",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
+        {dat_ads_q2,            "ads_q2",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
+        {dat_ads_q3,            "ads_q3",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
+        {dat_eps_vbatt,         "eps_vbatt",         'u', DAT_IS_STATUS, -1},         ///< Voltage of the battery [mV]
+        {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, -1},         ///< Current from boost converters [mA]
+        {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, -1},         ///< Current from the battery [mA]
+        {dat_eps_temp_bat0,     "eps_temp_bat0",     'u', DAT_IS_STATUS, -1},         ///< Battery temperature sensor
+        {dat_drp_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_ads,           "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
+        {dat_drp_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
+        {dat_drp_lang,          "drp_lang",          'u', DAT_IS_STATUS, 0},          ///< Langmuir data index
+        {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
+        {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
+        {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
+        {dat_obc_opmode,        "obc_opmode",        'i', DAT_IS_CONFIG, 0},          ///< General operation mode
+        {dat_rtc_date_time,     "rtc_date_time",     'i', DAT_IS_CONFIG, 0},          ///< RTC current unix time
+        {dat_com_freq,          "com_freq",          'u', DAT_IS_CONFIG, SCH_TX_FREQ},        ///< Communications frequency [Hz]
+        {dat_com_tx_pwr,        "com_tx_pwr",        'u', DAT_IS_CONFIG, SCH_TX_PWR},         ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
+        {dat_com_baud,          "com_baud",          'u', DAT_IS_CONFIG, SCH_TX_BAUD},        ///< Baudrate [bps]
+        {dat_com_mode,          "com_mode",          'u', DAT_IS_CONFIG, 0},          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
+        {dat_com_bcn_period,    "com_bcn_period",    'u', DAT_IS_CONFIG, SCH_TX_BCN_PERIOD},  ///< Number of seconds between trx beacon packets
+        {dat_obc_bcn_offset,    "obc_bcn_offset",    'u', DAT_IS_CONFIG, SCH_OBC_BCN_OFFSET}, ///< Number of seconds between obc beacon packets
+        {dat_tgt_omega_x,       "tgt_omega_x",       'f', DAT_IS_CONFIG, 0},          ///< Target acceleration value along the x axis
+        {dat_tgt_omega_y,       "tgt_omega_y",       'f', DAT_IS_CONFIG, 0},          ///< Target acceleration value along the y axis
+        {dat_tgt_omega_z,       "tgt_omega_z",       'f', DAT_IS_CONFIG, 0},          ///< Target acceleration value along the z axis
+        {dat_tgt_q0,            "tgt_q0",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_tgt_q1,            "tgt_q1",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_tgt_q2,            "tgt_q2",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_tgt_q3,            "tgt_q3",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
+        {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
+        {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
+        {dat_drp_ack_lang,      "drp_ack_lang",      'u', DAT_IS_CONFIG, 0},          ///< Langmuir data index acknowledge
+        {dat_drp_mach_step,     "drp_mach_step",     'i', DAT_IS_CONFIG, 0},          ///<
+        {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
+};
+///< The dat_status_last_var constant serves for looping through all status variables
+static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_status_list[0]);
 
 /**
  * Enum constants for dynamically identifying payload fields at execution time.
