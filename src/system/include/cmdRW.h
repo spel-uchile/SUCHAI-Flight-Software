@@ -36,8 +36,32 @@
  * Register reaction whee related (rw) commands
  */
 void cmd_rw_init(void);
+
+/**
+ * Get RW speed.
+ * @param fmt Str. Parameters format ""
+ * @param param Str. Parameters as string: ""
+ * @param nparams Int. Number of parameters 0
+ * @return 1 if executed correctly
+ */
 int rw_get_speed(char *fmt, char *params, int nparams);
+
+/**
+ * Get RW current.
+ * @param fmt Str. Parameters format ""
+ * @param param Str. Parameters as string: ""
+ * @param nparams Int. Number of parameters 0
+ * @return 1 if executed correctly
+ */
 int rw_get_current(char *fmt, char *params, int nparams);
+
+/**
+ * Set RW speed.
+ * @param fmt Str. Parameters format "%d %d"
+ * @param param Str. Parameters as string: "<motor_id> <speed>"
+ * @param nparams Int. Number of parameters 2
+ * @return 1 if executed correctly
+ */
 int rw_set_speed(char *fmt, char *params, int nparams);
 
 //#endif /* CMD_RW_H */

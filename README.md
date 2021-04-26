@@ -73,7 +73,7 @@ Linux installation requires the following libraries:
 * build-essential
 * cmake
 * pkg-config
-* pthread
+* pthread (libpthread-stubs0-dev)
 * cunit (libcunit1-dev)
 * sqlite3 (libsqlite3-dev)
 * zmq (libzmq3-dev)

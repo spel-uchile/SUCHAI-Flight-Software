@@ -49,6 +49,13 @@ void cmd_sensors_init(void);
  */
 int set_state(char *fmt, char *params, int nparams);
 
+/**
+ * Initialize a dummy sensor.
+ * @param fmt Str. Parameters format ""
+ * @param param Str. Parameters as string: ""
+ * @param nparams Int. Number of parameters 0
+ * @return CMD_OK if executed correctly
+ */
 int init_dummy_sensor(char *fmt, char *params, int nparams);
 
 #endif /* _CMD_SENS_H */

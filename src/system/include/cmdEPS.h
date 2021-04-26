@@ -117,7 +117,7 @@ int eps_set_output(char *fmt, char *params, int nparams);
  * Turn on/off al user outputs
  * @param fmt Str. Parameters format "<%d>"
  * @param params Str. Parameters as string "<0|1>"
- * @param nparams Int. Number of parameters |
+ * @param nparams Int. Number of parameters 1
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int eps_set_output_all(char *fmt, char *params, int nparams);

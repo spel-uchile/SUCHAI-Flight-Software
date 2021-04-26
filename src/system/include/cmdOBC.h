@@ -119,22 +119,11 @@ int obc_get_time(char *fmt, char *params, int nparams);
 int obc_system(char* fmt, char* params, int nparams);
 
 /**
- *
- * Function to test the console lecture on flight plan
- *
- * @param fmt Str. Parameters format "%d %s %d"
- * @param params Str. Parameters as string "<int> <string> <int>"
- * @param nparams Int. Number of parameters 3
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
- */
-int test_fp(char* fmt, char* params,int nparams);
-
-/**
  * Change <duty> cycle of pwm <channel>, so use this command carefully.
  * @warning only available in Nanomind
  * <duty> as percentage: 0-100, 10% ~ 1.0V RMS and 90% ~ 3.0V RMS
  * <channel> 0:X, 1:Y, 2:Z
- * 
+ *
  * @param fmt str. Parameters format: "%d %d"
  * @param params  str. Parameters as string <channel> <duty>,
  * @param nparams int. Number of parameters: 2
@@ -162,7 +151,7 @@ int obc_set_pwm_freq(char* fmt, char* params, int nparams);
  * 
  * @param fmt str. Parameters format: "%d"
  * @param params  str. Parameters as string <enable>,
- * @param nparams int. Number of parameters: 2
+ * @param nparams int. Number of parameters: 1
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int obc_pwm_pwr(char *fmt, char *params, int nparams);

@@ -34,7 +34,7 @@ void cmd_drp_init(void);
  *
  * @param fmt Str. Parameters format: "%d"
  * @param params Str. Parameters as string: "<MAGIC_NUMBER>"
- * @param nparams Int. Number of parameters: 0
+ * @param nparams Int. Number of parameters: 1
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int drp_execute_before_flight(char *fmt, char *params, int nparams);

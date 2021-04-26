@@ -69,19 +69,19 @@ int adcs_get_mag(char* fmt, char* params, int nparams);
 
 /**
  *
- * @param fmt
- * @param params
- * @param nparams
- * @return
+ * @param fmt Str. Parameters format "%lf"
+ * @param params Str. Parameters as string: "<control cycle>"
+ * @param nparams Int. Number of parameters 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int adcs_control_torque(char* fmt, char* params, int nparams);
 
 /**
  *
- * @param fmt
- * @param params
- * @param nparams
- * @return
+ * @param fmt ""
+ * @param params ""
+ * @param nparams 0
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
  */
 int adcs_mag_moment(char* fmt, char* params, int nparams);
 
