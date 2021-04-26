@@ -42,84 +42,151 @@ typedef struct __attribute__((packed)) dat_sys_var {
     value32_t value;    ///< Variable value
 } dat_sys_var_t;
 
-#define DAT_STATUS_MAX 50
 /**
  * List of status variables
  * Status variables are updated by the software itself not by ground operators
  */
-static dat_sys_var_t dat_status_list[DAT_STATUS_MAX] = {
-        {"obc_last_reset", 'u', 0},
-        {"obc_hrs_alive", 'u', 0},
-        {"obc_hrs_wo_reset", 'u', 0},
-        {"obc_reset_counter", 'u', 0},
-        {"obc_sw_wdt", 'u', 0},
-        {"obc_temp_1", 'f', 0},
-        {"obc_temp_2", 'f', 0},
-        {"obc_temp_3", 'f', 0},
-        {"dep_deployed", 'u', 0},
-        {"dep_ant_deployed", 'u', 0},
-        {"dep_date_time", 'u', 0},
-        {"com_count_tm", 'u', 0},
-        {"com_count_tc", 'u', 0},
-        {"com_last_tc", 'u', 0},
-        {"fpl_last", 'u', 0},
-        {"fpl_queue", 'u', 0},
-        {"ads_omega_x", 'f', 0},
-        {"ads_omega_y", 'f', 0},
-        {"ads_omega_z", 'f', 0},
-        {"ads_mag_x", 'f', 0},
-        {"ads_mag_y", 'f', 0},
-        {"ads_mag_z", 'f', 0},
-        {"ads_pos_x", 'f', 0},
-        {"ads_pos_y", 'f', 0},
-        {"ads_pos_z", 'f', 0},
-        {"ads_tle_epoch", 'u', 0},
-        {"ads_tle_last", 'u', 0},
-        {"ads_q0", 'f', 0},
-        {"ads_q1", 'f', 0},
-        {"ads_q2", 'f', 0},
-        {"ads_q3", 'f', 0},
-        {"eps_vbatt", 'u', 0},
-        {"eps_cur_sun", 'u', 0},
-        {"eps_cur_sys", 'u', 0},
-        {"eps_temp_bat0", 'u', 0},
-        {"drp_temp", 'u', 0},
-        {"drp_ads", 'u', 0},
-        {"drp_eps", 'u', 0},
-        {"drp_lang", 'u', 0},
-        {"drp_mach_action", 'u', 0},
-        {"drp_mach_state", 'u', 0},
-        {"drp_mach_left", 'u', 0},
-};
+#define DAT_OBC_LAST_RESET "obc_last_reset"
+#define DAT_OBC_HRS_ALIVE "obc_hrs_alive"
+#define DAT_OBC_HRS_WO_RESET "obc_hrs_wo_reset"
+#define DAT_OBC_RESET_COUNTER "obc_reset_counter"
+#define DAT_OBC_SW_WDT "obc_sw_wdt"
+#define DAT_OBC_TEMP_1 "obc_temp_1"
+#define DAT_OBC_TEMP_2 "obc_temp_2"
+#define DAT_OBC_TEMP_3 "obc_temp_3"
+#define DAT_DEP_DEPLOYED "dep_deployed"
+#define DAT_DEP_ANT_DEPLOYED "dep_ant_deployed"
+#define DAT_DEP_DATE_TIME "dep_date_time"
+#define DAT_COM_COUNT_TM "com_count_tm"
+#define DAT_COM_COUNT_TC "com_count_tc"
+#define DAT_COM_LAST_TC "com_last_tc"
+#define DAT_FPL_LAST "fpl_last"
+#define DAT_FPL_QUEUE "fpl_queue"
+#define DAT_ADS_OMEGA_X "ads_omega_x"
+#define DAT_ADS_OMEGA_Y "ads_omega_y"
+#define DAT_ADS_OMEGA_Z "ads_omega_z"
+#define DAT_ADS_MAG_X "ads_mag_x"
+#define DAT_ADS_MAG_Y "ads_mag_y"
+#define DAT_ADS_MAG_Z "ads_mag_z"
+#define DAT_ADS_POS_X "ads_pos_x"
+#define DAT_ADS_POS_Y "ads_pos_y"
+#define DAT_ADS_POS_Z "ads_pos_z"
+#define DAT_ADS_TLE_EPOCH "ads_tle_epoch"
+#define DAT_ADS_TLE_LAST "ads_tle_last"
+#define DAT_ADS_Q_0 "ads_q0"
+#define DAT_ADS_Q_1 "ads_q1"
+#define DAT_ADS_Q_2 "ads_q2"
+#define DAT_ADS_Q_3 "ads_q3"
+#define DAT_EPS_VBATT "eps_vbatt"
+#define DAT_EPS_CUR_SUN "eps_cur_sun"
+#define DAT_EPS_CUR_SYS "eps_cur_sys"
+#define DAT_EPS_TEMP_BAT_0 "eps_temp_bat0"
+#define DAT_DRP_TEMP "drp_temp"
+#define DAT_DRP_ADS "drp_ads"
+#define DAT_DRP_EPS "drp_eps"
+#define DAT_DRP_LANG "drp_lang"
+#define DAT_DRP_MACH_ACTION "drp_mach_action"
+#define DAT_DRP_MACH_STATE "drp_mach_state"
+#define DAT_DRP_MACH_LEFT "drp_mach_left"
 
-#define DAT_CONFIG_MAX 50
+static const dat_sys_var_t dat_status_list[] = {
+        {DAT_OBC_LAST_RESET, 'u', -1},      ///< Last reset source
+        {DAT_OBC_HRS_ALIVE, 'u', 0},       ///< Hours since first boot
+        {DAT_OBC_HRS_WO_RESET, 'u', 0},    ///< Hours since last reset
+        {DAT_OBC_RESET_COUNTER, 'u', 0},   ///< Number of reset since first boot
+        {DAT_OBC_SW_WDT, 'u', 0},          ///< Software watchdog timer counter
+        {DAT_OBC_TEMP_1, 'f', -1},          ///< Temperature value of the first sensor
+        {DAT_OBC_TEMP_2, 'f', -1},          ///< Temperature value of the second sensor
+        {DAT_OBC_TEMP_3, 'f', -1},          ///< Temperature value of the gyroscope
+        {DAT_DEP_DEPLOYED, 'u', 1},        ///< Was the satellite deployed?
+        {DAT_DEP_ANT_DEPLOYED, 'u', 1},    ///< Was the antenna deployed?
+        {DAT_DEP_DATE_TIME, 'u', -1},       ///< Antenna deployment unix time
+        {DAT_COM_COUNT_TM, 'u', 0},        ///< Number of Telemetries sent
+        {DAT_COM_COUNT_TC, 'u', 0},        ///< Number of received Telecommands
+        {DAT_COM_LAST_TC, 'u', -1},         ///< Unix time of the last received Telecommand
+        {DAT_FPL_LAST, 'u', 0},            ///< Last executed flight plan (unix time)
+        {DAT_FPL_QUEUE, 'u', 0},           ///< Flight plan queue length
+        {DAT_ADS_OMEGA_X, 'f', -1},         ///< Gyroscope acceleration value along the x axis
+        {DAT_ADS_OMEGA_Y, 'f', -1},         ///< Gyroscope acceleration value along the y axis
+        {DAT_ADS_OMEGA_Z, 'f', -1},         ///< Gyroscope acceleration value along the z axis
+        {DAT_ADS_MAG_X, 'f', -1},           ///< Magnetometer value along the x axis
+        {DAT_ADS_MAG_Y, 'f', -1},           ///< Magnetometer value along the y axis
+        {DAT_ADS_MAG_Z, 'f', -1},           ///< Magnetometer value along the z axis
+        {DAT_ADS_POS_X, 'f', -1},           ///< Satellite orbit position x (ECI)
+        {DAT_ADS_POS_Y, 'f', -1},           ///< Satellite orbit position y (ECI)
+        {DAT_ADS_POS_Z, 'f', -1},           ///< Satellite orbit position z (ECI)
+        {DAT_ADS_TLE_EPOCH, 'u', -1},       ///< Current TLE epoch, 0 if TLE is invalid
+        {DAT_ADS_TLE_LAST, 'u', -1},        ///< Last time position was propagated
+        {DAT_ADS_Q_0, 'f', -1},             ///< Attitude quaternion (Inertial to body)
+        {DAT_ADS_Q_1, 'f', -1},             ///< Attitude quaternion (Inertial to body)
+        {DAT_ADS_Q_2, 'f', -1},             ///< Attitude quaternion (Inertial to body)
+        {DAT_ADS_Q_3, 'f', -1},             ///< Attitude quaternion (Inertial to body)
+        {DAT_EPS_VBATT, 'u', -1},           ///< Voltage of the battery [mV]
+        {DAT_EPS_CUR_SUN, 'u', -1},         ///< Current from boost converters [mA]
+        {DAT_EPS_CUR_SYS, 'u', -1},         ///< Current from the battery [mA]
+        {DAT_EPS_TEMP_BAT_0, 'u', -1},      ///< Battery temperature sensor
+        {DAT_DRP_TEMP, 'u', 0},            ///< Temperature data index
+        {DAT_DRP_ADS, 'u', 0},             ///< ADS data index
+        {DAT_DRP_EPS, 'u', 0},             ///< EPS data index
+        {DAT_DRP_LANG, 'u', 0},            ///< Langmuir data index
+        {DAT_DRP_MACH_ACTION, 'u', 0},     ///<
+        {DAT_DRP_MACH_STATE, 'u', 0},      ///<
+        {DAT_DRP_MACH_LEFT, 'u', 0},       ///<
+};
+///< The dat_status_last_var constant serves for looping through all status variables
+static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_status_list[0]);
+
 /**
  * List of configuration variables
  * Configuration variables are updated by ground operators
  */
-static dat_sys_var_t dat_config_list[DAT_STATUS_MAX] = {
-        {"obc_op_mode", 'i', 0},          ///< C: General operation mode
-        {"rtc_date_time", 'i', 0},        ///< C: RTC current unix time
-        {"com_freq", 'u', 0},             ///< C: Communications frequency [Hz]
-        {"com_tx_pwr", 'u', 0},           ///< C: TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-        {"com_baud", 'u', 0},             ///< C: Baudrate [bps]
-        {"com_mode", 'u', 0},             ///< C: Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-        {"com_bcn_period", 'u', 0},       ///< C: Number of seconds between trx beacon packets
-        {"obc_bcn_offset", 'u', 0},       ///< C: Number of seconds between obc beacon packets
-        {"tgt_omega_x", 'f', 0},          ///< C: Target acceleration value along the x axis
-        {"tgt_omega_y", 'f', 0},          ///< C: Target acceleration value along the y axis
-        {"tgt_omega_z", 'f', 0},          ///< C: Target acceleration value along the z axis
-        {"tgt_q0", 'f', 0},               ///< C: Target quaternion (Inertial to body)
-        {"tgt_q1", 'f', 0},               ///< C: Target quaternion (Inertial to body)
-        {"tgt_q2", 'f', 0},               ///< C: Target quaternion (Inertial to body)
-        {"tgt_q3", 'f', 0},               ///< C: Target quaternion (Inertial to body)
-        {"drp_ack_temp", 'u', 0},         ///<C: Temperature data acknowledge
-        {"drp_ack_ads", 'u', 0},          ///<C: ADS data index acknowledge
-        {"drp_ack_eps", 'u', 0},          ///<C: EPS data index acknowledge
-        {"drp_ack_lang", 'u', 0},         ///<C: Langmuir data index acknowledge
-        {"drp_mach_step", 'i', 0},        ///< C:
-        {"drp_mach_payloads", 'u', 0},    ///< C:
+#define DAT_OBC_OP_MODE "obc_op_mode"
+#define DAT_RTC_DATE_TIME "rtc_date_time"
+#define DAT_COM_FREQ "com_freq"
+#define DAT_COM_TX_PWR "com_tx_pwr"
+#define DAT_COM_BAUD "com_baud"
+#define DAT_COM_MODE "com_mode"
+#define DAT_COM_BCN_PERIOD "com_bcn_period"
+#define DAT_OBC_BCN_OFFSET "obc_bcn_offset"
+#define DAT_TGT_OMEGA_X "tgt_omega_x"
+#define DAT_TGT_OMEGA_Y "tgt_omega_y"
+#define DAT_TGT_OMEGA_Z "tgt_omega_z"
+#define DAT_TGT_Q_0 "tgt_q0"
+#define DAT_TGT_Q_1 "tgt_q1"
+#define DAT_TGT_Q_2 "tgt_q2"
+#define DAT_TGT_Q_3 "tgt_q3"
+#define DAT_DRP_ACK_TEMP "drp_ack_temp"
+#define DAT_DRP_ACK_ADS "drp_ack_ads"
+#define DAT_DRP_ACK_EPS "drp_ack_eps"
+#define DAT_DRP_ACK_LANG "drp_ack_lang"
+#define DAT_DRP_MACH_STEP "drp_mach_step"
+#define DAT_DRP_MACH_PAYLOADS "drp_mach_payloads"
+
+static const dat_sys_var_t dat_config_list[] = {
+        {DAT_OBC_OP_MODE, 'i', 0},         ///< General operation mode
+        {DAT_RTC_DATE_TIME, 'i', 0},       ///< RTC current unix time
+        {DAT_COM_FREQ, 'u', SCH_TX_FREQ},            ///< Communications frequency [Hz]
+        {DAT_COM_TX_PWR, 'u', SCH_TX_PWR},          ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
+        {DAT_COM_BAUD, 'u', SCH_TX_BAUD},            ///< Baudrate [bps]
+        {DAT_COM_MODE, 'u', 0},            ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
+        {DAT_COM_BCN_PERIOD, 'u', SCH_TX_BCN_PERIOD},      ///< Number of seconds between trx beacon packets
+        {DAT_OBC_BCN_OFFSET, 'u', SCH_OBC_BCN_OFFSET},      ///< Number of seconds between obc beacon packets
+        {DAT_TGT_OMEGA_X, 'f', 0},         ///< Target acceleration value along the x axis
+        {DAT_TGT_OMEGA_Y, 'f', 0},         ///< Target acceleration value along the y axis
+        {DAT_TGT_OMEGA_Z, 'f', 0},         ///< Target acceleration value along the z axis
+        {DAT_TGT_Q_0, 'f', 0},             ///< Target quaternion (Inertial to body)
+        {DAT_TGT_Q_1, 'f', 0},             ///< Target quaternion (Inertial to body)
+        {DAT_TGT_Q_2, 'f', 0},             ///< Target quaternion (Inertial to body)
+        {DAT_TGT_Q_3, 'f', 0},             ///< Target quaternion (Inertial to body)
+        {DAT_DRP_ACK_TEMP, 'u', 0},        ///< Temperature data acknowledge
+        {DAT_DRP_ACK_ADS, 'u', 0},         ///< ADS data index acknowledge
+        {DAT_DRP_ACK_EPS, 'u', 0},         ///< EPS data index acknowledge
+        {DAT_DRP_ACK_LANG, 'u', 0},        ///< Langmuir data index acknowledge
+        {DAT_DRP_MACH_STEP, 'i', 0},       ///<
+        {DAT_DRP_MACH_PAYLOADS, 'u', 0},   ///<
 };
+///< The dat_config_last_var constant serves for looping through all status variables
+static const int dat_config_last_var = sizeof(dat_config_list) / sizeof(dat_config_list[0]);
 
 /**
  * Enum constants for dynamically identifying system status fields at execution time.
