@@ -30,7 +30,6 @@ void cmd_fp_init(void)
     cmd_add("fp_del_cmd_unix", fp_delete_unix, "%d", 1);
     cmd_add("fp_show", fp_show, "", 0);
     cmd_add("fp_reset", fp_reset,"", 0);
-    cmd_add("fp_test_params", test_fp_params, "%d %s %d", 3);
 }
 
 int fp_set(char *fmt, char *params, int nparams)
@@ -188,19 +187,5 @@ int fp_reset(char* fmt, char* params, int nparams)
         return CMD_OK;
     else
         return CMD_FAIL;
-}
-
-int test_fp_params(char* fmt, char* params,int nparams)
-{
-    int num1, num2;
-    char str[SCH_CMD_MAX_STR_PARAMS];
-    if(params == NULL || sscanf(params, fmt, &num1, &str, &num2) != nparams)
-    {
-        LOGW(tag, "test_fp used with invalid params: %s", params);
-        return CMD_ERROR;
-    }
-
-    printf("The parameters are: %d ; %s ; %d \n",num1, str ,num2);
-    return CMD_OK;
 }
 
