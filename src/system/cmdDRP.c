@@ -29,10 +29,10 @@ static const char *tag = "cmdDRP";
 void cmd_drp_init(void)
 {
     cmd_add("drp_ebf", drp_execute_before_flight, "%d", 1);
-//    cmd_add("drp_print_var", drp_print_system_var, "%s", 1);
     cmd_add("drp_print_vars", drp_print_system_vars, "", 0);
     cmd_add("drp_set_var", drp_update_sys_var_idx, "%d %f", 2);
     cmd_add("drp_set_var_name", drp_update_sys_var_name, "%s %f", 2);
+    cmd_add("drp_get_var_name", drp_get_sys_var_name, "%s", 1);
     cmd_add("drp_add_hrs_alive", drp_update_hours_alive, "%d", 1);
     cmd_add("drp_clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
     cmd_add("drp_set_deployed", drp_set_deployed, "%d", 1);
@@ -161,6 +161,31 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
     // Store the variable value
     int rc = dat_set_status_var(variable_def.address, variable);
     return rc >= 0 ? CMD_OK : CMD_FAIL;
+}
+
+int drp_get_sys_var_name(char *fmt, char *params, int nparams)
+{
+    char name[24];
+    if(params == NULL || sscanf(params, fmt, name) != nparams)
+    {
+        LOGE(tag, "Error parsing arguments!");
+        return CMD_ERROR;
+    }
+
+    // Get variable definition by name
+    dat_sys_var_t variable_def = dat_get_status_var_def_name(name);
+    if(variable_def.status == -1)
+    {
+        LOGE(tag, "drp_update_sys_var_name used with invalid name: %s", name);
+        return CMD_FAIL;
+    }
+
+    // Support int and float arguments
+    value32_t variable = dat_get_status_var(variable_def.address);
+    variable_def.value = variable;
+    dat_print_system_var(&variable_def);
+
+    return CMD_OK;
 }
 
 int drp_update_hours_alive(char *fmt, char *params, int nparams)

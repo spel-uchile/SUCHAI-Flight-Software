@@ -104,6 +104,16 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams);
 int drp_update_sys_var_name(char *fmt, char *params, int nparams);
 
 /**
+ * Print a system status variable value by name
+ * *
+ * @param fmt Str. Parameters format "%s"
+ * @param params Str. Parameters as string "<name>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int drp_get_sys_var_name(char *fmt, char *params, int nparams);
+
+/**
  * Update current hours alive and hours without reset counters adding <value>
  * hours.
  *
