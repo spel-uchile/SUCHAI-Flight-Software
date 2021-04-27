@@ -60,16 +60,16 @@ void dat_print_system_var(dat_sys_var_t *status)
 
     switch (status->type) {
         case 'u':
-            printf("%d, %s, %u, %d\n", status->address, status->name, status->value.u, status->status);
+            printf("%3d, %-20s, %u, %d\n", status->address, status->name, status->value.u, status->status);
             break;
         case 'i':
-            printf("%d, %s, %d, %d\n", status->address, status->name, status->value.i, status->status);
+            printf("%3d, %-20s, %d, %d\n", status->address, status->name, status->value.i, status->status);
             break;
         case 'f':
-            printf("%d, %s, %.6f, %d\n", status->address, status->name, status->value.f, status->status);
+            printf("%3d, %-20s, %.6f, %d\n", status->address, status->name, status->value.f, status->status);
             break;
         default:
-            printf("%d, %s, %#X, %d\n", status->address, status->name, status->value.u, status->status);
+            printf("%3d, %-20s, %#X, %d\n", status->address, status->name, status->value.u, status->status);
     }
 }
 

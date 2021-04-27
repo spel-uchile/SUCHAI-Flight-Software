@@ -46,8 +46,8 @@ int tm_send_status(char *fmt, char *params, int nparams)
     dat_sys_var_short_t status_buff[dat_status_last_var];
     for(i = 0; i<dat_status_last_var; i++)
     {
-        status_buff[i].address = csp_ntoh16(dat_status_list[i].address);
-        status_buff[i].value.u = csp_ntoh32(dat_get_status_var(dat_status_list[i].address).u);
+        status_buff[i].address = csp_hton16(dat_status_list[i].address);
+        status_buff[i].value.u = csp_hton32(dat_get_status_var(dat_status_list[i].address).u);
     }
 
     // Send telemetry
@@ -60,13 +60,13 @@ int tm_parse_status(char *fmt, char *params, int nparams)
         return CMD_ERROR;
 
     com_frame_t *frame = (com_frame_t *)params;
-    dat_sys_var_short_t *status_buff = (dat_sys_var_short_t *)frame;
+    dat_sys_var_short_t *status_buff = (dat_sys_var_short_t *)frame->data.data8;
 
     int i;
     for(i = 0; i<frame->ndata; i++)
     {
-        uint16_t address = csp_hton16(status_buff[i].address);
-        value32_t value = {.u = csp_hton32(status_buff[i].value.u)};
+        uint16_t address = csp_ntoh16(status_buff[i].address);
+        value32_t value = {.u = csp_ntoh32(status_buff[i].value.u)};
         dat_sys_var_t system_var = dat_get_status_var_def(address);
         system_var.value = value;
         dat_print_system_var(&system_var);
