@@ -133,18 +133,18 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
 {
 
     #ifdef LINUX
-        struct mallinfo2 mi;
-        mi = mallinfo2();
-        printf("Total non-mmapped bytes (arena):       %zu\n", mi.arena);
-        printf("# of free chunks (ordblks):            %zu\n", mi.ordblks);
-        printf("# of free fastbin blocks (smblks):     %zu\n", mi.smblks);
-        printf("# of mapped regions (hblks):           %zu\n", mi.hblks);
-        printf("Bytes in mapped regions (hblkhd):      %zu\n", mi.hblkhd);
-        printf("Max. total allocated space (usmblks):  %zu\n", mi.usmblks);
-        printf("Free bytes held in fastbins (fsmblks): %zu\n", mi.fsmblks);
-        printf("Total allocated space (uordblks):      %zu\n", mi.uordblks);
-        printf("Total free space (fordblks):           %zu\n", mi.fordblks);
-        printf("Topmost releasable block (keepcost):   %zu\n", mi.keepcost);
+        struct mallinfo mi;
+        mi = mallinfo();
+        printf("Total non-mmapped bytes (arena):       %d\n", mi.arena);
+        printf("# of free chunks (ordblks):            %d\n", mi.ordblks);
+        printf("# of free fastbin blocks (smblks):     %d\n", mi.smblks);
+        printf("# of mapped regions (hblks):           %d\n", mi.hblks);
+        printf("Bytes in mapped regions (hblkhd):      %d\n", mi.hblkhd);
+        printf("Max. total allocated space (usmblks):  %d\n", mi.usmblks);
+        printf("Free bytes held in fastbins (fsmblks): %d\n", mi.fsmblks);
+        printf("Total allocated space (uordblks):      %d\n", mi.uordblks);
+        printf("Total free space (fordblks):           %d\n", mi.fordblks);
+        printf("Topmost releasable block (keepcost):   %d\n", mi.keepcost);
     #else
         #if defined(NANOMIND) || defined(AVR32)
             size_t mem_heap = 0;
