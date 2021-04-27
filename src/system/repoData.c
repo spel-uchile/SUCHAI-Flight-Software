@@ -36,7 +36,7 @@ time_t sec = 0;
     #if SCH_STORAGE_TRIPLE_WR == 1
         static value32_t DAT_SYSTEM_VAR_BUFF[dat_status_last_address * 3];
     #else
-        int DAT_SYSTEM_VAR_BUFF[dat_status_last_addresss];
+        int DAT_SYSTEM_VAR_BUFF[dat_status_last_address];
     #endif
     static fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
@@ -120,60 +120,6 @@ void dat_repo_close(void)
 #endif
 }
 
-///**
-// * Function for testing triple writing.
-// *
-// * Should do the same as @c dat_set_system_var , but with only one system status repo.
-// *
-// * @param index Enum index of the field to set
-// * @param value Integer value to set the variable to
-// */
-//void _dat_set_system_var(dat_status_address_t index, int value)
-//{
-//    //Enter critical zone
-//    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-//
-//    //Uses internal memory
-//#if SCH_STORAGE_MODE == 0
-//    DAT_SYSTEM_VAR_BUFF[index] = value;
-//    //Uses external memory
-//#else
-//    storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
-//#endif
-//
-//    //Exit critical zone
-//    osSemaphoreGiven(&repo_data_sem);
-//}
-//
-///**
-// * Function for testing triple writing.
-// *
-// * Should do the same as @c dat_get_system_var , but with only one system status repo.
-// *
-// * @param index Enum index of the field to get
-// * @return The field's value
-// */
-//int _dat_get_system_var(dat_status_address_t index)
-//{
-//    int value = 0;
-//
-//    //Enter critical zone
-//    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-//
-//    //Use internal (volatile) memory
-//#if SCH_STORAGE_MODE == 0
-//    value = DAT_SYSTEM_VAR_BUFF[index];
-//    //Uses external (non-volatile) memory
-//#else
-//    value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
-//#endif
-//
-//    //Exit critical zone
-//    osSemaphoreGiven(&repo_data_sem);
-//
-//    return value;
-//}
-
 ///< Compatibility function
 int dat_set_system_var(dat_status_address_t index, int value)
 {
@@ -201,8 +147,8 @@ int dat_set_status_var(dat_status_address_t index, value32_t value)
     rc = storage_repo_set_value_idx(index, value.i, DAT_REPO_SYSTEM);
     //Uses tripled writing
     #if SCH_STORAGE_TRIPLE_WR == 1
-        int rc2 = storage_repo_set_value_idx(index + dat_status_last_addresss, value.i, DAT_REPO_SYSTEM);
-        int rc3 = storage_repo_set_value_idx(index + dat_status_last_addresss*2, value.i, DAT_REPO_SYSTEM);
+        int rc2 = storage_repo_set_value_idx(index + dat_status_last_address, value.i, DAT_REPO_SYSTEM);
+        int rc3 = storage_repo_set_value_idx(index + dat_status_last_address*2, value.i, DAT_REPO_SYSTEM);
         rc = rc & rc2 & rc3;
     #endif
 #endif
@@ -249,11 +195,11 @@ value32_t dat_get_status_var(dat_status_address_t index)
     #endif
     //Uses external (non-volatile) memory
 #else
-    value_1 = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
+    value_1.i = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
     //Uses tripled writing
     #if SCH_STORAGE_TRIPLE_WR == 1
-        value_2 = storage_repo_get_value_idx(index + dat_status_last_addresss, DAT_REPO_SYSTEM);
-        value_3 = storage_repo_get_value_idx(index + dat_status_last_addresss * 2, DAT_REPO_SYSTEM);
+        value_2.i = storage_repo_get_value_idx(index + dat_status_last_address, DAT_REPO_SYSTEM);
+        value_3.i = storage_repo_get_value_idx(index + dat_status_last_address * 2, DAT_REPO_SYSTEM);
     #endif
 #endif
 
