@@ -363,7 +363,7 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
          data_temp.obc_temp_1, data_temp.obc_temp_2, data_temp.obc_temp_3);
     dat_add_payload_sample(&data_temp, temp_sensors);
 
-//    dat_get_system_var(dat_system_last_var)
+//    dat_get_system_var(dat_status_last_address)
 #endif
 
     return CMD_OK;

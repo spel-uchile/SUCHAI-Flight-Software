@@ -480,7 +480,7 @@ int com_set_config(char *fmt, char *params, int nparams)
 int com_update_status_vars(char *fmt, char *params, int nparams)
 {
     char *names[5] = {"freq", "tx_pwr", "baud", "mode", "bcn_interval"};
-    dat_system_t vars[5] = {dat_com_freq, dat_com_tx_pwr, dat_com_bcn_period,
+    dat_status_address_t vars[5] = {dat_com_freq, dat_com_tx_pwr, dat_com_bcn_period,
                              dat_com_mode, dat_com_bcn_period};
     int table = 0;
     param_table_t *param_i = NULL;

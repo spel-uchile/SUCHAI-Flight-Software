@@ -25,7 +25,7 @@ void taskTest(void* param)
 
         dat_status_t status;
 
-        for (dat_system_t i = 0; i < dat_system_last_var; i++)
+        for (dat_status_address_t i = 0; i < dat_status_last_address; i++)
         {
             dat_set_system_var(i, (current_test+1)*100 + ((int) i));
         }

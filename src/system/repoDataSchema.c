@@ -17,53 +17,59 @@ struct map data_map[last_sensor] = {
         { "langmuir_data", (uint16_t) (sizeof(langmuir_data_t)), dat_drp_lang, dat_drp_ack_lang, "%u %f %f %f %d",                "timestamp sweep_voltage plasma_voltage plasma_temperature particles_counter"}
 };
 
-
-void dat_status_to_list(value32_t *varlist, dat_sys_var_t *status, int nvars)
+dat_sys_var_t dat_get_status_var_def(dat_status_address_t address)
 {
-    assert(varlist !=  NULL);
-    assert(status != NULL);
+    dat_sys_var_t var = {0};
     int i;
-    for(i = 0; i<nvars; i++)
-        varlist[i] = status[i].value;
-}
 
-void dat_status_from_list(value32_t *varlist, dat_sys_var_t *status, dat_sys_var_t *reference, int nvars)
-{
-    assert(varlist !=  NULL);
-    assert(status != NULL);
-    int i;
-    for(i = 0; i<nvars; i++)
+    if(address < dat_status_last_address)
     {
-        status[i].value = varlist[i];
-        if(reference != NULL)
+        for (i = 0; i < dat_status_last_var; i++)
         {
-            strcpy(status[i].name, reference[i].name);
-            status[i].type = reference[i].type;
+            if (dat_status_list[i].address == address)
+                return dat_status_list[i];
         }
     }
+
+    LOGE(tag, "Status var not found! (%d)", address);
+    return var;
 }
 
-void dat_print_status(dat_sys_var_t *status, int nvars)
+dat_sys_var_t dat_get_status_var_def_name(char *name)
+{
+    dat_sys_var_t var;
+    var.status = -1;
+    int i;
+
+    if(name != NULL)
+    {
+        for (i = 0; i < dat_status_last_var; i++)
+        {
+            if (strcmp(dat_status_list[i].name, name) == 0)
+                return dat_status_list[i];
+        }
+    }
+
+    LOGE(tag, "Status var not found! (%s)", name);
+    return var;
+}
+
+void dat_print_system_var(dat_sys_var_t *status)
 {
     assert(status != NULL);
-    int i;
-    printf("address, name, value, type\n");
-    for(i=0; i<nvars; i++)
-    {
-        dat_sys_var_t var = status[i];
-        switch (var.type) {
-            case 'u':
-                printf("%d, %s, %u, %d\n", var.address, var.name, var.value.u, var.is_status);
-                break;
-            case 'i':
-                printf("%d, %s, %d, %d\n", var.address, var.name, var.value.i, var.is_status);
-                break;
-            case 'f':
-                printf("%d, %s, %.6f, %d\n", var.address, var.name, var.value.f, var.is_status);
-                break;
-            default:
-                printf("%d, %s, %#X, %d\n", var.address, var.name, var.value.u, var.is_status);
-        }
+
+    switch (status->type) {
+        case 'u':
+            printf("%d, %s, %u, %d\n", status->address, status->name, status->value.u, status->status);
+            break;
+        case 'i':
+            printf("%d, %s, %d, %d\n", status->address, status->name, status->value.i, status->status);
+            break;
+        case 'f':
+            printf("%d, %s, %.6f, %d\n", status->address, status->name, status->value.f, status->status);
+            break;
+        default:
+            printf("%d, %s, %#X, %d\n", status->address, status->name, status->value.u, status->status);
     }
 }
 

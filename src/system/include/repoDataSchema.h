@@ -30,11 +30,11 @@ typedef struct __attribute__((packed)) fp_entry {
  * Also permits adding new status variables cheaply, by generalizing both the
  * dat_set_system_var and dat_get_system_var functions.
  *
- * The dat_system_last_var constant serves only for comparison when looping through all
+ * The dat_status_last_address constant serves only for comparison when looping through all
  * system status values. For example:
  *
  * @code
- * for (dat_system_t i = 0; i < dat_system_last_var; i++)
+ * for (dat_status_address_t i = 0; i < dat_status_last_address; i++)
  * {
  * // some code using i.
  * }
@@ -132,7 +132,7 @@ typedef enum dat_status_address_enum {
     //dat_custom,                 ///< Variable description
 
     /// LAST ELEMENT: DO NOT EDIT
-    dat_status_last_addresss           ///< Dummy element, the amount of status variables
+    dat_status_last_address           ///< Dummy element, the amount of status variables
 } dat_status_address_t;
 
 /**
@@ -144,18 +144,37 @@ typedef union value32_u{
     float f;
 } value32_t;
 
+///< Define opeartion modes
+#define DAT_OBC_OPMODE_NORMAL        (0) ///< Normal operation
+#define DAT_OBC_OPMODE_WARN          (1) ///< Fail safe operation
+#define DAT_OBC_OPMODE_FAIL          (2) ///< Generalized fail operation
+#define DAT_OBC_OPMODE_REF_POINT     (4) ///< Point to vector
+#define DAT_OBC_OPMODE_NAD_POINT     (5) ///< Point to nadir
+#define DAT_OBC_OPMODE_DETUMB_MAG    (6) ///< Detumbling
+
+///< Define is a variable is config or status
 #define DAT_IS_CONFIG 0
 #define DAT_IS_STATUS 1
+
 /**
- * A system variable (status or config) with a name, type and value
+ * A system variable (status or config) with an address, name, type and value
  */
 typedef struct __attribute__((packed)) dat_sys_var {
     uint16_t address;   ///< Variable address or index (in the data storage)
     char name[24];      ///< Variable name (max 24 chars)
     char type;          ///< Variable type (u: uint, i: int, f: float)
-    uint8_t is_status;  ///< Variable is status or is config
-    value32_t value;  ///< Variable default value
+    int8_t status;      ///< Variable is status (1), is config (0), or uninitialized (-1)
+    value32_t value;    ///< Variable default value
 } dat_sys_var_t;
+
+/**
+ * A system variable (status or config) with an address, and value
+ * A short version to be sent as telemetry
+ */
+typedef struct __attribute__((packed)) dat_sys_var_short {
+    uint16_t address;   ///< Variable address or index (in the data storage)
+    value32_t value;    ///< Variable default value
+} dat_sys_var_short_t;
 
 /**
  * List of status variables with address, name, type and default values
@@ -317,56 +336,22 @@ extern struct __attribute__((__packed__)) map {
     char var_names[200];
 } data_map[last_sensor];
 
-/** Union for easily casting status variable types */
-typedef union fvalue{
-    float f;
-    int32_t i;
-} fvalue_t;
-
-#define DAT_OBC_OPMODE_NORMAL        (0) ///< Normal operation
-#define DAT_OBC_OPMODE_WARN          (1) ///< Fail safe operation
-#define DAT_OBC_OPMODE_FAIL          (2) ///< Generalized fail operation
-#define DAT_OBC_OPMODE_REF_POINT     (4) ///< Point to vector
-#define DAT_OBC_OPMODE_NAD_POINT     (5) ///< Point to nadir
-#define DAT_OBC_OPMODE_DETUMB_MAG    (6) ///< Detumbling
-
 /** The repository's name */
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
 
-/** Copy a system @var to a status struct @st */
-#define DAT_CPY_SYSTEM_VAR(st, var) st->var = dat_get_system_var(var)
-
-/** Copy a float system @var to a status struct @st */
-#define DAT_CPY_SYSTEM_VAR_F(st, var) {fvalue_t v; v.i = (float)dat_get_system_var(var); st->var = v.f;}
-
-/** Print the name and value of a integer system status variable */
-#define DAT_PRINT_SYSTEM_VAR(st, var) printf("\t%s: %lu\n\r", #var, (unsigned long)st->var)
-
-/** Print the name and vale of a float system status variable */
-#define DAT_PRINT_SYSTEM_VAR_F(st, var) printf("\t%s: %f\n\r", #var, st->var)
-
 /**
- * Copies the status repository's values to list of values.
- * This function can be useful to pack and transmit the status variables
- * @warning @varlist and @status must point to reserved memory spaces
- *
- * @param status dat_status_t *. Pointer to destination structure
+ * Search and return a status variable definition from dat_status_list by index or by name
+ * @param address Variable index
+ * @param name Variable name
+ * @return dat_sys_var_t or 0 if not found.
  */
-void dat_status_to_list(value32_t *varlist, dat_sys_var_t *status, int nvars);
-
-/**
- * Copies a list of status values to a list of status variables.
- * This function can be useful to pack and transmit the status variables
- * @warning @varlist and @status must point to reserved memory spaces
- *
- * @param status dat_status_t *. Pointer to destination structure
- */
-void dat_status_from_list(value32_t *varlist, dat_sys_var_t *status, dat_sys_var_t *reference, int nvars);
+dat_sys_var_t dat_get_status_var_def(dat_status_address_t address);
+dat_sys_var_t dat_get_status_var_def_name(char *name);
 
 /**
  * Print the names and values of a system status variable list.
  * @param status Pointer to a status variables list
  */
-void dat_print_status(dat_sys_var_t *status, int nvars);
+void dat_print_system_var(dat_sys_var_t *status);
 
 #endif //REPO_DATA_SCHEMA_H

@@ -207,12 +207,12 @@ void test_system_vars(void)
     int init_value;
     int test_value = 85;
 
-    for (var_index = 0; var_index < dat_system_last_var; var_index++)
+    for (var_index = 0; var_index < dat_status_last_address; var_index++)
     {
-        init_value = dat_get_system_var((dat_system_t) var_index);
-        dat_set_system_var((dat_system_t) var_index, test_value);
-        var = dat_get_system_var((dat_system_t) var_index);
-        dat_set_system_var((dat_system_t) var_index, init_value);
+        init_value = dat_get_system_var((dat_status_address_t) var_index);
+        dat_set_system_var((dat_status_address_t) var_index, test_value);
+        var = dat_get_system_var((dat_status_address_t) var_index);
+        dat_set_system_var((dat_status_address_t) var_index, init_value);
         CU_ASSERT_EQUAL(var, test_value)
     }
 }
@@ -220,11 +220,11 @@ void test_system_vars(void)
 //Test of dat_set_system_var
 void test_set_system_vars_fault_tolerant(void)
 {
-    int rand_ind = rand() % dat_system_last_var;
+    int rand_ind = rand() % dat_status_last_address;
     int rand_val = rand();
     int val_1, val_2, val_3;
 
-    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    for (int i = dat_obc_opmode; i < dat_status_last_address; i++)
     {
         if (i == rand_ind)
         {
@@ -236,11 +236,11 @@ void test_set_system_vars_fault_tolerant(void)
         }
     }
 
-    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    for (int i = dat_obc_opmode; i < dat_status_last_address; i++)
     {
         val_1 = _dat_get_system_var(i);
-        val_2 = _dat_get_system_var(i + dat_system_last_var);
-        val_3 = _dat_get_system_var(i + dat_system_last_var * 2);
+        val_2 = _dat_get_system_var(i + dat_status_last_address);
+        val_3 = _dat_get_system_var(i + dat_status_last_address * 2);
         if (i == rand_ind)
         {
             CU_ASSERT_EQUAL(val_1, rand_val);
@@ -259,27 +259,27 @@ void test_set_system_vars_fault_tolerant(void)
 //Test of dat_get_system_var
 void test_get_system_vars_fault_tolerant(void)
 {
-    int rand_ind = rand() % dat_system_last_var;
+    int rand_ind = rand() % dat_status_last_address;
     int rand_val = rand();
     int val;
 
-    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    for (int i = dat_obc_opmode; i < dat_status_last_address; i++)
     {
         if (i == rand_ind)
         {
             _dat_set_system_var(i, 1);
-            _dat_set_system_var(i + dat_system_last_var, 2);
-            _dat_set_system_var(i + 2 * dat_system_last_var, 3);
+            _dat_set_system_var(i + dat_status_last_address, 2);
+            _dat_set_system_var(i + 2 * dat_status_last_address, 3);
         }
         else
         {
             _dat_set_system_var(i, rand_val);
-            _dat_set_system_var(i + dat_system_last_var, rand_val);
-            _dat_set_system_var(i + 2 * dat_system_last_var, rand_val);
+            _dat_set_system_var(i + dat_status_last_address, rand_val);
+            _dat_set_system_var(i + 2 * dat_status_last_address, rand_val);
         }
     }
 
-    for (int i = dat_obc_opmode; i < dat_system_last_var; i++)
+    for (int i = dat_obc_opmode; i < dat_status_last_address; i++)
     {
         val = dat_get_system_var(i);
 

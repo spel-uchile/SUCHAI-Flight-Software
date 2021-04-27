@@ -29,8 +29,10 @@ static const char *tag = "cmdDRP";
 void cmd_drp_init(void)
 {
     cmd_add("drp_ebf", drp_execute_before_flight, "%d", 1);
-    cmd_add("drp_get_vars", drp_print_system_vars, "", 0);
-    cmd_add("drp_set_var", drp_update_sys_var_idx, "%d %d", 2);
+//    cmd_add("drp_print_var", drp_print_system_var, "%s", 1);
+    cmd_add("drp_print_vars", drp_print_system_vars, "", 0);
+    cmd_add("drp_set_var", drp_update_sys_var_idx, "%d %f", 2);
+    cmd_add("drp_set_var_name", drp_update_sys_var_name, "%s %f", 2);
     cmd_add("drp_add_hrs_alive", drp_update_hours_alive, "%d", 1);
     cmd_add("drp_clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
     cmd_add("drp_set_deployed", drp_set_deployed, "%d", 1);
@@ -47,14 +49,14 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
         if(magic == SCH_DRP_MAGIC)
         {
             // Reset all status variables values to 0
-            dat_system_t var;
-            for(var = dat_obc_opmode; var < dat_system_last_var; var++)
+            dat_status_address_t var;
+            for(var = dat_obc_opmode; var < dat_status_last_address; var++)
             {
                 dat_set_system_var(var, 0);
             }
 
             //TODO: Set all status variables default values
-            dat_set_system_var(dat_rtc_date_time, (int)time(NULL));
+            dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
             dat_set_system_var(dat_com_bcn_period, SCH_TX_BCN_PERIOD);
             dat_set_system_var(dat_obc_bcn_offset, SCH_OBC_BCN_OFFSET);
             // dat_set_system_var(dat_custom, default_value);
@@ -80,38 +82,85 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
 int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
-    dat_print_status(dat_status_list, DAT_STATUS_MAX);
+    printf("address, name, value, type\n");
+    int i;
+    for(i=0; i<dat_status_last_var; i++)
+    {
+        dat_sys_var_t var = dat_status_list[i];
+        value32_t value = dat_get_status_var(var.address);
+        var.value = value;
+        dat_print_system_var(&var);
+    }
     return CMD_OK;
 }
 
 int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 {
-    if(params == NULL)
+    int address;
+    double value;
+    if(params == NULL || sscanf(params, fmt, &address, &value) != nparams)
     {
-        LOGE(tag, "Parameter null");
-        return CMD_FAIL;
+        LOGE(tag, "Error parsing arguments!");
+        return CMD_ERROR;
     }
-    int index, value;
-    if(sscanf(params, fmt, &index, &value) == nparams)
+
+    dat_status_address_t var_address = (dat_status_address_t)address;
+    if(var_address < dat_status_last_address)
     {
-        dat_system_t var_index = (dat_system_t)index;
-        if(var_index < dat_system_last_var)
-        {
-            dat_set_system_var(var_index, value);
-            return CMD_OK;
+        // Support int and float arguments
+        value32_t variable;
+        dat_sys_var_t variable_def = dat_get_status_var_def(var_address);
+        switch (variable_def.type) {
+            case 'f':
+                variable.f = (float)value;
+                break;
+            default:
+                variable.i = (int32_t)value;
+                break;
         }
-        else
-        {
-            LOGW(tag, "drp_update_sys_idx used with invalid index: %d", var_index);
-            return CMD_FAIL;
-        }
+        // Store the variable value
+        dat_set_status_var(var_address, variable);
+        return CMD_OK;
     }
     else
     {
-        LOGW(tag, "drp_update_sys_idx used with invalid params: %s", params);
+        LOGE(tag, "drp_update_sys_idx used with invalid index: %d", var_address);
+        return CMD_FAIL;
+    }
+}
+
+int drp_update_sys_var_name(char *fmt, char *params, int nparams)
+{
+    char name[24];
+    double value;
+    if(params == NULL || sscanf(params, fmt, name, &value) != nparams)
+    {
+        LOGE(tag, "Error parsing arguments!");
+        return CMD_ERROR;
+    }
+
+    // Get variable definition by name
+    dat_sys_var_t variable_def = dat_get_status_var_def_name(name);
+    if(variable_def.status == -1)
+    {
+        LOGE(tag, "drp_update_sys_var_name used with invalid name: %s", name);
         return CMD_FAIL;
     }
 
+    // Support int and float arguments
+    value32_t variable;
+    switch (variable_def.type) {
+        case 'f':
+            variable.f = (float)value;
+            break;
+        default:
+            variable.i = (int32_t)value;
+            break;
+    }
+
+    // Store the variable value
+    int rc = dat_set_status_var(variable_def.address, variable);
+    return rc >= 0 ? CMD_OK : CMD_FAIL;
 }
 
 int drp_update_hours_alive(char *fmt, char *params, int nparams)

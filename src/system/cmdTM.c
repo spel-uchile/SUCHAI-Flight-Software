@@ -42,19 +42,16 @@ int tm_send_status(char *fmt, char *params, int nparams)
     }
 
     // Pack status variables to a structure
-    value32_t status_buff[DAT_STATUS_MAX];
-    dat_status_to_list(status_buff, dat_status_list, DAT_STATUS_MAX);
-    if(log_lvl >= LOG_LVL_DEBUG)
+    int i;
+    dat_sys_var_short_t status_buff[dat_status_last_var];
+    for(i = 0; i<dat_status_last_var; i++)
     {
-        LOGD(tag, "Sending system status to node %d", dest_node)
-        dat_print_status(dat_status_list, DAT_STATUS_MAX);
+        status_buff[i].address = csp_ntoh16(dat_status_list[i].address);
+        status_buff[i].value.u = csp_ntoh32(dat_get_status_var(dat_status_list[i].address).u);
     }
 
-    // Fix data endianness
-    _hton32_buff((uint32_t *)(status_buff), sizeof(status_buff));
-
     // Send telemetry
-    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, DAT_STATUS_MAX);
+    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, dat_status_last_var);
 }
 
 int tm_parse_status(char *fmt, char *params, int nparams)
@@ -62,17 +59,18 @@ int tm_parse_status(char *fmt, char *params, int nparams)
     if(params == NULL)
         return CMD_ERROR;
 
-    // We receive a full frame with a list of status variables
     com_frame_t *frame = (com_frame_t *)params;
-    value32_t *status_buff = (value32_t *)frame->data.data32;
-    // Fix data endianness
-    _ntoh32_buff((uint32_t *)status_buff, frame->ndata);
-    // Create a temporal status variables list
-    dat_sys_var_t *status_list = malloc(sizeof(dat_sys_var_t)*frame->ndata);
-    dat_status_from_list(status_buff, status_list, dat_status_list, frame->ndata);
-    // Finally print the status variables and free the temporal buffer
-    dat_print_status(status_list, frame->ndata);
-    free(status_list);
+    dat_sys_var_short_t *status_buff = (dat_sys_var_short_t *)frame;
+
+    int i;
+    for(i = 0; i<frame->ndata; i++)
+    {
+        uint16_t address = csp_hton16(status_buff[i].address);
+        value32_t value = {.u = csp_hton32(status_buff[i].value.u)};
+        dat_sys_var_t system_var = dat_get_status_var_def(address);
+        system_var.value = value;
+        dat_print_system_var(&system_var);
+    }
 
     return CMD_OK;
 }
@@ -296,7 +294,7 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
             ack_pay = index_pay;
         }
 
-        dat_set_system_var(data_map[payload].sys_ack ,ack_pay);
+        dat_set_system_var(data_map[payload].sys_ack, ack_pay);
         return CMD_OK;
     }
     else

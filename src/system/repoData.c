@@ -33,18 +33,18 @@ time_t sec = 0;
 
 
 #if SCH_STORAGE_MODE == 0
-#if SCH_STORAGE_TRIPLE_WR == 1
-        int DAT_SYSTEM_VAR_BUFF[dat_system_last_var*3];
+    #if SCH_STORAGE_TRIPLE_WR == 1
+        static value32_t DAT_SYSTEM_VAR_BUFF[dat_status_last_address * 3];
     #else
-        int DAT_SYSTEM_VAR_BUFF[dat_system_last_var];
+        int DAT_SYSTEM_VAR_BUFF[dat_status_last_addresss];
     #endif
-    fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
+    static fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
 sample_machine_t machine;
 
 void initialize_payload_vars(void){
-    int i =0;
+    int i;
     for(i=0; i< last_sensor; ++i) {
         if(dat_get_system_var(data_map[i].sys_index) == -1) {
             dat_set_system_var(data_map[i].sys_index, 0);
@@ -57,23 +57,19 @@ void dat_repo_init(void)
 {
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
-    {
         LOGE(tag, "Unable to create system status repository mutex");
-    }
 
     if(osSemaphoreCreate(&repo_data_fp_sem) != CSP_SEMAPHORE_OK)
-    {
         LOGE(tag, "Unable to create flight plan repository mutex");
-    }
 
     LOGD(tag, "Initializing data repositories buffers...")
 #if (SCH_STORAGE_MODE == 0)
     {
         // Reset variables (we do not have persistent storage here)
         int index;
-        for(index=0; index<dat_system_last_var; index++)
+        for(index=0; index < dat_status_last_address; index++)
         {
-            dat_set_system_var((dat_system_t)index, INT_MAX);
+            dat_set_status_var(index, dat_get_status_var_def(index).value);
         }
 
         //Init internal flight plan table
@@ -113,23 +109,10 @@ void dat_repo_init(void)
         assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif
-
-//FIXME: Remove or check if this code is necessary
-//    /* TODO: Initialize custom variables */
-//    LOGD(tag, "Initializing system variables values...")
-////    dat_set_system_var(dat_obc_hrs_alive, 0);
-//    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
-//    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
-//    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
-//
-//#if (SCH_STORAGE_MODE > 0)
-//    initialize_payload_vars();
-//#endif
 }
 
 void dat_repo_close(void)
 {
-//FIXME: Use STORAGE_MODE=0 should also free memory
 #if SCH_STORAGE_MODE != 0
     {
         storage_close();
@@ -137,92 +120,121 @@ void dat_repo_close(void)
 #endif
 }
 
-/**
- * Function for testing triple writing.
- *
- * Should do the same as @c dat_set_system_var , but with only one system status repo.
- *
- * @param index Enum index of the field to set
- * @param value Integer value to set the variable to
- */
-void _dat_set_system_var(dat_system_t index, int value)
+///**
+// * Function for testing triple writing.
+// *
+// * Should do the same as @c dat_set_system_var , but with only one system status repo.
+// *
+// * @param index Enum index of the field to set
+// * @param value Integer value to set the variable to
+// */
+//void _dat_set_system_var(dat_status_address_t index, int value)
+//{
+//    //Enter critical zone
+//    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+//
+//    //Uses internal memory
+//#if SCH_STORAGE_MODE == 0
+//    DAT_SYSTEM_VAR_BUFF[index] = value;
+//    //Uses external memory
+//#else
+//    storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
+//#endif
+//
+//    //Exit critical zone
+//    osSemaphoreGiven(&repo_data_sem);
+//}
+//
+///**
+// * Function for testing triple writing.
+// *
+// * Should do the same as @c dat_get_system_var , but with only one system status repo.
+// *
+// * @param index Enum index of the field to get
+// * @return The field's value
+// */
+//int _dat_get_system_var(dat_status_address_t index)
+//{
+//    int value = 0;
+//
+//    //Enter critical zone
+//    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+//
+//    //Use internal (volatile) memory
+//#if SCH_STORAGE_MODE == 0
+//    value = DAT_SYSTEM_VAR_BUFF[index];
+//    //Uses external (non-volatile) memory
+//#else
+//    value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
+//#endif
+//
+//    //Exit critical zone
+//    osSemaphoreGiven(&repo_data_sem);
+//
+//    return value;
+//}
+
+///< Compatibility function
+int dat_set_system_var(dat_status_address_t index, int value)
 {
+    value32_t v;
+    v.i = value;
+    dat_set_status_var(index, v);
+}
+
+int dat_set_status_var(dat_status_address_t index, value32_t value)
+{
+    int rc = 0;
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
     //Uses internal memory
 #if SCH_STORAGE_MODE == 0
     DAT_SYSTEM_VAR_BUFF[index] = value;
-    //Uses external memory
-#else
-    storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
-#endif
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
-}
-
-/**
- * Function for testing triple writing.
- *
- * Should do the same as @c dat_get_system_var , but with only one system status repo.
- *
- * @param index Enum index of the field to get
- * @return The field's value
- */
-int _dat_get_system_var(dat_system_t index)
-{
-    int value = 0;
-
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    //Use internal (volatile) memory
-#if SCH_STORAGE_MODE == 0
-    value = DAT_SYSTEM_VAR_BUFF[index];
-    //Uses external (non-volatile) memory
-#else
-    value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
-#endif
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
-
-    return value;
-}
-
-int dat_set_system_var(dat_status_address_t index, value32_t value)
-{
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    //Uses internal memory
-#if SCH_STORAGE_MODE == 0
-    DAT_SYSTEM_VAR_BUFF[index] = value;
-        //Uses tripled writing
-        #if SCH_STORAGE_TRIPLE_WR == 1
-            DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var] = value;
-            DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var * 2] = value;
-        #endif
-    //Uses external memory
-#else
-    storage_repo_set_value_idx(index, value.i, DAT_REPO_SYSTEM);
     //Uses tripled writing
-#if SCH_STORAGE_TRIPLE_WR == 1
-    storage_repo_set_value_idx(index + dat_status_last_addresss, value.i, DAT_REPO_SYSTEM);
-    storage_repo_set_value_idx(index + dat_status_last_addresss*2, value.i, DAT_REPO_SYSTEM);
-#endif
+    #if SCH_STORAGE_TRIPLE_WR == 1
+        DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address] = value;
+        DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address * 2] = value;
+    #endif
+    //Uses external memory
+#else
+    rc = storage_repo_set_value_idx(index, value.i, DAT_REPO_SYSTEM);
+    //Uses tripled writing
+    #if SCH_STORAGE_TRIPLE_WR == 1
+        int rc2 = storage_repo_set_value_idx(index + dat_status_last_addresss, value.i, DAT_REPO_SYSTEM);
+        int rc3 = storage_repo_set_value_idx(index + dat_status_last_addresss*2, value.i, DAT_REPO_SYSTEM);
+        rc = rc & rc2 & rc3;
+    #endif
 #endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
+
+    return rc;
 }
 
-value32_t dat_get_system_var(dat_status_address_t index)
+int dat_set_status_var_name(char *name, value32_t value)
 {
-    int value_1 = 0;
-    int value_2 = 0;
-    int value_3 = 0;
+    dat_sys_var_t var = dat_get_status_var_def_name(name);
+    if(var.status == -1)
+        return -1; // Value not found
+    return dat_set_status_var(var.address, value);
+}
+
+///< Compatibility function
+int dat_get_system_var(dat_status_address_t index)
+{
+    value32_t var = dat_get_status_var(index);
+    return var.i;
+}
+
+value32_t dat_get_status_var(dat_status_address_t index)
+{
+    value32_t value_1;
+#if SCH_STORAGE_TRIPLE_WR == 1
+    value32_t value_2;
+    value32_t value_3;
+#endif
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
@@ -230,41 +242,41 @@ value32_t dat_get_system_var(dat_status_address_t index)
     //Use internal (volatile) memory
 #if SCH_STORAGE_MODE == 0
     value_1 = DAT_SYSTEM_VAR_BUFF[index];
-        //Uses tripled writing
-        #if SCH_STORAGE_TRIPLE_WR == 1
-            value_2 = DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var];
-            value_3 = DAT_SYSTEM_VAR_BUFF[index + dat_system_last_var * 2];
-        #endif
+    //Uses tripled writing
+    #if SCH_STORAGE_TRIPLE_WR == 1
+        value_2 = DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address];
+        value_3 = DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address * 2];
+    #endif
     //Uses external (non-volatile) memory
 #else
     value_1 = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
     //Uses tripled writing
-#if SCH_STORAGE_TRIPLE_WR == 1
-    value_2 = storage_repo_get_value_idx(index + dat_system_last_var, DAT_REPO_SYSTEM);
-    value_3 = storage_repo_get_value_idx(index + dat_system_last_var * 2, DAT_REPO_SYSTEM);
-#endif
+    #if SCH_STORAGE_TRIPLE_WR == 1
+        value_2 = storage_repo_get_value_idx(index + dat_status_last_addresss, DAT_REPO_SYSTEM);
+        value_3 = storage_repo_get_value_idx(index + dat_status_last_addresss * 2, DAT_REPO_SYSTEM);
+    #endif
 #endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
+    
+    // Compare values in tripled reading
 #if SCH_STORAGE_TRIPLE_WR == 1
     //Compare value and its copies
-    if (value_1 == value_2 || value_1 == value_3)
-    {
+    if (value_1.u == value_2.u || value_1.u == value_3.u)
         return value_1;
-    }
-    else if (value_2 == value_3)
-    {
+    else if (value_2.u == value_3.u)
         return value_2;
-    }
     else
-    {
         LOGE(tag, "Unable to get a correct value for index %d", index);
-        return value_1;
-    }
-#else
-    return value_1;
 #endif
+    return value_1;
+}
+
+value32_t dat_get_status_var_name(char *name)
+{
+    dat_sys_var_t var = dat_get_status_var_def_name(name);
+    return dat_get_status_var(var.address);
 }
 
 #if SCH_STORAGE_MODE == 0
@@ -589,17 +601,19 @@ int dat_delete_memory_sections(void)
     // Resetting memory system vars
     for(int i = 0; i < last_sensor; ++i)
     {
+        // Lock is acquired inside the function
         dat_set_system_var(data_map[i].sys_index, 0);
     }
+
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Free memory or drop databases
     ret = storage_delete_memory_sections();
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
 #if SCH_FP_ENABLED
     storage_flight_plan_reset();
 #endif
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
     return ret;
 }
 
@@ -715,50 +729,48 @@ int set_machine_state(machine_action_t action, unsigned int step, int nsamples)
     return 0;
 }
 
-void _get_sat_quaterion(quaternion_t *q,  dat_system_t index)
+void _get_sat_quaterion(quaternion_t *q,  dat_status_address_t index)
 {
+    assert(index+4 < dat_status_last_address);
     int i;
     for(i=0; i<4; i++)
     {
-        assert(index+i < dat_system_last_var);
-        value v;
-        v.i = dat_get_system_var(index+i);
+        value32_t v = dat_get_status_var(index+i);
         q->q[i] = (double)v.f;
     }
 }
 
-void _set_sat_quaterion(quaternion_t *q,  dat_system_t index)
+void _set_sat_quaterion(quaternion_t *q,  dat_status_address_t index)
 {
+    assert(index+4 < dat_status_last_address);
     int i;
     for(i=0; i<4; i++)
     {
-        assert(index+i < dat_system_last_var);
-        value v;
+        value32_t v;
         v.f = (float)q->q[i];
-        dat_set_system_var(index+i, v.i);
+        dat_set_status_var(index + i, v);
     }
 }
 
-void _get_sat_vector(vector3_t *r, dat_system_t index)
+void _get_sat_vector(vector3_t *r, dat_status_address_t index)
 {
+    assert(index+3 < dat_status_last_address);
     int i;
     for(i=0; i<3; i++)
     {
-        assert(index+i < dat_system_last_var);
-        value v;
-        v.i = dat_get_system_var(index+i);
+        value32_t v= dat_get_status_var(index+i);
         r->v[i] = (double)v.f;
     }
 }
 
-void _set_sat_vector(vector3_t *r, dat_system_t index)
+void _set_sat_vector(vector3_t *r, dat_status_address_t index)
 {
+    assert(index+3 < dat_status_last_address);
     int i;
     for(i=0; i<3; i++)
     {
-        assert(index+i < dat_system_last_var);
-        value v;
+        value32_t v;
         v.f = (float)r->v[i];
-        dat_set_system_var(index+i, v.i);
+        dat_set_status_var(index + i, v);
     }
 }
