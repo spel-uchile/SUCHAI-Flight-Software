@@ -82,7 +82,7 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
 int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
-    printf("address, name, value, type\n");
+    printf("idx, %-20s, value, type\n", "name");
     int i;
     for(i=0; i<dat_status_last_var; i++)
     {
@@ -97,7 +97,7 @@ int drp_print_system_vars(char *fmt, char *params, int nparams)
 int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 {
     int address;
-    double value;
+    float value;
     if(params == NULL || sscanf(params, fmt, &address, &value) != nparams)
     {
         LOGE(tag, "Error parsing arguments!");
@@ -112,7 +112,7 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
         dat_sys_var_t variable_def = dat_get_status_var_def(var_address);
         switch (variable_def.type) {
             case 'f':
-                variable.f = (float)value;
+                variable.f = value;
                 break;
             default:
                 variable.i = (int32_t)value;
@@ -132,7 +132,7 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 int drp_update_sys_var_name(char *fmt, char *params, int nparams)
 {
     char name[24];
-    double value;
+    float value;
     if(params == NULL || sscanf(params, fmt, name, &value) != nparams)
     {
         LOGE(tag, "Error parsing arguments!");
@@ -151,7 +151,7 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
     value32_t variable;
     switch (variable_def.type) {
         case 'f':
-            variable.f = (float)value;
+            variable.f = value;
             break;
         default:
             variable.i = (int32_t)value;
