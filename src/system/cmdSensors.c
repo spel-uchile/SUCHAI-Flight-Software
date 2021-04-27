@@ -186,3 +186,11 @@ int init_dummy_sensor(char *fmt, char *params, int nparams)
     LOGI(tag, "Initializing dummy sensor");
     return CMD_OK;
 }
+
+int is_payload_active(int payload, int active_payloads, int n_payloads) {
+//    printf("max number of active payload %d\n", (1 << n_payloads));
+    if ( active_payloads >= (1 << n_payloads) ) {
+        return 0;
+    }
+    return ( (active_payloads & (1 << payload)) != 0 );
+}

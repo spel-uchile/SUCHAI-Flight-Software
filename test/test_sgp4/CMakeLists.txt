@@ -26,6 +26,7 @@ set(SOURCE_FILES
         ../../src/system/repoDataSchema.c
         ../../src/system/taskDispatcher.c
         ../../src/system/taskExecuter.c
+        ../../src/system/taskSensors.c
 #        ../../src/system/taskInit.c
 #        ../../src/system/taskConsole.c
 #        ../../src/system/taskCommunications.c

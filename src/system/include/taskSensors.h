@@ -19,6 +19,4 @@
 #include "repoCommand.h"
 
 void taskSensors(void *param);
-
-int is_payload_active(int payload, int active_payloads, int n_payloads);
 #endif //_TASKSENSORS_H

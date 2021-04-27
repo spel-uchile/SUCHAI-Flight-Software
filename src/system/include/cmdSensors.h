@@ -81,4 +81,15 @@ int take_sample(char *fmt, char *params, int nparams);
  */
 int init_dummy_sensor(char *fmt, char *params, int nparams);
 
+
+/**
+ * Return if payload is active in sensor sampling
+ * @param payload
+ * @param active_payloads
+ * @param n_payloads
+ * @return
+ */
+int is_payload_active(int payload, int active_payloads, int n_payloads);
+
+
 #endif /* _CMD_SENS_H */
