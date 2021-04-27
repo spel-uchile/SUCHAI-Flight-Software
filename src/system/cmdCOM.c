@@ -223,6 +223,7 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
     int rc_conn = 0;
     int rc_send = 0;
     int nframe = 0;
+    int size_data = (int)len/n_data;
 
     // New connection
     csp_conn_t *conn;
@@ -238,13 +239,10 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
         com_frame_t *frame = (com_frame_t *)(packet->data);
         frame->nframe = csp_hton16((uint16_t)nframe++);
         frame->type = csp_hton16((uint16_t)type);
-        frame->ndata = csp_hton32((uint32_t)n_data);
         size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;
+        int data_sent = n_data < COM_FRAME_MAX_LEN/size_data ? n_data : (int)sent/size_data;
+        frame->ndata = csp_hton32((uint32_t)data_sent);
         memcpy(frame->data.data8, data, sent);
-        // Fix data endianness
-//        int i;
-//        for(i=0; i < sizeof(frame->data)/sizeof(uint32_t); i++)
-//            frame->data.data32[i] = csp_hton32(frame->data.data32[i]);
 
         // Send packet
         rc_send = csp_send(conn, packet, 500);
@@ -257,6 +255,8 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
 
         // Process more data
         len -= sent;
+        n_data -= data_sent;
+        data += sent;
     }
 
     // Close connection
