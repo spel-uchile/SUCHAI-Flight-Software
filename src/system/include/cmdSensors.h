@@ -50,6 +50,29 @@ void cmd_sensors_init(void);
 int set_state(char *fmt, char *params, int nparams);
 
 /**
+ *
+ * @param fmt "%u"
+ * @param params <payload>
+ * @param nparams 1
+ * @code
+ * // Activate first payload sensor
+ * activate_sensor 1
+ * // Activate second payload sensor
+ * activate_sensor 2
+ * @return
+ */
+int activate_sensor(char *fmt, char *params, int nparams);
+
+/**
+ *
+ * @param fmt %u
+ * @param params <payload>
+ * @param nparams 1
+ * @return
+ */
+int take_sample(char *fmt, char *params, int nparams);
+
+/**
  * Initialize a dummy sensor.
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""

@@ -254,7 +254,6 @@ typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
-    lang_sensors,           ///< Langmuir probe sensors
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -297,17 +296,6 @@ typedef struct __attribute__((__packed__)) eps_data {
     int32_t temp5;
     int32_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
 } eps_data_t;
-
-/**
- * Struct for storing data collected by langmuir probe payload.
- */
-typedef struct __attribute__((__packed__)) langmuir_data {
-    int timestamp;
-    float sweep_voltage;
-    float plasma_voltage;
-    float plasma_temperature;
-    int particles_counter;
-} langmuir_data_t;
 
 
 /**

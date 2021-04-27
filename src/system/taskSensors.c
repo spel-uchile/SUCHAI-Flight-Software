@@ -29,20 +29,21 @@ void taskSensors(void *param)
     int i;
     cmd_t *cmd_init;
     cmd_t *cmd_get;
-    int nsensors = 2;
-    char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor"};
-    char *get_cmds[] = {"obc_get_sensors", "obc_get_sensors"};
+    int nsensors = 3;
+    char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor"};
+    char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "sen_take_sample" };
 
-    machine = (sample_machine_t) {ST_PAUSE, ACT_STAND_BY, 3, 5, -1};
+    machine = (sample_machine_t) {ST_PAUSE, ACT_START, 0, 5, -1, nsensors};
 
     if(osSemaphoreCreate(&repo_machine_sem) != CSP_SEMAPHORE_OK)
     {
         LOGE(tag, "Unable to create system status repository mutex");
     }
 
-    for(i=0; i<nsensors; i++)
+    for(i=0; i < machine.total_sensors; i++)
     {
         cmd_init = cmd_get_str(init_cmds[i]);
+        cmd_add_params_str(cmd_init, "2 1");
         cmd_send(cmd_init);
     }
 
@@ -73,12 +74,15 @@ void taskSensors(void *param)
             }
             // Check for step
             else if (elapsed_sec % machine.step == 0) {
-                LOGD(tag, "SAMPLING...");
+                LOGI(tag, "SAMPLING...");
 
                 for(i=0; i<nsensors; i++) {
 //                    printf("payload %d active status %d\n", i, is_payload_active(i, machine.active_payloads, nsensors));
-                    if (is_payload_active(i, machine.active_payloads, nsensors)) {
+                    if (is_payload_active(i, machine.active_payloads, machine.total_sensors)) {
                         cmd_get = cmd_get_str(get_cmds[i]);
+                        char cmd_args[5];
+                        sprintf(cmd_args, " %d", i);
+                        cmd_add_params_str(cmd_get, cmd_args);
                         cmd_send(cmd_get);
                     }
                 }

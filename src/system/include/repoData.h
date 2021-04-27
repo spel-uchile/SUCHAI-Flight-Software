@@ -54,6 +54,7 @@ typedef struct sample_machine{
     unsigned int active_payloads;
     unsigned int step;
     int samples_left;
+    unsigned int total_sensors;
 } sample_machine_t;
 
 extern sample_machine_t machine;
