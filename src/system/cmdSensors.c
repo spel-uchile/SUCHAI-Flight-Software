@@ -165,7 +165,7 @@ int take_sample(char *fmt, char *params, int nparams)
 
 #ifdef NANOMIND
             eps_hk_t hk = {};
-            eps_hk_print(&hk);
+            eps_hk_get(&hk);
             cursun = hk.cursun;
             cursys = hk.cursys;
             vbatt = hk.vbatt;
