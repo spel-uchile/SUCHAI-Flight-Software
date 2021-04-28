@@ -43,16 +43,6 @@ time_t sec = 0;
 
 dat_stmachine_t status_machine;
 
-void dat_init_payload_data_map(void){
-    int i;
-    for(i=0; i< last_sensor; ++i) {
-        if(dat_get_system_var(data_map[i].sys_index) == -1) {
-            dat_set_system_var(data_map[i].sys_index, 0);
-            dat_set_system_var(data_map[i].sys_ack, 0);
-        }
-    }
-}
-
 void dat_repo_init(void)
 {
     // Init repository mutex

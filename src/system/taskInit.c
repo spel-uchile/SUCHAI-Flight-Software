@@ -45,9 +45,6 @@ void taskInit(void *param)
     dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
     dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
     dat_set_system_var(dat_ads_tle_epoch, 0);  // Reset TLE on boot
-#if (SCH_STORAGE_MODE > 0)
-    initialize_payload_vars();
-#endif
 
     LOGD(tag, "Initialization commands ...");
     // Init LibCSP system

@@ -79,11 +79,6 @@ int dat_set_stmachine_state(dat_stmachine_action_t action, unsigned int step, in
 int dat_stmachine_is_sensor_active(int payload, int active_payloads, int n_payloads);
 
 /**
- * Initializes payload storage helper variables
- */
-void dat_init_payload_data_map(void);
-
-/**
  * Initializes data repositories, including:
  *      Both repo's mutexes.
  *      The storage system (if permanent memory is being used).
