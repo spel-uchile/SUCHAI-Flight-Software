@@ -29,61 +29,6 @@
 #include "data_storage.h"
 
 
-/**
- * Function for testing triple writing.
- *
- * Should do the same as @c dat_set_system_var , but with only one system status repo.
- *
- * @param index Enum index of the field to set
- * @param value Integer value to set the variable to
- */
-void _dat_set_system_var(dat_status_address_t index, int value)
-{
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    //Uses internal memory
-#if SCH_STORAGE_MODE == 0
-    DAT_SYSTEM_VAR_BUFF[index] = value;
-    //Uses external memory
-#else
-    storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
-#endif
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
-}
-
-/**
- * Function for testing triple writing.
- *
- * Should do the same as @c dat_get_system_var , but with only one system status repo.
- *
- * @param index Enum index of the field to get
- * @return The field's value
- */
-int _dat_get_system_var(dat_status_address_t index)
-{
-    int value = 0;
-
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    //Use internal (volatile) memory
-#if SCH_STORAGE_MODE == 0
-    value = DAT_SYSTEM_VAR_BUFF[index];
-    //Uses external (non-volatile) memory
-#else
-    value = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
-#endif
-
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
-
-    return value;
-}
-
-
 /** SUIT 2: Command repository **/
 /* The suite initialization function.
  * Initializes
@@ -220,6 +165,13 @@ void test_fp_delete(void)
     char args[SCH_CMD_MAX_STR_PARAMS];
     memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
     memset(args, 0, SCH_CMD_MAX_STR_PARAMS);
+
+    // Set flight plan values
+    for(i=0; i<10; i++)
+    {
+        result = dat_set_fp(i, "test_cmd", "arg1 arg2 arg3", i, 0);
+        CU_ASSERT_EQUAL(result, 0);
+    }
 
     // Delete entries and check a deleted entry cannot be read
     for(i=0; i<10; i++)

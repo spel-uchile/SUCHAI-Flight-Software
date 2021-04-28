@@ -100,7 +100,7 @@ echo ""
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_INFO"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_bug_delay
@@ -120,7 +120,7 @@ rm -f ../test_bug_delay_log.txt
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --log_lvl "LOG_LVL_DEBUG"  --comm "1"  --fp "0"  --hk "0"  --test "0"  --st_mode "0"  --node "1"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "1" --con "0" --fp "0"  --hk "0"  --test "0"  --st_mode "0"  --node "1"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_tm_io

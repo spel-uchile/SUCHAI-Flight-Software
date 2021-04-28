@@ -17,20 +17,18 @@ int main(void)
     printf("-----------------------------------------\n\n");
 
     /* Init software subsystems */
-    log_init();      // Logging system
+    log_init(LOG_LEVEL, -1);      // Logging system
     cmd_repo_init(); // Command repository initialization
     dat_repo_init(); // Update status repository
 
     /* Initializing shared Queues */
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
-    if(dispatcher_queue == 0)
-        LOGE(tag, "Error creating dispatcher queue");
     executer_stat_queue = osQueueCreate(1,sizeof(int));
-    if(executer_stat_queue == 0)
-        LOGE(tag, "Error creating executer stat queue");
     executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
-    if(executer_cmd_queue == 0)
-        LOGE(tag, "Error creating executer cmd queue");
+
+    if(dispatcher_queue == 0) LOGE(tag, "Error creating dispatcher queue");
+    if(executer_stat_queue == 0) LOGE(tag, "Error creating executer stat queue");
+    if(executer_cmd_queue == 0) LOGE(tag, "Error creating executer cmd queue");
 
     int n_threads = 5;
     os_thread threads_id[n_threads];
@@ -58,8 +56,8 @@ int main(void)
 
 }
 
-#ifdef FREERTOS
-#ifndef NANOMIND
+/* FreeRTOS Hooks */
+#if  defined(FREERTOS) && !defined(NANOMIND) && !defined(ESP32)
 /**
  * Task idle handle function. Performs operations inside the idle task
  * configUSE_IDLE_HOOK must be set to 1
@@ -95,5 +93,4 @@ void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
     /* Stack overflow handle */
     while(1);
 }
-#endif
 #endif

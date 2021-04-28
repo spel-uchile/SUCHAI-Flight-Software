@@ -101,7 +101,9 @@ void dat_repo_close(void);
  * @return 0 if OK, -1 in case of error
  */
 int dat_set_system_var(dat_status_address_t index, int value);
+int _dat_set_system_var(dat_status_address_t index, int value);
 int dat_set_status_var(dat_status_address_t index, value32_t value);
+
 
 /**
  * Sets a status/config variable by index by name
@@ -119,6 +121,7 @@ int dat_set_system_var_name(char *name, value32_t value);
  * @return The field's value
  */
 int dat_get_system_var(dat_status_address_t index);
+int _dat_get_system_var(dat_status_address_t index);
 value32_t dat_get_status_var(dat_status_address_t index);
 
 /**

@@ -120,6 +120,64 @@ void dat_repo_close(void)
 #endif
 }
 
+/**
+ * Function for testing triple writing.
+ *
+ * Should do the same as @c dat_set_system_var , but with only one system status repo.
+ *
+ * @param index Enum index of the field to set
+ * @param value Integer value to set the variable to
+ */
+int _dat_set_system_var(dat_status_address_t index, int value)
+{
+    int rc = 0;
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    //Uses internal memory
+#if SCH_STORAGE_MODE == 0
+    value32_t var = {.i=value};
+    DAT_SYSTEM_VAR_BUFF[index] = var;
+    //Uses external memory
+#else
+    rc = storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
+#endif
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+
+    return rc;
+}
+
+/**
+ * Function for testing triple writing.
+ *
+ * Should do the same as @c dat_get_system_var , but with only one system status repo.
+ *
+ * @param index Enum index of the field to get
+ * @return The field's value
+ */
+int _dat_get_system_var(dat_status_address_t index)
+{
+    value32_t value;
+
+    //Enter critical zone
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    //Use internal (volatile) memory
+#if SCH_STORAGE_MODE == 0
+    value = DAT_SYSTEM_VAR_BUFF[index];
+    //Uses external (non-volatile) memory
+#else
+    value.i = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
+#endif
+
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+
+    return value.i;
+}
+
 ///< Compatibility function
 int dat_set_system_var(dat_status_address_t index, int value)
 {
@@ -231,7 +289,7 @@ static int _dat_set_fp_async(int timetodo, char* command, char* args, int execut
     int i;
     for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
     {
-        if(data_base[i].unixtime == 0)
+        if(data_base[i].unixtime == -1)
         {
             data_base[i].unixtime = timetodo;
             data_base[i].executions = executions;
@@ -257,7 +315,7 @@ static int _dat_del_fp_async(int timetodo)
     {
         if(timetodo == data_base[i].unixtime)
         {
-            data_base[i].unixtime = 0;
+            data_base[i].unixtime = -1;
             data_base[i].executions = 0;
             data_base[i].periodical = 0;
             free(data_base[i].args);
@@ -302,8 +360,8 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
             *executions = data_base[i].executions;
             *period = data_base[i].periodical;
 
-            if (data_base[i].periodical > 0)
-                _dat_set_fp_async(elapsed_sec+*period, data_base[i].cmd, data_base[i].args, *executions, *period);
+//            if (data_base[i].periodical > 0)
+//                _dat_set_fp_async(elapsed_sec+*period, data_base[i].cmd, data_base[i].args, *executions, *period);
 
             _dat_del_fp_async(elapsed_sec);
             rc = 0;  // found, then break!
@@ -344,7 +402,7 @@ int dat_reset_fp(void)
     int i;
     for(i=0;i<SCH_FP_MAX_ENTRIES;i++)
     {
-        data_base[i].unixtime = 0;
+        data_base[i].unixtime = -1;
         data_base[i].cmd = NULL;
         data_base[i].args = NULL;
         data_base[i].executions = 0;
@@ -371,7 +429,7 @@ int dat_show_fp (void)
 
     for(i = 0;i < SCH_FP_MAX_ENTRIES; i++)
     {
-        if(data_base[i].unixtime!=0)
+        if(data_base[i].unixtime!=-1)
         {
             if(cont == 0)
             {

@@ -48,23 +48,27 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
     {
         if(magic == SCH_DRP_MAGIC)
         {
-            // Reset all status variables values to 0
-            dat_status_address_t var;
-            for(var = dat_obc_opmode; var < dat_status_last_address; var++)
+            int index;
+            int rc = 0;
+            // Reset all status variables values to default values
+            for(index=0; index < dat_status_last_address; index++)
             {
-                dat_set_system_var(var, 0);
+                rc += dat_set_status_var(index, dat_get_status_var_def(index).value);
             }
 
-            //TODO: Set all status variables default values
-            dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
-            dat_set_system_var(dat_com_bcn_period, SCH_TX_BCN_PERIOD);
-            dat_set_system_var(dat_obc_bcn_offset, SCH_OBC_BCN_OFFSET);
-            // dat_set_system_var(dat_custom, default_value);
+            // Update relevant status variables
+            rc += dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
 
             // Delete memory sections
-            dat_delete_memory_sections();
+            rc += dat_delete_memory_sections();
 
-            return CMD_OK;
+            if(rc == 0)
+                return CMD_OK;
+            else
+            {
+                LOGE(tag, "%d errors in drp_ebf!", -rc);
+                return CMD_FAIL;
+            }
         }
         else
         {
