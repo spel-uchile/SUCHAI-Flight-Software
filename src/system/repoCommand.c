@@ -330,9 +330,6 @@ int cmd_repo_init(void)
     cmd_index = 0;  // Reset registered command counter
 
     // Init repos
-#if SCH_TEST_ENABLED
-    cmd_test_init();
-#endif
     cmd_obc_init();
     cmd_drp_init();
     cmd_console_init();

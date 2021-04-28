@@ -303,12 +303,13 @@ int storage_table_flight_plan_init(int drop)
 
 int storage_table_payload_init(int drop)
 {
-
+    int rc = 0;
 #if SCH_STORAGE_MODE == 0
     if(drop)
         if(db != NULL)
             free(db);
     db = malloc(SCH_SECTIONS_PER_PAYLOAD*SCH_SIZE_PER_SECTION*last_sensor);
+    rc = db != NULL ? 0 : -1;
 #endif
 
 #if SCH_STORAGE_MODE > 0
@@ -317,7 +318,6 @@ int storage_table_payload_init(int drop)
     {
         char* err_msg;
         char* sql;
-        int rc;
         int i;
         for(i=0; i< last_sensor; ++i)
         {
@@ -381,7 +381,6 @@ int storage_table_payload_init(int drop)
 
 #if SCH_STORAGE_MODE ==1
         char* err_msg;
-        int rc;
         rc = sqlite3_exec(db, create_table, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK )

@@ -23,6 +23,8 @@
  */
 
 #include "main.h"
+#include "include/taskTest.h"
+#include "include/cmdTestCommand.h"
 
 const char *tag = "main";
 
@@ -35,6 +37,7 @@ int main(void)
     /* Init software subsystems */
     log_init(LOG_LEVEL, 0);      // Logging system
     cmd_repo_init(); // Command repository initialization
+    cmd_test_init(); // Include test commands
     dat_repo_init(); // Update status repository
 
     LOGI(tag, "Creating tasks...");

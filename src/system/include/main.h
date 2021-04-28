@@ -58,9 +58,6 @@
 #if SCH_FP_ENABLED
 #include "taskFlightPlan.h"
 #endif
-#if SCH_TEST_ENABLED
-#include "taskTest.h"
-#endif
 
 /**
  * ESP32 already define main in the esp-id framework, the entry point

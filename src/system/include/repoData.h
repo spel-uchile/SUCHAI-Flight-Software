@@ -95,22 +95,44 @@ void dat_repo_init(void);
 void dat_repo_close(void);
 
 /**
- * Sets an int field in the status repository to a new value.
+ * Sets a status/config variable by index
  *
- * @param index Enum index of the field to set
- * @param value Integer value to set the variable to
+ * @param index Index or address of the variable to set
+ * @param value Value to set
+ * @return 0 if OK, -1 in case of error
  */
-void dat_set_system_var(dat_system_t index, int value);
-void _dat_set_system_var(dat_system_t index, int value);  //Auxiliary function for testing
+int dat_set_system_var(dat_status_address_t index, int value);
+int _dat_set_system_var(dat_status_address_t index, int value);
+int dat_set_status_var(dat_status_address_t index, value32_t value);
+
 
 /**
- * Returns an int field's value inside the status repository.
+ * Sets a status/config variable by index by name
  *
- * @param index Enum index of the field to get
+ * @param name Variable name
+ * @param value Value to set
+ * @return 0 if OK, -1 in case of error
+ */
+int dat_set_system_var_name(char *name, value32_t value);
+
+/**
+ * Returns status/config variable by index
+ *
+ * @param index Index of the variable to set
  * @return The field's value
  */
-int dat_get_system_var(dat_system_t index);
-int _dat_get_system_var(dat_system_t index);  //Auxiliary function for testing
+int dat_get_system_var(dat_status_address_t index);
+int _dat_get_system_var(dat_status_address_t index);
+value32_t dat_get_status_var(dat_status_address_t index);
+
+/**
+ * Returns status/config variable by name
+ *
+ * @param index Index of the variable to set
+ * @return The field's value
+ */
+value32_t dat_get_status_var_name(char *name);
+
 
 /**
  * Gets an executable command from the flight plan repo.
@@ -272,9 +294,9 @@ int get_sizeof_type(char* c_type);
  * These functions only read/set 3 (vector) or 4 (quaternions)
  * variables starting from the given index.
  */
-void _get_sat_quaterion(quaternion_t *q,  dat_system_t index);
-void _set_sat_quaterion(quaternion_t *q,  dat_system_t index);
-void _get_sat_vector(vector3_t *r, dat_system_t index);
-void _set_sat_vector(vector3_t *r, dat_system_t index);
+void _get_sat_quaterion(quaternion_t *q,  dat_status_address_t index);
+void _set_sat_quaterion(quaternion_t *q,  dat_status_address_t index);
+void _get_sat_vector(vector3_t *r, dat_status_address_t index);
+void _set_sat_vector(vector3_t *r, dat_status_address_t index);
 
 #endif // DATA_REPO_H

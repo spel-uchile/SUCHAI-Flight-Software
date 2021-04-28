@@ -51,14 +51,67 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams);
 int drp_print_system_vars(char *fmt, char *params, int nparams);
 
 /**
- * Update a system status variable <value> by <index>
+ * Update a system status variable by index (address)
+ * Support int, uint and float parameters
  *
- * @param fmt Str. Parameters format "%d %d"
- * @param params Str. Parameters as string "<index> <value>"
+ * @param fmt Str. Parameters format "%d %f"
+ * @param params Str. Parameters as string "<address> <value>"
  * @param nparams Int. Number of parameters 2
  * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ *
+ * @code
+ * //From console
+ * drp_set_var 1 123
+ * drp_set_var 3 -4.25
+ *
+ * //From code
+ * cmd_t cmd = cmd_get_str("drp_set_var");
+ * cmd_add_params(&cmd, 1, 123)
+ * cmd_send(&cmd)
+ *
+ * cmd_t cmd = cmd_get_str("drp_set_var");
+ * cmd_add_params(&cmd, 3, -4.25)
+ * cmd_send(&cmd)
+ * @endcode
  */
 int drp_update_sys_var_idx(char *fmt, char *params, int nparams);
+
+/**
+ * Update a system status variable by name
+ * Support int, uint and float parameters
+ *
+ * @param fmt Str. Parameters format "%s %f"
+ * @param params Str. Parameters as string "<name> <value>"
+ * @param nparams Int. Number of parameters 2
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ *
+ *  * @code
+ * //From console
+ * drp_set_var_name obc_op_mode 123
+ * drp_set_var_name tgt_omega_x -4.25
+ *
+ * //From code
+ * cmd_t cmd = cmd_get_str("drp_set_var_name");
+ * cmd_add_params(&cmd, "obc_op_mode", 123)
+ * cmd_send(&cmd)
+ *
+ * cmd_t cmd = cmd_get_str("drp_set_var_name");
+ * cmd_add_params(&cmd, "tgt_omega_x", -4.25)
+ * cmd_send(&cmd)
+ * @endcode
+ *
+ */
+int drp_update_sys_var_name(char *fmt, char *params, int nparams);
+
+/**
+ * Print a system status variable value by name
+ * *
+ * @param fmt Str. Parameters format "%s"
+ * @param params Str. Parameters as string "<name>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int drp_get_sys_var_name(char *fmt, char *params, int nparams);
 
 /**
  * Update current hours alive and hours without reset counters adding <value>

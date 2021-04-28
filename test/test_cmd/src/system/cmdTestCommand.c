@@ -35,10 +35,14 @@ int test_cmd_str_int(char *fmt, char *params, int nparams)
 int test_cmd_double_int(char *fmt, char *params, int nparams)
 {
     float v1 = 0, v2 = 0;
-    int v3 = 0,v4 = 0;
-
+    int v3 = 0, v4 = 0;
+    // 1.00, 2.09, 12, 23
     assertf(sscanf(params,fmt, &v1, &v2, &v3, &v4) == nparams, tag, "The format of parameters are: %s and parameters used are: %s",fmt, params);
-    LOGI(tag, "%s: %f_%f_%i_%i", "con_double_int",v1,v2,v3,v4);
+    LOGI(tag, "%s: %f %f %i %i", "con_double_int",v1, v2, v3, v4);
+    assert(v1-1.00 < 1e-6);
+    assert(v2-2.09 < 1e-6);
+    assert(v3==12);
+    assert(v4=23);
     return CMD_OK;
 }
 

@@ -27,9 +27,6 @@
 #include "cmdCOM.h"
 #include "cmdTM.h"
 #endif
-#if SCH_TEST_ENABLED
-#include "cmdTestCommand.h"
-#endif
 #ifdef SCH_USE_NANOPOWER
 #include "cmdEPS.h"
 #endif

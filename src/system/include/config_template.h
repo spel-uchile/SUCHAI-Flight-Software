@@ -57,7 +57,6 @@
 #define SCH_HK_ENABLED          {{SCH_EN_HK}}      ///< TaskHousekeeping enabled (0 | 1)
 #define SCH_SEN_ENABLED         {{SCH_EN_SEN}}     ///< TaskSensors enabled (0 | 1)
 #define SCH_ADCS_ENABLED        {{SCH_EN_ADCS}}    ///< TaskADCS enabled (0 | 1)
-#define SCH_TEST_ENABLED        {{SCH_EN_TEST}}    ///< Set to run tests (0 | 1)
 #define SCH_WDT_PERIOD          120                ///< CPU watchdog timer period in seconds
 #define SCH_MAX_WDT_TIMER       60                 ///< Seconds to send wdt_reset command
 #define SCH_MAX_GND_WDT_TIMER   (3600*48)          ///< Seconds to reset the OBC if the ground watchdog was not clear

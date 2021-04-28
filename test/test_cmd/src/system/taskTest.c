@@ -17,7 +17,7 @@ void taskTest(void *param)
 
     LOGI(tag, "Test: test_double_int from vars")
     cmd_t *test_cmd2 = cmd_get_str("test_double_int");
-    cmd_add_params_var(test_cmd2, 1.08, 2.09, 12, 23);
+    cmd_add_params_var(test_cmd2, 1.00, 2.09, 12, 23); //Test only with 1.00, 2.09, 12, 23
     osQueueSend(dispatcher_queue, &test_cmd2, portMAX_DELAY);
     osDelay(500);
 
@@ -47,15 +47,16 @@ void taskTest(void *param)
     cmd_send(test_cmd);
     osDelay(500);
 
-    LOGI(tag, "Test: drp_get_vars");
-    test_cmd = cmd_get_str("drp_get_vars");
+    LOGI(tag, "Test: drp_print_vars");
+    test_cmd = cmd_get_str("drp_print_vars");
     cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
     osDelay(500);
 
     LOGI(tag, "Test: drp_set_var");
     test_cmd = cmd_get_str("drp_set_var");
-    cmd_add_params_var(test_cmd, dat_obc_opmode, 123);
+    cmd_add_params_var(test_cmd, dat_obc_opmode, 123.0);
+//    cmd_add_params_str(test_cmd, "obc_opmode 123");
     cmd_send(test_cmd);
     osDelay(500);
     // Check if the command worked
@@ -72,7 +73,7 @@ void taskTest(void *param)
     assertf(hours_alive == 123, tag, "Failed to set variable, read: %d", hours_alive);
 
     LOGI(tag, "Test: drp_get_vars");
-    test_cmd = cmd_get_str("drp_get_vars");
+    test_cmd = cmd_get_str("drp_print_vars");
     cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
     osDelay(500);

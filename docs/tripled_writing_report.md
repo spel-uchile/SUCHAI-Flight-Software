@@ -62,8 +62,8 @@ size limit, which is big enough.
 The methodology of storing a value on memory is basically the same.
 The original value will be set on memory as usual, let's say on
 index *i*. Then, the respective copies will be kept on index
-*i + dat_system_last_var* and *dat_system_last_var * 2 + index*,
-where *dat_system_last_var* is the last index on the set of status
+*i + dat_status_last_address* and *dat_status_last_address * 2 + index*,
+where *dat_status_last_address* is the last index on the set of status
 variables that makes reference to its size. In this way, the values
 will be distributed fairly into the buffer. Thus, it'll be easier 
 to get them and check if they are correct.
@@ -73,8 +73,8 @@ If the *SCH_STORAGE_TRIPLE_WR* is enabled, three variables are
 needed to save every copy of a value previously set on indexes 
 indicated by *dat_set_system_var*. To explain this better, let's say 
 the original value stored on index *i* (its respective copies are 
-stored then on index *i + dat_system_last_var* and *i + 
-dat_system_last_var * 2*) must be obtained: each one of 
+stored then on index *i + dat_status_last_address* and *i + 
+dat_status_last_address * 2*) must be obtained: each one of 
 the three variables declared will keep the value and its replicas.
 Now, to confirm the memory is not totally corrupted, these three
 values should be compared: at least two copies must be equal to 

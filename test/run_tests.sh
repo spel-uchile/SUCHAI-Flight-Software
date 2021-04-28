@@ -16,7 +16,7 @@ export WORKSPACE=${SCRIPT_PATH}/..
 # Prints the current workspace path, for debugging purposes
 echo ${WORKSPACE}
 
-# ------------------ TEST_CMD ------------------
+# ---------------- --TEST_CMD ------------------
 
 # The main test log is called test_cmd_log.txt
 # That log is compares with test_cmd_log_base.txt
@@ -24,7 +24,7 @@ echo ${WORKSPACE}
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "1" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "0"  --fp "0"  --hk "0"  --test "1"  --st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_cmd
@@ -44,7 +44,7 @@ cd ..
 rm -f test_cmd_comparator_log.txt
 python logs_comparator.py | cat >> test_cmd_comparator_log.txt
 
-# ------------------ TEST_UNIT ------------------
+# ---------------- --TEST_UNIT ------------------
 
 # The test log is called test_unit_log.txt
 
@@ -56,7 +56,7 @@ do
 
     # Compiles the project with the test's parameters
     cd ${WORKSPACE}/src/system/include
-    python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode ${i}
+    python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode ${i}
 
     # Compiles the test
     cd ${WORKSPACE}/test/test_unit
@@ -73,13 +73,13 @@ do
 
 done
 
-# ------------------ TEST_LOAD ------------------
+# ---------------- --TEST_LOAD ------------------
 
 # The test log is called test_load_log.txt
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_load
@@ -94,13 +94,13 @@ rm -f ../test_load_log.txt
 ./SUCHAI_Flight_Software_Test | cat >> ../test_load_log.txt
 echo ""
 
-# ------------------ TEST_BUG_DELAY ------------------
+# ---------------- --TEST_BUG_DELAY ------------------
 
 # The test log is called test_bug_delay_log.txt
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE" --sch_comm "0" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_INFO"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode "0"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_bug_delay
@@ -114,13 +114,13 @@ make
 rm -f ../test_bug_delay_log.txt
 ./SUCHAI_Flight_Software_Test | cat >> ../test_bug_delay_log.txt
 
-# ------------------ TEST_TM_IO ------------------
+# ---------------- --TEST_TM_IO ------------------
 
 # The test log is called test_tm_io_log.txt
 
 # Compiles the project with the test's parameters
 cd ${WORKSPACE}/src/system/include
-python3 configure.py "LINUX" --log_lvl "LOG_LVL_DEBUG" --sch_comm "1" --sch_fp "0" --sch_hk "0" --sch_test "0" --sch_st_mode "0" --sch_node "1"
+python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "1" --con "0" --fp "0"  --hk "0"  --test "0"  --st_mode "0"  --node "1"
 
 # Compiles the test
 cd ${WORKSPACE}/test/test_tm_io

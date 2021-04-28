@@ -8,6 +8,7 @@
  */
 
 #include "repoDataSchema.h"
+static const char *tag = "repoDataSchema";
 
 struct map data_map[last_sensor] = {
         {"temp_data",      (uint16_t) (sizeof(temp_data_t)),     dat_drp_temp, dat_drp_ack_temp, "%u %f %f %f",                   "timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
@@ -15,157 +16,59 @@ struct map data_map[last_sensor] = {
         { "eps_data",      (uint16_t) (sizeof(eps_data_t)),      dat_drp_eps,  dat_drp_ack_eps,  "%u %u %u %u %d %d %d %d %d %d", "timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"}
 };
 
-
-void dat_status_to_struct(dat_status_t *status)
+dat_sys_var_t dat_get_status_var_def(dat_status_address_t address)
 {
-    assert(status != NULL);
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_opmode);        ///< General operation mode
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_last_reset);    ///< Last reset source
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_hrs_alive);     ///< Hours since first boot
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_hrs_wo_reset);  ///< Hours since last reset
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_reset_counter); ///< Number of reset since first boot
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_sw_wdt);        ///< Software watchdog timer counter
-    DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_1);        ///< Temperature value of the first sensor
-    DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_2);        ///< Temperature value of the second sensor
-    DAT_CPY_SYSTEM_VAR_F(status, dat_obc_temp_3);        ///< Temperature value of the gyroscope
+    dat_sys_var_t var = {0};
+    int i;
 
-    DAT_CPY_SYSTEM_VAR(status, dat_dep_deployed);      ///< Was the satellite deployed?
-    DAT_CPY_SYSTEM_VAR(status, dat_dep_ant_deployed);  ///< Was the antenna deployed?
-    DAT_CPY_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix time
+    if(address < dat_status_last_address)
+    {
+        for (i = 0; i < dat_status_last_var; i++)
+        {
+            if (dat_status_list[i].address == address)
+                return dat_status_list[i];
+        }
+    }
 
-    DAT_CPY_SYSTEM_VAR(status, dat_rtc_date_time);     /// RTC current unix time
-
-    DAT_CPY_SYSTEM_VAR(status, dat_com_count_tm);      ///< number of TM sent
-    DAT_CPY_SYSTEM_VAR(status, dat_com_count_tc);      ///< number of received TC
-    DAT_CPY_SYSTEM_VAR(status, dat_com_last_tc);       ///< Unix time of the last received tc
-    DAT_CPY_SYSTEM_VAR(status, dat_com_freq);          ///< Frequency [Hz]
-    DAT_CPY_SYSTEM_VAR(status, dat_com_tx_pwr);        ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-    DAT_CPY_SYSTEM_VAR(status, dat_com_baud);          ///< Baudrate [bps]
-    DAT_CPY_SYSTEM_VAR(status, dat_com_mode);          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-    DAT_CPY_SYSTEM_VAR(status, dat_com_bcn_period);    ///< Number of seconds between beacon packets
-    DAT_CPY_SYSTEM_VAR(status, dat_obc_bcn_offset);    ///< Number of seconds between obc beacon packets
-
-    DAT_CPY_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
-    DAT_CPY_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
-
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_x);       ///< Gyroscope acceleration value along the x axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_y);       ///< Gyroscope acceleration value along the y axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_omega_z);       ///< Gyroscope acceleration value along the z axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_omega_x);         ///< Target acceleration value along the x axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_omega_y);         ///< Target acceleration value along the y axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_omega_z);         ///< Target acceleration value along the z axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_pos_x);         ///< Satellite orbit position x (ECI)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_pos_y);         ///< Satellite orbit position y (ECI)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_pos_z);         ///< Satellite orbit position z (ECI)
-    DAT_CPY_SYSTEM_VAR(status, dat_ads_tle_epoch);       ///< Current TLE epoch, 0 if TLE is invalid
-    DAT_CPY_SYSTEM_VAR(status, dat_ads_tle_last);        ///< Las time position was propagated
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q0);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q1);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q2);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_ads_q3);           ///< Attitude quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q0);           ///< Target quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q1);           ///< Target quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q2);           ///< Target quaternion (Inertial to body)
-    DAT_CPY_SYSTEM_VAR_F(status, dat_tgt_q3);           ///< Target quaternion (Inertial to body)
-
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
-    DAT_CPY_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
-
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_lang);
-
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_temp);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_ads);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_eps);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_ack_lang);
-
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_action);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_state);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_step);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_payloads);
-    DAT_CPY_SYSTEM_VAR(status, dat_drp_mach_left);
+    LOGE(tag, "Status var not found! (%d)", address);
+    return var;
 }
 
-void dat_print_status(dat_status_t *status)
+dat_sys_var_t dat_get_status_var_def_name(char *name)
 {
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_opmode);        ///< General operation mode
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_last_reset);    ///< Last reset source
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_hrs_alive);     ///< Hours since first boot
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_hrs_wo_reset);  ///< Hours since last reset
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_reset_counter); ///< Number of reset since first boot
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_sw_wdt);        ///< Software watchdog timer counter
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_1);      ///< Temperature value of the first sensor
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_2);      ///< Temperature value of the second sensor
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_obc_temp_3);      ///< Temperature value of the gyroscope
+    dat_sys_var_t var;
+    var.status = -1;
+    int i;
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_dep_deployed);      ///< Was the satellite deployed?
-    DAT_PRINT_SYSTEM_VAR(status, dat_dep_ant_deployed);  ///< Was the antenna deployed?
-    DAT_PRINT_SYSTEM_VAR(status, dat_dep_date_time);     ///< Deployment unix time
+    if(name != NULL)
+    {
+        for (i = 0; i < dat_status_last_var; i++)
+        {
+            if (strcmp(dat_status_list[i].name, name) == 0)
+                return dat_status_list[i];
+        }
+    }
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_rtc_date_time);     /// RTC current unix time
+    LOGE(tag, "Status var not found! (%s)", name);
+    return var;
+}
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_count_tm);      ///< number of TM sent
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_count_tc);      ///< number of received TC
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_last_tc);       ///< Unix time of the last received tc
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_freq);          ///< Frequency [Hz]
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_tx_pwr);        ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_baud);          ///< Baudrate [bps]
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_mode);          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-    DAT_PRINT_SYSTEM_VAR(status, dat_com_bcn_period);    ///< Number of seconds between beacon packets
-    DAT_PRINT_SYSTEM_VAR(status, dat_obc_bcn_offset);    ///< Number of seconds between obc beacon packets
+void dat_print_system_var(dat_sys_var_t *status)
+{
+    assert(status != NULL);
 
-    DAT_PRINT_SYSTEM_VAR(status, dat_fpl_last);          ///< Last executed flight plan (unix time)
-    DAT_PRINT_SYSTEM_VAR(status, dat_fpl_queue);         ///< Flight plan queue length
-
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_x);         ///< Gyroscope acceleration value along the x axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_y);         ///< Gyroscope acceleration value along the y axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_omega_z);         ///< Gyroscope acceleration value along the z axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_omega_x);         ///< Target acceleration value along the x axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_omega_y);         ///< Target acceleration value along the y axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_omega_z);         ///< Target acceleration value along the z axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_x);         ///< Magnetometer x axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_y);         ///< Magnetometer y axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_mag_z);         ///< Magnetometer z axis
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_pos_x);         ///< Satellite orbit position x (ECI)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_pos_y);         ///< Satellite orbit position y (ECI)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_pos_z);         ///< Satellite orbit position z (ECI)
-    DAT_PRINT_SYSTEM_VAR(status, dat_ads_tle_epoch);       ///< Current TLE epoch, 0 if TLE is invalid
-    DAT_PRINT_SYSTEM_VAR(status, dat_ads_tle_last);        ///< Las time position was propagated
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q0);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q1);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q2);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_ads_q3);           ///< Attitude quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q0);           ///< Target quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q1);           ///< Target quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q2);           ///< Target quaternion (Inertial to body)
-    DAT_PRINT_SYSTEM_VAR_F(status, dat_tgt_q3);           ///< Target quaternion (Inertial to body)
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_vbatt);         ///< Voltage of battery [mV]
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sun);       ///< Current from boost converters [mA]
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_cur_sys);       ///< Current out of battery [mA]
-    DAT_PRINT_SYSTEM_VAR(status, dat_eps_temp_bat0);     ///< Battery temperature sensor
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_lang);
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_temp);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_ads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_eps);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_ack_lang);
-
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_action);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_state);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_step);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_payloads);
-    DAT_PRINT_SYSTEM_VAR(status, dat_drp_mach_left);
+    switch (status->type) {
+        case 'u':
+            printf("%3d, %-20s, %u, %d\n", status->address, status->name, status->value.u, status->status);
+            break;
+        case 'i':
+            printf("%3d, %-20s, %d, %d\n", status->address, status->name, status->value.i, status->status);
+            break;
+        case 'f':
+            printf("%3d, %-20s, %.6f, %d\n", status->address, status->name, status->value.f, status->status);
+            break;
+        default:
+            printf("%3d, %-20s, %#X, %d\n", status->address, status->name, status->value.u, status->status);
+    }
 }
 

@@ -10,38 +10,41 @@ static const char* tag = "tm_io_test_task";
 
 void taskTest(void* param)
 {
-    char* tag = (char*) param;
-
     LOGI(tag, "Started");
     LOGI(tag, "---- Telemetries Input/Output test ----");
 
     int test_amount = 5;
 
-    for (int current_test = 0; current_test < test_amount; current_test++)
+    cmd_t *drp_ebf = cmd_get_str("drp_ebf");
+    cmd_add_params_var(drp_ebf, 1010);
+    cmd_send(drp_ebf);
+
+    for(int current_test = 0; current_test < test_amount; current_test++)
     {
-        osDelay(5000);
+        osDelay(1000);
 
         LOGI(tag, "---- Sending Telemetry %d ----", current_test+1);
 
-        dat_status_t status;
-
-        for (dat_system_t i = 0; i < dat_system_last_var; i++)
+        for (dat_status_address_t i = 0; i < dat_status_last_address; i++)
         {
-            dat_set_system_var(i, (current_test+1)*100 + ((int) i));
+            value32_t value;
+            int test_value = (current_test+1)*100 + (int)i;
+            value.i = test_value;
+            if(dat_get_status_var_def(i).type == 'f')
+                value.f = (float)test_value;
+            dat_set_status_var(i, value);
         }
 
-        dat_status_to_struct(&status);
-
-        cmd_t* cmd = cmd_get_str("send_status");
+        cmd_t* cmd = cmd_get_str("tm_send_status");
         cmd_add_params_var(cmd, 1);
 
         cmd_send(cmd);
     }
 
-    osDelay(5000);
+    osDelay(1000);
 
     LOGI(tag, "---- Sending Exit Command ----");
 
-    cmd_t *cmd_exit = cmd_get_str("reset");
+    cmd_t *cmd_exit = cmd_get_str("obc_reset");
     cmd_send(cmd_exit);
 }
