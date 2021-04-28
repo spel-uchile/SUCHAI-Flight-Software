@@ -39,7 +39,8 @@ def parse_args():
     parser.add_argument('--zmq_out', type=str, default="tcp://127.0.0.1:8002")
     parser.add_argument('--st_mode', type=str, default="1")
     parser.add_argument('--st_triple_wr', type=str, default="1")
-    parser.add_argument('--buffers_csp', type=str, default="10")
+    parser.add_argument('--buffers_csp', type=str, default="100")
+    parser.add_argument('--socket_len', type=str, default="100")
 
     args = parser.parse_args()
     return args
@@ -76,6 +77,7 @@ def make_config(args, ftemp="config_template.h", fconfig="config.h"):
     config = config.replace("{{SCH_STORAGE_TRIPLE_WR}}", args.st_triple_wr)
     config = config.replace("{{SCH_STORAGE_PGUSER}}", "spel")
     config = config.replace("{{SCH_BUFFERS_CSP}}", args.buffers_csp)
+    config = config.replace("{{SCH_CSP_SOCK_LEN}}", args.socket_len)
 
     with open(fconfig, 'w') as new_config:
         new_config.write(config)

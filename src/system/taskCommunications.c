@@ -43,7 +43,7 @@ void taskCommunications(void *param)
         LOGE(tag, "Error biding socket (%d)!", rc)
         return;
     }
-    if((rc = csp_listen(sock, 5)) != CSP_ERR_NONE)
+    if((rc = csp_listen(sock, SCH_CSP_SOCK_LEN)) != CSP_ERR_NONE)
     {
         LOGE(tag, "Error listening to socket (%d)", rc)
         return;

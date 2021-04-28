@@ -117,7 +117,8 @@
 #define SCH_TASK_SEN_STACK        (5*256)   ///< Sensor task stack size in words
 
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
-#define SCH_BUFFERS_CSP           (10)       ///< Number of available CSP buffers
+#define SCH_BUFFERS_CSP           (100)     ///< Number of available CSP buffers
+#define SCH_CSP_SOCK_LEN          (100)     ///< Max number of packets in a connection queue
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES       (255)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (256)      ///< Limit for the parameters length
