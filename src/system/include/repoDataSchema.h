@@ -55,6 +55,8 @@ typedef enum dat_status_address_enum {
     dat_obc_temp_1,               ///< Temperature value of the first sensor
     dat_obc_temp_2,               ///< Temperature value of the second sensor
     dat_obc_temp_3,               ///< Temperature value of the gyroscope
+    dat_obc_executed_cmds,        ///< Total number of executed commands
+    dat_obc_failed_cmds,          ///< Total number of failed commands
 
     /// DEP: Deployment related variables.
     dat_dep_deployed,             ///< Was the satellite deployed?
@@ -189,6 +191,8 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_obc_temp_1,        "obc_temp_1",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the first sensor
         {dat_obc_temp_2,        "obc_temp_2",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the second sensor
         {dat_obc_temp_3,        "obc_temp_3",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the gyroscope
+        {dat_obc_executed_cmds, "obc_executed_cmds", 'u', DAT_IS_STATUS, 0},
+        {dat_obc_failed_cmds,   "obc_failed_cmds",   'u', DAT_IS_STATUS, 0},
         {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 1},          ///< Was the satellite deployed?
         {dat_dep_ant_deployed,  "dep_ant_deployed",  'u', DAT_IS_STATUS, 1},          ///< Was the antenna deployed?
         {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, -1},         ///< Antenna deployment unix time
