@@ -541,6 +541,7 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     if(tle.sgp4Error != 0)
         return CMD_FAIL;
 
+    //TODO: Use value32_t instead
     value pos[3] = {(float)r[0], (float)r[1], (float)r[2]};
     dat_set_system_var(dat_ads_pos_x, pos[0].i);
     dat_set_system_var(dat_ads_pos_y, pos[1].i);
