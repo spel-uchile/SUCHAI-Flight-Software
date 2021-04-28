@@ -24,7 +24,7 @@ static char trx_node = SCH_TRX_ADDRESS;
 
 #ifdef SCH_USE_NANOCOM
 static void _com_config_help(void);
-static void _com_config_find(char *param_name, int *table, gs_param_table_instance_t **param);
+static void _com_config_find(char *param_name, int *table, param_table_t **param);
 #endif
 
 void cmd_com_init(void)
@@ -549,7 +549,7 @@ void _com_config_help(void)
  * @param param param_table_t *. The parameter type, size and index will be
  * stored here. If the parameter is not found, this pointer is set to NULL.
  */
-void _com_config_find(char *param_name, int *table, gs_param_table_instance_t **param)
+void _com_config_find(char *param_name, int *table, param_table_t **param)
 {
     int i = 0;
     int table_tmp = -1;

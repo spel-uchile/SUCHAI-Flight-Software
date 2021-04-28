@@ -121,7 +121,7 @@ typedef enum dat_status_address_enum {
     dat_drp_ack_eps,              ///< EPS data index acknowledge
     dat_drp_ack_lang,             ///< Langmuir data index acknowledge
 
-    /// Sample Machine: Current state of sample machine
+    /// Sample Machine: Current state of sample status_machine
     dat_drp_mach_action,          ///<
     dat_drp_mach_state,           ///<
     dat_drp_mach_step,            ///<

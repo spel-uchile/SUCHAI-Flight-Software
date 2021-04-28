@@ -41,7 +41,7 @@ int set_state(char *fmt, char *params, int nparams)
     unsigned int step;
     int nsamples;
     if(nparams == sscanf(params, fmt, &action, &step, &nsamples)){
-        int rc = set_machine_state(action, step, nsamples);
+        int rc = dat_set_stmachine_state(action, step, nsamples);
         return rc ? CMD_OK : CMD_FAIL;
     }
     return CMD_ERROR;
@@ -59,33 +59,37 @@ int activate_sensor(char *fmt, char *params, int nparams)
         if(payload < 0 ) {
             if (activate == 0) {
                 osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-                machine.active_payloads = 0;
+                status_machine.active_payloads = 0;
                 osSemaphoreGiven(&repo_machine_sem);
 
             } else  {
                 osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-                machine.active_payloads = 0;
+                status_machine.active_payloads = 0;
                 int i;
-                for (i=0; i < machine.total_sensors; i++) {
-                    machine.active_payloads +=  1 << i ;
+                for (i=0; i < status_machine.total_sensors; i++) {
+                    status_machine.active_payloads +=  1 << i ;
                 }
                 osSemaphoreGiven(&repo_machine_sem);
             }
             return CMD_OK;
         }
 
-        if ( payload >= machine.total_sensors ) {
+        if (payload >= status_machine.total_sensors ) {
             return CMD_ERROR;
         }
 
-        if( activate == 1  && !is_payload_active(payload, machine.active_payloads, machine.total_sensors) ) {
+        if( activate == 1  && !dat_stmachine_is_sensor_active(payload,
+                                                              status_machine.active_payloads,
+                                                              status_machine.total_sensors) ) {
             osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-            machine.active_payloads = ((unsigned  int)1 << payload) | machine.active_payloads;
+            status_machine.active_payloads = ((unsigned  int)1 << payload) | status_machine.active_payloads;
             osSemaphoreGiven(&repo_machine_sem);
             return CMD_OK;
-        } else if ( activate == 0 && is_payload_active(payload, machine.active_payloads, machine.total_sensors) ) {
+        } else if ( activate == 0 && dat_stmachine_is_sensor_active(payload,
+                                                                    status_machine.active_payloads,
+                                                                    status_machine.total_sensors) ) {
             osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-            machine.active_payloads = ((unsigned  int)1 << payload) ^ machine.active_payloads;
+            status_machine.active_payloads = ((unsigned  int)1 << payload) ^ status_machine.active_payloads;
             osSemaphoreGiven(&repo_machine_sem);
             return CMD_OK;
         }
@@ -185,12 +189,4 @@ int init_dummy_sensor(char *fmt, char *params, int nparams)
 {
     LOGI(tag, "Initializing dummy sensor");
     return CMD_OK;
-}
-
-int is_payload_active(int payload, int active_payloads, int n_payloads) {
-//    printf("max number of active payload %d\n", (1 << n_payloads));
-    if ( active_payloads >= (1 << n_payloads) ) {
-        return 0;
-    }
-    return ( (active_payloads & (1 << payload)) != 0 );
 }
