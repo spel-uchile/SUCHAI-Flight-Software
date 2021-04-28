@@ -603,11 +603,11 @@ int dat_delete_memory_sections(void)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Free memory or drop databases
     ret = storage_delete_memory_sections();
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
 #if SCH_FP_ENABLED
     storage_flight_plan_reset();
 #endif
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
     return ret;
 }
 
