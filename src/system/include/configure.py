@@ -74,7 +74,7 @@ def make_config(args, ftemp="config_template.h", fconfig="config.h"):
     config = config.replace("{{SCH_ZMQ_IN}}", args.zmq_in)
     config = config.replace("{{SCH_STORAGE}}", args.st_mode)
     config = config.replace("{{SCH_STORAGE_TRIPLE_WR}}", args.st_triple_wr)
-    config = config.replace("{{SCH_STORAGE_PGUSER}}", os.environ['USER'])
+    config = config.replace("{{SCH_STORAGE_PGUSER}}", "spel")
     config = config.replace("{{SCH_BUFFERS_CSP}}", args.buffers_csp)
 
     with open(fconfig, 'w') as new_config:
