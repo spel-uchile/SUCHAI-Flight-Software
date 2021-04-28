@@ -208,13 +208,22 @@ int com_debug(char *fmt, char *params, int nparams);
 int com_set_node(char *fmt, char *params, int nparams);
 
 /**
- * Show current trx_node setting. @see com_set_node
- * @param fmt Not used
- * @param params Not used
- * @param nparams Not used
- * @return CMD_OK
+ * Send (and set) current time to node
+ * @param fmt Str. Parameters format: "%d"
+ * @param params  Str. Parameters: <node>
+ * @param nparams Str. Number of parameters: 1
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
  */
 int com_get_node(char *fmt, char *params, int nparams);
+
+/**
+ *
+ * @param fmt
+ * @param params
+ * @param nparams
+ * @return
+ */
+int com_set_time_node(char *fmt, char *params, int nparams);
 
 /**
  * Reset the TRX GND Watchdog timer at @node node by sending a CSP command to the

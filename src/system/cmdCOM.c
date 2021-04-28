@@ -37,6 +37,7 @@ void cmd_com_init(void)
     cmd_add("com_debug", com_debug, "", 0);
     cmd_add("com_set_node", com_set_node, "%d", 1);
     cmd_add("com_get_node", com_get_node, "", 0);
+    cmd_add("com_set_time_node", com_set_time_node, "%d", 1);
 #ifdef SCH_USE_NANOCOM
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%s", 1);
@@ -287,6 +288,8 @@ int com_debug(char *fmt, char *params, int nparams)
     csp_route_print_table();
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
+    LOGD(tag, "Connections")
+    csp_conn_print_table();
 
     return CMD_OK;
 }
@@ -313,6 +316,21 @@ int com_get_node(char *fmt, char *params, int nparams)
 {
     printf("TRX Node: %d\n", trx_node);
     return CMD_OK;
+}
+
+int com_set_time_node(char *fmt, char *params, int nparams)
+{
+    int node;
+    if(params == NULL || sscanf(params, fmt, &node) != nparams)
+    {
+        LOGE(tag, "Error parsing params!");
+        return CMD_ERROR;
+    }
+
+    char cmd[SCH_CMD_MAX_STR_NAME];
+    sprintf(cmd, "%d obc_set_time %d", node, (int)dat_get_time());
+    LOGI(tag, "Sending command 'com_send_cmd %s' to %d", cmd, node);
+    com_send_cmd("%d %n", cmd, 2);
 }
 
 #ifdef SCH_USE_NANOCOM
