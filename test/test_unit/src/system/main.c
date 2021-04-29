@@ -55,7 +55,7 @@ void testParseCommands(void)
     char *name;
 
     // Case 1: command without parameters; command do not req. parameters.
-    cmd = cmd_parse_from_str("obc_get_mem");
+    cmd = cmd_build_from_str("obc_get_mem");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
     CU_ASSERT_STRING_EQUAL("obc_get_mem", name)
@@ -63,7 +63,7 @@ void testParseCommands(void)
     free(cmd); free(name);
 
     // Case 2: command with parameters; command do not req. parameters.
-    cmd = cmd_parse_from_str("obc_get_mem foo");
+    cmd = cmd_build_from_str("obc_get_mem foo");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
     CU_ASSERT_STRING_EQUAL("obc_get_mem", name)
@@ -71,7 +71,7 @@ void testParseCommands(void)
     free(cmd); free(name);
 
     // Case 3: command with parameters; command require parameters.
-    cmd = cmd_parse_from_str("obc_debug 1");
+    cmd = cmd_build_from_str("obc_debug 1");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
     CU_ASSERT_STRING_EQUAL("obc_debug", name)
@@ -79,7 +79,7 @@ void testParseCommands(void)
     free(cmd); free(name);
 
     // Case 4: command without parameters; command require parameters.
-    cmd = cmd_parse_from_str("obc_debug");
+    cmd = cmd_build_from_str("obc_debug");
     CU_ASSERT_PTR_NOT_NULL(cmd);
     name = cmd_get_name(cmd->id);
     CU_ASSERT_STRING_EQUAL("obc_debug", name)
@@ -87,17 +87,17 @@ void testParseCommands(void)
     free(cmd); free(name);
 
     // Case 5: not valid command
-    cmd = cmd_parse_from_str("invalid_command");
+    cmd = cmd_build_from_str("invalid_command");
     CU_ASSERT_PTR_NULL(cmd);
     free(cmd);
 
     // Case 6: empty command
-    cmd = cmd_parse_from_str("\0");
+    cmd = cmd_build_from_str("\0");
     CU_ASSERT_PTR_NULL(cmd);
     free(cmd);
 
     // Case 7: \n or \cr command
-    cmd = cmd_parse_from_str("\r\n");
+    cmd = cmd_build_from_str("\r\n");
     CU_ASSERT_PTR_NULL(cmd);
     free(cmd);
 }
@@ -541,7 +541,7 @@ int main()
     }
 
     /* add the tests to the suite */
-    if ((NULL == CU_add_test(pSuite, "test of cmd_parse_from_str()", testParseCommands))){
+    if ((NULL == CU_add_test(pSuite, "test of cmd_build_from_str()", testParseCommands))){
         CU_cleanup_registry();
         return CU_get_error();
     }
