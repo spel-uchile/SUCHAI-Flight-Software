@@ -55,7 +55,7 @@ void taskConsole(void *param)
         if(console_read(buffer, SCH_BUFF_MAX_LEN-1) != 0)
             continue;
 
-        new_cmd = cmd_parse_from_str(buffer);
+        new_cmd = cmd_build_from_str(buffer);
 
         if(new_cmd != NULL)
         {

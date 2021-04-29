@@ -169,7 +169,7 @@ static void com_receive_tc(csp_packet_t *packet)
     {
         // Parse and send command for execution
         LOGI(tag, "TC: %s", cmd_str);
-        cmd_t *new_cmd = cmd_parse_from_str(cmd_str);
+        cmd_t *new_cmd = cmd_build_from_str(cmd_str);
         if (new_cmd != NULL)
             cmd_send(new_cmd);
 
@@ -188,7 +188,7 @@ static void com_receive_cmd(csp_packet_t *packet)
 {
     // Make sure the buffer is a null terminated string
     packet->data[packet->length] = '\0';
-    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
+    cmd_t *new_cmd = cmd_build_from_str((char *)(packet->data));
 
     // Send command to execution if not null
     if(new_cmd != NULL)
