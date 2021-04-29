@@ -21,6 +21,7 @@
 #include "taskConsole.h"
 
 static const char *tag = "Console";
+static const char *cmd_hist = "/tmp/suchai_fs_history.txt";
 
 const char console_banner[] =
 "\n______________________________________________________________________________\n\
@@ -78,6 +79,11 @@ void taskConsole(void *param)
 int console_init(void)
 {
     LOGD(tag, "Init...\n");
+
+#ifdef LINUX
+    linenoiseHistoryLoad(cmd_hist); /* Load the history at startup */
+#endif
+
     cmd_print_all();
     return 0;
 }
@@ -90,6 +96,7 @@ int console_read(char *buffer, int len)
     if(line != NULL)
     {
         linenoiseHistoryAdd(line);
+        linenoiseHistorySave(cmd_hist);
         strncpy(buffer, line, len);
         free(line);
         return 0;
