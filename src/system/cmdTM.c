@@ -59,7 +59,7 @@ int tm_send_var(char *fmt, char *params, int nparams)
 {
     //Format: <node>
     int dest_node;
-    char *var_name;
+    char var_name[SCH_CMD_MAX_STR_PARAMS];
 
     if(params == NULL || sscanf(params, fmt, &dest_node, var_name) != nparams)
     {
