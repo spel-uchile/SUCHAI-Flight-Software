@@ -537,7 +537,7 @@ int storage_set_payload_data(int index, void* data, int payload)
 
     LOGI(tag, "Writing in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
 //    int ret = spn_fl512s_write_data(0, add, data, data_map[payload].size);
-    int ret = write_data_with_chek(add, (uint8_t *)data, data_map[payload].size);
+    int ret = write_data_with_check(add, (uint8_t *)data, data_map[payload].size);
     return ret;
 }
 
