@@ -105,6 +105,8 @@ int take_sample(char *fmt, char *params, int nparams)
     int payload;
     if(nparams == sscanf(params, fmt, &payload)) {
 
+        int ret;
+
         if( payload >= last_sensor) {
             return CMD_ERROR;
         }
@@ -124,7 +126,11 @@ int take_sample(char *fmt, char *params, int nparams)
 #endif
             /* Save temperature data */
             struct temp_data data_temp = {curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
-            dat_add_payload_sample(&data_temp, temp_sensors);
+            ret = dat_add_payload_sample(&data_temp, temp_sensors);
+
+            if (ret != 0) {
+                return CMD_FAIL;
+            }
             return CMD_OK;
         }
         else if ( payload == 1) // ADS
@@ -148,7 +154,10 @@ int take_sample(char *fmt, char *params, int nparams)
             struct ads_data data_ads = {curr_time,
                                         gyro_x, gyro_y, gyro_z,
                                         mag_x, mag_y, mag_z};
-            dat_add_payload_sample(&data_ads, ads_sensors);
+            ret = dat_add_payload_sample(&data_ads, ads_sensors);
+            if (ret != 0) {
+                return CMD_FAIL;
+            }
             return CMD_OK;
         }
         else if ( payload == 2) // EPS
@@ -178,7 +187,10 @@ int take_sample(char *fmt, char *params, int nparams)
 #endif
             struct eps_data data_eps = {curr_time, cursun, cursys, vbatt,
                                         temp1, temp2, temp3, temp4, temp5, temp6};
-            dat_add_payload_sample(&data_eps, eps_sensors);
+            ret = dat_add_payload_sample(&data_eps, eps_sensors);
+            if (ret != 0) {
+                return CMD_FAIL;
+            }
             return CMD_OK;
         }
     }

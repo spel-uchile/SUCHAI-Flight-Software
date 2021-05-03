@@ -108,4 +108,14 @@ int tm_send_from(char *fmt, char *params, int nparams);
  */
 int tm_set_ack(char *fmt, char *params, int nparams);
 
+
+/**
+ *
+ * @param fmt %u %u
+ * @param params "<payload> <index>"
+ * @param nparams 2
+ * @return CMD_OK or CMD_FAIL
+ */
+int tm_get_single(char *fmt, char *params, int nparams);
+
 #endif //CMDTM_H

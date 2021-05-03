@@ -239,6 +239,15 @@ int dat_show_time(int format);
 int dat_add_payload_sample(void* data, int payload);
 
 /**
+ *
+ * @param data
+ * @param payload
+ * @param index
+ * @return
+ */
+int dat_get_payload_sample(void*data, int payload, int index);
+
+/**
  * Gets a data struct from the payload table.
  *
  * @param data Pointer to the struct where the values will be stored

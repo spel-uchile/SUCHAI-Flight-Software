@@ -27,6 +27,7 @@ void cmd_tm_init(void)
     cmd_add("tm_send_status", tm_send_status, "%d", 1);
     cmd_add("tm_send_var", tm_send_var, "%d %s", 2);
     cmd_add("tm_get_last", tm_get_last, "%u", 1);
+    cmd_add("tm_get_single", tm_get_single, "%u %u", 2);
     cmd_add("tm_send_last", tm_send_last, "%u %u", 2);
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
     cmd_add("tm_send_from", tm_send_from, "%u %u %u", 3);
@@ -145,6 +146,39 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
     }
 }
 
+int tm_get_single(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "params is null!");
+        return CMD_ERROR;
+    }
+
+    uint32_t payload;
+    uint32_t index;
+
+    if(nparams == sscanf(params, fmt, &payload, &index))
+    {
+        if(payload >= last_sensor) {
+            return CMD_FAIL;
+        }
+
+        int payload_size = data_map[payload].size;
+        char buff[payload_size];
+        int ret;
+        ret = dat_get_payload_sample(buff, payload, index);
+        dat_print_payload_struct(buff, payload);
+
+        if( ret == -1) {
+            return CMD_ERROR;
+        }
+
+        return CMD_OK;
+    }
+
+    return CMD_ERROR;
+}
+
 int tm_get_last(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
@@ -167,9 +201,15 @@ int tm_get_last(char *fmt, char *params, int nparams)
         }
         int payload_size = data_map[payload].size;
         char buff[payload_size];
-        dat_get_recent_payload_sample(buff, payload,0);
+        int ret;
+        ret = dat_get_recent_payload_sample(buff, payload,0);
         //FIXME: Check memory usage
         dat_print_payload_struct(buff, payload);
+
+        if( ret == -1) {
+            return CMD_ERROR;
+        }
+
         return CMD_OK;
     }
     else

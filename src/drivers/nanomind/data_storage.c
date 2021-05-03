@@ -484,6 +484,34 @@ int storage_close(void)
     return 0;
 }
 
+int write_data_with_check(uint32_t add, uint8_t * data, uint16_t size)
+{
+    int i;
+    uint8_t data_aux[size];
+    for (i=0 ; i < 10; ++i) {
+        uint32_t add_aux = add + i*size;
+        int ret_write = spn_fl512s_write_data(0, add_aux, data, size);
+
+        int ret_read = spn_fl512s_read_data(0, add_aux, data_aux, size);
+
+        if (ret_read != 0 || ret_write != 0 ) {
+            return -1;
+        }
+        // Check integrity
+        int j, integrity=0;
+        for (j=0; j < size; j++) {
+            if (data[j] != data_aux[j]) {
+                integrity += 1;
+                break;
+            }
+        }
+        if (integrity == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int storage_set_payload_data(int index, void* data, int payload)
 {
     if(payload >= last_sensor)
@@ -508,11 +536,33 @@ int storage_set_payload_data(int index, void* data, int payload)
     }
 
     LOGI(tag, "Writing in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
-    int ret = spn_fl512s_write_data(0, add, data, data_map[payload].size);
-    if(ret != 0){
-        return -1;
+//    int ret = spn_fl512s_write_data(0, add, data, data_map[payload].size);
+    int ret = write_data_with_chek(add, (uint8_t *)data, data_map[payload].size);
+    return ret;
+}
+
+int read_data_with_check(uint32_t add, uint8_t * data, uint16_t size) {
+
+    int i;
+    for (i=0 ; i < 10; ++i) {
+        uint32_t add_aux = add + i*size;
+        int read_ret = spn_fl512s_read_data(0, add_aux, data, size);
+
+        if( read_ret != 0) {
+            return -1;
+        }
+        int j, integity=0;
+        for (j=0; j<size; ++j) {
+            if (data[j] == 0xff) {
+                integity +=1;
+                break;
+            }
+        }
+        if (integity == 0) {
+            return i;
+        }
     }
-    return 0;
+    return -1;
 }
 
 int storage_get_payload_data(int index, void* data, int payload)
@@ -538,18 +588,22 @@ int storage_get_payload_data(int index, void* data, int payload)
         return -1;
     }
 
-    LOGV(tag, "Reading in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
+    LOGI(tag, "Reading in address: %u, %d bytes\n", (unsigned int)add, data_map[payload].size);
 //    printf("Reading values of size %u \n", data_map[payload]);
 //    spn_fl512s_read_data(add, (uint8_t *) data, data_map[payload]);
-    spn_fl512s_read_data(0, add, (uint8_t *)data, data_map[payload].size);
-//    printf("Reading value %d \n", *(uint8_t*)data);
-//    LOGV(tag, "Read 0x%X", (unsigned int)data.data32);
+    int read_ret = 0;
+//    read_ret = spn_fl512s_read_data(0, add, (uint8_t *)data, data_map[payload].size);
+    read_ret = read_data_with_check(add, (uint8_t *)data, data_map[payload].size);
+    if (read_ret < 0) {
+        return -1 ;
+    }
     return 0;
 }
 
 int storage_delete_memory_sections()
 {
     // Deleting Payload Memory Sections
+    //spn_fl512s_erase_chip(0);
     for(int i = 0;  i < SCH_SECTIONS_PER_PAYLOAD*last_sensor; ++i)
     {
         LOGI(tag, "deleting section in address %u\n", (unsigned int)storage_addresses_payloads[i]);
