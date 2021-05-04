@@ -149,7 +149,7 @@ void init_communications(void)
 #endif //X86||GROUNDSTATION
 
 #ifdef RPI
-    csp_i2c_uart_init(SCH_COMM_ADDRESS, 0, 115200);
+    csp_i2c_uart_init(SCH_COMM_ADDRESS, 0, 9600);
     csp_rtable_set(8, 2, &csp_if_i2c_uart, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C to TRX node
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c_uart, CSP_NODE_MAC); // Rest of the traffic to I2C using node i2c address
 #endif
