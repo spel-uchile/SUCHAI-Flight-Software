@@ -160,7 +160,7 @@ int take_sample(char *fmt, char *params, int nparams)
             }
             return CMD_OK;
         }
-        else if ( payload == 2) // EPS
+        else if (payload == 2) // EPS
         {
             uint32_t cursun=1;
             uint32_t cursys=2;
@@ -188,6 +188,22 @@ int take_sample(char *fmt, char *params, int nparams)
             struct eps_data data_eps = {curr_time, cursun, cursys, vbatt,
                                         temp1, temp2, temp3, temp4, temp5, temp6};
             ret = dat_add_payload_sample(&data_eps, eps_sensors);
+            if (ret != 0) {
+                return CMD_FAIL;
+            }
+            return CMD_OK;
+        } else if (payload == 3) {
+
+            // Pack status variables to a structure
+            int i;
+            dat_sys_var_short_t status_buff[dat_status_last_var];
+            for(i = 0; i<dat_status_last_var; i++)
+            {
+                status_buff[i].address = csp_hton16(dat_status_list[i].address);
+                status_buff[i].value.u = csp_hton32(dat_get_status_var(dat_status_list[i].address).u);
+            }
+
+            ret = dat_add_payload_sample(&status_buff, sta_sensors);
             if (ret != 0) {
                 return CMD_FAIL;
             }

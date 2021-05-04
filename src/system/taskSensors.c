@@ -29,9 +29,9 @@ void taskSensors(void *param)
     int i;
     cmd_t *cmd_init;
     cmd_t *cmd_get;
-    int nsensors = 3;
-    char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor"};
-    char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "sen_take_sample" };
+    int nsensors = 4;
+    char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor"};
+    char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "eps_get_hk", "sen_take_sample" };
 
     status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 0, 5, -1, nsensors};
 
@@ -74,7 +74,7 @@ void taskSensors(void *param)
             }
             // Check for step
             else if (elapsed_sec % status_machine.step == 0) {
-                LOGI(tag, "SAMPLING...");
+                LOGD(tag, "SAMPLING...");
 
                 for(i=0; i<nsensors; i++) {
 //                    printf("payload %d active status %d\n", i, dat_stmachine_is_sensor_active(i, status_machine.active_payloads, nsensors));

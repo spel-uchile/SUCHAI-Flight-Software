@@ -115,20 +115,20 @@ typedef enum dat_status_address_enum {
     dat_drp_temp,                 ///< Temperature data index
     dat_drp_ads,                  ///< ADS data index
     dat_drp_eps,                  ///< EPS data index
-    dat_drp_lang,                 ///< Langmuir data index
+    dat_drp_sta,                 ///< Status data index
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
     dat_drp_ack_ads,              ///< ADS data index acknowledge
     dat_drp_ack_eps,              ///< EPS data index acknowledge
-    dat_drp_ack_lang,             ///< Langmuir data index acknowledge
+    dat_drp_ack_sta,             ///< Status data index acknowledge
 
     /// Sample Machine: Current state of sample status_machine
-    dat_drp_mach_action,          ///<
-    dat_drp_mach_state,           ///<
-    dat_drp_mach_step,            ///<
-    dat_drp_mach_payloads,        ///<
-    dat_drp_mach_left,            ///<
+    dat_drp_mach_action,          ///< Current action of sampling state machine
+    dat_drp_mach_state,           ///< Current state of sampling state machine
+    dat_drp_mach_step,            ///< Step in seconds of sampling state machine
+    dat_drp_mach_payloads,        ///< Binary data storing active payload being sampled
+    dat_drp_mach_left,            ///< Samples left for sampling state machine
 
     /// Add a new status variables address here
     //dat_custom,                 ///< Variable description
@@ -223,7 +223,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_drp_ads,           "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
         {dat_drp_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
-        {dat_drp_lang,          "drp_lang",          'u', DAT_IS_STATUS, 0},          ///< Langmuir data index
+        {dat_drp_sta,           "drp_sta",          'u', DAT_IS_STATUS, 0},          ///< Langmuir data index
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
@@ -245,7 +245,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
-        {dat_drp_ack_lang,      "drp_ack_lang",      'u', DAT_IS_CONFIG, 0},          ///< Langmuir data index acknowledge
+        {dat_drp_ack_sta,      "drp_ack_sta",        'u', DAT_IS_CONFIG, 0},          ///< Langmuir data index acknowledge
         {dat_drp_mach_step,     "drp_mach_step",     'i', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
 };
@@ -272,6 +272,7 @@ typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
+    sta_sensors,            ///< Status Variables
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -317,6 +318,15 @@ typedef struct __attribute__((__packed__)) eps_data {
 
 
 /**
+ * Struct for storing data collected by status variables.
+ */
+typedef struct __attribute__((__packed__)) sta_data {
+    uint32_t timestamp;
+    dat_sys_var_short_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
+} sta_data_t;
+
+
+/**
  * Data Map Struct for data schema definition.
  */
 extern struct __attribute__((__packed__)) map {
@@ -324,8 +334,8 @@ extern struct __attribute__((__packed__)) map {
     uint16_t  size;
     uint32_t sys_index;
     uint32_t sys_ack;
-    char data_order[50];
-    char var_names[200];
+    char data_order[200];
+    char var_names[1000];
 } data_map[last_sensor];
 
 /** The repository's name */
