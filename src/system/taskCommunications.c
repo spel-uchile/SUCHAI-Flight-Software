@@ -43,7 +43,7 @@ void taskCommunications(void *param)
         LOGE(tag, "Error biding socket (%d)!", rc)
         return;
     }
-    if((rc = csp_listen(sock, 5)) != CSP_ERR_NONE)
+    if((rc = csp_listen(sock, SCH_CSP_SOCK_LEN)) != CSP_ERR_NONE)
     {
         LOGE(tag, "Error listening to socket (%d)", rc)
         return;
@@ -84,20 +84,20 @@ void taskCommunications(void *param)
                     // Create a response packet and send
                     rep_ok = csp_buffer_clone(rep_ok_tmp);
                     csp_send(conn, rep_ok, 1000);
-                    #ifdef SCH_RESEND_TM_NODE
-                    tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
-                    #endif
-                    // Process TM packet
-                    com_receive_tm(packet);
-                    csp_buffer_free(packet);
+
                     #ifdef SCH_RESEND_TM_NODE
                     // Resend a copy of the packet to another node
+                    tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
                     assert(tmp_packet != NULL);
                     assert(tmp_packet != packet);
                     rc = csp_sendto(CSP_PRIO_NORM, SCH_RESEND_TM_NODE, SCH_TRX_PORT_TM, csp_conn_sport(conn), CSP_O_NONE, tmp_packet, 1000);
                     if(rc == -1)
                         csp_buffer_free(tmp_packet);
                     #endif
+
+                    // Process TM packet
+                    com_receive_tm(packet);
+                    csp_buffer_free(packet);
                     break;
 
                 case SCH_TRX_PORT_RPT:
@@ -169,7 +169,7 @@ static void com_receive_tc(csp_packet_t *packet)
     {
         // Parse and send command for execution
         LOGI(tag, "TC: %s", cmd_str);
-        cmd_t *new_cmd = cmd_parse_from_str(cmd_str);
+        cmd_t *new_cmd = cmd_build_from_str(cmd_str);
         if (new_cmd != NULL)
             cmd_send(new_cmd);
 
@@ -188,7 +188,7 @@ static void com_receive_cmd(csp_packet_t *packet)
 {
     // Make sure the buffer is a null terminated string
     packet->data[packet->length] = '\0';
-    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
+    cmd_t *new_cmd = cmd_build_from_str((char *)(packet->data));
 
     // Send command to execution if not null
     if(new_cmd != NULL)

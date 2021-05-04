@@ -40,6 +40,18 @@ void cmd_tm_init(void);
 int tm_send_status(char *fmt, char *params, int nparams);
 
 /**
+ * Send specific status variable as telemetry. This command collects the current value
+ * of the status variable, builds a frame and downloads telemetry to the
+ * specified node. To parse the data @seealso tm_parse_status
+ *
+ * @param fmt Str. Parameters format: "%d %s"
+ * @param param Str. Parameters as string, node to send TM and variable name: <node> <variable name>. Ex: "10 obc_last_reset"
+ * @param nparams Int. Number of parameters: 2
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int tm_send_var(char *fmt, char *params, int nparams);
+
+/**
  * Parses a status variables telemetry, @seealso tm_send_status.
  *
  * @param fmt Str. Not used.
@@ -95,5 +107,15 @@ int tm_send_from(char *fmt, char *params, int nparams);
  * @return CMD_OK or CMD_FAIL
  */
 int tm_set_ack(char *fmt, char *params, int nparams);
+
+
+/**
+ *
+ * @param fmt %u %u
+ * @param params "<payload> <index>"
+ * @param nparams 2
+ * @return CMD_OK or CMD_FAIL
+ */
+int tm_get_single(char *fmt, char *params, int nparams);
 
 #endif //CMDTM_H

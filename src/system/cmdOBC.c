@@ -326,16 +326,25 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
 
     /* Get sample time */
     int curr_time =  (int)time(NULL);
+    int ret;
 
     /* Save temperature data */
     struct temp_data data_temp = {curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
-    dat_add_payload_sample(&data_temp, temp_sensors);
+    ret = dat_add_payload_sample(&data_temp, temp_sensors);
+
+    if(ret != 0) {
+        return CMD_FAIL;
+    }
 
     /* Save ADCS data */
     struct ads_data data_ads = {curr_time,
                                 gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
                                 hmc_reading.x, hmc_reading.y, hmc_reading.z};
-    dat_add_payload_sample(&data_ads, ads_sensors);
+    ret = dat_add_payload_sample(&data_ads, ads_sensors);
+
+    if(ret != 0) {
+        return CMD_FAIL;
+    }
 
     /* Print readings */
 #if LOG_LEVEL >= LOG_LVL_DEBUG
@@ -541,6 +550,7 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     if(tle.sgp4Error != 0)
         return CMD_FAIL;
 
+    //TODO: Use value32_t instead
     value pos[3] = {(float)r[0], (float)r[1], (float)r[2]};
     dat_set_system_var(dat_ads_pos_x, pos[0].i);
     dat_set_system_var(dat_ads_pos_y, pos[1].i);

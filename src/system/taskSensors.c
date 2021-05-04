@@ -33,14 +33,14 @@ void taskSensors(void *param)
     char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor"};
     char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "sen_take_sample" };
 
-    machine = (sample_machine_t) {ST_PAUSE, ACT_START, 0, 5, -1, nsensors};
+    status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 0, 5, -1, nsensors};
 
     if(osSemaphoreCreate(&repo_machine_sem) != CSP_SEMAPHORE_OK)
     {
         LOGE(tag, "Unable to create system status repository mutex");
     }
 
-    for(i=0; i < machine.total_sensors; i++)
+    for(i=0; i < status_machine.total_sensors; i++)
     {
         cmd_init = cmd_get_str(init_cmds[i]);
         cmd_add_params_str(cmd_init, "2 1");
@@ -52,33 +52,35 @@ void taskSensors(void *param)
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, 1000); //Suspend task
-        LOGD(tag, "state: %d, action %d, samples left: %d", machine.state, machine.action, machine.samples_left)
+        LOGD(tag, "state: %d, action %d, samples left: %d", status_machine.state, status_machine.action, status_machine.samples_left)
         osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
         // Apply action
-        if (machine.action != ACT_STAND_BY) {
-            if (machine.action == ACT_START) {
-                machine.state = ST_SAMPLING;
-                machine.action = ACT_STAND_BY;
-            } else if (machine.action == ACT_PAUSE) {
-                machine.state = ST_PAUSE;
-                machine.action = ACT_STAND_BY;
+        if (status_machine.action != ACT_STAND_BY) {
+            if (status_machine.action == ACT_START) {
+                status_machine.state = ST_SAMPLING;
+                status_machine.action = ACT_STAND_BY;
+            } else if (status_machine.action == ACT_PAUSE) {
+                status_machine.state = ST_PAUSE;
+                status_machine.action = ACT_STAND_BY;
             }
         }
 
         // States
-        if (machine.state == ST_SAMPLING) {
+        if (status_machine.state == ST_SAMPLING) {
             // Check for samples left
-            if (machine.samples_left == 0) {
-                machine.state = ST_PAUSE;
-                machine.action = ACT_STAND_BY;
+            if (status_machine.samples_left == 0) {
+                status_machine.state = ST_PAUSE;
+                status_machine.action = ACT_STAND_BY;
             }
             // Check for step
-            else if (elapsed_sec % machine.step == 0) {
+            else if (elapsed_sec % status_machine.step == 0) {
                 LOGI(tag, "SAMPLING...");
 
                 for(i=0; i<nsensors; i++) {
-//                    printf("payload %d active status %d\n", i, is_payload_active(i, machine.active_payloads, nsensors));
-                    if (is_payload_active(i, machine.active_payloads, machine.total_sensors)) {
+//                    printf("payload %d active status %d\n", i, dat_stmachine_is_sensor_active(i, status_machine.active_payloads, nsensors));
+                    if (dat_stmachine_is_sensor_active(i,
+                                                       status_machine.active_payloads,
+                                                       status_machine.total_sensors)) {
                         cmd_get = cmd_get_str(get_cmds[i]);
                         char cmd_args[5];
                         sprintf(cmd_args, " %d", i);
@@ -86,17 +88,17 @@ void taskSensors(void *param)
                         cmd_send(cmd_get);
                     }
                 }
-                if (machine.samples_left != -1) {
-                    machine.samples_left -= 1;
+                if (status_machine.samples_left != -1) {
+                    status_machine.samples_left -= 1;
                 }
             }
         }
 
-        int action = (int) machine.action;
-        int state = (int) machine.state;
-        int step = (int) machine.step;
-        int active_payloads = (int) machine.active_payloads;
-        int samples_left = (int) machine.samples_left;
+        int action = (int) status_machine.action;
+        int state = (int) status_machine.state;
+        int step = (int) status_machine.step;
+        int active_payloads = (int) status_machine.active_payloads;
+        int samples_left = (int) status_machine.samples_left;
         osSemaphoreGiven(&repo_machine_sem);
 
         dat_set_system_var(dat_drp_mach_action, action);

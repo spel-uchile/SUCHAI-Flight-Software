@@ -35,6 +35,7 @@ def get_parameters():
     parser.add_argument('--st_mode', type=str, default="1")
     parser.add_argument('--st_triple_wr', type=str, default="1")
     parser.add_argument('--buffers_csp', type=str, default="10")
+    parser.add_argument('--socket_len', type=str, default="100")
     # Build parameters
     parser.add_argument('--drivers', action="store_true", help="Install platform drivers")
     parser.add_argument('--ssh', action="store_true", help="Use ssh for git clone")

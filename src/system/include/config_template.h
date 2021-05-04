@@ -117,6 +117,7 @@
 
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
 #define SCH_BUFFERS_CSP           ({{SCH_BUFFERS_CSP}})       ///< Number of available CSP buffers
+#define SCH_CSP_SOCK_LEN          ({{SCH_CSP_SOCK_LEN}})       ///< Max number of packets in a connection queue
 #define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES       (255)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (256)      ///< Limit for the parameters length

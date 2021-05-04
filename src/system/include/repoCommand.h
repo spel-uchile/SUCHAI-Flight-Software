@@ -208,7 +208,7 @@ void cmd_add_params_var(cmd_t *cmd, ...);
  *      assert(cmd != NULL);
  * @endcode
  */
-cmd_t *cmd_parse_from_str(char *buff);
+cmd_t *cmd_build_from_str(char *buff);
 
 /**
  * Destroys a command and frees the allocated memory

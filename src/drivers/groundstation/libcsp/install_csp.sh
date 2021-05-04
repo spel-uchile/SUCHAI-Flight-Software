@@ -9,5 +9,5 @@ fi
 
 cd libcsp
 echo "Build libcsp"
-python2 ./waf configure --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-rtable cidr --with-driver-usart=linux --install-csp --prefix=../ build install
+python2 ./waf configure --with-max-connections 1000 --with-conn-queue-length 1000 --with-router-queue-length 1000 --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-rtable cidr --with-driver-usart=linux --install-csp --prefix=../ build install
 cd -

@@ -115,13 +115,13 @@ add_definitions(-D_GNU_SOURCE)
 # Build nanopower drivers
 if(USE_GSDRIVERS)
     add_definitions(-DSCH_USE_NANOPOWER)
-    list(APPEND SOURCE_FILES src/drivers/Linux/gs-drivers/nanopower2.c)
-    include_directories(src/drivers/Linux/gs-drivers/include)
+#    list(APPEND SOURCE_FILES src/drivers/Linux/gs-drivers/nanopower2.c)
+#    include_directories(src/drivers/Linux/gs-drivers/include)
 
     add_definitions(-DSCH_USE_NANOCOM)
-    link_libraries(-lparam)
-    include_directories(src/drivers/Linux/gs-drivers/libparam/include)
-    include_directories(src/drivers/Linux/gs-drivers/libparam/src/include)
+#    link_libraries(-lparam)
+#    include_directories(src/drivers/Linux/gs-drivers/libparam/include)
+#    include_directories(src/drivers/Linux/gs-drivers/libparam/src/include)
 endif()
 
 add_executable(SUCHAI_Flight_Software ${SOURCE_FILES})

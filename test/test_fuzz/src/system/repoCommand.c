@@ -195,7 +195,7 @@ void cmd_add_params_var(cmd_t *cmd, ...)
     }
 }
 
-cmd_t *cmd_parse_from_str(char *buff)
+cmd_t *cmd_build_from_str(char *buff)
 {
     cmd_t *new_cmd = NULL;
     size_t len = strlen(buff);

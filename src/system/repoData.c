@@ -41,17 +41,7 @@ time_t sec = 0;
     static fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
-sample_machine_t machine;
-
-void initialize_payload_vars(void){
-    int i;
-    for(i=0; i< last_sensor; ++i) {
-        if(dat_get_system_var(data_map[i].sys_index) == -1) {
-            dat_set_system_var(data_map[i].sys_index, 0);
-            dat_set_system_var(data_map[i].sys_ack, 0);
-        }
-    }
-}
+dat_stmachine_t status_machine;
 
 void dat_repo_init(void)
 {
@@ -506,12 +496,12 @@ int dat_set_time(int new_time)
 
     if (rc == -1)
     {
-        LOGE(tag, "Failed attempt at creating a child process for setting the machine clock");
+        LOGE(tag, "Failed attempt at creating a child process for setting the status_machine clock");
         return 1;
     }
     else if (rc == 127)
     {
-        LOGE(tag, "Failed attempt at starting a shell for setting machine clock");
+        LOGE(tag, "Failed attempt at starting a shell for setting status_machine clock");
         return 1;
     }
     else
@@ -562,13 +552,25 @@ int dat_add_payload_sample(void* data, int payload)
     osSemaphoreGiven(&repo_data_sem);
 
     // Update address
-    if(ret==0) {
-        dat_set_system_var(data_map[payload].sys_index, index+1);
-        return index+1;
+    if (ret >= 0) {
+        dat_set_system_var(data_map[payload].sys_index, index+1+ret);
+        return index+1+ret;
     } else {
         LOGE(tag, "Couldn't set data payload %d", payload);
         return -1;
     }
+}
+
+int dat_get_payload_sample(void*data, int payload, int index)
+{
+    int ret;
+
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    ret = storage_get_payload_data(index, data, payload);
+    osSemaphoreGiven(&repo_data_sem);
+
+    return ret;
 }
 
 
@@ -613,11 +615,11 @@ int dat_delete_memory_sections(void)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Free memory or drop databases
     ret = storage_delete_memory_sections();
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
 #if SCH_FP_ENABLED
     storage_flight_plan_reset();
 #endif
-    //Exit critical zone
-    osSemaphoreGiven(&repo_data_sem);
     return ret;
 }
 
@@ -719,18 +721,26 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     return 0;
 }
 
-int set_machine_state(machine_action_t action, unsigned int step, int nsamples)
+int dat_set_stmachine_state(dat_stmachine_action_t action, unsigned int step, int nsamples)
 {
     LOGI(tag, "Changing state to  %d %u %d", action, step, nsamples);
     if (action >= 0 && action < ACT_LAST && step > 0 && nsamples > -2) {
         osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-        machine.action = action;
-        machine.step = step;
-        machine.samples_left = nsamples;
+        status_machine.action = action;
+        status_machine.step = step;
+        status_machine.samples_left = nsamples;
         osSemaphoreGiven(&repo_machine_sem);
         return 1;
     }
     return 0;
+}
+
+int dat_stmachine_is_sensor_active(int payload, int active_payloads, int n_payloads) {
+//    printf("max number of active payload %d\n", (1 << n_payloads));
+    if ( active_payloads >= (1 << n_payloads) ) {
+        return 0;
+    }
+    return ( (active_payloads & (1 << payload)) != 0 );
 }
 
 void _get_sat_quaterion(quaternion_t *q,  dat_status_address_t index)

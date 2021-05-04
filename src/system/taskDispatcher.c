@@ -43,11 +43,22 @@ void taskDispatcher(void *param)
             {
 
                 /* Send the command to executer Queue - BLOCKING */
+                int executed_cmds = dat_get_system_var(dat_obc_executed_cmds); //Count executed commands
+                executed_cmds = executed_cmds + 1; //Add last command executed to count
+                dat_set_system_var(dat_obc_executed_cmds, executed_cmds); //Set new count
                 osQueueSend(executer_cmd_queue, &new_cmd, portMAX_DELAY);
                 LOGD(tag, "Cmd: %X, Param: %p, Orig: %X", new_cmd->id, &(new_cmd->params), -1);
 
                 /* Get the result from Executer Stat Queue - BLOCKING */
                 osQueueReceive(executer_stat_queue, &cmd_result, portMAX_DELAY);
+                if (cmd_result != CMD_OK)
+                {
+                    int failed_cmds = dat_get_system_var(dat_obc_failed_cmds);
+                    failed_cmds = failed_cmds + 1;
+                    dat_set_system_var(dat_obc_failed_cmds, failed_cmds);
+                }
+
+
             }
         }
     }
