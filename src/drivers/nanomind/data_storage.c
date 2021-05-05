@@ -552,8 +552,8 @@ int read_data_with_check(uint32_t add, uint8_t * data, uint16_t size) {
             return -1;
         }
         int j, integity=0;
-        for (j=0; j<size; ++j) {
-            if (data[j] == 0xff) {
+        for (j=0; j<size/4; ++j) {
+            if ( ((uint32_t*)data)[j] == 0xffffffff) {
                 integity +=1;
                 break;
             }
