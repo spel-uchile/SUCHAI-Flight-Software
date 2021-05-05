@@ -301,16 +301,15 @@ int storage_table_flight_plan_init(int drop)
     return 0;
 }
 
-
-
 int storage_table_payload_init(int drop)
 {
-
+    int rc = 0;
 #if SCH_STORAGE_MODE == 0
     if(drop)
         if(db != NULL)
             free(db);
     db = malloc(SCH_SECTIONS_PER_PAYLOAD*SCH_SIZE_PER_SECTION*last_sensor);
+    rc = db != NULL ? 0 : -1;
 #endif
 
 #if SCH_STORAGE_MODE > 0
@@ -319,7 +318,6 @@ int storage_table_payload_init(int drop)
     {
         char* err_msg;
         char* sql;
-        int rc;
         int i;
         for(i=0; i< last_sensor; ++i)
         {
@@ -356,12 +354,12 @@ int storage_table_payload_init(int drop)
     int i = 0;
     for(i=0; i< last_sensor; ++i)
     {
-        char create_table[SCH_BUFF_MAX_LEN*2];
-        memset(&create_table, 0, SCH_BUFF_MAX_LEN*2);
-        snprintf(create_table, SCH_BUFF_MAX_LEN*2, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
-        char* tok_sym[30];
-        char* tok_var[30];
-        char order[50];
+        char create_table[SCH_BUFF_MAX_LEN*5];
+        memset(&create_table, 0, SCH_BUFF_MAX_LEN*5);
+        snprintf(create_table, SCH_BUFF_MAX_LEN*5, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
+        char* tok_sym[300];
+        char* tok_var[300];
+        char order[500];
         strcpy(order, data_map[i].data_order);
         char var_names[SCH_BUFF_MAX_LEN];
         memset(&var_names, 0, SCH_BUFF_MAX_LEN);
@@ -383,7 +381,6 @@ int storage_table_payload_init(int drop)
 
 #if SCH_STORAGE_MODE ==1
         char* err_msg;
-        int rc;
         rc = sqlite3_exec(db, create_table, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK )
