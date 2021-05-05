@@ -552,13 +552,25 @@ int dat_add_payload_sample(void* data, int payload)
     osSemaphoreGiven(&repo_data_sem);
 
     // Update address
-    if(ret==0) {
-        dat_set_system_var(data_map[payload].sys_index, index+1);
-        return index+1;
+    if (ret >= 0) {
+        dat_set_system_var(data_map[payload].sys_index, index+1+ret);
+        return index+1+ret;
     } else {
         LOGE(tag, "Couldn't set data payload %d", payload);
         return -1;
     }
+}
+
+int dat_get_payload_sample(void*data, int payload, int index)
+{
+    int ret;
+
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    ret = storage_get_payload_data(index, data, payload);
+    osSemaphoreGiven(&repo_data_sem);
+
+    return ret;
 }
 
 
