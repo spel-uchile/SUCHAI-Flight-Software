@@ -58,7 +58,8 @@ int eps_get_hk(char *fmt, char *params, int nparams)
         eps_hk_print(&hk);
 
         int curr_time = (int)time(NULL);
-        struct eps_data data_eps = {curr_time, hk.cursun, hk.cursys, hk.vbatt,
+        int index_eps = dat_get_system_var(data_map[eps_sensors].sys_index);
+        struct eps_data data_eps = {index_eps, curr_time, hk.cursun, hk.cursys, hk.vbatt,
                 hk.temp[0], hk.temp[1], hk.temp[2], hk.temp[3], hk.temp[4], hk.temp[5]};
 
         int ret;

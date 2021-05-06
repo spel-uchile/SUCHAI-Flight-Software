@@ -329,7 +329,8 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
     int ret;
 
     /* Save temperature data */
-    struct temp_data data_temp = {curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
+    int index_temp = dat_get_system_var(data_map[temp_sensors].sys_index);
+    struct temp_data data_temp = {index_temp, curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
     ret = dat_add_payload_sample(&data_temp, temp_sensors);
 
     if(ret != 0) {
@@ -337,7 +338,8 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
     }
 
     /* Save ADCS data */
-    struct ads_data data_ads = {curr_time,
+    int index_ads = dat_get_system_var(data_map[ads_sensors].sys_index);
+    struct ads_data data_ads = {index_ads, curr_time,
                                 gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
                                 hmc_reading.x, hmc_reading.y, hmc_reading.z};
     ret = dat_add_payload_sample(&data_ads, ads_sensors);

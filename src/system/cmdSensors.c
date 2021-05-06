@@ -125,7 +125,8 @@ int take_sample(char *fmt, char *params, int nparams)
             gs_mpu3300_read_temp(&gyro_temp);
 #endif
             /* Save temperature data */
-            struct temp_data data_temp = {curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
+            int index_temp = dat_get_system_var(data_map[temp_sensors].sys_index);
+            struct temp_data data_temp = {index_temp, curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
             ret = dat_add_payload_sample(&data_temp, temp_sensors);
 
             if (ret != 0) {
@@ -151,7 +152,8 @@ int take_sample(char *fmt, char *params, int nparams)
             mag_z = hmc_reading.z;
 #endif
             /* Save ADCS data */
-            struct ads_data data_ads = {curr_time,
+            int index_ads = dat_get_system_var(data_map[ads_sensors].sys_index);
+            struct ads_data data_ads = {index_ads, curr_time,
                                         gyro_x, gyro_y, gyro_z,
                                         mag_x, mag_y, mag_z};
             ret = dat_add_payload_sample(&data_ads, ads_sensors);
@@ -185,7 +187,8 @@ int take_sample(char *fmt, char *params, int nparams)
             temp5 = hk.temp[4];
             temp6 = hk.temp[5];
 #endif
-            struct eps_data data_eps = {curr_time, cursun, cursys, vbatt,
+            int index_eps = dat_get_system_var(data_map[eps_sensors].sys_index);
+            struct eps_data data_eps = {index_eps, curr_time, cursun, cursys, vbatt,
                                         temp1, temp2, temp3, temp4, temp5, temp6};
             ret = dat_add_payload_sample(&data_eps, eps_sensors);
             if (ret != 0) {
@@ -196,14 +199,16 @@ int take_sample(char *fmt, char *params, int nparams)
 
             // Pack status variables to a structure
             int i;
-            dat_sys_var_short_t status_buff[dat_status_last_var];
+            uint32_t status_buff[dat_status_last_var];
             for(i = 0; i<dat_status_last_var; i++)
             {
-                status_buff[i].address = csp_hton16(dat_status_list[i].address);
-                status_buff[i].value.u = csp_hton32(dat_get_status_var(dat_status_list[i].address).u);
+                status_buff[i] = dat_get_status_var(dat_status_list[i].address).u;
             }
 
-            ret = dat_add_payload_sample(&status_buff, sta_sensors);
+            int index_sta = dat_get_system_var(data_map[sta_sensors].sys_index);
+            struct sta_data data_sta = {index_sta, curr_time};
+            memcpy(data_sta.sta_buff, status_buff, sizeof(status_buff));
+            ret = dat_add_payload_sample(&data_sta, sta_sensors);
             if (ret != 0) {
                 return CMD_FAIL;
             }

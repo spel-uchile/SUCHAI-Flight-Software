@@ -648,13 +648,19 @@ int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_n
 void get_value_string(char* ret_string, char* c_type, char* buff)
 {
     if(strcmp(c_type, "%f") == 0) {
-        sprintf(ret_string, " %f", *((float*)buff));
+        if (*((int *)buff) == -1) {
+            sprintf(ret_string, " 'nan'");
+        } else {
+            sprintf(ret_string, " %f", *((float*)buff));
+        }
     }
     else if(strcmp(c_type, "%d") == 0) {
         sprintf(ret_string, " %d", *((int*)buff));
     }
     else if(strcmp(c_type, "%u") == 0) {
         sprintf(ret_string, " %u", *((unsigned int*)buff));
+    } else if(strcmp(c_type, "%i") == 0) {
+        sprintf(ret_string," %i", *((int*)buff));
     }
 }
 
@@ -667,7 +673,10 @@ int get_sizeof_type(char* c_type)
         return sizeof(int);
     } else if(strcmp(c_type, "%u") == 0) {
         return sizeof(int);
-    } else {
+    } else if(strcmp(c_type, "%i") == 0) {
+        return sizeof(int);
+    }
+    else {
         return -1;
     }
 }
@@ -678,16 +687,16 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     //FIXME: Use malloc to allocate large buffers, here 1280  bytes allocated!
     //FIXME: Task stack size: 5*256 = 1280 bytes!
 
-    char* tok_sym[30];
-    char* tok_var[30];
-    char *order = (char *)malloc(50);
+    char* tok_sym[300];
+    char* tok_var[300];
+    char *order = (char *)malloc(300);
     strcpy(order, data_map[payload].data_order);
-    char *var_names = (char *)malloc(200);
+    char *var_names = (char *)malloc(1000);
     strcpy(var_names, data_map[payload].var_names);
     int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, (int)payload);
 
-    char *values = (char *)malloc(500);
-    char *names = (char *)malloc(500);
+    char *values = (char *)malloc(1000);
+    char *names = (char *)malloc(1000);
     strcpy(names, "");
     strcpy(values, "");
 
@@ -711,7 +720,7 @@ int dat_print_payload_struct(void* data, unsigned int payload)
         }
     }
     strcat(names, ":");
-    printf("%s %s\n", names, values);
+    LOGI(tag, "%s %s\n", names, values);
 
     free(order);
     free(var_names);

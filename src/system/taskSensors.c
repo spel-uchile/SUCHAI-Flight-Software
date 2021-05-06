@@ -31,7 +31,7 @@ void taskSensors(void *param)
     cmd_t *cmd_get;
     int nsensors = 4;
     char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor"};
-    char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "eps_get_hk", "sen_take_sample" };
+    char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "sen_take_sample", "sen_take_sample"};
 
     status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 0, 5, -1, nsensors};
 
