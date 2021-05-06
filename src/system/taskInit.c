@@ -70,7 +70,7 @@ void taskInit(void *param)
         LOGI(tag, "FIRST DEPLOY");
         /* First deploy - 30min TRX Silence */
         LOGI(tag, "Setting TRX Inhibit to: %d seconds...", 1860);
-        cmd_t *tx_silence = cmd_build_from_str("com_get_config tx_inhibit 1860");
+        cmd_t *tx_silence = cmd_build_from_str("com_set_config tx_inhibit 1860");
         cmd_send(tx_silence);
 
         /* Wait 30 minutes before antenna deployment */
