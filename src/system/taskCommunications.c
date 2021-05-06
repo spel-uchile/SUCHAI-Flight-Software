@@ -82,8 +82,8 @@ void taskCommunications(void *param)
 
                 case SCH_TRX_PORT_TM:
                     // Create a response packet and send
-                    rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    csp_send(conn, rep_ok, 1000);
+                    //rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    //csp_send(conn, rep_ok, 1000);
 
                     #ifdef SCH_RESEND_TM_NODE
                     // Resend a copy of the packet to another node

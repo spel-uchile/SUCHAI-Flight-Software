@@ -114,38 +114,62 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
 //    int index_ack = dat_get_system_var(data_map[payload].sys_ack);
 //    int delay = index_pay - index_ack;
 
+    // New connection
+    csp_conn_t *conn;
+    conn = csp_connect(CSP_PRIO_NORM, dest_node, SCH_TRX_PORT_TM, 500, CSP_O_NONE);
+    if(conn == NULL)
+    {
+        LOGE(tag, "Cannot create connection!");
+        return;
+    }
+
     int i;
     for(i=0; i < n_frames; ++i) {
-        com_data_t data;
-        memset(&data, 0, sizeof(data));
-        data.node = (uint8_t)dest_node;
-        data.frame.node = SCH_COMM_ADDRESS;
-        data.frame.nframe = (uint16_t) i;
-        data.frame.type = (uint8_t)(TM_TYPE_PAYLOAD + payload);
-        data.frame.ndata = (uint32_t)structs_per_frame;
+        csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
+        packet->length = sizeof(com_frame_t);
+        memset(&packet->data, 0, sizeof(com_frame_t));
+        com_frame_t *frame = (com_frame_t *)(packet->data);
+        frame->node = SCH_COMM_ADDRESS;
+        frame->nframe = csp_hton16((uint16_t) i);
+        frame->type = (uint8_t)(TM_TYPE_PAYLOAD + payload);
+        frame->ndata = csp_hton32((uint32_t)structs_per_frame);
 
         int j;
         for(j=0; j < structs_per_frame; ++j) {
             if( (i*structs_per_frame) +j >= n_samples ) {
-                data.frame.ndata = (uint32_t) j;
+                frame->ndata = (uint32_t) j;
                 break;
             }
 
             char buff[payload_size];
             dat_get_recent_payload_sample(buff, payload, (n_samples+(index_pay-des)) - (i*structs_per_frame+j+1));
-            int mem_delay = (j*payload_size);
-            memcpy(data.frame.data.data8+mem_delay, buff, payload_size);
+            int mem_offset = (j * payload_size);
+            memcpy(frame->data.data8 + mem_offset, buff, payload_size);
         }
 
-        LOGI(tag, "Sending %d structs of payload %d", data.frame.ndata, (int)payload);
-        _hton32_buff(data.frame.data.data32, sizeof(data.frame.data.data8)/ sizeof(uint32_t));
-        _com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata, data.frame.nframe);
-        LOGI(tag, "Node    : %d", data.frame.node);
-        LOGI(tag, "Frame   : %d", data.frame.nframe);
-        LOGI(tag, "Type    : %d", (data.frame.type));
-        LOGI(tag, "Samples : %d", (data.frame.ndata));
-        print_buff(data.frame.data.data8, payload_size*structs_per_frame);
+        LOGI(tag, "Sending %d structs of payload %d", frame->ndata, (int)payload);
+        _hton32_buff(frame->data.data32, COM_FRAME_MAX_LEN / sizeof(uint32_t));
+        //_com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata, data.frame.nframe);
+        LOGI(tag, "Node    : %d", frame->node);
+        LOGI(tag, "Frame   : %d", frame->nframe);
+        LOGI(tag, "Type    : %d", frame->type);
+        LOGI(tag, "Samples : %d", frame->ndata);
+        print_buff(frame->data.data8, payload_size*structs_per_frame);
+
+        // Send packet
+        int rc_send = csp_send(conn, packet, 500);
+        if(rc_send == 0)
+        {
+            LOGE(tag, "Error sending frame %d! (%d)", frame->nframe, rc_send);
+            csp_buffer_free(packet);
+            break;
+        }
     }
+
+    // Close connection
+    int rc_conn = csp_close(conn);
+    if(rc_conn != CSP_ERR_NONE)
+        LOGE(tag, "Error closing connection! (%d)", rc_conn);
 }
 
 int tm_get_single(char *fmt, char *params, int nparams)
