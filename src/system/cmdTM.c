@@ -127,7 +127,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
     for(i=0; i < n_frames; ++i) {
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
         packet->length = sizeof(com_frame_t);
-        memset(&packet->data, 0, sizeof(com_frame_t));
+        memset(packet->data, 0, sizeof(com_frame_t));
         com_frame_t *frame = (com_frame_t *)(packet->data);
         frame->node = SCH_COMM_ADDRESS;
         frame->nframe = csp_hton16((uint16_t) i);
