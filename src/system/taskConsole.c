@@ -93,25 +93,40 @@ int console_read(char *buffer, int len)
 #ifdef LINUX
     char *line;
     line = linenoise("SUCHAI> ");
-    if(line != NULL)
-    {
-        linenoiseHistoryAdd(line);
-        linenoiseHistorySave(cmd_hist);
-        strncpy(buffer, line, len);
-        free(line);
-        return 0;
-    }
-    return -1;
+    if(line == NULL)
+        return -1;
+
+    linenoiseHistoryAdd(line);
+    linenoiseHistorySave(cmd_hist);
+    strncpy(buffer, line, len);
+    free(line);
 #else
     char *s = fgets(buffer, len, stdin);
-    // Clean CR and LF character to be compatible with
-    // linenoise behaviour
+    // Clean CR and LF character to be compatible with linenoise behaviour
+    if(s == NULL)
+        return -1;
+
     int i;
     for(i=0; i<len; i++)
     {
         if(s[i] == '\n' || s[i] == '\r')
             s[i] = 0;
     }
-    return (s != NULL) ? 0 : -1;
 #endif
+
+    /* Parse remote commands mode using "<node>: command" */
+    int next;
+    int node;
+    if(sscanf(buffer, "%d: %n", &node, &next) == 1)
+    {
+        printf("(%d) %s\r\n", next, buffer+next);
+        char *tmp_buff = malloc(len+1);
+        memset(tmp_buff, 0 , len+1);
+        strncpy(tmp_buff, buffer+next, len-next);
+        memset(buffer, 0, len);
+        snprintf(buffer, len, "com_send_cmd %d %s", node, tmp_buff);
+        printf("%s\r\n", buffer);
+        free(tmp_buff);
+    }
+    return 0;
 }

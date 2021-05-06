@@ -205,13 +205,13 @@ static void com_receive_tm(csp_packet_t *packet)
     com_frame_t *frame = (com_frame_t *)packet->data;
 
     frame->nframe = csp_ntoh16(frame->nframe);
-    frame->type = csp_ntoh16(frame->type);
     frame->ndata = csp_ntoh32(frame->ndata);
 
     LOGI(tag, "Received: %d bytes", packet->length);
+    LOGI(tag, "Node    : %d", frame->node);
     LOGI(tag, "Frame   : %d", frame->nframe);
-    LOGI(tag, "Type    : %d", (frame->type));
-    LOGI(tag, "Samples : %d", (frame->ndata));
+    LOGI(tag, "Type    : %d", frame->type);
+    LOGI(tag, "Samples : %d", frame->ndata);
 
     if(frame->type == TM_TYPE_STATUS)
     {

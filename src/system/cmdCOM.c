@@ -238,8 +238,9 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
         packet->length = sizeof(com_frame_t);
         com_frame_t *frame = (com_frame_t *)(packet->data);
+        frame->node = SCH_COMM_ADDRESS;
         frame->nframe = csp_hton16((uint16_t)nframe++);
-        frame->type = csp_hton16((uint16_t)type);
+        frame->type = (uint8_t)type;
         size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;
         int data_sent = n_data < COM_FRAME_MAX_LEN/size_data ? n_data : (int)sent/size_data;
         frame->ndata = csp_hton32((uint32_t)data_sent);

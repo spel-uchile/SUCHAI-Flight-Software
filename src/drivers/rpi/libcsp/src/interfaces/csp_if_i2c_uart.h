@@ -10,7 +10,7 @@ extern csp_iface_t csp_if_i2c_uart;
 /**
  * Maximum transfer length on I2C
  */
-#define I2C_MTU 	256
+#define I2C_MTU 	255
 /**
  * Sync bytes
  */
@@ -25,7 +25,7 @@ typedef struct __attribute__((packed)) i2c_uart_frame_s {
     uint16_t len;
     //! Not used by CSP - Destination address
     uint8_t addr;
-    //! Not used by CSP - total bytes to send by I2C
+    //! Total bytes to send by I2C
     uint16_t len_tx;
     //! CSP data (data+header)
     uint8_t data[I2C_MTU];

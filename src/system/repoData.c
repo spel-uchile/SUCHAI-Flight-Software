@@ -173,7 +173,7 @@ int dat_set_system_var(dat_status_address_t index, int value)
 {
     value32_t v;
     v.i = value;
-    dat_set_status_var(index, v);
+    return dat_set_status_var(index, v);
 }
 
 int dat_set_status_var(dat_status_address_t index, value32_t value)

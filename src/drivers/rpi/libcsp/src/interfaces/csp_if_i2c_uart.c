@@ -116,21 +116,21 @@ void csp_i2c_uart_rx(uint8_t *buf, int len, void *pxTaskWoken) {
     csp_packet_t *packet2 = (csp_packet_t *) frame;
     printf("[IN] id: %#X (%d, %d)\n", packet2->id.ext, packet2->id.src, packet2->id.dst);
     packet2->id.ext = csp_ntoh32(packet2->id.ext);
-    printf("[IN] id: %#X (%d, %d)\n", packet2->id.ext, packet2->id.src, packet2->id.dst);
-    printf("[IN ] Total len: %d. Fram sync: %#X, Frame len: %d. Iface len: %d, Frame Add: %d|\n", len, frame->sync, frame->len, frame->len_tx, frame->addr);
-    printf("[IN ] CSP From: %d. To: %d. Len: %d, \n", packet2->id.src, packet2->id.dst, packet2->length);
-    print_buff(buf, len);
+    printf("[IN] id: %#X (%d, %d)\r\n", packet2->id.ext, packet2->id.src, packet2->id.dst);
+    printf("[IN ] Total len: %d. Fram sync: %#X, Frame len: %d. Iface len: %d, Frame Add: %d|\r\n", len, frame->sync, frame->len, frame->len_tx, frame->addr);
+    printf("[IN ] CSP From: %d. To: %d. Len: %d, \r\n", packet2->id.src, packet2->id.dst, packet2->length);
+    //print_buff(buf, len);
     print_buff(frame->data, frame->len_tx);
     */
 
-    if ((frame->len < 4) || (frame->len > I2C_MTU)) {
+    if ((frame->len_tx < 4) || (frame->len_tx > I2C_MTU)) {
         csp_if_i2c_uart.frame++;
         csp_buffer_free_isr(frame);
         return;
     }
 
     /* Strip the CSP header off the length field before converting to CSP packet */
-    frame->len -= sizeof(csp_id_t);
+    frame->len_tx -= sizeof(csp_id_t);
 
     /* Convert the packet from network to host order */
     csp_packet_t *packet = (csp_packet_t *) frame;
