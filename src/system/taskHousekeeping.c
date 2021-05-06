@@ -108,13 +108,18 @@ void taskHousekeeping(void *param)
         }
 
         /* Send OBC beacon */
-        if ((elapsed_sec % _obc_bcn_period) == 0){
-            com_bcn_period = dat_get_system_var(dat_com_bcn_period);
-            obc_bcn_offset = dat_get_system_var(dat_obc_bcn_offset);
-            _obc_bcn_period = com_bcn_period + obc_bcn_offset;
+        if ((elapsed_sec % _obc_bcn_period) == 0)
+        {
+            int _com_bcn_period = dat_get_system_var(dat_com_bcn_period);
+            int _obc_bcn_offset = dat_get_system_var(dat_obc_bcn_offset);
+            if(_com_bcn_period != com_bcn_period || _obc_bcn_offset != obc_bcn_offset)
+            {
+                com_bcn_period = _com_bcn_period;
+                obc_bcn_offset = _obc_bcn_offset;
+                _obc_bcn_period = com_bcn_period + obc_bcn_offset;
+            }
             cmd_t *cmd_tm_send_status;
-            cmd_tm_send_status = cmd_get_str("tm_send_status");
-            cmd_add_params_str(cmd_tm_send_status, "10");
+            cmd_tm_send_status = cmd_build_from_str("tm_send_status 10");
             cmd_send(cmd_tm_send_status);
         }
     }
