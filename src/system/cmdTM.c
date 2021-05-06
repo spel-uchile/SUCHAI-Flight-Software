@@ -354,9 +354,14 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
             return CMD_FAIL;
         }
 
-        ack_pay += k_samples;
-        if(ack_pay > index_pay) {
+        if( ack_pay > k_samples) {
+            return CMD_FAIL;
+        }
+
+        if( k_samples > index_pay) {
             ack_pay = index_pay;
+        } else  {
+            ack_pay = k_samples;
         }
 
         dat_set_system_var(data_map[payload].sys_ack, ack_pay);
