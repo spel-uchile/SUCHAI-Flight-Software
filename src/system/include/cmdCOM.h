@@ -272,19 +272,23 @@ int com_get_hk(char *fmt, char *params, int nparams);
  * any parameter value by name. The special argument 'help' can be
  * used to print the list of available parameters.
  *
- * @param fmt Str. Parameters format: "%s"
- * @param params Str. Parameters: <param_name>, the parameter name
- * @param nparams Str. Number of parameters: 1
+ * TABLES:  0 Running parameters
+ *          1 RX parameters
+ *          5 TX parameters
+ *
+ * @param fmt Str. Parameters format: "%d %s"
+ * @param params Str. Parameters: <table> <param_name>, the parameter name
+ * @param nparams Str. Number of parameters: 2
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
  *
  * @code
  *      // Function usage
- *      com_get_config("%s", "help", 1);     // Print the parameter list
- *      com_get_config("%s", "csp_node", 1); // Read and print the TRX node
+ *      com_get_config("%d %s", "0 help", 1);     // Print the parameter list
+ *      com_get_config("%d %s", "0 csp_node", 1); // Read and print the TRX node
  *
  *      // Command usage to get a TRX parameter
  *      cmd_t *send_cmd = cmd_get_str("com_get_config"); // Get the command
- *      cmd_add_params(send_cmd, "tx_pwr")  // Read param "tx_pwr"
+ *      cmd_add_params(send_cmd, "0 tx_pwr")  // Read param "tx_pwr"
  *      cmd_send(send_cmd);
  * @endcode
  *
@@ -297,20 +301,24 @@ int com_get_config(char *fmt, char *params, int nparams);
  * any parameter value by name. The special argument 'help 0' can be
  * used to print the list of available parameters.
  *
- * @param fmt Str. Parameters format: "%s %s"
- * @param params Str. Parameters: <param_name> <param_value>, the parameter name
+ * TABLES:  0 Running parameters
+ *          1 RX parameters
+ *          5 TX parameters
+ *
+ * @param fmt Str. Parameters format: "%d %s %s"
+ * @param params Str. Parameters: <table> <param_name> <param_value>, the parameter name
  * and value as strings.
- * @param nparams Str. Number of parameters: 2
+ * @param nparams Str. Number of parameters: 3
  * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
  *
  * @code
  *      // Function usage
- *      com_set_config("%s %s", "help 0", 1);     // Print the parameter list
- *      com_set_config("%s %s", "csp_node 5", 1); // Set and print the TRX node
+ *      com_set_config("%d %s %s", "0 help 0", 3);     // Print the parameter list
+ *      com_set_config("%d %s %s", "0 csp_node 5", 1); // Set and print the TRX node
  *
  *      // Command usage to set a TRX parameter
  *      cmd_t *send_cmd = cmd_get_str("com_set_config"); // Get the command
- *      cmd_add_params(send_cmd, "tx_pwr 0")  // Set param "tx_pwr" to 0
+ *      cmd_add_params(send_cmd, "0 tx_pwr 0")  // Set param "tx_pwr" to 0
  *      cmd_send(send_cmd);
  * @endcode
  *

@@ -221,49 +221,66 @@ int init_setup_trx(void) {
     cmd_t *trx_cmd;
     // Set TX_INHIBIT to implement silent time
     trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "tx_inhibit", TOSTRING(SCH_TX_INHIBIT));
+    cmd_add_params_var(trx_cmd, 0, "tx_inhibit", TOSTRING(SCH_TX_INHIBIT));
     cmd_send(trx_cmd);
     if(log_lvl >= LOG_LVL_DEBUG)
     {
-        trx_cmd = cmd_build_from_str("com_get_config tx_inhibit");
+        trx_cmd = cmd_build_from_str("com_get_config 0 tx_inhibit");
+        cmd_send(trx_cmd);
+    }
+    trx_cmd = cmd_build_from_str("com_set_config 0 bcn_holdoff 60)");
+    cmd_send(trx_cmd);
+    if(log_lvl >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_build_from_str("com_get_config 0 bcn_holdoff");
         cmd_send(trx_cmd);
     }
     // Set TX_PWR
     trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "tx_pwr", dat_get_status_var(dat_com_tx_pwr).i);
+    cmd_add_params_var(trx_cmd, 0, "tx_pwr", dat_get_status_var(dat_com_tx_pwr).i);
     cmd_send(trx_cmd);
     if(log_lvl >= LOG_LVL_DEBUG)
     {
-        trx_cmd = cmd_build_from_str("com_get_config tx_pwr");
+        trx_cmd = cmd_build_from_str("com_get_config 0 tx_pwr");
         cmd_send(trx_cmd);
     }
-    // Set TX_BEACON_PERIOD
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "bcn_interval", dat_get_status_var(dat_com_bcn_period).i);
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_build_from_str("com_get_config bcn_interval");
-        cmd_send(trx_cmd);
-    }
-    // Set TRX Freq
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "freq", dat_get_status_var(dat_com_freq).i);
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_build_from_str("com_get_config freq");
-        cmd_send(trx_cmd);
-    }
-    // Set TRX Baud
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "baud", dat_get_status_var(dat_com_baud).i);
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_build_from_str("com_get_config baud");
-        cmd_send(trx_cmd);
-    }
+//    // Set TX_BEACON_PERIOD
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 0, "bcn_interval", dat_get_status_var(dat_com_bcn_period).i);
+//    cmd_send(trx_cmd);
+//    if(log_lvl >= LOG_LVL_DEBUG)
+//    {
+//        trx_cmd = cmd_build_from_str("com_get_config 0 bcn_interval");
+//        cmd_send(trx_cmd);
+//    }
+//    // Set TRX Freq
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 1, "freq", dat_get_status_var(dat_com_freq).i);
+//    cmd_send(trx_cmd);
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 5, "freq", dat_get_status_var(dat_com_freq).i);
+//    cmd_send(trx_cmd);
+//    if(log_lvl >= LOG_LVL_DEBUG)
+//    {
+//        trx_cmd = cmd_build_from_str("com_get_config 1 freq");
+//        cmd_send(trx_cmd);
+//        trx_cmd = cmd_build_from_str("com_get_config 5 freq");
+//        cmd_send(trx_cmd);
+//    }
+//    // Set TRX Baud
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 1, "baud", dat_get_status_var(dat_com_baud).i);
+//    cmd_send(trx_cmd);
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 5, "baud", dat_get_status_var(dat_com_baud).i);
+//    cmd_send(trx_cmd);
+//    if(log_lvl >= LOG_LVL_DEBUG)
+//    {
+//        trx_cmd = cmd_build_from_str("com_get_config 1 baud");
+//        cmd_send(trx_cmd);
+//        trx_cmd = cmd_build_from_str("com_get_config 5 baud");
+//        cmd_send(trx_cmd);
+//    }
 }
 
 int init_create_task(void) {

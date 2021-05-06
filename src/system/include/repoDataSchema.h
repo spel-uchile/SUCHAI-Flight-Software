@@ -193,7 +193,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_obc_temp_3,        "obc_temp_3",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the gyroscope
         {dat_obc_executed_cmds, "obc_executed_cmds", 'u', DAT_IS_STATUS, 0},
         {dat_obc_failed_cmds,   "obc_failed_cmds",   'u', DAT_IS_STATUS, 0},
-        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 1},          ///< Was the satellite deployed?
+        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 2},          ///< Was the satellite deployed?
         {dat_dep_ant_deployed,  "dep_ant_deployed",  'u', DAT_IS_STATUS, 1},          ///< Was the antenna deployed?
         {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, -1},         ///< Antenna deployment unix time
         {dat_com_count_tm,      "com_count_tm",      'u', DAT_IS_STATUS, 0},          ///< Number of Telemetries sent
