@@ -223,7 +223,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_drp_ads,           "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
         {dat_drp_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
-        {dat_drp_sta,           "drp_sta",          'u', DAT_IS_STATUS, 0},          ///< Langmuir data index
+        {dat_drp_sta,           "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Langmuir data index
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
@@ -245,7 +245,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
-        {dat_drp_ack_sta,      "drp_ack_sta",        'u', DAT_IS_CONFIG, 0},          ///< Langmuir data index acknowledge
+        {dat_drp_ack_sta,       "drp_ack_sta",       'u', DAT_IS_CONFIG, 0},          ///< Langmuir data index acknowledge
         {dat_drp_mach_step,     "drp_mach_step",     'i', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
 };
@@ -281,7 +281,8 @@ typedef enum payload_id {
  * Struct for storing temperature data.
  */
 typedef struct __attribute__((__packed__)) temp_data {
-    int timestamp;
+    uint32_t index;
+    uint32_t timestamp;
     float obc_temp_1;
     float obc_temp_2;
     float obc_temp_3;
@@ -291,7 +292,8 @@ typedef struct __attribute__((__packed__)) temp_data {
  * Struct for storing data collected by ads sensors.
  */
 typedef struct __attribute__((__packed__)) ads_data {
-    int timestamp;
+    uint32_t index;
+    uint32_t timestamp;
     float acc_x;            ///< Gyroscope acceleration value along the x axis
     float acc_y;            ///< Gyroscope acceleration value along the y axis
     float acc_z;            ///< Gyroscope acceleration value along the z axis
@@ -304,7 +306,8 @@ typedef struct __attribute__((__packed__)) ads_data {
  * Struct for storing data collected by eps housekeeping.
  */
 typedef struct __attribute__((__packed__)) eps_data {
-    int timestamp;
+    uint32_t index;
+    uint32_t timestamp;
     uint32_t cursun;            ///< Current from boost converters [mA]
     uint32_t cursys;            ///< Current out of battery [mA]
     uint32_t vbatt;            ///< Voltage of battery [mV]
@@ -321,8 +324,9 @@ typedef struct __attribute__((__packed__)) eps_data {
  * Struct for storing data collected by status variables.
  */
 typedef struct __attribute__((__packed__)) sta_data {
+    uint32_t index;
     uint32_t timestamp;
-    dat_sys_var_short_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
+    uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
 } sta_data_t;
 
 
@@ -334,7 +338,7 @@ extern struct __attribute__((__packed__)) map {
     uint16_t  size;
     uint32_t sys_index;
     uint32_t sys_ack;
-    char data_order[200];
+    char data_order[300];
     char var_names[1000];
 } data_map[last_sensor];
 

@@ -354,19 +354,19 @@ int storage_table_payload_init(int drop)
     int i = 0;
     for(i=0; i< last_sensor; ++i)
     {
-        char create_table[SCH_BUFF_MAX_LEN*5];
-        memset(&create_table, 0, SCH_BUFF_MAX_LEN*5);
-        snprintf(create_table, SCH_BUFF_MAX_LEN*5, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
+        char create_table[SCH_BUFF_MAX_LEN*4];
+        memset(&create_table, 0, SCH_BUFF_MAX_LEN*4);
+        snprintf(create_table, SCH_BUFF_MAX_LEN*4, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
         char* tok_sym[300];
         char* tok_var[300];
-        char order[500];
+        char order[300];
         strcpy(order, data_map[i].data_order);
-        char var_names[SCH_BUFF_MAX_LEN];
-        memset(&var_names, 0, SCH_BUFF_MAX_LEN);
+        char var_names[SCH_BUFF_MAX_LEN*4];
+        memset(&var_names, 0, SCH_BUFF_MAX_LEN*4);
         strcpy(var_names, data_map[i].var_names);
         int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, i);
 
-        int j=0;
+        int j;
         for(j=0; j < nparams; ++j)
         {
             char line[100];
@@ -377,7 +377,7 @@ int storage_table_payload_init(int drop)
             }
         }
         strcat(create_table, ")");
-        LOGD(tag, "SQL command: %s", create_table);
+        LOGI(tag, "SQL command: %s", create_table);
 
 #if SCH_STORAGE_MODE ==1
         char* err_msg;
@@ -559,7 +559,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
             memset(&insert_query, 0, sizeof(insert_query));
             snprintf(insert_query,SCH_BUFF_MAX_LEN*2, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
                     command, args, executions, periodical);
-            LOGI(tag, "Flight Plan Postgres Command: %s",  insert_query);
+            LOGD(tag, "Flight Plan Postgres Command: %s",  insert_query);
             PGresult *res = PQexec(conn, insert_query);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Flight Plan Postgres Command INSERT failed: %s", PQerrorMessage(conn));
@@ -827,16 +827,16 @@ int storage_set_payload_data(int index, void* data, int payload)
     return 0;
 #endif
 #if SCH_STORAGE_MODE > 0
-    char* tok_sym[30];
-    char* tok_var[30];
-    char order[50];
+    char* tok_sym[300];
+    char* tok_var[300];
+    char order[300];
     strcpy(order, data_map[payload].data_order);
-    char var_names[200];
+    char var_names[1000];
     strcpy(var_names, data_map[payload].var_names);
     int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
 
-    char values[500];
-    char names[500];
+    char values[1000];
+    char names[1000];
     strcpy(names, "(id, tstz,");
     sprintf(values, "(%d, current_timestamp,", index);
 
@@ -862,7 +862,7 @@ int storage_set_payload_data(int index, void* data, int payload)
 
     strcat(names, ")");
     strcat(values, ")");
-    char insert_row[200];
+    char insert_row[2000];
     sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
     LOGD(tag, "%s", insert_row);
 
@@ -918,16 +918,16 @@ int storage_get_payload_data(int index, void* data, int payload)
     memcpy(data, add, data_map[payload].size);
 #endif
 #if SCH_STORAGE_MODE > 0
-    char* tok_sym[30];
-    char* tok_var[30];
-    char order[50];
+    char* tok_sym[300];
+    char* tok_var[300];
+    char order[300];
     strcpy(order, data_map[payload].data_order);
-    char var_names[200];
+    char var_names[1000];
     strcpy(var_names, data_map[payload].var_names);
     int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
 
-    char values[500];
-    char names[500];
+    char values[1000];
+    char names[1000];
 
     strcpy(names, "");
     int j;
@@ -942,8 +942,8 @@ int storage_get_payload_data(int index, void* data, int payload)
         }
     }
 
-    char get_value[200];
-    sprintf(get_value,"SELECT %s FROM %s WHERE id=%d LIMIT 1"
+    char get_value[2000];
+    sprintf(get_value,"SELECT %s FROM %s WHERE index=%d LIMIT 1"
             ,names, data_map[payload].table, index);
     LOGD(tag, "%s",  get_value);
 
