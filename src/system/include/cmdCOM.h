@@ -35,8 +35,9 @@
  * inside a frame.
  */
 typedef struct __attribute__((__packed__)) com_frame{
-    uint16_t nframe;         ///< Frame number
-    uint16_t type;          ///< Telemetry type
+    uint16_t nframe;        ///< Frame number
+    uint8_t type;           ///< Telemetry type
+    uint8_t node;           ///< Node of origin
     uint32_t ndata;         ///< Number of data samples (structs) in the frame
     /**
      * De data buffer containing @ndata structs of payload data. The structs

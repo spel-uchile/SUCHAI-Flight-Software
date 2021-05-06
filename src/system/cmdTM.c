@@ -119,8 +119,9 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         com_data_t data;
         memset(&data, 0, sizeof(data));
         data.node = (uint8_t)dest_node;
+        data.frame.node = SCH_COMM_ADDRESS;
         data.frame.nframe = (uint16_t) i;
-        data.frame.type = (uint16_t)(TM_TYPE_PAYLOAD + payload);
+        data.frame.type = (uint8_t)(TM_TYPE_PAYLOAD + payload);
         data.frame.ndata = (uint32_t)structs_per_frame;
 
         int j;
@@ -139,6 +140,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         LOGI(tag, "Sending %d structs of payload %d", data.frame.ndata, (int)payload);
         _hton32_buff(data.frame.data.data32, sizeof(data.frame.data.data8)/ sizeof(uint32_t));
         _com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata);
+        LOGI(tag, "Node    : %d", data.frame.node);
         LOGI(tag, "Frame   : %d", data.frame.nframe);
         LOGI(tag, "Type    : %d", (data.frame.type));
         LOGI(tag, "Samples : %d", (data.frame.ndata));
