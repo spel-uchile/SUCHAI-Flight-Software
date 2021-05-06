@@ -219,11 +219,11 @@ int com_send_data(char *fmt, char *params, int nparams)
     }
 }
 
-int _com_send_data(int node, void *data, size_t len, int type, int n_data)
+int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame)
 {
     int rc_conn = 0;
     int rc_send = 0;
-    int nframe = 0;
+    int nframe = n_frame;
     int size_data = (int)len/n_data;
 
     // New connection

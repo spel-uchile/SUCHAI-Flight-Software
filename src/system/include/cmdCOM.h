@@ -162,9 +162,10 @@ int com_send_data(char *fmt, char *params, int nparams);
  * @param len Buffer len in bytes
  * @param type Telemetry type
  * @param n_data Number of struct of data in the buffer
+ * @param n_frame Starting frame index
  * @return CMD_OK | CMD_FAIL | CMD_ERROR
  */
-int _com_send_data(int node, void *data, size_t len, int type, int n_data);
+int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame);
 
 /**
  * Auxiliary function to convert an array of 32bit values to network (big) endian.

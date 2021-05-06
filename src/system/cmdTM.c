@@ -53,7 +53,7 @@ int tm_send_status(char *fmt, char *params, int nparams)
     }
 
     // Send telemetry
-    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, dat_status_last_var);
+    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, dat_status_last_var, 0);
 }
 
 int tm_send_var(char *fmt, char *params, int nparams)
@@ -75,7 +75,7 @@ int tm_send_var(char *fmt, char *params, int nparams)
     status_buff[0].value.u = csp_hton32(dat_get_status_var(address).u);
 
     // Send telemetry
-    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, 1);
+    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, 1, 0);
 }
 
 int tm_parse_status(char *fmt, char *params, int nparams)
@@ -139,7 +139,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
 
         LOGI(tag, "Sending %d structs of payload %d", data.frame.ndata, (int)payload);
         _hton32_buff(data.frame.data.data32, sizeof(data.frame.data.data8)/ sizeof(uint32_t));
-        _com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata);
+        _com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata, data.frame.nframe);
         LOGI(tag, "Node    : %d", data.frame.node);
         LOGI(tag, "Frame   : %d", data.frame.nframe);
         LOGI(tag, "Type    : %d", (data.frame.type));

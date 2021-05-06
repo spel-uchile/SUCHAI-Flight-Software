@@ -720,7 +720,7 @@ int dat_print_payload_struct(void* data, unsigned int payload)
         }
     }
     strcat(names, ":");
-    LOGI(tag, "%s %s\n", names, values);
+    printf( "%s %s\n", names, values);
 
     free(order);
     free(var_names);
