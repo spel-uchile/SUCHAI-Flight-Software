@@ -943,7 +943,7 @@ int storage_get_payload_data(int index, void* data, int payload)
     }
 
     char get_value[2000];
-    sprintf(get_value,"SELECT %s FROM %s WHERE index=%d LIMIT 1"
+    sprintf(get_value,"SELECT %s FROM %s WHERE id=%d LIMIT 1"
             ,names, data_map[payload].table, index);
     LOGD(tag, "%s",  get_value);
 
