@@ -84,8 +84,8 @@ int storage_init(const char *file)
         return -1;
     }
 
-    char* value_str;
-    if ((value_str = PQgetvalue(res, 0, 0)) == NULL)
+    char * value_str = PQgetvalue(res, 0, 0);
+    if (value_str == NULL)
     {
         //Create database
         char create_db[SCH_BUFF_MAX_LEN];
@@ -377,7 +377,7 @@ int storage_table_payload_init(int drop)
             }
         }
         strcat(create_table, ")");
-        LOGI(tag, "SQL command: %s", create_table);
+        LOGD(tag, "SQL command: %s", create_table);
 
 #if SCH_STORAGE_MODE ==1
         char* err_msg;
@@ -444,12 +444,12 @@ int storage_repo_get_value_idx(int index, char *table)
         PQclear(res);
         return -1;
     }
-    char* value_str;
-    if ((value_str = PQgetvalue(res, 0, 0)) != NULL)
+    char * value_str = PQgetvalue(res, 0, 0);
+    if ( value_str != NULL)
         value = atoi(value_str);
     else
     {
-        LOGE(tag, "The value wasn't found");
+        LOGE(tag, "Value does not found in for status variable index: %d", index);
     }
     PQclear(res);
 #endif
@@ -491,7 +491,13 @@ int storage_repo_get_value_str(char *name, char *table)
         PQclear(res);
         return -1;
     }
-    value = atoi(PQgetvalue(res, 0, 0));
+    char * value_str = PQgetvalue(res, 0, 0);
+    if (value_str != NULL) {
+        value = atoi(value_str);
+    } else {
+        LOGE(tag, "Value not found for sys variable: %s", name);
+    }
+
 #endif
     return value;
 }
@@ -829,14 +835,14 @@ int storage_set_payload_data(int index, void* data, int payload)
 #if SCH_STORAGE_MODE > 0
     char* tok_sym[300];
     char* tok_var[300];
-    char order[300];
+    char *order = (char *)malloc(300);
     strcpy(order, data_map[payload].data_order);
-    char var_names[1000];
+    char *var_names = (char *)malloc(1000);
     strcpy(var_names, data_map[payload].var_names);
     int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
 
-    char values[1000];
-    char names[1000];
+    char *values = (char *)malloc(1000);
+    char *names = (char *)malloc(1000);
     strcpy(names, "(id, tstz,");
     sprintf(values, "(%d, current_timestamp,", index);
 
@@ -862,8 +868,12 @@ int storage_set_payload_data(int index, void* data, int payload)
 
     strcat(names, ")");
     strcat(values, ")");
-    char insert_row[2000];
+    char*  insert_row = (char *)malloc(2000);
     sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
+    free(order);
+    free(var_names);
+    free(values);
+    free(names);
     LOGD(tag, "%s", insert_row);
 
 #if SCH_STORAGE_MODE == 1
@@ -879,6 +889,7 @@ int storage_set_payload_data(int index, void* data, int payload)
     }
 #elif SCH_STORAGE_MODE == 2
     PGresult *res = PQexec(conn, insert_row);
+    free(insert_row);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));
         PQclear(res);
@@ -987,7 +998,9 @@ int storage_get_payload_data(int index, void* data, int payload)
     int val;
     for(j=0; j < nparams; ++j) {
         int param_size = get_sizeof_type(tok_sym[j]);
-        get_psql_value(tok_sym[j], &val, res, j);
+        if (get_psql_value(tok_sym[j], &val, res, j) == -1) {
+            return -1;
+        }
         // TODO: sum data pointer with accumulative param sizes
         memcpy(data+(j*4), &val, param_size);
     }
@@ -1066,24 +1079,31 @@ const char* get_sql_type(char* c_type)
         }
     }
 #elif SCH_STORAGE_MODE == 2
-    void get_psql_value(char* c_type, void* buff, PGresult *res, int j)
+    int get_psql_value(char* c_type, void* buff, PGresult *res, int j)
     {
+        char * res_str = PQgetvalue(res, 0, j);
+
+        if( res_str == NULL ) {
+            return -1 ;
+        }
+
         if(strcmp(c_type, "%f") == 0) {
             float val;
-            val =(float) atof(PQgetvalue(res, 0, j));
+            val =(float) atof(res_str);
             memcpy(buff, &val, sizeof(float));
         }
         else if(strcmp(c_type, "%d") == 0) {
             int val;
-            val =  atoi(PQgetvalue(res, 0, j));
+            val =  atoi(res_str);
             memcpy(buff, &val, sizeof(int));
         }
         else if(strcmp(c_type, "%u") == 0) {
             unsigned int val;
             // TODO: Change to  strtoul()
-            val = (unsigned int) atol(PQgetvalue(res, 0, j));
+            val = (unsigned int) atol(res_str);
             memcpy(buff, &val, sizeof(unsigned int));
         }
+        return 0;
     }
 #endif
 

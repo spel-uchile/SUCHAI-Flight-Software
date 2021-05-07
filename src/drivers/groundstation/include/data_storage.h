@@ -19,8 +19,6 @@
 #if SCH_STORAGE_MODE == 1
     #include <sqlite3.h>
 #elif SCH_STORAGE_MODE == 2
-    // TODO: Implement Flight Plan to remove sqlite dependency in STORAGE_MODE 2
-    #include <sqlite3.h>
     #include <libpq-fe.h>
 #endif
 
@@ -217,7 +215,7 @@ const char* get_sql_type(char* c_type);
 #if SCH_STORAGE_MODE == 1
     void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
 #elif SCH_STORAGE_MODE == 2
-    void get_psql_value(char* c_type, void* buff, PGresult *res, int j);
+    int get_psql_value(char* c_type, void* buff, PGresult *res, int j);
 #endif
 
 // TODO: Remove not used function?
