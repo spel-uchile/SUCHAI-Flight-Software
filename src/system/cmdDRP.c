@@ -137,7 +137,20 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
 {
     char name[MAX_VAR_NAME];
     float value;
-    if(params == NULL || sscanf(params, fmt, name, &value) != nparams)
+
+    if(params == NULL)
+    {
+        LOGE(tag, "Error parsing arguments!");
+        return CMD_ERROR;
+    }
+
+    if(strlen(&params[0]) > MAX_VAR_NAME)
+    {
+        LOGE(tag, "drp_update_sys_var_name used with invalid name: %s", name);
+        return CMD_FAIL;
+    }
+
+    if(sscanf(params, fmt, name, &value) != nparams)
     {
         LOGE(tag, "Error parsing arguments!");
         return CMD_ERROR;
