@@ -34,9 +34,8 @@ void taskHousekeeping(void *param)
     unsigned int _05min_check = 5*60;       //05[m] condition
     unsigned int _1hour_check = 60*60;      //01[h] condition
     /*Get OBC beacon period*/
-    unsigned int com_bcn_period = dat_get_system_var(dat_com_bcn_period);
-    unsigned int obc_bcn_offset = dat_get_system_var(dat_obc_bcn_offset);
-    unsigned int _obc_bcn_period = com_bcn_period + obc_bcn_offset;
+    int obc_bcn_period = dat_get_system_var(dat_com_bcn_period);
+    int last_obc_bcn_period = obc_bcn_period;
 
     portTick xLastWakeTime = osTaskGetTickCount();
 
@@ -47,6 +46,23 @@ void taskHousekeeping(void *param)
 
         /* 1 second actions */
         dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
+
+        /* Send OBC beacon */
+        int curr_obc_beacon_period = dat_get_system_var(dat_com_bcn_period);
+        if(curr_obc_beacon_period != last_obc_bcn_period)
+        {
+            obc_bcn_period = curr_obc_beacon_period;
+            last_obc_bcn_period = curr_obc_beacon_period;
+        }
+
+        obc_bcn_period --;
+        if (obc_bcn_period < 0)
+        {
+            cmd_t *cmd_tm_send_status;
+            cmd_tm_send_status = cmd_build_from_str("tm_send_status 10");
+            cmd_send(cmd_tm_send_status);
+            obc_bcn_period = curr_obc_beacon_period;
+        }
 
         //  Debug command
         if(log_lvl > LOG_LVL_DEBUG)
@@ -105,22 +121,6 @@ void taskHousekeeping(void *param)
             cmd_t *cmd_1h = cmd_get_str("drp_add_hrs_alive");
             cmd_add_params_var(cmd_1h, 1); // Add 1hr
             cmd_send(cmd_1h);
-        }
-
-        /* Send OBC beacon */
-        if ((elapsed_sec % _obc_bcn_period) == 0)
-        {
-            int _com_bcn_period = dat_get_system_var(dat_com_bcn_period);
-            int _obc_bcn_offset = dat_get_system_var(dat_obc_bcn_offset);
-            if(_com_bcn_period != com_bcn_period || _obc_bcn_offset != obc_bcn_offset)
-            {
-                com_bcn_period = _com_bcn_period;
-                obc_bcn_offset = _obc_bcn_offset;
-                _obc_bcn_period = com_bcn_period + obc_bcn_offset;
-            }
-            cmd_t *cmd_tm_send_status;
-            cmd_tm_send_status = cmd_build_from_str("tm_send_status 10");
-            cmd_send(cmd_tm_send_status);
         }
     }
 }
