@@ -45,7 +45,7 @@ dat_sys_var_t dat_get_status_var_def_name(char *name)
     {
         for (i = 0; i < dat_status_last_var; i++)
         {
-            if (strcmp(dat_status_list[i].name, name) == 0)
+            if (strncmp(dat_status_list[i].name, name, (size_t)MAX_VAR_NAME) == 0)
                 return dat_status_list[i];
         }
     }

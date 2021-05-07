@@ -135,7 +135,7 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
 
 int drp_update_sys_var_name(char *fmt, char *params, int nparams)
 {
-    char name[24];
+    char name[MAX_VAR_NAME];
     float value;
     if(params == NULL || sscanf(params, fmt, name, &value) != nparams)
     {
@@ -169,12 +169,15 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
 
 int drp_get_sys_var_name(char *fmt, char *params, int nparams)
 {
-    char name[24];
-    if(params == NULL || sscanf(params, fmt, name) != nparams)
+    if(params == NULL)
     {
         LOGE(tag, "Error parsing arguments!");
         return CMD_ERROR;
     }
+
+    char *name;
+    name = (char *)malloc(sizeof(char)*MAX_VAR_NAME);
+    strncpy(params, name, MAX_VAR_NAME);
 
     // Get variable definition by name
     dat_sys_var_t variable_def = dat_get_status_var_def_name(name);
@@ -189,6 +192,7 @@ int drp_get_sys_var_name(char *fmt, char *params, int nparams)
     variable_def.value = variable;
     dat_print_system_var(&variable_def);
 
+    free(name);
     return CMD_OK;
 }
 
