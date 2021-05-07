@@ -125,6 +125,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
 
     int i;
     for(i=0; i < n_frames; ++i) {
+
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
         packet->length = sizeof(com_frame_t);
         memset(packet->data, 0, sizeof(com_frame_t));
@@ -137,7 +138,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         int j;
         for(j=0; j < structs_per_frame; ++j) {
             if( (i*structs_per_frame) +j >= n_samples ) {
-                frame->ndata = (uint32_t) j;
+                frame->ndata = csp_hton32((uint32_t) j);
                 break;
             }
 
@@ -148,21 +149,28 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         }
 
         LOGI(tag, "Sending %d structs of payload %d", frame->ndata, (int)payload);
-        _hton32_buff(frame->data.data32, COM_FRAME_MAX_LEN / sizeof(uint32_t));
+//        _hton32_buff((uint32_t *)frame->data.data32, sizeof(data.frame.data.data8)/ sizeof(uint32_t));
         //_com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata, data.frame.nframe);
         LOGI(tag, "Node    : %d", frame->node);
         LOGI(tag, "Frame   : %d", frame->nframe);
         LOGI(tag, "Type    : %d", frame->type);
         LOGI(tag, "Samples : %d", frame->ndata);
-        print_buff(frame->data.data8, payload_size*structs_per_frame);
+//        print_buff(frame->data.data8, payload_size*structs_per_frame);
 
         // Send packet
         int rc_send = csp_send(conn, packet, 500);
         if(rc_send == 0)
         {
-            LOGE(tag, "Error sending frame %d! (%d)", frame->nframe, rc_send);
             csp_buffer_free(packet);
+            LOGE(tag, "Error sending frame %d! (%d)", i, rc_send);
             break;
+        }
+
+        if(i%10 == 0)
+        {
+            csp_close(conn);
+            osDelay(3000);
+            conn = csp_connect(CSP_PRIO_NORM, dest_node, SCH_TRX_PORT_TM, 500, CSP_O_NONE);
         }
     }
 
