@@ -199,12 +199,10 @@ int tm_get_single(char *fmt, char *params, int nparams)
         char buff[payload_size];
         int ret;
         ret = dat_get_payload_sample(buff, payload, index);
-        dat_print_payload_struct(buff, payload);
-
         if( ret == -1) {
             return CMD_ERROR;
         }
-
+        dat_print_payload_struct(buff, payload);
         return CMD_OK;
     }
 

@@ -64,24 +64,29 @@ void taskSensors(void *param)
     {
         osTaskDelayUntil(&xLastWakeTime, 1000); //Suspend task
         LOGD(tag, "state: %d, action %d, samples left: %d", status_machine.state, status_machine.action, status_machine.samples_left)
-        osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
+
         // Apply action
         if (status_machine.action != ACT_STAND_BY) {
+            osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
             if (status_machine.action == ACT_START) {
+
                 status_machine.state = ST_SAMPLING;
                 status_machine.action = ACT_STAND_BY;
             } else if (status_machine.action == ACT_PAUSE) {
                 status_machine.state = ST_PAUSE;
                 status_machine.action = ACT_STAND_BY;
             }
+            osSemaphoreGiven(&repo_machine_sem);
         }
 
         // States
         if (status_machine.state == ST_SAMPLING) {
             // Check for samples left
             if (status_machine.samples_left == 0) {
+                osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
                 status_machine.state = ST_PAUSE;
                 status_machine.action = ACT_STAND_BY;
+                osSemaphoreGiven(&repo_machine_sem);
             }
             // Check for step
             else if (elapsed_sec % status_machine.step == 0) {
@@ -100,7 +105,9 @@ void taskSensors(void *param)
                     }
                 }
                 if (status_machine.samples_left != -1) {
+                    osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
                     status_machine.samples_left -= 1;
+                    osSemaphoreGiven(&repo_machine_sem);
                 }
             }
         }
@@ -110,7 +117,6 @@ void taskSensors(void *param)
         step = (int) status_machine.step;
         active_payloads = (int) status_machine.active_payloads;
         samples_left = (int) status_machine.samples_left;
-        osSemaphoreGiven(&repo_machine_sem);
 
         dat_set_system_var(dat_drp_mach_action, action);
         dat_set_system_var(dat_drp_mach_state, state);
