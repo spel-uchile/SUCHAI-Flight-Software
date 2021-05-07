@@ -148,14 +148,16 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
             memcpy(frame->data.data8 + mem_offset, buff, payload_size);
         }
 
+        int k;
+        for(int k=0; k<sizeof(frame->data.data32); k++)
+            frame->data.data32[k] = csp_hton32(frame->data.data32[k]);
+
         LOGI(tag, "Sending %d structs of payload %d", frame->ndata, (int)payload);
-//        _hton32_buff((uint32_t *)frame->data.data32, sizeof(data.frame.data.data8)/ sizeof(uint32_t));
-        //_com_send_data(dest_node, data.frame.data.data8, COM_FRAME_MAX_LEN, data.frame.type, data.frame.ndata, data.frame.nframe);
         LOGI(tag, "Node    : %d", frame->node);
         LOGI(tag, "Frame   : %d", frame->nframe);
         LOGI(tag, "Type    : %d", frame->type);
         LOGI(tag, "Samples : %d", frame->ndata);
-//        print_buff(frame->data.data8, payload_size*structs_per_frame);
+        //print_buff(frame->data.data8, payload_size*structs_per_frame);
 
         // Send packet
         int rc_send = csp_send(conn, packet, 500);
@@ -166,12 +168,8 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
             break;
         }
 
-        if(i%10 == 0)
-        {
-            csp_close(conn);
-            osDelay(3000);
-            conn = csp_connect(CSP_PRIO_NORM, dest_node, SCH_TRX_PORT_TM, 500, CSP_O_NONE);
-        }
+        if((i+1)%SCH_COM_MAX_PACKETS == 0)
+            osDelay(SCH_COM_TX_DELAY_MS);
     }
 
     // Close connection

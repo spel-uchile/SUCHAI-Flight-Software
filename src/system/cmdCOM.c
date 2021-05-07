@@ -259,6 +259,9 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
         len -= sent;
         n_data -= data_sent;
         data += sent;
+
+        if(nframe%SCH_COM_MAX_PACKETS == 0)
+            osDelay(SCH_COM_TX_DELAY_MS);
     }
 
     // Close connection

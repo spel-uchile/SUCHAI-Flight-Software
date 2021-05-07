@@ -82,7 +82,8 @@
 #define SCH_TX_FREQ             437250000          /// Default TRX freq in Hz
 #define SCH_TX_BAUD             4800               /// Default TRX baudrate [4800|9600|19200]
 #define SCH_OBC_BCN_OFFSET      30                 /// OBC beacon period offset
-
+#define SCH_COM_MAX_PACKETS     10                 /// Max number of packets to transmit in a row before a small pause
+#define SCH_COM_TX_DELAY_MS     3000               /// Delay (ms) between continuous transmissions
 
 /* Data repository settings */
 #define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
