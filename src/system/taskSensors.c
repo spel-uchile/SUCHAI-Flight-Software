@@ -33,7 +33,18 @@ void taskSensors(void *param)
     char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor"};
     char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "sen_take_sample", "sen_take_sample"};
 
-    status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 0, 5, -1, nsensors};
+
+    int action = dat_get_system_var(dat_drp_mach_action);
+    int state = dat_get_system_var(dat_drp_mach_state);
+    int step = dat_get_system_var(dat_drp_mach_step);
+    int active_payloads = dat_get_system_var(dat_drp_mach_payloads);
+    int samples_left = dat_get_system_var(dat_drp_mach_left);
+
+    if( action < 0 || state < 0  || active_payloads < 0 || step < 0) {
+        status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 0, 5, -1, nsensors};
+    } else {
+        status_machine = (dat_stmachine_t) {state, action, active_payloads, step, samples_left, nsensors};
+    }
 
     if(osSemaphoreCreate(&repo_machine_sem) != CSP_SEMAPHORE_OK)
     {
@@ -94,11 +105,11 @@ void taskSensors(void *param)
             }
         }
 
-        int action = (int) status_machine.action;
-        int state = (int) status_machine.state;
-        int step = (int) status_machine.step;
-        int active_payloads = (int) status_machine.active_payloads;
-        int samples_left = (int) status_machine.samples_left;
+        action = (int) status_machine.action;
+        state = (int) status_machine.state;
+        step = (int) status_machine.step;
+        active_payloads = (int) status_machine.active_payloads;
+        samples_left = (int) status_machine.samples_left;
         osSemaphoreGiven(&repo_machine_sem);
 
         dat_set_system_var(dat_drp_mach_action, action);

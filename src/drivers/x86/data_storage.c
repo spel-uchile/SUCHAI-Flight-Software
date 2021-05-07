@@ -84,8 +84,8 @@ int storage_init(const char *file)
         return -1;
     }
 
-    char* value_str;
-    if ((value_str = PQgetvalue(res, 0, 0)) == NULL)
+    char * value_str = PQgetvalue(res, 0, 0);
+    if (value_str == NULL)
     {
         //Create database
         char create_db[SCH_BUFF_MAX_LEN];
@@ -377,7 +377,7 @@ int storage_table_payload_init(int drop)
             }
         }
         strcat(create_table, ")");
-        LOGI(tag, "SQL command: %s", create_table);
+        LOGD(tag, "SQL command: %s", create_table);
 
 #if SCH_STORAGE_MODE ==1
         char* err_msg;
@@ -444,12 +444,12 @@ int storage_repo_get_value_idx(int index, char *table)
         PQclear(res);
         return -1;
     }
-    char* value_str;
-    if ((value_str = PQgetvalue(res, 0, 0)) != NULL)
+    char * value_str = PQgetvalue(res, 0, 0);
+    if ( value_str != NULL)
         value = atoi(value_str);
     else
     {
-        LOGE(tag, "The value wasn't found");
+        LOGE(tag, "Value does not found in for status variable index: %d", index);
     }
     PQclear(res);
 #endif
@@ -491,7 +491,13 @@ int storage_repo_get_value_str(char *name, char *table)
         PQclear(res);
         return -1;
     }
-    value = atoi(PQgetvalue(res, 0, 0));
+    char * value_str = PQgetvalue(res, 0, 0);
+    if (value_str != NULL) {
+        value = atoi(value_str);
+    } else {
+        LOGE(tag, "Value not found for sys variable: %s", name);
+    }
+
 #endif
     return value;
 }

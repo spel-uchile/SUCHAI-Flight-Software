@@ -112,8 +112,6 @@ int take_sample(char *fmt, char *params, int nparams)
         }
 
         int curr_time =  (int)time(NULL);
-
-
         if( payload == 0 ) // Temperature
         {
             int16_t sensor1=1, sensor2=2;
