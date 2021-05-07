@@ -647,14 +647,16 @@ int com_set_beacon(char *fmt, char *params, int nparams)
     }
     dat_set_system_var(dat_com_bcn_period, period);
 
-    char bcn_interval_configuration[SCH_CMD_MAX_STR_PARAMS];
-    snprintf(bcn_interval_configuration, SCH_CMD_MAX_STR_PARAMS, "0 bcn_interval %d", period);
+    char bcn_interval_configuration[32];
+    memset(bcn_interval_configuration, 0, 32);
+    snprintf(bcn_interval_configuration, 32, "0 bcn_interval %d", period);
 
-    char bcn_offset_configuration[SCH_CMD_MAX_STR_PARAMS];
-    snprintf(bcn_offset_configuration, SCH_CMD_MAX_STR_PARAMS, "0 bcn_holdoff %d", offset);
+    char bcn_offset_configuration[32];
+    memset(bcn_offset_configuration, 0,32);
+    snprintf(bcn_offset_configuration, 32, "0 bcn_holdoff %d", offset);
 
-    int rc_interval = com_set_config("%d %s %d", bcn_interval_configuration, 3);
-    int rc_offset = com_set_config("%d %s %d", bcn_offset_configuration, 3);
+    int rc_interval = com_set_config("%d %s %s", bcn_interval_configuration, 3);
+    int rc_offset = com_set_config("%d %s %s", bcn_offset_configuration, 3);
 
     return rc_interval && rc_offset;
 }
