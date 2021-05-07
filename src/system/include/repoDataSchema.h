@@ -161,9 +161,11 @@ typedef union value32_u{
 /**
  * A system variable (status or config) with an address, name, type and value
  */
+#define MAX_VAR_NAME 24
+
 typedef struct __attribute__((packed)) dat_sys_var {
     uint16_t address;   ///< Variable address or index (in the data storage)
-    char name[24];      ///< Variable name (max 24 chars)
+    char name[MAX_VAR_NAME];      ///< Variable name (max 24 chars)
     char type;          ///< Variable type (u: uint, i: int, f: float)
     int8_t status;      ///< Variable is status (1), is config (0), or uninitialized (-1)
     value32_t value;    ///< Variable default value
