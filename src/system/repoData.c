@@ -689,6 +689,8 @@ int dat_print_payload_struct(void* data, unsigned int payload)
 
     char* tok_sym[300];
     char* tok_var[300];
+//    char** tok_sym = (char**)malloc(300);
+//    char** tok_var = (char**)malloc(300);
     char *order = (char *)malloc(300);
     strcpy(order, data_map[payload].data_order);
     char *var_names = (char *)malloc(1000);
@@ -726,6 +728,8 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     free(var_names);
     free(values);
     free(names);
+//    free(tok_sym);
+//    free(tok_var);
 
     return 0;
 }
