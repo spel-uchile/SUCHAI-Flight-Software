@@ -338,7 +338,7 @@ int com_set_time_node(char *fmt, char *params, int nparams)
     com_send_cmd("%d %n", cmd, 2);
 }
 
-#if 1//def SCH_USE_NANOCOM
+#ifdef SCH_USE_NANOCOM
 int com_reset_wdt(char *fmt, char *params, int nparams)
 {
 
