@@ -329,4 +329,7 @@ int com_set_config(char *fmt, char *params, int nparams);
 /* TODO: Add documentation */
 int com_update_status_vars(char *fmt, char *params, int nparams);
 
+/* TODO: ADD documentation */
+int com_set_beacon(char *fmt, char *params, int nparams);
+
 #endif /* CMD_COM_H */

@@ -43,6 +43,7 @@ void cmd_com_init(void)
     cmd_add("com_get_config", com_get_config, "%d %s", 2);
     cmd_add("com_set_config", com_set_config, "%d %s %s", 3);
     cmd_add("com_update_status", com_update_status_vars, "", 0);
+    cmd_add("com_set_beacon", com_set_beacon, "%d %d", 2);
 #endif
 }
 
@@ -334,7 +335,7 @@ int com_set_time_node(char *fmt, char *params, int nparams)
     com_send_cmd("%d %n", cmd, 2);
 }
 
-#ifdef SCH_USE_NANOCOM
+#if 1//def SCH_USE_NANOCOM
 int com_reset_wdt(char *fmt, char *params, int nparams)
 {
 
@@ -630,5 +631,28 @@ void _com_config_find(char *param_name, int table, param_table_t **param)
 
     *param = NULL;
     return;
+}
+
+int com_set_beacon(char *fmt, char *params, int nparams)
+{
+    int period;
+    int offset;
+    if(params == NULL || sscanf(params, fmt, &period, &offset) != nparams)
+    {
+        LOGE(tag, "Error parsing params!");
+        return CMD_ERROR;
+    }
+    dat_set_system_var(dat_com_bcn_period, period);
+
+    char bcn_interval_configuration[SCH_CMD_MAX_STR_PARAMS];
+    snprintf(bcn_interval_configuration, SCH_CMD_MAX_STR_PARAMS, "0 bcn_interval %d", period);
+
+    char bcn_offset_configuration[SCH_CMD_MAX_STR_PARAMS];
+    snprintf(bcn_offset_configuration, SCH_CMD_MAX_STR_PARAMS, "0 bcn_holdoff %d", offset);
+
+    int rc_interval = com_set_config("%d %s %d", bcn_interval_configuration, 3);
+    int rc_offset = com_set_config("%d %s %d", bcn_offset_configuration, 3);
+
+    return rc_interval && rc_offset;
 }
 #endif //SCH_USE_NANOCOM
