@@ -175,9 +175,18 @@ int drp_get_sys_var_name(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     }
 
-    char *name;
-    name = (char *)malloc(sizeof(char)*MAX_VAR_NAME);
-    strncpy(params, name, MAX_VAR_NAME);
+    if(strlen(params) > MAX_VAR_NAME) {
+        LOGE(tag, "drp_get_sys_var_name used with invalid name: %s", params);
+        return CMD_FAIL;
+    }
+
+    char name[MAX_VAR_NAME];
+
+    if(sscanf(params, fmt, name) != nparams)
+    {
+        LOGE(tag, "Error parsing arguments!");
+        return CMD_ERROR;
+    }
 
     // Get variable definition by name
     dat_sys_var_t variable_def = dat_get_status_var_def_name(name);
@@ -192,7 +201,6 @@ int drp_get_sys_var_name(char *fmt, char *params, int nparams)
     variable_def.value = variable;
     dat_print_system_var(&variable_def);
 
-    free(name);
     return CMD_OK;
 }
 
