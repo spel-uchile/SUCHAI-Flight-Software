@@ -95,7 +95,11 @@ def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile)
         node.send_message("obc_reset", hdr)
 
         # Get SUCHAI process return code
-        return_code = suchai_process.wait()
+        try:
+            return_code = suchai_process.wait(300)
+        except:
+            e = sys.exc_info()[0]
+            print("Error: {}".formate(e))
         end_time = time.time()
 
         if print_logfile:
