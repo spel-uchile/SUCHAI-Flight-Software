@@ -1048,7 +1048,7 @@ static int dummy_callback(void *data, int argc, char **argv, char **names)
 const char* get_sql_type(char* c_type)
 {
     if(strcmp(c_type, "%f") == 0) {
-        return "REAL";
+        return "DOUBLE PRECISION";
     }
     else if(strcmp(c_type, "%d") == 0) {
         return "INTEGER";

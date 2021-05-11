@@ -309,7 +309,7 @@ void test_payload_data(void)
 
     int rc, i;
     int n_test = 10;
-    int time_test = 1596853407;
+    uint32_t time_test = 1596853407;
     uint32_t uint_test = (uint32_t)rand();
     int32_t int_test = (int32_t)rand();
     float float_test = ((float)rand()/(float)(RAND_MAX)) * 1.0;
@@ -319,6 +319,7 @@ void test_payload_data(void)
     {
         temp_data_t data_temp;
         data_temp.timestamp = time_test+i;
+        data_temp.index = (uint32_t)i;
         data_temp.obc_temp_1 = float_test+i;
         data_temp.obc_temp_2 = float_test+i;
         data_temp.obc_temp_3 = float_test+i;
@@ -327,6 +328,7 @@ void test_payload_data(void)
 
         eps_data_t data_eps;
         data_eps.timestamp = time_test+i;
+        data_eps.index = (uint32_t)i;
         data_eps.cursun = uint_test+i;
         data_eps.cursys = uint_test+i;
         data_eps.vbatt = uint_test+i;
