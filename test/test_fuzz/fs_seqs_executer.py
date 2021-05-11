@@ -99,7 +99,7 @@ def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile)
             return_code = suchai_process.wait(300)
         except:
             e = sys.exc_info()[0]
-            print("Error: {}".formate(e))
+            print("Error: {}".format(e))
         end_time = time.time()
 
         if print_logfile:
