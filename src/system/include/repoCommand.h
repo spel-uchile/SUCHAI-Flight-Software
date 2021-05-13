@@ -134,7 +134,7 @@ cmd_t * cmd_get_idx(int idx);
  * string so the user must free the array.
  *
  * @param idx Int. Command index or id
- * @return Int. CMD_OK if the command was found, CMD_ERROR otherwise.
+ * @return Str. Command name.
  */
 char * cmd_get_name(int idx);
 
@@ -219,6 +219,12 @@ void cmd_free(cmd_t *cmd);
 * Print the list of registered commands
 */
 void cmd_print_all(void);
+
+/**
+ * Saves and returns list of available commands
+ * @return char *. List of commands.
+ */
+char *cmd_save_all(void);
 
 /**
  * Initializes the command buffer adding null_cmd

@@ -20,6 +20,7 @@
 
 #define TM_TYPE_GENERIC 0
 #define TM_TYPE_STATUS  1
+#define TM_TYPE_HELP    2
 #define TM_TYPE_PAYLOAD 10
 
 /**
@@ -62,6 +63,16 @@ int tm_send_var(char *fmt, char *params, int nparams);
  */
 int tm_parse_status(char *fmt, char *params, int nparams);
 
+/**
+ * Parses a commands list as string, @seealso tm_send_cmds.
+ *
+ * @param fmt Str. Not used.
+ * @param param char *. Parameters as pointer to raw data. Receives a
+ * status_t structure
+ * @param nparams Int. Not used.
+ * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ */
+int tm_parse_string(char *fmt, char *params, int nparams);
 
 /**
  * Print last struct data stored from specific payload.
@@ -118,4 +129,5 @@ int tm_set_ack(char *fmt, char *params, int nparams);
  */
 int tm_get_single(char *fmt, char *params, int nparams);
 
+int tm_send_cmds(char *fmt, char *params, int nparms);
 #endif //CMDTM_H

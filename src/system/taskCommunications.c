@@ -140,7 +140,6 @@ void taskCommunications(void *param)
                     break;
             }
         }
-
         /* Close current connection, and handle next */
         csp_close(conn);
     }
@@ -216,6 +215,12 @@ static void com_receive_tm(csp_packet_t *packet)
     if(frame->type == TM_TYPE_STATUS)
     {
         cmd_parse_tm = cmd_get_str("tm_parse_status");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
+    else if(frame->type == TM_TYPE_HELP)
+    {
+        cmd_parse_tm = cmd_get_str("tm_parse_string");
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }
