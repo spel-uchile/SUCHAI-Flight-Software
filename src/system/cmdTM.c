@@ -24,6 +24,7 @@ static const char *tag = "cmdTM";
 void cmd_tm_init(void)
 {
     cmd_add("tm_parse_status", tm_parse_status, "", 0);
+    cmd_add("tm_parse_string", tm_parse_string, "", 0);
     cmd_add("tm_send_status", tm_send_status, "%d", 1);
     cmd_add("tm_send_var", tm_send_var, "%d %s", 2);
     cmd_add("tm_get_last", tm_get_last, "%u", 1);
@@ -32,6 +33,7 @@ void cmd_tm_init(void)
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
     cmd_add("tm_send_from", tm_send_from, "%u %u %u", 3);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
+    cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
 }
 
 int tm_send_status(char *fmt, char *params, int nparams)
@@ -75,7 +77,7 @@ int tm_send_var(char *fmt, char *params, int nparams)
     status_buff[0].value.u = csp_hton32(dat_get_status_var(address).u);
 
     // Send telemetry
-    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, 1, 0);
+    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_GENERIC, 1, 0);
 }
 
 int tm_parse_status(char *fmt, char *params, int nparams)
@@ -95,6 +97,22 @@ int tm_parse_status(char *fmt, char *params, int nparams)
         system_var.value = value;
         dat_print_system_var(&system_var);
     }
+
+    return CMD_OK;
+}
+
+int tm_parse_string(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+        return CMD_ERROR;
+
+    com_frame_t *frame = (com_frame_t *)params;
+    char *cmds_list;
+    cmds_list = (char *)malloc(strlen((char *)frame->data.data8));
+    memset(cmds_list, '\0', strlen((char *)frame->data.data8 + 1));
+    cmds_list = (char *)frame->data.data8;
+    //char *cmds_list = (char *)params;
+    printf("Available commands list: %s", cmds_list);
 
     return CMD_OK;
 }
@@ -351,7 +369,6 @@ int tm_send_from(char *fmt, char *params, int nparams)
     }
 }
 
-
 int tm_set_ack(char *fmt, char *params, int nparams) {
     if(params == NULL)
     {
@@ -399,4 +416,14 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
     {
         return CMD_ERROR;
     }
+}
+
+int tm_send_cmds(char *fmt, char *params, int nparams)
+{
+    int node;
+    if(params != NULL && sscanf(params, fmt, &node) == nparams) {
+        int rc = _com_send_data(node, cmd_save_all(), strlen(cmd_save_all()), TM_TYPE_HELP, 1, 0);
+        return CMD_OK;
+    }
+    return CMD_ERROR;
 }
