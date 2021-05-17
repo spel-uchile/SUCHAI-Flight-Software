@@ -68,13 +68,13 @@ int storage_table_repo_init(char* table, int drop)
     return 0;
 }
 
-int storage_table_flight_plan_init(int drop)
+int storage_table_flight_plan_init(int drop, int * entries)
 {
     int rc = 0;
 
     // If set to drop the memory, it erases the flight plan sections
     if (drop == 1)
-        rc = storage_flight_plan_reset();
+        rc = storage_flight_plan_reset(entries);
 
     return rc;
 }
@@ -128,12 +128,10 @@ int storage_repo_set_value_str(char *name, int value, char *table)
  * @param timetodo Execution time of the command to find
  * @return The command's index, -1 if not found or error
  */
-static int flight_plan_find_index(int timetodo)
+static int flight_plan_find_index(int timetodo, int entries)
 {
     // Calculates information on how the flight plan is stored
     int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
-
-    int entries = dat_get_system_var(dat_fpl_queue);
 
     // For every index
     for (int i = 0; i < entries; i++)
@@ -163,18 +161,16 @@ static int flight_plan_find_index(int timetodo)
  * @param index Storage index of the entry
  * @return 0 if OK, -1 if Error
  */
-static int flight_plan_erase_index(int index)
+static int flight_plan_erase_index(int index, int * entries)
 {
-    int entries = dat_get_system_var(dat_fpl_queue);
-
-    if (index < 0 || index >= entries)
+    if (index < 0 || index >= *entries)
     {
         LOGW(tag, "Failed attempt at erasing flight plan entry index %d, out of bounds", index);
         return -1;
     }
 
     // Generates a buffer for the flight plan entries
-    uint8_t section_data[entries*max_command_size];
+    uint8_t section_data[(*entries)*max_command_size];
 
     // Calculates memory address of the section
     int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
@@ -184,7 +180,7 @@ static int flight_plan_erase_index(int index)
     uint32_t add = storage_addresses_flight_plan[section_index];
 
     // Reads the whole section
-    spn_fl512s_read_data(0, add, (uint8_t*)section_data, (uint16_t)entries*max_command_size);
+    spn_fl512s_read_data(0, add, (uint8_t*)section_data, (uint16_t)(*entries)*max_command_size);
 
     // Deletes the section
     LOGI(tag, "Deleting section in address %u", (unsigned int)add);
@@ -199,7 +195,7 @@ static int flight_plan_erase_index(int index)
     int written_entries = 0;
 
     // Rewrites all commands, except the one that was going to be erased and any that were 'null'
-    for (int i = 0; i < entries; i++)
+    for (int i = 0; i < *entries; i++)
     {
         int buffer_index = i*max_command_size;
         int timetodo = *((int*)&(section_data[buffer_index]));
@@ -213,7 +209,7 @@ static int flight_plan_erase_index(int index)
             if (rc != 0)
             {
                 LOGE(tag, "Failed attempt at writing data in storage address %u", (unsigned int)add);
-                dat_set_system_var(dat_fpl_queue, written_entries);
+                *entries = written_entries;
                 return -1;
             }
 
@@ -224,16 +220,15 @@ static int flight_plan_erase_index(int index)
     }
 
     // Sets the amount of entries written
-    dat_set_system_var(dat_fpl_queue, written_entries);
+    *entries = written_entries;
 
     return 0;
 }
 
-int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical)
+int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical, int * entries)
 {
     // Finds an index with an empty entry
-    int entries = dat_get_system_var(dat_fpl_queue);
-    int index = entries;
+    int index = *entries;
 
     if (index >= SCH_FP_MAX_ENTRIES)
     {
@@ -302,15 +297,15 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
         return -1;
     }
 
-    dat_set_system_var(dat_fpl_queue, entries+1);
+    *entries =  *entries + 1;
 
     return 0;
 }
 
-int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical)
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical, int * entries)
 {
     // Finds the table index for timetodo
-    int index = flight_plan_find_index(timetodo);
+    int index = flight_plan_find_index(timetodo, *entries);
 
     if (index < 0)
         return -1;
@@ -348,7 +343,7 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
 
     // Deletes the command from storage
     int rc;
-    rc = flight_plan_erase_index(index);
+    rc = flight_plan_erase_index(index, entries);
 
     if (rc != 0)
         return -1;
@@ -365,10 +360,10 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
     return 0;
 }
 
-int storage_flight_plan_erase(int timetodo)
+int storage_flight_plan_erase(int timetodo, int * entries)
 {
     // Finds the index to erase
-    int index = flight_plan_find_index(timetodo);
+    int index = flight_plan_find_index(timetodo, *entries);
 
     if (index < 0)
     {
@@ -377,7 +372,7 @@ int storage_flight_plan_erase(int timetodo)
     }
 
     // Erases the entry in index
-    int rc = flight_plan_erase_index(index);
+    int rc = flight_plan_erase_index(index, entries);
 
     if (rc != 0)
     {
@@ -387,14 +382,13 @@ int storage_flight_plan_erase(int timetodo)
     return rc;
 }
 
-int storage_flight_plan_reset(void)
+int storage_flight_plan_reset(int * entries)
 {
-    int entries = dat_get_system_var(dat_fpl_queue);
 
     int commands_per_section = SCH_SIZE_PER_SECTION/max_command_size;
 
     // Amount of sections that the flight plan uses
-    int fp_sections = (entries/commands_per_section) + 1;
+    int fp_sections = (*entries/commands_per_section) + 1;
 
     // Deletes all flight plan memory sections
     for (int i = 0; i < fp_sections; i++)
@@ -404,26 +398,20 @@ int storage_flight_plan_reset(void)
         if (rc != 0)
         {
             LOGE(tag, "Failed attempt at deleting data in storage address %u", (unsigned int)storage_addresses_flight_plan[i]);
-            dat_set_system_var(dat_fpl_queue, entries >= 0 ? entries : 0);
             return -1;
         }
 
         // An entries section gets erased
-        entries -= commands_per_section;
+        *entries = *entries - commands_per_section;
     }
 
     // The entries amount can't be below zero
-    entries = (entries < 0) ? 0 : entries;
-
-    dat_set_system_var(dat_fpl_queue, entries);
-
+    *entries = (*entries < 0) ? 0 : *entries;
     return 0;
 }
 
-int storage_flight_plan_show_table(void)
+int storage_flight_plan_show_table(int entries)
 {
-    int entries = dat_get_system_var(dat_fpl_queue);
-
     if (entries == 0)
     {
         LOGI(tag, "Flight plan table empty");

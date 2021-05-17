@@ -56,7 +56,7 @@ int storage_table_repo_init(char *table, int drop);
  * @param drop Int. Set to 1 to drop the existing table before create one
  * @return 0 OK, -1 Error
  */
-int storage_table_flight_plan_init(int drop);
+int storage_table_flight_plan_init(int drop, int * entries);
 
 /**
  * Create new table in the opened database (@relatesalso storage_init)
@@ -116,7 +116,7 @@ int storage_repo_set_value_idx(int index, int value, char *table);
  * @param repeat Int. Value of time to run the command
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, int periodical);
+int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat, int periodical, int *entries);
 
 /**
  * Get the row of a certain time and set the values in the variables committed
@@ -129,7 +129,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int repeat,
  * @param repeat Int. Value of times to run the command
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_get(int timetodo, char* command, char* args, int* repeat, int* periodical);
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* repeat, int* periodical, int * entries);
 
 /**
  * Erase the row in the table in the opened database (@relatesalso storage_init) that
@@ -140,7 +140,7 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* repeat
  * @param timetodo Int. time to do the action
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_erase(int timetodo);
+int storage_flight_plan_erase(int timetodo, int * entries);
 
 /**
  * Reset the table in the opened database (@relatesalso storage_init) in the
@@ -150,7 +150,7 @@ int storage_flight_plan_erase(int timetodo);
  *
  * @return 0 OK, -1 Error
  */
-int storage_flight_plan_reset(void);
+int storage_flight_plan_reset(int * entries);
 
 /**
  * Show the table in the opened database (@relatesalso storage_init) in the
@@ -160,7 +160,7 @@ int storage_flight_plan_reset(void);
  *
  * @return 0 OK
  */
-int storage_flight_plan_show_table(void);
+int storage_flight_plan_show_table(int entries);
 
 /**
  * Set a value for specific payload with index value

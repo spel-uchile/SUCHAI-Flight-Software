@@ -49,8 +49,6 @@ void dat_repo_init(void)
     if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
         LOGE(tag, "Unable to create system status repository mutex");
 
-    if(osSemaphoreCreate(&repo_data_fp_sem) != CSP_SEMAPHORE_OK)
-        LOGE(tag, "Unable to create flight plan repository mutex");
 
     LOGD(tag, "Initializing data repositories buffers...")
 #if (SCH_STORAGE_MODE == 0)
@@ -95,7 +93,9 @@ void dat_repo_init(void)
         assertf(rc==0, tag, "Unable to create payload repo");
 
         //Init system flight plan table
-        rc=storage_table_flight_plan_init(0);
+        int entries = dat_get_system_var(dat_fpl_queue);
+        rc=storage_table_flight_plan_init(0, &entries);
+        dat_set_system_var(dat_fpl_queue, entries);
         assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif
@@ -319,24 +319,28 @@ static int _dat_del_fp_async(int timetodo)
 
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
 {
+    int entries = dat_get_system_var(dat_fpl_queue);
 
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     //TODO : agregar signal de segment para responder falla
     int rc = _dat_set_fp_async(timetodo, command, args, executions, periodical);
 #else
-    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical);
+    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
     return rc;
 }
 
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* period)
 {
     int rc;
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     int i;
@@ -359,26 +363,30 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
         }
     }
 #else
-    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, period);
+    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, period, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
 
     return rc;
 }
 
 int dat_del_fp(int timetodo)
 {
-
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE ==0
     int rc = _dat_del_fp_async(timetodo);
 #else
-    int rc = storage_flight_plan_erase(timetodo);
+    int rc = storage_flight_plan_erase(timetodo, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
 
     return rc;
 }
@@ -386,7 +394,8 @@ int dat_del_fp(int timetodo)
 int dat_reset_fp(void)
 {
     int rc;
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     int i;
@@ -400,17 +409,21 @@ int dat_reset_fp(void)
     }
     rc = 0;
 #else
-    rc = storage_table_flight_plan_init(1);
+    rc = storage_table_flight_plan_init(1, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
     return rc;
 }
 
 int dat_show_fp (void)
 {
     int rc;
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE ==0
     int cont = 0;
@@ -437,10 +450,10 @@ int dat_show_fp (void)
     }
     rc = 0;
 #else
-    rc = storage_flight_plan_show_table();
+    rc = storage_flight_plan_show_table(entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
     return rc;
 }
 
@@ -618,7 +631,12 @@ int dat_delete_memory_sections(void)
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 #if SCH_FP_ENABLED
-    storage_flight_plan_reset();
+
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    storage_flight_plan_reset(&entries);
+    osSemaphoreGiven(&repo_data_sem);
+    dat_set_system_var(dat_fpl_queue, entries >= 0 ? entries : 0);
 #endif
     return ret;
 }
