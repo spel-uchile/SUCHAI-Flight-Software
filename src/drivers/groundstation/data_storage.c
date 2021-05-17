@@ -29,9 +29,10 @@ static const char *tag = "data_storage";
     static sqlite3 *db = NULL;
 #elif SCH_STORAGE_MODE == 2
     PGconn *conn = NULL;
+    PGresult *res;
 #endif
 
-char* fp_table = "flightPlan";
+char* fp_table = "flightplan";
 char fs_db_name[15];
 char postgres_conf_s[SCH_BUFF_MAX_LEN];
 
@@ -75,7 +76,7 @@ int storage_init(const char *file)
                              "WHERE datname = '%s';", fs_db_name);
 
     LOGD(tag, "SQL command: %s", select_exist_db);
-    PGresult *res = PQexec(conn, select_exist_db);
+    res = PQexec(conn, select_exist_db);
 
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command failed: %s", PQerrorMessage(conn));
@@ -210,7 +211,7 @@ int storage_table_repo_init(char* table, int drop)
      "value INT);", table);
     LOGD(tag, "SQL command: %s", create_table_string);
     // TODO: manage connection error in res
-    PGresult *res = PQexec(conn, create_table_string);
+    res = PQexec(conn, create_table_string);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command CREATE failed: %s", PQerrorMessage(conn));
         PQclear(res);
@@ -220,7 +221,7 @@ int storage_table_repo_init(char* table, int drop)
 #endif
 }
 
-int storage_table_flight_plan_init(int drop)
+int storage_table_flight_plan_init(int drop, int * entries)
 {
     char* err_msg;
     char* sql;
@@ -275,7 +276,7 @@ int storage_table_flight_plan_init(int drop)
         char drop_query[SCH_BUFF_MAX_LEN];
         memset(&drop_query, 0, SCH_BUFF_MAX_LEN);
         snprintf(drop_query, SCH_BUFF_MAX_LEN, "DROP TABLE IF EXISTS %s", fp_table);
-        PGresult *res = PQexec(conn, drop_query);
+        res = PQexec(conn, drop_query);
         if ( PQresultStatus(res) != PGRES_COMMAND_OK ) {
             LOGE(tag, "Drop fp postgres command: %s failed", drop_query)
             PQclear(res);
@@ -288,7 +289,7 @@ int storage_table_flight_plan_init(int drop)
                               "executions int , "
                               "periodical int );";
 
-    PGresult *res = PQexec(conn, create_fp_query);
+    res = PQexec(conn, create_fp_query);
     if ( PQresultStatus(res) != PGRES_COMMAND_OK ) {
         LOGE(tag, "create fp postgres command: %s failed", create_fp_query)
         PQclear(res);
@@ -339,7 +340,7 @@ int storage_table_payload_init(int drop)
             sql = malloc(SCH_BUFF_MAX_LEN);
             memset(sql, 0, SCH_BUFF_MAX_LEN);
             sprintf(sql,"DROP TABLE IF EXISTS %s",  data_map[i].table);
-            PGresult *res = PQexec(conn, sql);
+            res = PQexec(conn, sql);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Failed to drop table %s. Error: %s. SQL: %s", sql, PQerrorMessage(conn));
             } else {
@@ -394,7 +395,7 @@ int storage_table_payload_init(int drop)
         }
 #elif SCH_STORAGE_MODE==2
         // TODO: manage connection error in res
-        PGresult *res = PQexec(conn, create_table);
+        res = PQexec(conn, create_table);
         if (PQresultStatus(res) != PGRES_COMMAND_OK) {
             LOGE(tag, "command CREATE PAYLOAD failed: %s", PQerrorMessage(conn));
             PQclear(res);
@@ -438,9 +439,10 @@ int storage_repo_get_value_idx(int index, char *table)
     memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
     snprintf(get_value_query,SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE idx=%d;", table, index);
     LOGD(tag, "%s",  get_value_query);
-    PGresult *res = PQexec(conn, get_value_query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        LOGE(tag, "command storage_repo_get_value_idx failed: %s", PQerrorMessage(conn));
+    res = PQexec(conn, get_value_query);
+    int status = PQresultStatus(res);
+    if (status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
+        LOGE(tag, "command storage_repo_get_value_idx failed or return 0: %s", PQerrorMessage(conn));
         PQclear(res);
         return -1;
     }
@@ -449,7 +451,7 @@ int storage_repo_get_value_idx(int index, char *table)
         value = atoi(value_str);
     else
     {
-        LOGE(tag, "Value does not found in for status variable index: %d", index);
+        LOGE(tag, "Value does not for status variable index: %d", index);
     }
     PQclear(res);
 #endif
@@ -485,7 +487,7 @@ int storage_repo_get_value_str(char *name, char *table)
     memset(&get_value_query, 0, sizeof(get_value_query));
     snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE name=\"%s\";", table, name);
     LOGD(tag, get_value_query);
-    PGresult *res = PQexec(conn, get_value_query);
+    res = PQexec(conn, get_value_query);
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         LOGE(tag, "command storage_repo_get_value_str failed: %s", PQerrorMessage(conn));
         PQclear(res);
@@ -541,7 +543,7 @@ int storage_repo_set_value_idx(int index, int value, char *table)
                              "SET value = %d; "
                              , table, index, value, value);
     LOGD(tag, "%s",  set_value_query);
-    PGresult *res = PQexec(conn, set_value_query);
+    res = PQexec(conn, set_value_query);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));
         PQclear(res);
@@ -553,7 +555,7 @@ int storage_repo_set_value_idx(int index, int value, char *table)
     return 0;
 }
 
-int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical)
+int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical, int * entries)
 {
     #if SCH_STORAGE_MODE > 0
         char * insert_query_template =  "INSERT INTO %s (time, command, args, executions, periodical) "
@@ -566,7 +568,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
             snprintf(insert_query,SCH_BUFF_MAX_LEN*2, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
                     command, args, executions, periodical);
             LOGD(tag, "Flight Plan Postgres Command: %s",  insert_query);
-            PGresult *res = PQexec(conn, insert_query);
+            res = PQexec(conn, insert_query);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Flight Plan Postgres Command INSERT failed: %s", PQerrorMessage(conn));
                 PQclear(res);
@@ -602,7 +604,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     return 0;
 }
 
-int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical)
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical, int * entries)
 {
     #if SCH_STORAGE_MODE > 0
         #if SCH_STORAGE_MODE == 2
@@ -610,10 +612,15 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
             int col;
 
             char get_value_query[100];
-            sprintf(get_value_query, "SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
-            PGresult *res = PQexec(conn, get_value_query);
-            if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-                LOGE(tag, "command storage_flight_plan_get failed: %s", PQerrorMessage(conn));
+            sprintf(get_value_query, "SELECT * FROM %s WHERE time = %d;", fp_table, timetodo);
+            LOGD(tag, "flight plan get query: %s ", get_value_query);
+//            CONNECTION_BAD
+//            LOGI(tag, "flight plan connection status: %d", PQstatus(conn))
+            res = PQexec(conn, get_value_query);
+            int status = PQresultStatus(res);
+
+            if (status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
+                LOGE(tag, "command storage_flight_plan_get failed or return 0: %s", PQerrorMessage(conn));
                 PQclear(res);
                 return -1;
             }
@@ -632,10 +639,10 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
             *executions = atoi(PQgetvalue(res, 0, 3));
             *periodical = atoi(PQgetvalue(res, 0, 4));
 
-            storage_flight_plan_erase(timetodo);
+            storage_flight_plan_erase(timetodo, entries);
 
             if (*periodical > 0)
-                storage_flight_plan_set(timetodo+*periodical, command, args,*executions,*periodical);
+                storage_flight_plan_set(timetodo+*periodical, command, args,*executions,*periodical, entries);
 
             PQclear(res);
             return 0;
@@ -665,7 +672,7 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
                 *executions = atoi(results[8]);
                 *periodical = atoi(results[9]);
 
-                storage_flight_plan_erase(timetodo);
+                storage_flight_plan_erase(timetodo, entries);
 
                 //if (atoi(results[9]) > 0)
                     //storage_flight_plan_set(timetodo+*periodical,results[6],results[7],*executions,*periodical);
@@ -678,14 +685,14 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
     return 0;
 }
 
-int storage_flight_plan_erase(int timetodo)
+int storage_flight_plan_erase(int timetodo, int * entries)
 {
     #if SCH_STORAGE_MODE > 0
         #if SCH_STORAGE_MODE == 2
             char del_query[SCH_BUFF_MAX_LEN];
             memset(&del_query, 0, SCH_BUFF_MAX_LEN);
             snprintf(del_query, SCH_BUFF_MAX_LEN, "DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
-            PGresult *res = PQexec(conn, del_query);
+            res = PQexec(conn, del_query);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Error in function storage_flight_plan_erase, postgres failed: %s", PQerrorMessage(conn));
                 PQclear(res);
@@ -720,12 +727,12 @@ int storage_flight_plan_erase(int timetodo)
     return 0;
 }
 
-int storage_flight_plan_reset(void)
+int storage_flight_plan_reset(int * entries)
 {
-    return storage_table_flight_plan_init(1);
+    return storage_table_flight_plan_init(1, entries);
 }
 
-int storage_flight_plan_show_table (void) {
+int storage_flight_plan_show_table (int entries) {
     #if SCH_STORAGE_MODE > 0
         #if SCH_STORAGE_MODE == 2
         int row;
@@ -734,8 +741,9 @@ int storage_flight_plan_show_table (void) {
         char get_value_query[SCH_BUFF_MAX_LEN];
         memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
         snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT * FROM %s", fp_table);
-        PGresult *res = PQexec(conn, get_value_query);
-        if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        res = PQexec(conn, get_value_query);
+        int status = PQresultStatus(res);
+        if ( status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK ) {
             LOGE(tag, "command storage_flight_plan_show_table failed: %s", PQerrorMessage(conn));
             PQclear(res);
             return -1;
@@ -888,7 +896,7 @@ int storage_set_payload_data(int index, void* data, int payload)
         return -1;
     }
 #elif SCH_STORAGE_MODE == 2
-    PGresult *res = PQexec(conn, insert_row);
+    res = PQexec(conn, insert_row);
     free(insert_row);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));
@@ -988,8 +996,9 @@ int storage_get_payload_data(int index, void* data, int payload)
 
     sqlite3_finalize(stmt);
 #elif SCH_STORAGE_MODE == 2
-    PGresult *res = PQexec(conn, get_value);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    res = PQexec(conn, get_value);
+    int status = PQresultStatus(res);
+    if (status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
         LOGE(tag, "command storage_get_recent_payload_data failed: %s", PQerrorMessage(conn));
         PQclear(res);
         return -1;
@@ -1048,7 +1057,7 @@ static int dummy_callback(void *data, int argc, char **argv, char **names)
 const char* get_sql_type(char* c_type)
 {
     if(strcmp(c_type, "%f") == 0) {
-        return "REAL";
+        return "DOUBLE PRECISION";
     }
     else if(strcmp(c_type, "%d") == 0) {
         return "INTEGER";
