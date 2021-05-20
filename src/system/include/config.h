@@ -55,7 +55,7 @@
 #define SCH_COMM_ENABLE         1    ///< TaskCommunications enabled (0 | 1)
 #define SCH_FP_ENABLED          1      ///< TaskFlightPlan enabled (0 | 1)
 #define SCH_HK_ENABLED          1      ///< TaskHousekeeping enabled (0 | 1)
-#define SCH_SEN_ENABLED         0     ///< TaskSensors enabled (0 | 1)
+#define SCH_SEN_ENABLED         1     ///< TaskSensors enabled (0 | 1)
 #define SCH_ADCS_ENABLED        0    ///< TaskADCS enabled (0 | 1)
 #define SCH_WDT_PERIOD          120                ///< CPU watchdog timer period in seconds
 #define SCH_MAX_WDT_TIMER       60                 ///< Seconds to send wdt_reset command

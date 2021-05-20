@@ -45,6 +45,7 @@ void taskSensors(void *param)
     } else {
         status_machine = (dat_stmachine_t) {state, action, active_payloads, step, samples_left, nsensors};
     }
+//    status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 1, 3600, -1, nsensors};
 
     if(osSemaphoreCreate(&repo_machine_sem) != CSP_SEMAPHORE_OK)
     {
@@ -54,7 +55,7 @@ void taskSensors(void *param)
     for(i=0; i < status_machine.total_sensors; i++)
     {
         cmd_init = cmd_get_str(init_cmds[i]);
-        cmd_add_params_str(cmd_init, "2 1");
+//        cmd_add_params_str(cmd_init, "1010");
         cmd_send(cmd_init);
     }
 
