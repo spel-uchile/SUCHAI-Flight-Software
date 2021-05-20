@@ -34,6 +34,9 @@ void cmd_tm_init(void)
     cmd_add("tm_send_from", tm_send_from, "%u %u %u", 3);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
     cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
+#ifdef LINUX
+    cmd_add("tm_send_file", tm_send_file, "%s %u", 2);
+#endif
 }
 
 int tm_send_status(char *fmt, char *params, int nparams)
@@ -427,3 +430,42 @@ int tm_send_cmds(char *fmt, char *params, int nparams)
     }
     return CMD_ERROR;
 }
+
+#ifdef LINUX
+int tm_send_file(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+    {
+        LOGE(tag, "params is null!");
+        return CMD_ERROR;
+    }
+
+    char file_name[100];
+    uint32_t node;
+    if(nparams == sscanf(params, fmt, file_name, &node))
+    {
+
+        FILE *fptr;
+
+        fptr = fopen(file_name,"rb");  // r for read, b for binary
+
+        fseek(fptr, 0L, SEEK_END);
+        long sz = ftell(fptr);
+        fseek(fptr, 0L, SEEK_SET);
+
+        uint32_t n_frame =  (int)sz/COM_FRAME_MAX_LEN + 1;
+        if ( (int)sz % COM_FRAME_MAX_LEN == 0 && sz != 0 ) {
+            n_frame -= n_frame;
+        }
+        char * buffer = malloc((int)sz );
+        fread(buffer, (int)sz,1, fptr);
+
+         // read 10 bytes to our buffer
+        print_buff(buffer, (int)sz);
+        _com_send_data((int) node, (void*) buffer, (int)sz, TM_TYPE_FILE, n_frame, 1);
+
+        free(buffer);
+        fclose(fptr);
+    }
+}
+#endif

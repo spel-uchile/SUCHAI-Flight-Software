@@ -225,7 +225,7 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
     int rc_conn = 0;
     int rc_send = 0;
     int nframe = n_frame;
-    int size_data = (int)len/n_data;
+    int size_data = (type ==TM_TYPE_PAYLOAD) ? (int)len/n_data : len;
 
     // New connection
     csp_conn_t *conn;
@@ -244,7 +244,9 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
         frame->type = (uint8_t)type;
         size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;
         int data_sent = n_data < COM_FRAME_MAX_LEN/size_data ? n_data : (int)sent/size_data;
-        frame->ndata = csp_hton32((uint32_t)data_sent);
+
+        frame->ndata = (type ==TM_TYPE_PAYLOAD) ? csp_hton32((uint32_t)data_sent) : csp_hton32((uint32_t)n_data);
+
         memcpy(frame->data.data8, data, sent);
 
         // Send packet
@@ -258,7 +260,9 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
 
         // Process more data
         len -= sent;
-        n_data -= data_sent;
+        if (type == TM_TYPE_PAYLOAD) {
+            n_data -= data_sent;
+        }
         data += sent;
 
         if(nframe%SCH_COM_MAX_PACKETS == 0)

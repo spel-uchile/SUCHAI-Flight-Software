@@ -18,6 +18,7 @@
 
 #include "drivers.h"
 #include "repoCommand.h"
+#include "cmdTM.h"
 
 /**
  * Fixed size of one CSP frame is 200. A frame contains not only data but also

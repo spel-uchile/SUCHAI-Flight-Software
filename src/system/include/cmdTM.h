@@ -22,6 +22,7 @@
 #define TM_TYPE_STATUS  1
 #define TM_TYPE_HELP    2
 #define TM_TYPE_PAYLOAD 10
+#define TM_TYPE_FILE 100
 
 /**
  * Register TM commands
@@ -130,4 +131,18 @@ int tm_set_ack(char *fmt, char *params, int nparams);
 int tm_get_single(char *fmt, char *params, int nparams);
 
 int tm_send_cmds(char *fmt, char *params, int nparms);
+
+#ifdef LINUX
+
+/**
+ * Send a file usign libcsp network
+ *
+ * @param fmt %s %u
+ * @param params "<filename> <node>"
+ * @param nparams 2
+ * @return CMD_OK or CMD_FAIL
+ */
+int tm_send_file(char *fmt, char *params, int nparams);
+#endif
+
 #endif //CMDTM_H

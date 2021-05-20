@@ -242,6 +242,33 @@ static void com_receive_tm(csp_packet_t *packet)
             dat_add_payload_sample((frame->data.data8)+delay, payload); //Save next struct
         }
     }
+    else if(frame->type == TM_TYPE_FILE)
+    {
+        print_buff(frame->data.data8, COM_FRAME_MAX_LEN);
+#ifdef LINUX
+        FILE *fptr;
+        char fname[100] = "testfile.jpg";
+
+
+        fptr = fopen(fname,"rb");
+
+        if(fptr == NULL) {
+            fptr = fopen(fname,"wb");
+        } else {
+            if (frame->nframe != 1) {
+                fclose(fptr);
+                fptr = fopen(fname,"ab");
+            }
+        }
+
+        int cur_size = (int) ftell(fptr);
+        int written = fwrite(frame->data.data8, 1, COM_FRAME_MAX_LEN, fptr);
+
+        LOGI(tag, "current file size: %d, %d", cur_size, written);
+
+        fclose(fptr);
+#endif
+    }
     else
     {
         LOGW(tag, "Undefined telemetry type %d!", frame->type);
