@@ -60,40 +60,37 @@ int obc_ident(char* fmt, char* params, int nparams)
 
 int obc_debug(char *fmt, char *params, int nparams)
 {
-    if(params == NULL)
+    int dbg_type;
+    if(params == NULL || sscanf(params, fmt, &dbg_type) != nparams)
     {
         LOGE(tag, "Parameter null");
         return CMD_FAIL;
     }
-    int dbg_type;
-    if(sscanf(params, fmt, &dbg_type) == nparams)
-    {
-        #ifdef AVR32
-            switch(dbg_type)
-            {
-                case 0: LED_Toggle(LED0); break;
-                case 1: LED_Toggle(LED1); break;
-                case 2: LED_Toggle(LED2); break;
-                case 3: LED_Toggle(LED3); break;
-                default: LED_Toggle(LED0);
-            }
-        #endif
-        #ifdef NANOMIND
-            if(dbg_type <= GS_A3200_LED_A)
-                gs_a3200_led_toggle((gs_a3200_led_t)dbg_type);
-        #endif
-        #ifdef ESP32
-            static int level = 0;
-            level = ~level;
-            gpio_set_level(BLINK_GPIO, level);
-        #endif
-        #ifdef LINUX
-            LOGV(tag, "OBC Debug (%d)", dbg_type);
-        #endif
-        return CMD_OK;
-    }
-    LOGW(tag, "Command obc_debug used with invalid param!");
-    return CMD_FAIL;
+
+    #ifdef AVR32
+        switch(dbg_type)
+        {
+            case 0: LED_Toggle(LED0); break;
+            case 1: LED_Toggle(LED1); break;
+            case 2: LED_Toggle(LED2); break;
+            case 3: LED_Toggle(LED3); break;
+            default: LED_Toggle(LED0);
+        }
+    #endif
+    #ifdef NANOMIND
+        if(dbg_type <= GS_A3200_LED_A)
+            gs_a3200_led_toggle((gs_a3200_led_t)dbg_type);
+    #endif
+    #ifdef ESP32
+        static int level = 0;
+        level = ~level;
+        gpio_set_level(BLINK_GPIO, level);
+    #endif
+    #ifdef LINUX
+        LOGV(tag, "OBC Debug (%d)", dbg_type);
+    #endif
+    return CMD_OK;
+
 }
 
 int obc_reset_wdt(char *fmt, char *params, int nparams)
@@ -170,24 +167,18 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
 
 int obc_set_time(char* fmt, char* params,int nparams)
 {
-    if(params == NULL)
-    {
-        LOGE(tag, "Parameter null");
-        return CMD_FAIL;
-    }
     int time_to_set;
-    if(sscanf(params, fmt, &time_to_set) == nparams){
-        int rc = dat_set_time(time_to_set);
-        if (rc == 0)
-            return CMD_OK;
-        else
-            return CMD_FAIL;
-    }
-    else
+    if(params == NULL || sscanf(params, fmt, &time_to_set) != nparams)
     {
-        LOGW(tag, "set_time used with invalid params: %s", params);
+        LOGE(tag, "Invalid params");
         return CMD_FAIL;
     }
+
+    int rc = dat_set_time(time_to_set);
+    if (rc == 0)
+        return CMD_OK;
+    else
+        return CMD_ERROR;
 }
 
 int obc_get_time(char *fmt, char *params, int nparams)
@@ -235,19 +226,23 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
 #ifdef NANOMIND
     int channel;
     int duty;
-    if(sscanf(params, fmt, &channel, &duty) == nparams)
+    if(params == NULL || sscanf(params, fmt, &channel, &duty) != nparams)
     {
-        LOGI(tag, "Setting duty %d to Channel %d", duty, channel);
-        gs_a3200_pwm_enable(channel);
-        gs_a3200_pwm_set_duty(channel, duty);
-        return CMD_OK;
-
-    }
-    else
-    {
-        LOGW(tag, "set_pwm_duty used with invalid params: %s", params);
+        LOGW(tag, "set_pwm_duty used with invalid params!");
         return CMD_FAIL;
     }
+
+    if(channel < 0 || channel > 2 || duty < -100 || duty > 100)
+    {
+        LOGW(tag, "set_pwm_duty params out of range %d %d!", channel, duty);
+        return CMD_FAIL;
+    }
+
+    LOGI(tag, "Setting duty %d to Channel %d", duty, channel);
+    gs_a3200_pwm_enable(channel);
+    gs_a3200_pwm_set_duty(channel, duty);
+    return CMD_OK;
+
 #else
     LOGW(tag, "Command not supported!");
     return CMD_FAIL;
@@ -260,15 +255,15 @@ int obc_set_pwm_freq(char* fmt, char* params, int nparams)
     int channel;
     float freq;
     
-    if(sscanf(params, fmt, &channel, &freq) != nparams)
-        return CMD_ERROR;
+    if(params == NULL || sscanf(params, fmt, &channel, &freq) != nparams)
+        return CMD_FAIL;
     
     /* The pwm cant handle frequencies above 433 Hz or below 0.1 Hz */
     if(channel > 2 || channel < 0 || freq > 433.0 || freq < 0.1)
     {
         LOGW(tag, "Parameters out of range: 0 <= channel <= 2 (%d), \
              0.1 <= freq <= 433.0 (%.4f)", channel, freq);
-        return CMD_ERROR;
+        return CMD_FAIL;
     }
     
     float actual_freq = gs_a3200_pwm_set_freq(channel, freq);
@@ -283,11 +278,8 @@ int obc_pwm_pwr(char *fmt, char *params, int nparams)
 {
 #ifdef NANOMIND
     int enable;
-    if(params == NULL)
-        return CMD_ERROR;
-    
-    if(sscanf(params, fmt, &enable) != nparams)
-        return CMD_ERROR;
+    if(params == NULL || sscanf(params, fmt, &enable) != nparams)
+        return CMD_FAIL;
     
     /* Turn on/off power channel */
     LOGI(tag, "PWM enabled: %d", enable>0 ? 1:0);
@@ -452,6 +444,7 @@ int obc_get_tle(char *fmt, char *params, int nparams)
 {
     LOGI(tag, "%s", tle1);
     LOGI(tag, "%s", tle2);
+    return CMD_OK;
 }
 
 int obc_set_tle(char *fmt, char *params, int nparams)
