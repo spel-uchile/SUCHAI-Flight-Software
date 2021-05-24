@@ -116,12 +116,14 @@ typedef enum dat_status_address_enum {
     dat_drp_ads,                  ///< ADS data index
     dat_drp_eps,                  ///< EPS data index
     dat_drp_sta,                 ///< Status data index
+    dat_drp_stt,
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
     dat_drp_ack_ads,              ///< ADS data index acknowledge
     dat_drp_ack_eps,              ///< EPS data index acknowledge
     dat_drp_ack_sta,             ///< Status data index acknowledge
+    dat_drp_ack_stt,
 
     /// Sample Machine: Current state of sample status_machine
     dat_drp_mach_action,          ///< Current action of sampling state machine
@@ -225,7 +227,8 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_drp_ads,           "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
         {dat_drp_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
-        {dat_drp_sta,           "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Langmuir data index
+        {dat_drp_sta,           "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
+        {dat_drp_stt,           "drp_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
@@ -247,7 +250,8 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
-        {dat_drp_ack_sta,       "drp_ack_sta",       'u', DAT_IS_CONFIG, 0},          ///< Langmuir data index acknowledge
+        {dat_drp_ack_sta,       "drp_ack_sta",       'u', DAT_IS_CONFIG, 0},          ///< Status data index acknowledge
+        {dat_drp_ack_stt,       "drp_ack_stt",       'u', DAT_IS_CONFIG, 0},          ///< Stt data index acknowledge
         {dat_drp_mach_step,     "drp_mach_step",     'i', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
 };
@@ -275,6 +279,7 @@ typedef enum payload_id {
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
     sta_sensors,            ///< Status Variables
+    stt_sensors,
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -330,6 +335,19 @@ typedef struct __attribute__((__packed__)) sta_data {
     uint32_t timestamp;
     uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
 } sta_data_t;
+
+
+/**
+ * Struct for storing data collected by stt.
+ */
+typedef struct __attribute__((__packed__)) stt_data {
+    uint32_t index;
+    uint32_t timestamp;
+    float ra;
+    float dec;
+    float roll;
+    float time;
+} stt_data_t;
 
 
 /**
