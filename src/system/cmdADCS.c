@@ -31,7 +31,7 @@ static const char* tag = "cmdADCS";
 void cmd_adcs_init(void)
 {
 //    cmd_add("adcs_point", adcs_point, "", 0);
-//    cmd_add("adcs_quat", adcs_get_quaternion, "", 0);
+    cmd_add("adcs_quat", adcs_get_quaternion, "", 0);
     cmd_add("adcs_omega", adcs_get_omega, "", 0);
     cmd_add("adcs_mag", adcs_get_mag, "", 0);
     cmd_add("adcs_do_control", adcs_control_torque, "%lf", 1);
@@ -106,11 +106,12 @@ int adcs_get_quaternion(char* fmt, char* params, int nparams)
 
 int adcs_get_omega(char* fmt, char* params, int nparams)
 {
-    gs_error_t result;
+#ifdef NANOMIND
+    int result;
     gs_mpu3300_gyro_t gyro_reading;
     result = gs_mpu3300_read_gyro(&gyro_reading);
 
-    if(result == GS_OK)
+    if(result == 0)
     {
         vector3_t omega;
         omega.v0 = gyro_reading.gyro_x;
@@ -120,10 +121,13 @@ int adcs_get_omega(char* fmt, char* params, int nparams)
         return CMD_OK;
     }
     return CMD_FAIL;
+#endif
+    return CMD_OK;
 }
 
 int adcs_get_mag(char* fmt, char* params, int nparams)
 {
+#ifdef NANOMIND
     gs_error_t result;
     gs_hmc5843_data_t hmc_reading;
     result = gs_hmc5843_read_single(&hmc_reading);
@@ -138,6 +142,8 @@ int adcs_get_mag(char* fmt, char* params, int nparams)
         return CMD_OK;
     }
     return CMD_FAIL;
+#endif
+    return CMD_OK;
 }
 
 int adcs_control_torque(char* fmt, char* params, int nparams)
