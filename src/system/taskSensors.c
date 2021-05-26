@@ -99,7 +99,7 @@ void taskSensors(void *param)
                                                        status_machine.active_payloads,
                                                        status_machine.total_sensors)) {
                         cmd_get = cmd_get_str(get_cmds[i]);
-                        char cmd_args[5];
+                        char cmd_args[20];
                         sprintf(cmd_args, " %d", i);
                         cmd_add_params_str(cmd_get, cmd_args);
                         cmd_send(cmd_get);

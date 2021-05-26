@@ -207,7 +207,7 @@ int take_sample(char *fmt, char *params, int nparams)
             struct sta_data data_sta = {index_sta, curr_time};
             memcpy(data_sta.sta_buff, status_buff, sizeof(status_buff));
             ret = dat_add_payload_sample(&data_sta, sta_sensors);
-            if (ret != 0) {
+            if (ret == -1) {
                 return CMD_FAIL;
             }
             return CMD_OK;
