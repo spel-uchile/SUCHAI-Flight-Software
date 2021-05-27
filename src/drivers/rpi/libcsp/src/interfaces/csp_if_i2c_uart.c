@@ -32,9 +32,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "i2c_usart_linux.h"
 #include "csp_if_i2c_uart.h"
 #include "log_utils.h"
+#include "osDelay.h"
 
 static int i2c_uart_lock_init = 0;
 static csp_bin_sem_handle_t i2c_uart_lock;
+static csp_bin_sem_handle_t i2c_uart_ans_lock;
 
 /**
  * Receive a CSP packet and cast to a I2C_UART frame, ready to be transmitted
@@ -87,10 +89,19 @@ int csp_i2c_uart_tx(csp_iface_t * interface, csp_packet_t * packet, uint32_t tim
     print_buff(buff, sizeof(i2c_uart_frame_t));
     print_buff((char *)frame->data, frame->len_tx);
     */
-    csp_bin_sem_wait(&i2c_uart_lock, 1000);
+    int rc;
+    rc = csp_bin_sem_wait(&i2c_uart_lock, 2000);
+    if(rc != CSP_SEMAPHORE_OK)
+        return CSP_ERR_DRIVER;
+
+    // Transmmit
     i2c_usart_putstr(buff, sizeof(i2c_uart_frame_t));
+    printf("[I2C_UART] Waiting lock...\n");
+    // Wait confirmation
+    rc = csp_bin_sem_wait(&i2c_uart_ans_lock, 2000);
+    printf("[I2C_UART] Released? %d\n", rc);
     csp_bin_sem_post(&i2c_uart_lock);
-    return CSP_ERR_NONE;
+    return rc == CSP_SEMAPHORE_OK ? CSP_ERR_NONE : CSP_ERR_DRIVER;
 }
 
 /**
@@ -146,16 +157,16 @@ int csp_i2c_uart_init(uint8_t addr, int handle, int speed) {
     /* Init lock only once */
     if (i2c_uart_lock_init == 0) {
         csp_bin_sem_create(&i2c_uart_lock);
+        csp_bin_sem_create(&i2c_uart_ans_lock);
+        csp_bin_sem_wait(&i2c_uart_ans_lock, CSP_INFINITY); // Just decrement the semaphore to star locked;
         i2c_uart_lock_init = 1;
     }
 
     /* Create uart */
     struct i2c_usart_conf conf;
     conf.baudrate = speed;
-    //TODO: Port depends on RPi Model
-    //conf.device = "/dev/ttyAMA0";
-    //conf.device = "/dev/ttyUSB0";
-    conf.device = "/dev/ttyS0";
+    conf.device = "/dev/serial0";
+    conf.uart_ans_lock = &i2c_uart_ans_lock;
     if(i2c_usart_init(&conf) != CSP_ERR_NONE)
     {
         printf("Error initializing USART\n");

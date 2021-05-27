@@ -18,8 +18,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <i2c_usart_linux.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,12 +28,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <termios.h>
 #include <fcntl.h>
 
-#include <csp/csp.h>
 #include <sys/time.h>
+
+#include <i2c_usart_linux.h>
 #include <csp_if_i2c_uart.h>
+
 
 static int fd = -1;
 static i2c_usart_callback_t i2c_usart_callback = NULL;
+static csp_bin_sem_handle_t *i2c_uart_ans_lock = NULL;
 
 static void *serial_rx_thread(void *vptr_args);
 
@@ -112,6 +113,8 @@ int i2c_usart_init(const struct i2c_usart_conf * conf) {
 		return CSP_ERR_DRIVER;
 	}
 
+    i2c_uart_ans_lock = conf->uart_ans_lock;
+
 	pthread_t rx_thread;
 	if (pthread_create(&rx_thread, NULL, serial_rx_thread, NULL) != 0) {
 		csp_log_error("%s: pthread_create() failed to create Rx thread for device: [%s], errno: %s", __FUNCTION__, conf->device, strerror(errno));
@@ -151,20 +154,32 @@ static void *serial_rx_thread(void *vptr_args) {
 
 	// Receive loop
 	while (1) {
+        printf("UART READING ...\n");
         memset(cbuf, 0, sizeof(i2c_uart_frame_t));
 		int nbytes = 0;
 
 		/* SYNC */
-        read(fd, cbuf, 1);
-        read(fd, cbuf+1, 1);
-        while(cbuf[0] != 'O' && cbuf[1] != 'K')
+        read(fd, cbuf+1, 1); putchar(cbuf[1]);
+        while(1)
         {
-            cbuf[0] = cbuf[1];
-            read(fd, cbuf+1, 1); putchar(cbuf[1]);
+            if(cbuf[0] == 'O' && cbuf[1] == 'K')
+                goto new_frame;
+            if(cbuf[0] == 'T' && cbuf[1] == 'X')
+                goto sync_tx;
+            else
+            {
+                cbuf[0] = cbuf[1];
+                read(fd, cbuf+1, 1); putchar(cbuf[1]);
+            }
 
         }
-        nbytes += 2;
+sync_tx:
+        printf("[I2C_UART] Releasing lock...\n");
+        csp_bin_sem_post(i2c_uart_ans_lock);
+        continue;
 
+new_frame:
+        nbytes += 2;
         /* Read the rest of the packet */
 		while(nbytes < sizeof(i2c_uart_frame_t))
         {
@@ -177,6 +192,7 @@ static void *serial_rx_thread(void *vptr_args) {
 		if (i2c_usart_callback) {
 			i2c_usart_callback(cbuf, nbytes, NULL);
 		}
+        continue;
 	}
 	return NULL;
 }

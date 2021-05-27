@@ -30,6 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include <stdint.h>
+#include <csp/csp.h>
+#include <csp/arch/csp_semaphore.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +53,8 @@ struct i2c_usart_conf {
     uint8_t paritysetting;
     //! Enable parity checking (Windows only).
     uint8_t checkparity;
+    //! Sync semaphore
+    csp_bin_sem_handle_t *uart_ans_lock;
 };
 
 /**
