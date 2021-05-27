@@ -429,7 +429,7 @@ int storage_repo_get_value_idx(int index, char *table)
     if(rc == SQLITE_ROW)
         value = sqlite3_column_int(stmt, 0);
     else
-    LOGE(tag, "Some error encountered (rc=%d)", rc);
+    LOGE(tag, "Some error encountered (rc=%d) getting status var %d", rc, index);
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
