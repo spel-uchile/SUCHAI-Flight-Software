@@ -154,12 +154,12 @@ static void *serial_rx_thread(void *vptr_args) {
 
 	// Receive loop
 	while (1) {
-        printf("UART READING ...\n");
+        /** printf("UART READING ...\n"); */
         memset(cbuf, 0, sizeof(i2c_uart_frame_t));
 		int nbytes = 0;
 
 		/* SYNC */
-        read(fd, cbuf+1, 1); putchar(cbuf[1]);
+        read(fd, cbuf+1, 1); //putchar(cbuf[1]);
         while(1)
         {
             if(cbuf[0] == 'O' && cbuf[1] == 'K')
@@ -169,12 +169,12 @@ static void *serial_rx_thread(void *vptr_args) {
             else
             {
                 cbuf[0] = cbuf[1];
-                read(fd, cbuf+1, 1); putchar(cbuf[1]);
+                read(fd, cbuf+1, 1); //putchar(cbuf[1]);
             }
 
         }
 sync_tx:
-        printf("[I2C_UART] Releasing lock...\n");
+        /** printf("[I2C_UART] Releasing lock...\n"); */
         csp_bin_sem_post(i2c_uart_ans_lock);
         continue;
 

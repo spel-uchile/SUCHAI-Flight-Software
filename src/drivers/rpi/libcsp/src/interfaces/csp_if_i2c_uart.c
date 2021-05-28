@@ -96,12 +96,23 @@ int csp_i2c_uart_tx(csp_iface_t * interface, csp_packet_t * packet, uint32_t tim
 
     // Transmmit
     i2c_usart_putstr(buff, sizeof(i2c_uart_frame_t));
-    printf("[I2C_UART] Waiting lock...\n");
+
     // Wait confirmation
+    /** printf("[I2C_UART] Waiting lock...\n");*/
     rc = csp_bin_sem_wait(&i2c_uart_ans_lock, 2000);
-    printf("[I2C_UART] Released? %d\n", rc);
+    /** printf("[I2C_UART] Released? %d\n", rc); */
     csp_bin_sem_post(&i2c_uart_lock);
-    return rc == CSP_SEMAPHORE_OK ? CSP_ERR_NONE : CSP_ERR_DRIVER;
+
+    // Confirmation was not received
+    if(rc != CSP_SEMAPHORE_OK)
+    {
+        csp_log_error("Error sending packet %p (%d)", packet, rc);
+        return CSP_ERR_DRIVER;
+    }
+
+    // Free the packet if the transmission was successful
+    csp_buffer_free(packet);
+    return CSP_ERR_NONE;
 }
 
 /**
