@@ -32,6 +32,20 @@
 #include "repoCommand.h"
 #include "os/os.h"
 
+typedef enum upper_istage_cmd_enum
+{
+    IS2_START_SENSORS_TEMP=30,
+    IS2_STOP_SENSORS_TEMP,
+    IS2_GET_TEMP,
+    IS2_READ_SW_FACE,
+    IS2_BURN_FACE,
+    IS2_SET_BURN,
+    IS2_SENSORS_TEMP_STATUS
+}upper_istage_cmd_t;
+
+#define ISTAGE_UPPER_ADD 0x40
+#define ISTAGE_GSSB_TWI_HANDLER 2
+
 /**
  * Register reaction whee related (rw) commands
  */
@@ -64,6 +78,14 @@ int rw_get_current(char *fmt, char *params, int nparams);
  */
 int rw_set_speed(char *fmt, char *params, int nparams);
 
-//#endif /* CMD_RW_H */
+
+/** UPPER ISTAGE COMMANDS **/
+#ifdef SCH_USE_ISTAGE2
+int istage2_get_temp(char *fmt, char *params, int nparams);
+int istage2_get_state_panel(char *fmt, char *params, int nparams);
+int istage2_deploy_panel(char *fmt, char *params, int nparams);
+int istage2_set_deploy(char *fmt, char *params, int nparams);
+int istage2_get_sensors_status(char *fmt, char *params, int nparams);
+#endif
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_CMDRW_H

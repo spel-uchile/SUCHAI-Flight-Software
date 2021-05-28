@@ -42,6 +42,7 @@
     #define SCH_USE_NANOCOM
     #define SCH_USE_GSSB
     #define SCH_USE_RW
+    #define SCH_USE_ISTAGE2
 #endif
 
 /* System debug configurations */
