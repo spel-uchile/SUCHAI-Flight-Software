@@ -17,18 +17,18 @@
 	#include <stdint.h>
 	typedef pthread_mutex_t osSemaphore;
 
-	#define CSP_SEMAPHORE_OK 	1
-	#define CSP_SEMAPHORE_ERROR 2
-	#define CSP_MUTEX_OK 		CSP_SEMAPHORE_OK
-	#define CSP_MUTEX_ERROR		CSP_SEMAPHORE_ERROR
+	#define OS_SEMAPHORE_OK     1
+	#define OS_SEMAPHORE_ERROR  2
+	#define OS_MUTEX_OK 		OS_SEMAPHORE_OK
+	#define OS_MUTEX_ERROR		OS_SEMAPHORE_ERROR
 #else
 	#include "FreeRTOS.h"
 	#include "queue.h"
 	#include "semphr.h"
 	typedef xSemaphoreHandle osSemaphore;
 
-	#define CSP_SEMAPHORE_OK 	pdPASS
-    #define CSP_SEMAPHORE_ERROR	pdFAIL
+	#define OS_SEMAPHORE_OK 	pdPASS
+    #define OS_SEMAPHORE_ERROR	pdFAIL
     #define CSP_MUTEX_OK		CSP_SEMAPHORE_OK
     #define CSP_MUTEX_ERROR		CSP_SEMAPHORE_ERROR
 #endif

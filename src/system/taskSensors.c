@@ -47,7 +47,7 @@ void taskSensors(void *param)
     }
 //    status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 1, 3600, -1, nsensors};
 
-    if(osSemaphoreCreate(&repo_machine_sem) != CSP_SEMAPHORE_OK)
+    if(osSemaphoreCreate(&repo_machine_sem) != OS_SEMAPHORE_OK)
     {
         LOGE(tag, "Unable to create system status repository mutex");
     }

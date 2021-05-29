@@ -46,7 +46,7 @@ dat_stmachine_t status_machine;
 void dat_repo_init(void)
 {
     // Init repository mutex
-    if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
+    if(osSemaphoreCreate(&repo_data_sem) != OS_SEMAPHORE_OK)
         LOGE(tag, "Unable to create system status repository mutex");
 
 
