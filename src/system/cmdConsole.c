@@ -39,7 +39,7 @@ int con_debug_msg(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Parameter null");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     printf("%s", params);
@@ -61,10 +61,10 @@ int con_set_logger(char *fmt, char *params, int nparams)
     int log_node;
 
     if(params == NULL || (sscanf(params, fmt, &log_lvl, &log_node) != nparams))
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     if(log_lvl > LOG_LVL_VERBOSE)
-        return CMD_FAIL;
+        return CMD_ERROR;
 
     log_set((log_level_t)log_lvl, log_node);
     return CMD_OK;

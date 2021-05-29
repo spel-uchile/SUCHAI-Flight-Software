@@ -35,22 +35,22 @@ void cmd_sensors_init(void)
 int set_state(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     unsigned int action;
     unsigned int step;
     int nsamples;
     if(nparams == sscanf(params, fmt, &action, &step, &nsamples)){
         int rc = dat_set_stmachine_state(action, step, nsamples);
-        return rc ? CMD_OK : CMD_FAIL;
+        return rc ? CMD_OK : CMD_ERROR;
     }
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int activate_sensor(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     int payload;
     int activate;
@@ -75,7 +75,7 @@ int activate_sensor(char *fmt, char *params, int nparams)
         }
 
         if (payload >= status_machine.total_sensors ) {
-            return CMD_ERROR;
+            return CMD_SYNTAX_ERROR;
         }
 
         if( activate == 1  && !dat_stmachine_is_sensor_active(payload,
@@ -94,13 +94,14 @@ int activate_sensor(char *fmt, char *params, int nparams)
             return CMD_OK;
         }
     }
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int take_sample(char *fmt, char *params, int nparams)
 {
+    //TODO: SEPARATE EACH TAKE SAMPLE IN A FUNCTION
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     int payload;
     if(nparams == sscanf(params, fmt, &payload)) {
@@ -108,7 +109,7 @@ int take_sample(char *fmt, char *params, int nparams)
         int ret;
 
         if( payload >= last_sensor) {
-            return CMD_ERROR;
+            return CMD_SYNTAX_ERROR;
         }
 
         int curr_time =  (int)time(NULL);
@@ -128,7 +129,7 @@ int take_sample(char *fmt, char *params, int nparams)
             ret = dat_add_payload_sample(&data_temp, temp_sensors);
 
             if (ret != 0) {
-                return CMD_FAIL;
+                return CMD_ERROR;
             }
             return CMD_OK;
         }
@@ -156,7 +157,7 @@ int take_sample(char *fmt, char *params, int nparams)
                                         mag_x, mag_y, mag_z};
             ret = dat_add_payload_sample(&data_ads, ads_sensors);
             if (ret != 0) {
-                return CMD_FAIL;
+                return CMD_ERROR;
             }
             return CMD_OK;
         }
@@ -190,7 +191,7 @@ int take_sample(char *fmt, char *params, int nparams)
                                         temp1, temp2, temp3, temp4, temp5, temp6};
             ret = dat_add_payload_sample(&data_eps, eps_sensors);
             if (ret != 0) {
-                return CMD_FAIL;
+                return CMD_ERROR;
             }
             return CMD_OK;
         } else if (payload == 3) {
@@ -208,12 +209,12 @@ int take_sample(char *fmt, char *params, int nparams)
             memcpy(data_sta.sta_buff, status_buff, sizeof(status_buff));
             ret = dat_add_payload_sample(&data_sta, sta_sensors);
             if (ret == -1) {
-                return CMD_FAIL;
+                return CMD_ERROR;
             }
             return CMD_OK;
         }
     }
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int init_dummy_sensor(char *fmt, char *params, int nparams)

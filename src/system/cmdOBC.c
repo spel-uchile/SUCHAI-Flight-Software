@@ -64,7 +64,7 @@ int obc_debug(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &dbg_type) != nparams)
     {
         LOGE(tag, "Parameter null");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     #ifdef AVR32
@@ -95,14 +95,13 @@ int obc_debug(char *fmt, char *params, int nparams)
 
 int obc_reset_wdt(char *fmt, char *params, int nparams)
 {
-    int rc = CMD_OK;
     #ifdef NANOMIND
        wdt_clear();
     #endif
     #ifdef AVR32
        wdt_clear();
     #endif
-    return rc;
+    return CMD_OK;
 }
 
 int obc_reset(char *fmt, char *params, int nparams)
@@ -171,7 +170,7 @@ int obc_set_time(char* fmt, char* params,int nparams)
     if(params == NULL || sscanf(params, fmt, &time_to_set) != nparams)
     {
         LOGE(tag, "Invalid params");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     int rc = dat_set_time(time_to_set);
@@ -190,7 +189,7 @@ int obc_get_time(char *fmt, char *params, int nparams)
     }
 
     int rc = dat_show_time(format);
-    return (rc == 0) ? CMD_OK : CMD_FAIL;
+    return (rc == 0) ? CMD_OK : CMD_ERROR;
 }
 
 int obc_system(char* fmt, char* params, int nparams)
@@ -202,7 +201,7 @@ int obc_system(char* fmt, char* params, int nparams)
         if(rc < 0)
         {
             LOGE(tag, "Call to system failed! (%d)", rc)
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
         else
         {
@@ -213,11 +212,11 @@ int obc_system(char* fmt, char* params, int nparams)
     else
     {
         LOGE(tag, "Parameter null");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 #else
     LOGW(tag, "Command not suported!");
-    return CMD_FAIL;
+    return CMD_ERROR;
 #endif
 }
 
@@ -229,13 +228,13 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
     if(params == NULL || sscanf(params, fmt, &channel, &duty) != nparams)
     {
         LOGW(tag, "set_pwm_duty used with invalid params!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     if(channel < 0 || channel > 2 || duty < -100 || duty > 100)
     {
         LOGW(tag, "set_pwm_duty params out of range %d %d!", channel, duty);
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     LOGI(tag, "Setting duty %d to Channel %d", duty, channel);
@@ -245,7 +244,7 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
 
 #else
     LOGW(tag, "Command not supported!");
-    return CMD_FAIL;
+    return CMD_ERROR;
 #endif
 }
 
@@ -256,21 +255,21 @@ int obc_set_pwm_freq(char* fmt, char* params, int nparams)
     float freq;
     
     if(params == NULL || sscanf(params, fmt, &channel, &freq) != nparams)
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     
     /* The pwm cant handle frequencies above 433 Hz or below 0.1 Hz */
     if(channel > 2 || channel < 0 || freq > 433.0 || freq < 0.1)
     {
         LOGW(tag, "Parameters out of range: 0 <= channel <= 2 (%d), \
              0.1 <= freq <= 433.0 (%.4f)", channel, freq);
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
     
     float actual_freq = gs_a3200_pwm_set_freq(channel, freq);
     LOGI(tag, "PWM %d Freq set to: %.4f", channel, actual_freq);
     return CMD_OK;
 #else
-    return CMD_FAIL;
+    return CMD_ERROR;
 #endif
 }
 
@@ -279,7 +278,7 @@ int obc_pwm_pwr(char *fmt, char *params, int nparams)
 #ifdef NANOMIND
     int enable;
     if(params == NULL || sscanf(params, fmt, &enable) != nparams)
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     
     /* Turn on/off power channel */
     LOGI(tag, "PWM enabled: %d", enable>0 ? 1:0);
@@ -290,7 +289,7 @@ int obc_pwm_pwr(char *fmt, char *params, int nparams)
     return CMD_OK;
 #else
     LOGW(tag, "Command not supported!");
-    return CMD_FAIL;
+    return CMD_ERROR;
 #endif
 }
 
@@ -326,7 +325,7 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
     ret = dat_add_payload_sample(&data_temp, temp_sensors);
 
     if(ret != 0) {
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     /* Save ADCS data */
@@ -337,7 +336,7 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
     ret = dat_add_payload_sample(&data_ads, ads_sensors);
 
     if(ret != 0) {
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     /* Print readings */
@@ -463,13 +462,13 @@ int obc_set_tle(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &line_n, &next) != nparams-1)
     {
         LOGE(tag, "Error parsing parameters!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     if(strlen(params) != 69)
     {
         LOGE(tag, "Invalid TLE line len! (%d)", strlen(params));
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     if(line_n == 1)
@@ -485,7 +484,7 @@ int obc_set_tle(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "Invalid TLE Line parameter");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     return CMD_OK;
@@ -501,7 +500,7 @@ int obc_update_tle(char *fmt, char *params, int nparams)
     if(tle.sgp4Error != 0)
     {
         dat_set_system_var(dat_ads_tle_epoch, 0);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     LOGV(tag, "Updated to epoch %.8f (%d)", tle.epoch, (int)(tle.epoch/1000.0));
@@ -521,7 +520,7 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     int ts=0;
 
     if(params != NULL && sscanf(params, fmt, &ts) != nparams)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     if(ts == 0)
         ts = dat_get_time();
@@ -543,7 +542,7 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     LOGD(tag, "Er: %d", tle.rec.error);
 
     if(tle.sgp4Error != 0)
-        return CMD_FAIL;
+        return CMD_ERROR;
 
     //TODO: Use value32_t instead
     value pos[3] = {(float)r[0], (float)r[1], (float)r[2]};

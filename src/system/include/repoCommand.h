@@ -55,11 +55,11 @@
 
 /* Command definitions */
 /**
- * Define return the command
+ * Define commands return values
  */
-#define CMD_OK 1        ///< Command executed successfully
-#define CMD_FAIL 0      ///< Command not executed as expected
-#define CMD_ERROR -1    ///< Command returned an error
+#define CMD_OK 1             ///< Command executed successfully
+#define CMD_ERROR 0          ///< Command not executed as expected
+#define CMD_SYNTAX_ERROR -1  ///< Command parameters syntax error
 
 /**
  *  Defines the prototype of a command

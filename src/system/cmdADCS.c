@@ -46,7 +46,7 @@ int adcs_point(char* fmt, char* params, int nparams)
 {
     csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
     if(packet == NULL)
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     memset(packet->data, 0, COM_FRAME_MAX_LEN);
 
     vector3_t r;
@@ -63,7 +63,7 @@ int adcs_point(char* fmt, char* params, int nparams)
     if(rc != 0)
     {
         csp_buffer_free((void *)packet);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     return CMD_OK;
@@ -101,7 +101,7 @@ int adcs_get_quaternion(char* fmt, char* params, int nparams)
 
     free(out_buff);
     free(in_buff);
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int adcs_get_omega(char* fmt, char* params, int nparams)
@@ -120,7 +120,7 @@ int adcs_get_omega(char* fmt, char* params, int nparams)
         _set_sat_vector(&omega, dat_ads_omega_x);
         return CMD_OK;
     }
-    return CMD_FAIL;
+    return CMD_ERROR;
 #endif
     return CMD_OK;
 }
@@ -141,7 +141,7 @@ int adcs_get_mag(char* fmt, char* params, int nparams)
         _set_sat_vector(&mag, dat_ads_mag_x);
         return CMD_OK;
     }
-    return CMD_FAIL;
+    return CMD_ERROR;
 #endif
     return CMD_OK;
 }
@@ -158,7 +158,7 @@ int adcs_control_torque(char* fmt, char* params, int nparams)
     mat_set_diag(&P_omega, 0.003, 0.003, 0.003);
 
     if(params == NULL || sscanf(params, fmt, &ctrl_cycle) != nparams)
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
 
     // PARAMETERS
     quaternion_t q_i2b_est; // Current quaternion. Read as from ADCS
@@ -216,7 +216,7 @@ int adcs_control_torque(char* fmt, char* params, int nparams)
 
     csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
     if(packet == NULL)
-        return CMD_FAIL;
+        return CMD_ERROR;
 
     int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
                        "adcs_set_torque %.06f %.06f %.06f",
@@ -230,7 +230,7 @@ int adcs_control_torque(char* fmt, char* params, int nparams)
     if(rc != 0)
     {
         csp_buffer_free((void *)packet);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     return CMD_OK;
@@ -305,7 +305,7 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
 
     csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
     if(packet == NULL)
-        return CMD_FAIL;
+        return CMD_ERROR;
 
     int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
                        "adcs_set_mag_moment %.06f %.06f %.06f",
@@ -355,7 +355,7 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
     if(rc != 0)
     {
         csp_buffer_free((void *)packet);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     return CMD_OK;
@@ -465,7 +465,7 @@ int adcs_send_attitude(char* fmt, char* params, int nparams)
 
     csp_packet_t *packet = csp_buffer_get(COM_FRAME_MAX_LEN);
     if(packet == NULL)
-        return CMD_FAIL;
+        return CMD_ERROR;
 
     int len = snprintf(packet->data, COM_FRAME_MAX_LEN,
                        "adcs_set_attitude %lf %lf %lf %lf %lf %lf %lf %lf",
@@ -480,7 +480,7 @@ int adcs_send_attitude(char* fmt, char* params, int nparams)
     if(rc != 0)
     {
         csp_buffer_free((void *)packet);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     return CMD_OK;

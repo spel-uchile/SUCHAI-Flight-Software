@@ -37,7 +37,7 @@ void cmd_tm_init(void);
  * @param fmt Str. Parameters format: "%d"
  * @param param Str. Parameters as string, node to send TM: <node>. Ex: "10"
  * @param nparams Int. Number of parameters: 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int tm_send_status(char *fmt, char *params, int nparams);
 
@@ -49,7 +49,7 @@ int tm_send_status(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format: "%d %s"
  * @param param Str. Parameters as string, node to send TM and variable name: <node> <variable name>. Ex: "10 obc_last_reset"
  * @param nparams Int. Number of parameters: 2
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int tm_send_var(char *fmt, char *params, int nparams);
 
@@ -60,7 +60,7 @@ int tm_send_var(char *fmt, char *params, int nparams);
  * @param param char *. Parameters as pointer to raw data. Receives a
  * status_t structure
  * @param nparams Int. Not used.
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int tm_parse_status(char *fmt, char *params, int nparams);
 
@@ -71,7 +71,7 @@ int tm_parse_status(char *fmt, char *params, int nparams);
  * @param param char *. Parameters as pointer to raw data. Receives a
  * status_t structure
  * @param nparams Int. Not used.
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int tm_parse_string(char *fmt, char *params, int nparams);
 
@@ -80,7 +80,7 @@ int tm_parse_string(char *fmt, char *params, int nparams);
  * @param fmt "%u"
  * @param params "<payload> "
  * @param nparams 1
- * @return CMD_OK or CMD_FAIL
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_get_last(char *fmt, char *params, int nparams);
 
@@ -89,7 +89,7 @@ int tm_get_last(char *fmt, char *params, int nparams);
  * @param fmt "%u %u"
  * @param params "<destination node> <payload> "
  * @param nparams 2
- * @return CMD_OK or CMD_FAIL
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_send_last(char *fmt, char *params, int nparams);
 
@@ -98,7 +98,7 @@ int tm_send_last(char *fmt, char *params, int nparams);
  * @param fmt "%u %u"
  * @param params "<destination node> <payload>"
  * @param nparams 2
- * @return CMD_OK or CMD_FAIL
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_send_all(char *fmt, char *params, int nparams);
 
@@ -107,7 +107,7 @@ int tm_send_all(char *fmt, char *params, int nparams);
  * @param fmt "%u %u %u"
  * @param params "<destination node> <payload> <k samples>"
  * @param nparams 3
- * @return CMD_OK or CMD_FAIL
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_send_from(char *fmt, char *params, int nparams);
 
@@ -116,7 +116,7 @@ int tm_send_from(char *fmt, char *params, int nparams);
  * @param fmt "%u %u"
  * @param params "<payload> <k samples>"
  * @param nparams 2
- * @return CMD_OK or CMD_FAIL
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_set_ack(char *fmt, char *params, int nparams);
 
@@ -126,7 +126,7 @@ int tm_set_ack(char *fmt, char *params, int nparams);
  * @param fmt %u %u
  * @param params "<payload> <index>"
  * @param nparams 2
- * @return CMD_OK or CMD_FAIL
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_get_single(char *fmt, char *params, int nparams);
 
@@ -140,7 +140,7 @@ int tm_send_cmds(char *fmt, char *params, int nparms);
  * @param fmt %s %u
  * @param params "<filename> <node>"
  * @param nparams 2
- * @return CMD_OK or CMD_FAIL
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_send_file(char *fmt, char *params, int nparams);
 #endif

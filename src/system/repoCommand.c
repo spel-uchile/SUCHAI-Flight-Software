@@ -59,7 +59,7 @@ int cmd_add(char *name, cmdFunction function, char *fparams, int nparam)
     else
     {
         LOGW(tag, "Unable to add cmd: %s. Buffer full (%d)", name, cmd_index);
-        return CMD_ERROR;
+        return -1;
     }
 }
 
@@ -414,7 +414,7 @@ void cmd_repo_close(void)
 int cmd_null(char *fparams, char *params, int nparam)
 {
     LOGD(tag, "cmd_null was used with params format: %s and params string: %s", fparams, params);
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int cmd_print(cmd_t* cmd)

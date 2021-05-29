@@ -21,8 +21,8 @@
 #include "cmdGSSB.h"
 
 #define CMD_ERROR_NONE CMD_OK
-#define CMD_ERROR_SYNTAX  CMD_ERROR
-#define CMD_ERROR_FAIL CMD_FAIL
+#define CMD_ERROR_SYNTAX  CMD_SYNTAX_ERROR
+#define CMD_ERROR_FAIL CMD_ERROR
 #define GS_OK 0
 
 static const char* tag = "cmdGSSB";
@@ -69,7 +69,7 @@ int gssb_pwr(char *fmt, char *params, int nparams)
     int vcc_on, vcc2_on;
     if(sscanf(params, fmt, &vcc_on, &vcc2_on) != nparams)
         return CMD_ERROR_SYNTAX;
-    
+
     if (vcc_on > 0)
         gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
     else
@@ -98,7 +98,7 @@ int gssb_select_addr(char *fmt, char *params, int nparams)
     {
         if(addr > 0)
             i2c_addr = addr;
-        
+
         LOGI(tag, "Selected I2C addr %#X (%d)", i2c_addr, i2c_addr);
         return CMD_ERROR_NONE;
     }
@@ -609,7 +609,7 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
 {
     gs_gssb_istage_status_t status;
     const char *state_str;
-    
+
     if (gs_gssb_istage_status(i2c_addr, i2c_timeout_ms, &status) != GS_OK)
         return CMD_ERROR_FAIL;
 
@@ -999,7 +999,7 @@ int gssb_update_status(char *fmt, char *params, int nparams)
         return CMD_OK;
     }
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int gssb_antenna_release(char *fmt, char *params, int nparams)

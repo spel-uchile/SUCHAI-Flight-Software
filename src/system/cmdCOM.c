@@ -52,7 +52,7 @@ int com_ping(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node;
@@ -62,8 +62,10 @@ int com_ping(char *fmt, char *params, int nparams)
         LOGI(tag, "Ping to %d took %d", node, rc);
         if(rc > 0)
             return CMD_OK;
+        else
+            return CMD_ERROR;
     }
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_rpt(char *fmt, char *params, int nparams)
@@ -71,7 +73,7 @@ int com_send_rpt(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node;
@@ -87,7 +89,7 @@ int com_send_rpt(char *fmt, char *params, int nparams)
         if(packet == NULL)
         {
             LOGE(tag, "Could not allocate packet!");
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
         packet->length = (uint16_t)(msg_len+1);
         memcpy(packet->data, msg, msg_len+1);
@@ -105,12 +107,12 @@ int com_send_rpt(char *fmt, char *params, int nparams)
         {
             LOGE(tag, "Error sending data to repeater. (rc: %d)", rc);
             csp_buffer_free(packet);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
 
     LOGE(tag, "Error parsing parameters!");
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_cmd(char *fmt, char *params, int nparams)
@@ -118,7 +120,7 @@ int com_send_cmd(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node, next, n_args;
@@ -145,12 +147,12 @@ int com_send_cmd(char *fmt, char *params, int nparams)
         else
         {
             LOGE(tag, "Error sending command. (rc: %d, re: %d)", rc, rep[0]);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
 
     LOGE(tag, "Error parsing parameters!");
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_tc_frame(char *fmt, char *params, int nparams)
@@ -158,7 +160,7 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node, next, n_args;
@@ -184,12 +186,12 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
         else
         {
             LOGE(tag, "Error sending TC. (rc: %d, re: %d)", rc, rep[0]);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
 
     LOGE(tag, "Error parsing parameters! (np: %d, n: %d)", n_args, next);
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_data(char *fmt, char *params, int nparams)
@@ -197,7 +199,7 @@ int com_send_data(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint8_t rep[1] = {0};
@@ -216,7 +218,7 @@ int com_send_data(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 }
 
@@ -274,7 +276,7 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
     if(rc_conn != CSP_ERR_NONE)
         LOGE(tag, "Error closing connection! (%d)", rc_conn);
 
-    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_FAIL;
+    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_ERROR;
 }
 
 void _hton32_buff(uint32_t *buff, int len)
@@ -308,22 +310,22 @@ int com_set_node(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node;
     if(sscanf(params, fmt, &node) == nparams)
     {
         trx_node = node;
-        LOGI(tag, "TRX node set to %d", node);
+        LOGR(tag, "TRX node set to %d", node);
         return CMD_OK;
     }
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_get_node(char *fmt, char *params, int nparams)
 {
-    printf("TRX Node: %d\n", trx_node);
+    LOGR(tag, "TRX Node: %d\n", trx_node);
     return CMD_OK;
 }
 
@@ -333,7 +335,7 @@ int com_set_time_node(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &node) != nparams)
     {
         LOGE(tag, "Error parsing params!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     char cmd[SCH_CMD_MAX_STR_NAME];
@@ -371,14 +373,14 @@ int com_reset_wdt(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "Error sending GND Reset. (rc: %d)", rc);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 }
 
 int com_get_hk(char *fmt, char *params, int nparams)
 {
     //TODO: Implement
-    return CMD_FAIL;
+    return CMD_ERROR;
 }
 
 int com_get_config(char *fmt, char *params, int nparams)
@@ -391,7 +393,7 @@ int com_get_config(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     // Format: <table> <param_name>
@@ -415,7 +417,7 @@ int com_get_config(char *fmt, char *params, int nparams)
         if(param_i == NULL)
         {
             LOGW(tag, "Param %s not found in table %d", param, table);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
 
         // Actually get the parameter value
@@ -436,9 +438,10 @@ int com_get_config(char *fmt, char *params, int nparams)
         {
             LOGE(tag, "Error getting parameter %s! (rc: %d)", param, rc);
             free(out);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_set_config(char *fmt, char *params, int nparams)
@@ -453,7 +456,7 @@ int com_set_config(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     // Format: <param_name> <value>
@@ -477,7 +480,7 @@ int com_set_config(char *fmt, char *params, int nparams)
         if(param_i == NULL)
         {
             LOGW(tag, "Param %s not found in table %d!", param, table);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
 
         // Actually get the parameter value
@@ -499,9 +502,11 @@ int com_set_config(char *fmt, char *params, int nparams)
         {
             LOGE(tag, "Error setting parameter %s! (rc: %d)", param, rc);
             free(out);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
+
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_update_status_vars(char *fmt, char *params, int nparams)
@@ -647,7 +652,7 @@ int com_set_beacon(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &period, &offset) != nparams)
     {
         LOGE(tag, "Error parsing params!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
     dat_set_system_var(dat_com_bcn_period, period);
 
@@ -662,6 +667,6 @@ int com_set_beacon(char *fmt, char *params, int nparams)
     int rc_interval = com_set_config("%d %s %s", bcn_interval_configuration, 3);
     int rc_offset = com_set_config("%d %s %s", bcn_offset_configuration, 3);
 
-    return rc_interval && rc_offset;
+    return (rc_interval == CMD_OK && rc_offset == CMD_OK) ? CMD_OK : CMD_ERROR;
 }
 #endif //SCH_USE_NANOCOM

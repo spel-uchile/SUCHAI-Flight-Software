@@ -56,7 +56,7 @@ int gssb_bus_scan(char *fmt, char *params, int nparams);
  * @param fmt Str. ""
  * @param param Str. ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_read_sunsensor(char *fmt, char *params, int nparams);
 
@@ -65,7 +65,7 @@ int gssb_read_sunsensor(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_get_temp(char *fmt, char *params, int nparams);
 
@@ -74,7 +74,7 @@ int gssb_get_temp(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d"
  * @param param Str. Parameters as string: "<conf>"
  * @param nparams Int. Number of parameters 1
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_sunsensor_conf(char *fmt, char *params, int nparams);
 
@@ -84,7 +84,7 @@ int gssb_sunsensor_conf(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_sunsensor_conf_save(char *fmt, char *params, int nparams);
 
@@ -94,7 +94,7 @@ int gssb_sunsensor_conf_save(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%i"
  * @param param Str. Parameters as string: "<new_i2c_addr>"
  * @param nparams Int. Number of parameters 1
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_set_i2c_addr(char *fmt, char *params, int nparams);
 
@@ -104,7 +104,7 @@ int gssb_set_i2c_addr(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_commit_i2c_addr(char *fmt, char *params, int nparams);
 
@@ -114,7 +114,7 @@ int gssb_commit_i2c_addr(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_get_version(char *fmt, char *params, int nparams);
 
@@ -124,7 +124,7 @@ int gssb_get_version(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_get_uuid(char *fmt, char *params, int nparams);
 
@@ -134,7 +134,7 @@ int gssb_get_uuid(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_get_model(char *fmt, char *params, int nparams);
 
@@ -144,7 +144,7 @@ int gssb_get_model(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_interstage_temp(char *fmt, char *params, int nparams);
 
@@ -154,7 +154,7 @@ int gssb_interstage_temp(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_msp_outside_temp(char *fmt, char *params, int nparams);
 
@@ -163,7 +163,7 @@ int gssb_msp_outside_temp(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_msp_outside_temp_calibrate(char *fmt, char *params, int nparams);
 
@@ -172,7 +172,7 @@ int gssb_msp_outside_temp_calibrate(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_internal_temp(char *fmt, char *params, int nparams);
 
@@ -182,7 +182,7 @@ int gssb_internal_temp(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_interstage_burn(char *fmt, char *params, int nparams);
 
@@ -192,7 +192,7 @@ int gssb_interstage_burn(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_common_sun_voltage(char *fmt, char *params, int nparams);
 
@@ -201,7 +201,7 @@ int gssb_common_sun_voltage(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_interstage_get_burn_settings(char *fmt, char *params, int nparams);
 
@@ -210,7 +210,7 @@ int gssb_interstage_get_burn_settings(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d %d %d %d %d %d %d"
  * @param param Str. Parameters as string: "<std_time> <increment_ms> <short_cnt_down> <max_repeat> <rep_time_s> <switch_polarity> <reboot_deploy_cnt>"
  * @param nparams Int. Number of parameters 7
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams);
 
@@ -220,7 +220,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_interstage_arm(char *fmt, char *params, int nparams);
 
@@ -230,7 +230,7 @@ int gssb_interstage_arm(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_interstage_state(char *fmt, char *params, int nparams);
 
@@ -239,7 +239,7 @@ int gssb_interstage_state(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams);
 
@@ -249,7 +249,7 @@ int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_soft_reset(char *fmt, char *params, int nparams);
 
@@ -258,7 +258,7 @@ int gssb_soft_reset(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_interstage_get_status(char *fmt, char *params, int nparams);
 
@@ -268,7 +268,7 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param param Str. Parameters as string: ""
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int gssb_update_status(char *fmt, char *params, int nparams);
 
@@ -277,7 +277,7 @@ int gssb_update_status(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d %d %d %d"
  * @param param Str. Parameters as string: "<addr> <knife_on> <knife_off> <repeats>"
  * @param nparams Int. Number of parameters 0
- * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_FAIL in case of failures
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of errors or CMD_ERROR_SYNTAX in case of failures
  */
 int gssb_antenna_release(char *fmt, char *params, int nparams);
 

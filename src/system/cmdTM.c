@@ -45,7 +45,7 @@ int tm_send_status(char *fmt, char *params, int nparams)
     int dest_node;
     if(params == NULL || sscanf(params, fmt, &dest_node) != nparams)
     {
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     // Pack status variables to a structure
@@ -69,7 +69,7 @@ int tm_send_var(char *fmt, char *params, int nparams)
 
     if(params == NULL || sscanf(params, fmt, &dest_node, var_name) != nparams)
     {
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     // Pack status variable to a structure
@@ -86,7 +86,7 @@ int tm_send_var(char *fmt, char *params, int nparams)
 int tm_parse_status(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     com_frame_t *frame = (com_frame_t *)params;
     dat_sys_var_short_t *status_buff = (dat_sys_var_short_t *)frame->data.data8;
@@ -107,7 +107,7 @@ int tm_parse_status(char *fmt, char *params, int nparams)
 int tm_parse_string(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     com_frame_t *frame = (com_frame_t *)params;
     char *cmds_list;
@@ -204,7 +204,7 @@ int tm_get_single(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "params is null!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint32_t payload;
@@ -213,7 +213,7 @@ int tm_get_single(char *fmt, char *params, int nparams)
     if(nparams == sscanf(params, fmt, &payload, &index))
     {
         if(payload >= last_sensor) {
-            return CMD_FAIL;
+            return CMD_SYNTAX_ERROR;
         }
 
         int payload_size = data_map[payload].size;
@@ -227,7 +227,7 @@ int tm_get_single(char *fmt, char *params, int nparams)
         return CMD_OK;
     }
 
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int tm_get_last(char *fmt, char *params, int nparams)
@@ -235,20 +235,20 @@ int tm_get_last(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "params is null!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint32_t payload;
     if(nparams == sscanf(params, fmt, &payload))
     {
         if(payload >= last_sensor) {
-            return CMD_FAIL;
+            return CMD_SYNTAX_ERROR;
         }
 
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
 
         if(index_pay < 1){
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
         int payload_size = data_map[payload].size;
         char buff[payload_size];
@@ -266,7 +266,7 @@ int tm_get_last(char *fmt, char *params, int nparams)
     else
     {
         LOGW(tag, "Invalid args!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 }
 
@@ -275,7 +275,7 @@ int tm_send_last(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "params is null!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint32_t dest_node;
@@ -283,12 +283,12 @@ int tm_send_last(char *fmt, char *params, int nparams)
     if(nparams == sscanf(params, fmt, &payload, &dest_node))
     {
         if(payload >= last_sensor) {
-            return CMD_FAIL;
+            return CMD_SYNTAX_ERROR;
         }
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
 
         if(index_pay < 1){
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
 
         int structs_per_frame = (COM_FRAME_MAX_LEN) / data_map[payload].size;
@@ -302,7 +302,7 @@ int tm_send_last(char *fmt, char *params, int nparams)
     else
     {
         LOGW(tag, "Invalid args!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 }
 
@@ -311,7 +311,7 @@ int tm_send_all(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "params is null!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint32_t dest_node;
@@ -320,7 +320,7 @@ int tm_send_all(char *fmt, char *params, int nparams)
     if(nparams == sscanf(params, fmt, &payload, &dest_node)) {
 
         if(payload >= last_sensor) {
-            return CMD_FAIL;
+            return CMD_SYNTAX_ERROR;
         }
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
         int index_ack = dat_get_system_var(data_map[payload].sys_ack);
@@ -329,7 +329,7 @@ int tm_send_all(char *fmt, char *params, int nparams)
     }
     else
     {
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 }
 
@@ -338,7 +338,7 @@ int tm_send_from(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "params is null!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint32_t dest_node;
@@ -348,11 +348,11 @@ int tm_send_from(char *fmt, char *params, int nparams)
     if(nparams == sscanf(params, fmt, &payload, &dest_node, &samples)) {
 
         if(payload >= last_sensor) {
-            return CMD_FAIL;
+            return CMD_SYNTAX_ERROR;
         }
 
         if(samples < 1) {
-            return CMD_FAIL;
+            return CMD_SYNTAX_ERROR;
         }
 
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
@@ -368,7 +368,7 @@ int tm_send_from(char *fmt, char *params, int nparams)
     }
     else
     {
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 }
 
@@ -376,7 +376,7 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
     if(params == NULL)
     {
         LOGE(tag, "params is null!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint32_t payload;
@@ -386,12 +386,12 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
 
         if(payload >= last_sensor) {
             LOGE(tag, "payload not found")
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
 
         if(k_samples < 1) {
             LOGE(tag, "could not acknowledge %d", k_samples)
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
 
         int ack_pay = dat_get_system_var(data_map[payload].sys_ack);
@@ -399,11 +399,11 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
 
         if(ack_pay== -1 || index_pay==-1) {
             LOGE(tag, "something bad happen");
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
 
         if( ack_pay > k_samples) {
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
 
         if( k_samples > index_pay) {
@@ -417,18 +417,17 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
     }
     else
     {
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 }
 
 int tm_send_cmds(char *fmt, char *params, int nparams)
 {
     int node;
-    if(params != NULL && sscanf(params, fmt, &node) == nparams) {
-        int rc = _com_send_data(node, cmd_save_all(), strlen(cmd_save_all()), TM_TYPE_HELP, 1, 0);
-        return CMD_OK;
-    }
-    return CMD_ERROR;
+    if(params == NULL || sscanf(params, fmt, &node) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    return _com_send_data(node, cmd_save_all(), strlen(cmd_save_all()), TM_TYPE_HELP, 1, 0);
 }
 
 #ifdef LINUX
@@ -437,7 +436,7 @@ int tm_send_file(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "params is null!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     char file_name[100];
@@ -462,10 +461,15 @@ int tm_send_file(char *fmt, char *params, int nparams)
 
          // read 10 bytes to our buffer
         print_buff(buffer, (int)sz);
-        _com_send_data((int) node, (void*) buffer, (int)sz, TM_TYPE_FILE, n_frame, 1);
+        int rc = _com_send_data((int) node, (void*) buffer, (int)sz, TM_TYPE_FILE, n_frame, 1);
 
         free(buffer);
         fclose(fptr);
+
+        return rc;
     }
+    else
+        return CMD_SYNTAX_ERROR;
+
 }
 #endif

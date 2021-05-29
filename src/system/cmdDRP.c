@@ -41,7 +41,7 @@ void cmd_drp_init(void)
 int drp_execute_before_flight(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     int magic;
     if(nparams == sscanf(params, fmt, &magic))
@@ -67,19 +67,19 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
             else
             {
                 LOGE(tag, "%d errors in drp_ebf!", -rc);
-                return CMD_FAIL;
+                return CMD_ERROR;
             }
         }
         else
         {
             LOGW(tag, "EBF executed with incorrect magic number!")
-            return CMD_FAIL;
+            return CMD_SYNTAX_ERROR;
         }
     }
     else
     {
         LOGW(tag, "EBF executed with invalid parameter!")
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 }
 
@@ -105,7 +105,7 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &address, &value) != nparams)
     {
         LOGE(tag, "Error parsing arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     dat_status_address_t var_address = (dat_status_address_t)address;
@@ -129,7 +129,7 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "drp_update_sys_idx used with invalid index: %d", var_address);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 }
 
@@ -141,19 +141,19 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Error parsing arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     if(strlen(&params[0]) > MAX_VAR_NAME)
     {
         LOGE(tag, "drp_update_sys_var_name used with invalid name: %s", name);
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     if(sscanf(params, fmt, name, &value) != nparams)
     {
         LOGE(tag, "Error parsing arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     // Get variable definition by name
@@ -161,7 +161,7 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
     if(variable_def.status == -1)
     {
         LOGE(tag, "drp_update_sys_var_name used with invalid name: %s", name);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     // Support int and float arguments
@@ -177,7 +177,7 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
 
     // Store the variable value
     int rc = dat_set_status_var(variable_def.address, variable);
-    return rc >= 0 ? CMD_OK : CMD_FAIL;
+    return rc >= 0 ? CMD_OK : CMD_ERROR;
 }
 
 int drp_get_sys_var_name(char *fmt, char *params, int nparams)
@@ -185,12 +185,12 @@ int drp_get_sys_var_name(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Error parsing arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     if(strlen(params) > MAX_VAR_NAME) {
         LOGE(tag, "drp_get_sys_var_name used with invalid name: %s", params);
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     char name[MAX_VAR_NAME];
@@ -198,7 +198,7 @@ int drp_get_sys_var_name(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, name) != nparams)
     {
         LOGE(tag, "Error parsing arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     // Get variable definition by name
@@ -206,7 +206,7 @@ int drp_get_sys_var_name(char *fmt, char *params, int nparams)
     if(variable_def.status == -1)
     {
         LOGE(tag, "drp_update_sys_var_name used with invalid name: %s", name);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     // Support int and float arguments
@@ -222,28 +222,32 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Parameter null");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
     int value;  // Value to add
     int current;  // Current value to update
+    int rc;
 
     if(sscanf(params, fmt, &value) == nparams)
     {
         // Adds <value> to current hours alive
         current = dat_get_system_var(dat_obc_hrs_alive);
         current += value;
-        dat_set_system_var(dat_obc_hrs_alive, current);
+        rc = dat_set_system_var(dat_obc_hrs_alive, current);
 
         // Adds <value> to current hours without reset
         current = dat_get_system_var(dat_obc_hrs_wo_reset);
         current += value;
-        dat_set_system_var(dat_obc_hrs_wo_reset, current);
-        return CMD_OK;
+        rc += dat_set_system_var(dat_obc_hrs_wo_reset, current);
+        if(rc == 0)
+            return CMD_OK;
+        else
+            return CMD_ERROR;
     }
     else
     {
         LOGW(tag, "drp_update_hours_alive used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 }
 
@@ -258,9 +262,9 @@ int drp_set_deployed(char *fmt, char *params, int nparams)
     int deployed;
     if(params == NULL || sscanf(params, fmt, &deployed) != nparams)
     {
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
-    dat_set_system_var(dat_dep_deployed, deployed);
-    return CMD_OK;
+    int rc = dat_set_system_var(dat_dep_deployed, deployed);
+    return rc == 0 ? CMD_OK : CMD_ERROR;
 }

@@ -11,17 +11,17 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_CMDRW_H
 #define SUCHAI_FLIGHT_SOFTWARE_CMDRW_H
 
-//#include "drivers.h"
-//#include "config.h"
-//#include "globals.h"
-//#include "log_utils.h"
+#include "drivers.h"
+#include "config.h"
+#include "globals.h"
+#include "log_utils.h"
 #include "rwdrv10987.h"
 
 //#include "config.h"
 //#include "osDelay.h"
 
 #ifdef LINUX
-#include <stdint.h>
+    #include <stdint.h>
     #include <fcntl.h>
     #include <sys/ioctl.h>
     #include <linux/i2c-dev.h>

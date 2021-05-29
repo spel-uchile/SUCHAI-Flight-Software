@@ -69,7 +69,7 @@ void cmd_com_init(void);
  * @param fmt Str. Parameters format "%d"
  * @param param Str. Parameters as string: <node>. Ex: "10"
  * @param nparams Int. Number of parameters 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly or CMD_ERROR in case of errors
  */
 int com_ping(char *fmt, char *param, int nparams);
 
@@ -80,7 +80,7 @@ int com_ping(char *fmt, char *param, int nparams);
  * @param fmt Str. Parameters format "%d %s"
  * @param param Str. Parameters as string: "<node> <message>". Ex: "10 Hi!"
  * @param nparams Int. Number of parameters 2
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly or CMD_ERROR in case of errors
  */
 int com_send_rpt(char *fmt, char *param, int nparams);
 
@@ -91,7 +91,7 @@ int com_send_rpt(char *fmt, char *param, int nparams);
  * @param fmt Str. Parameters format "%d %s"
  * @param param Str. Parameters as string: "<node> <command> [parameters]". Ex: "10 help"
  * @param nparams Int. Number of parameters 2
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly or CMD_ERROR in case of errors
  */
 int com_send_cmd(char *fmt, char *param, int nparams);
 
@@ -110,7 +110,7 @@ int com_send_cmd(char *fmt, char *param, int nparams);
  *      Ex: "10 help;ping 1"
  * @param nparams Int. Number of parameters: 1 (assumes that %n return the next
  *                parameter pointer).
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly or CMD_ERROR in case of errors
  *
  * @code
  *      // Create the TC frame for node 1 with 4 commands
@@ -136,8 +136,7 @@ int com_send_tc_frame(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format: "" (not used)
  * @param params com_data_t *. Pointer to a com_data_t structure.
  * @param nparams int. Number of parameters: 1
- * @return CMD_OK if executed correctly (data was sent and confirmed)
- * or CMD_FAIL in case of errors.
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  *
  * @code
  *      // Create the data buffer
@@ -164,7 +163,7 @@ int com_send_data(char *fmt, char *params, int nparams);
  * @param type Telemetry type
  * @param n_data Number of struct of data in the buffer
  * @param n_frame Starting frame index
- * @return CMD_OK | CMD_FAIL | CMD_ERROR
+ * @return CMD_OK | CMD_ERROR | CMD_ERROR
  */
 int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame);
 
@@ -206,7 +205,7 @@ int com_debug(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format: "%d"
  * @param params Str. Parameters: <node>, the TRX node number
  * @param nparams Str. Number of parameters: 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
  */
 int com_set_node(char *fmt, char *params, int nparams);
 
@@ -215,7 +214,7 @@ int com_set_node(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format: "%d"
  * @param params  Str. Parameters: <node>
  * @param nparams Str. Number of parameters: 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
  */
 int com_get_node(char *fmt, char *params, int nparams);
 
@@ -237,7 +236,7 @@ int com_set_time_node(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format: "%d"
  * @param params Str. Parameters: [node], the TRX node number
  * @param nparams Str. Number of parameters: 0|1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
  *
  * @code
  *      // Function usage
@@ -281,7 +280,7 @@ int com_get_hk(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format: "%d %s"
  * @param params Str. Parameters: <table> <param_name>, the parameter name
  * @param nparams Str. Number of parameters: 2
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
  *
  * @code
  *      // Function usage
@@ -311,7 +310,7 @@ int com_get_config(char *fmt, char *params, int nparams);
  * @param params Str. Parameters: <table> <param_name> <param_value>, the parameter name
  * and value as strings.
  * @param nparams Str. Number of parameters: 3
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors.
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
  *
  * @code
  *      // Function usage

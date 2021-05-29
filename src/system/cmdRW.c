@@ -116,7 +116,7 @@ int istage2_get_state_panel(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &panel) != nparams)
     {
         LOGW(tag2, "get_state_panel used with invalid params!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     char istage_cmd[2] = {IS2_READ_SW_FACE, (char)panel};
@@ -134,7 +134,7 @@ int istage2_deploy_panel(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &panel) != nparams)
     {
         LOGW(tag2, "deploy_panel used with invalid params!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     char istage_cmd[2] = {IS2_BURN_FACE, (char)panel};
@@ -152,7 +152,7 @@ int istage2_set_deploy(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &config) != nparams)
     {
         LOGW(tag2, "deploy_panel used with invalid params!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     char istage_cmd[2] = {IS2_SET_BURN, (char)config};
