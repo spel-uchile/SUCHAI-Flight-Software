@@ -119,14 +119,17 @@ int console_read(char *buffer, int len)
     int node;
     if(sscanf(buffer, "%d: %n", &node, &next) == 1)
     {
-        printf("(%d) %s\r\n", next, buffer+next);
-        char *tmp_buff = malloc(len+1);
-        memset(tmp_buff, 0 , len+1);
-        strncpy(tmp_buff, buffer+next, len-next);
-        memset(buffer, 0, len);
-        snprintf(buffer, len, "com_send_cmd %d %s", node, tmp_buff);
-        printf("%s\r\n", buffer);
-        free(tmp_buff);
+        if(next < len)
+        {
+            printf("(%d) %s\r\n", next, buffer + next);
+            char *tmp_buff = malloc(len + 1);
+            memset(tmp_buff, 0, len + 1);
+            strncpy(tmp_buff, buffer + next, len - next);
+            memset(buffer, 0, len);
+            snprintf(buffer, len, "com_send_cmd %d %s", node, tmp_buff);
+            printf("%s\r\n", buffer);
+            free(tmp_buff);
+        }
     }
     return 0;
 }
