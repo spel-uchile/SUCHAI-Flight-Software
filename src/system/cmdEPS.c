@@ -34,9 +34,12 @@ void cmd_eps_init(void)
     cmd_add("eps_get_hk", eps_get_hk, "", 0);
     cmd_add("eps_get_config", eps_get_config, "", 0);
     cmd_add("eps_set_heater", eps_set_heater, "%d %d", 2);
-    cmd_add("eps_update_status", eps_update_status_vars, "", 0);
     cmd_add("eps_set_output", eps_set_output, "%d %d", 2);
     cmd_add("eps_set_output_all", eps_set_output_all, "%d", 1);
+    cmd_add("eps_set_vboost", eps_set_vboost, "%d", 1);
+    cmd_add("eps_set_mppt", eps_set_pptmode, "%d", 1);
+    cmd_add("eps_reset_wdt", eps_reset_wdt, "", 0);
+    cmd_add("eps_update_status", eps_update_status_vars, "", 0);
 #endif
 }
 
@@ -184,6 +187,38 @@ int eps_set_output_all(char *fmt, char *params, int nparams)
         return CMD_OK;
     else
         return CMD_ERROR;
+}
+
+int eps_set_vboost(char *fmt, char *params, int nparams)
+{
+    int vboost;
+    if(params == NULL || sscanf(params, fmt, &vboost) != nparams)
+    {
+        LOGE(tag, "Error parsing parameters!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    int rc = eps_vboost_set(vboost, vboost, vboost);
+    return rc > 0 ? CMD_OK : CMD_ERROR;
+}
+
+int eps_set_pptmode(char *fmt, char *params, int nparams)
+{
+    int pptmode;
+    if(params == NULL || sscanf(params, fmt, &pptmode) != nparams)
+    {
+        LOGE(tag, "Error parsing parameters!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    int rc = eps_pptmode_set((char)pptmode);
+    return rc > 0 ? CMD_OK : CMD_ERROR;
+}
+
+int eps_reset_wdt(char *fmt, char *params, int nparams)
+{
+    int rc = eps_wdt_gnd_reset();
+    return rc > 0 ? CMD_OK : CMD_ERROR;
 }
 
 #endif //SCH_USE_NANOPOWER

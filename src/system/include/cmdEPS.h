@@ -122,4 +122,32 @@ int eps_set_output(char *fmt, char *params, int nparams);
  */
 int eps_set_output_all(char *fmt, char *params, int nparams);
 
+/**
+ * Set boost converter fixed voltage (used in ppt manual mode) in mV
+ * @param fmt Str. Parameters format "<%d>"
+ * @param params Str. Parameters as string "<mV>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int eps_set_vboost(char *fmt, char *params, int nparams);
+
+/**
+ * Set PPT mode
+ *      0 = HW, 1 = MPPT, 2 = FIXED
+ * @param fmt Str. Parameters format "<%d>"
+ * @param params Str. Parameters as string "<0|1||2>"
+ * @param nparams Int. Number of parameters 1
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int eps_set_pptmode(char *fmt, char *params, int nparams);
+
+/**
+ * Kick EPS ground WDT
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int eps_reset_wdt(char *fmt, char *params, int nparams);
+
 #endif //CMDEPS_H
