@@ -170,7 +170,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         }
 
         int k;
-        for(int k=0; k<sizeof(frame->data.data32); k++)
+        for(k=0; k<sizeof(frame->data.data32); k++)
             frame->data.data32[k] = csp_hton32(frame->data.data32[k]);
 
         LOGI(tag, "Sending %d structs of payload %d", frame->ndata, (int)payload);

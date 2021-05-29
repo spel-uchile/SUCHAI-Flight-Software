@@ -351,16 +351,8 @@ int com_reset_wdt(char *fmt, char *params, int nparams)
     int rc, node, n_args = 0;
 
     // If no params received, try to reset the default trx_node node
-    if(params == NULL)
-        node = trx_node;
-    else
-    {
-        //format: <node>
-        n_args = sscanf(params, fmt, &node);
-        // If no params received, try to reset the current trx_node
-        if(n_args != nparams)
-            node = trx_node;
-    }
+    if(params == NULL || sscanf(params, fmt, &node) != nparams)
+        node = (int)trx_node;
 
     // Send and empty message to GNDWDT_RESET (9) port
     rc = csp_transaction(CSP_PRIO_CRITICAL, node, AX100_PORT_GNDWDT_RESET, 1000, NULL, 0, NULL, 0);
@@ -528,7 +520,8 @@ int com_update_status_vars(char *fmt, char *params, int nparams)
         _com_config_find(names[i], table, &param_i);
 
         // Warning if the parameter name was not found
-        assert(param_i != NULL);
+        if(param_i == NULL)
+            LOGE(tag, "Parameter (%d) %s not found!", table, names[i]);
 
         // Actually get the parameter value
         void *out = malloc(param_i->size);

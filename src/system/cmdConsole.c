@@ -48,24 +48,22 @@ int con_debug_msg(char *fmt, char *params, int nparams)
 
 int con_help(char *fmt, char *params, int nparams)
 {
-//    osSemaphoreTake(&log_mutex, portMAX_DELAY);
     printf("List of commands:\n");
     cmd_print_all();
-//    osSemaphoreGiven(&log_mutex);
     return CMD_OK;
 }
 
 int con_set_logger(char *fmt, char *params, int nparams)
 {
-    int log_lvl;
-    int log_node;
+    int lvl;
+    int node;
 
-    if(params == NULL || (sscanf(params, fmt, &log_lvl, &log_node) != nparams))
+    if(params == NULL || (sscanf(params, fmt, &lvl, &node) != nparams))
         return CMD_SYNTAX_ERROR;
 
-    if(log_lvl > LOG_LVL_VERBOSE)
+    if(lvl > LOG_LVL_VERBOSE)
         return CMD_ERROR;
 
-    log_set((log_level_t)log_lvl, log_node);
+    log_set((log_level_t)lvl, node);
     return CMD_OK;
 }
