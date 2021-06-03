@@ -219,13 +219,23 @@ int com_set_node(char *fmt, char *params, int nparams);
 int com_get_node(char *fmt, char *params, int nparams);
 
 /**
- *
- * @param fmt
- * @param params
- * @param nparams
- * @return
+ * Get <current_time> and send obc_set_time <current_time> to <node>
+ * @param fmt "%d"
+ * @param params <node>
+ * @param nparams 1
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
  */
 int com_set_time_node(char *fmt, char *params, int nparams);
+
+/**
+ * Download current TLE for <satellite_name> and send obc_set_tle <tle1>, obc_set_tle <tle2>, and obc_update_tle
+ * commands to <node>
+ * @param fmt "%d %s"
+ * @param params <node> <satellte_name>
+ * @param nparams 2
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
+ */
+int com_set_tle_node(char *fmt, char *params, int nparams);
 
 /**
  * Reset the TRX GND Watchdog timer at @node node by sending a CSP command to the

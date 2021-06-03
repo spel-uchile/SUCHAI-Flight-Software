@@ -38,6 +38,7 @@ void cmd_com_init(void)
     cmd_add("com_set_node", com_set_node, "%d", 1);
     cmd_add("com_get_node", com_get_node, "", 0);
     cmd_add("com_set_time_node", com_set_time_node, "%d", 1);
+    cmd_add("com_set_tle_node", com_set_tle_node, "%d %s", 2);
 #ifdef SCH_USE_NANOCOM
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%d %s", 2);
@@ -342,6 +343,101 @@ int com_set_time_node(char *fmt, char *params, int nparams)
     sprintf(cmd, "%d obc_set_time %d", node, (int)dat_get_time());
     LOGI(tag, "Sending command 'com_send_cmd %s' to %d", cmd, node);
     com_send_cmd("%d %n", cmd, 2);
+}
+
+int com_set_tle_node(char *fmt, char *params, int nparams)
+{
+    char sat[50]; // TLE sat max name is 24
+    int rc, node;
+    memset(sat, 0, 50);
+    // fmt: %s
+    if(params == NULL || sscanf(params, fmt, &node, sat) != nparams)
+    {
+        LOGE(tag, "Error parsing params!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    // Download cubesat TLE file
+    rc = system("wget https://www.celestrak.com/NORAD/elements/cubesat.txt -O /tmp/cubesat.tle");
+    if(rc < 0)
+    {
+        LOGW(tag, "Error downloading TLE file (%d)", rc);
+        return CMD_ERROR;
+    }
+
+    // Search the required satellite tle
+    char line[100];
+    snprintf(line, 100, "cat /tmp/cubesat.tle | grep -A 2 %s > /tmp/%s.tle", sat, sat);
+    LOGI(tag, "%s", line);
+    rc = system(line);
+    if(rc < 0)
+    {
+        LOGE(tag, "Error grep TLE for %s (%d)", sat, rc);
+        return CMD_ERROR;
+    }
+
+    // Read the required TLE file
+    memset(line, 0, 100);
+    snprintf(line, 100, "/tmp/%s.tle", sat);
+    LOGI(tag, "%s", line);
+    FILE *file = fopen(line, "r");
+    if(file == NULL)
+    {
+        LOGE(tag, "Error reading file %s", line);
+    }
+
+    char cmd[SCH_CMD_MAX_STR_NAME];
+    // Read satellite name... skip
+    memset(line, 0, 100);
+    char *tle = fgets(line, 100, file);
+    if(tle == NULL)
+        return CMD_ERROR;
+    LOGD(tag, line);
+
+    // Read and send first TLE line
+    memset(line, 0, 100);
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+
+    tle = fgets(line, 100, file);
+    if(tle == NULL)
+        return CMD_ERROR;
+    memset(line+69, 0, 100-69); // Clean the string from \r, \n others
+    LOGD(tag, line);
+
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_tle %s", node, line);
+    LOGD(tag, cmd);
+    rc = com_send_cmd("%d %n", cmd, 2);
+    if(rc != CMD_OK)
+        return CMD_ERROR;
+
+    // Read and send second TLE line
+    memset(line, 0, 100);
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+
+    tle = fgets(line, 100, file);
+    if(tle == NULL)
+        return CMD_ERROR;
+    memset(line+69, 0, 100-69); // Clean the string from \r, \n others
+    LOGD(tag, line);
+
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_tle %s", node, line);
+    LOGD(tag, cmd);
+    rc = com_send_cmd("%d %n", cmd, 2);
+    if(rc != CMD_OK)
+        return CMD_ERROR;
+
+    // Send update tle command
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_update_tle", node);
+    LOGD(tag, cmd);
+    rc = com_send_cmd("%d %n", cmd, 2);
+    if(rc != CMD_OK)
+        return CMD_ERROR;
+
+    fclose(file);
+
+    LOGR(tag, "TLE sent ok!")
+    return CMD_OK;
 }
 
 #ifdef SCH_USE_NANOCOM
@@ -660,6 +756,12 @@ int com_set_beacon(char *fmt, char *params, int nparams)
     int rc_interval = com_set_config("%d %s %s", bcn_interval_configuration, 3);
     int rc_offset = com_set_config("%d %s %s", bcn_offset_configuration, 3);
 
-    return (rc_interval == CMD_OK && rc_offset == CMD_OK) ? CMD_OK : CMD_ERROR;
+    if(rc_interval == CMD_OK && rc_offset == CMD_OK)
+    {
+        LOGR(tag, "Set beacon period: %d, offset %d", period, offset);
+        return CMD_OK;
+    }
+    else
+        return CMD_ERROR;
 }
 #endif //SCH_USE_NANOCOM
