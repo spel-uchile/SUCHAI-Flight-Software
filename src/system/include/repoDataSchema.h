@@ -117,6 +117,7 @@ typedef enum dat_status_address_enum {
     dat_drp_eps,                  ///< EPS data index
     dat_drp_sta,                 ///< Status data index
     dat_drp_stt,
+    dat_drp_stt_exp_time,
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
@@ -124,6 +125,7 @@ typedef enum dat_status_address_enum {
     dat_drp_ack_eps,              ///< EPS data index acknowledge
     dat_drp_ack_sta,             ///< Status data index acknowledge
     dat_drp_ack_stt,
+    dat_drp_ack_stt_exp_time,
 
     /// Sample Machine: Current state of sample status_machine
     dat_drp_mach_action,          ///< Current action of sampling state machine
@@ -229,6 +231,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
         {dat_drp_sta,           "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
         {dat_drp_stt,           "drp_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
+        {dat_drp_stt_exp_time,  "drp_stt_exp_time",  'u', DAT_IS_STATUS, 0},          ///< STT data exposure time index
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
@@ -252,6 +255,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
         {dat_drp_ack_sta,       "drp_ack_sta",       'u', DAT_IS_CONFIG, 0},          ///< Status data index acknowledge
         {dat_drp_ack_stt,       "drp_ack_stt",       'u', DAT_IS_CONFIG, 0},          ///< Stt data index acknowledge
+        {dat_drp_ack_stt_exp_time, "drp_ack_stt_exp_time",'u', DAT_IS_CONFIG, 0},     ///< Stt data exp time index acknowledge
         {dat_drp_mach_step,     "drp_mach_step",     'd', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
 };
@@ -280,6 +284,7 @@ typedef enum payload_id {
     eps_sensors,            ///< Eps sensors
     sta_sensors,            ///< Status Variables
     stt_sensors,
+    stt_exp_time_sensors,
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -346,9 +351,16 @@ typedef struct __attribute__((__packed__)) stt_data {
     float ra;
     float dec;
     float roll;
-    float time;
+    int time;
+    float exec_time;
 } stt_data_t;
 
+typedef struct __attribute__((__packed__)) stt_exp_time_data{
+    uint32_t index;
+    uint32_t timestamp;
+    int exp_time;
+    int n_stars;
+}stt_exp_time_data_t;
 
 /**
  * Data Map Struct for data schema definition.
@@ -367,22 +379,23 @@ static char status_var_string[] = "sat_index timestamp obc_last_reset obc_hrs_al
                                   "dep_deployed dep_ant_deployed dep_date_time com_count_tm com_count_tc com_last_tc "
                                   "fpl_last fpl_queue ads_omega_x ads_omega_y ads_omega_z ads_mag_x ads_mag_y ads_mag_z "
                                   "ads_pos_x ads_pos_y ads_pos_z ads_tle_epoch ads_tle_last ads_q0 ads_q1 ads_q2 ads_q3"
-                                  " eps_vbatt eps_cur_sun eps_cur_sys eps_temp_bat0 drp_temp drp_ads drp_eps drp_sta "
+                                  " eps_vbatt eps_cur_sun eps_cur_sys eps_temp_bat0 drp_temp drp_ads drp_eps drp_sta drp_stt drp_stt_exp_time"
                                   "drp_mach_action drp_mach_state drp_mach_left obc_opmode rtc_date_time com_freq "
                                   "com_tx_pwr com_baud com_mode com_bcn_period obc_bcn_offset tgt_omega_x tgt_omega_y "
                                   "tgt_omega_z tgt_q0 tgt_q1 tgt_q2 tgt_q3 drp_ack_temp drp_ack_ads drp_ack_eps "
-                                  "drp_ack_sta drp_mach_step drp_mach_payloads";
+                                  "drp_ack_sta drp_ack_stt dr_ack_stt_exp_time drp_mach_step drp_mach_payloads";
 
 static char status_var_types[] = "%u %u %u %u %u %u %u %f %f %f %u %u %u %u %u %u %u %u %u %u %f %f %f %f %f %f %f %f "
-                                 "%f %u %u %f %f %f %f %u %u %u %u %u %u %u %u %u %u %u %u %i %i %u %u %u %u %u %u %f "
-                                 "%f %f %f %f %f %f %u %u %u %u %u %i %u";
+                                 "%f %u %u %f %f %f %f %u %u %u %u %u %u %u %u %u %u %u %u %i %i %u %u %u %u %u %u %u %u %f "
+                                 "%f %f %f %f %f %f %u %u %u %u %u %u %u %i %u";
 
 static data_map_t data_map[] = {
 {"temp_data",      (uint16_t) (sizeof(temp_data_t)),dat_drp_temp,dat_drp_ack_temp, "%u %u %f %f %f",                   "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
 { "ads_data",      (uint16_t) (sizeof(ads_data_t)), dat_drp_ads, dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f",          "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
 { "eps_data",      (uint16_t) (sizeof(eps_data_t)), dat_drp_eps, dat_drp_ack_eps,  "%u %u %u %u %u %d %d %d %d %d %d", "sat_index timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
 {"sta_data",       (uint16_t) (sizeof(sta_data_t)), dat_drp_sta, dat_drp_ack_sta, status_var_types, status_var_string},
-{"stt_data",       (uint16_t) (sizeof(stt_data_t)), dat_drp_stt, dat_drp_ack_stt, "%u %u %f %f %f %f", "sat_index timestamp ra dec roll time"}
+{"stt_data",       (uint16_t) (sizeof(stt_data_t)), dat_drp_stt, dat_drp_ack_stt, "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+{"stt_exp_time",   (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
 };
 
 /** The repository's name */
