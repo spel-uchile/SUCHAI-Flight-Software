@@ -35,15 +35,15 @@ uint16_t rwdrv10987_get_speed(uint8_t motor_id)
     //send sample speed cmd
     if(motor_id == MOTOR1_ID){
         uint8_t cmd[3] = {SAMPLE_SPEED_CODE_MOTOR1, 0x00, 0x00};
-        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else if(motor_id == MOTOR2_ID){
         uint8_t cmd[3] = {SAMPLE_SPEED_CODE_MOTOR2, 0x00, 0x00};
-        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else if(motor_id == MOTOR3_ID){
         uint8_t cmd[3] = {SAMPLE_SPEED_CODE_MOTOR3, 0x00, 0x00};
-        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else{
         printf("[RWDRV10987:Error]: Bad id");
@@ -52,7 +52,7 @@ uint16_t rwdrv10987_get_speed(uint8_t motor_id)
     osDelay(100);
     //read data regs
     uint8_t res[2];
-    gs_i2c_master_transaction(2, BIuC_ADDR, NULL, 0, res, 2, 20);
+    gs_i2c_master_transaction(2, BIuC_ADDR, NULL, 0, res, 2, 200);
 
     uint16_t speed = (res[0]<<8) | res[1];
     osDelay(100);
@@ -70,15 +70,15 @@ float rwdrv10987_get_current(uint8_t motor_id)
     //send sample current cmd
     if(motor_id == MOTOR1_ID){
         uint8_t cmd[3] = {SAMPLE_CURRENT_CODE_MOTOR1, 0x00, 0x00};
-        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else if(motor_id == MOTOR2_ID){
         uint8_t cmd[3] = {SAMPLE_CURRENT_CODE_MOTOR2, 0x00, 0x00};
-        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else if(motor_id == MOTOR3_ID){
         uint8_t cmd[3] = {SAMPLE_CURRENT_CODE_MOTOR1, 0x00, 0x00};
-        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else{
         printf("[RWDRV10987:Error]: Bad id");
@@ -87,7 +87,7 @@ float rwdrv10987_get_current(uint8_t motor_id)
     osDelay(1);
     //read data regs
     uint8_t res[2];
-    gs_i2c_master_transaction(2, BIuC_ADDR, NULL, 0, res, 2, 20);
+    gs_i2c_master_transaction(2, BIuC_ADDR, NULL, 0, res, 2, 200);
 
     uint16_t current_aux = ((res[0]&0x07)<<8) | res[1];
     float current = 3000*(current_aux-1023)/2048.0; //[mA]
@@ -107,17 +107,17 @@ int8_t rwdrv10987_set_speed(uint8_t motor_id, uint16_t speed)
     if(motor_id == MOTOR1_ID)
     {
         uint8_t cmd[3] = {SET_SPEED_CODE_MOTOR1, speed & 0xff, speed >> 8};
-        result_cmd = gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        result_cmd = gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else if(motor_id == MOTOR2_ID)
     {
         uint8_t cmd[3] = {SET_SPEED_CODE_MOTOR2, speed & 0xff, speed >> 8};
-        result_cmd = gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        result_cmd = gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else if(motor_id == MOTOR3_ID)
     {
         uint8_t cmd[3] = {SET_SPEED_CODE_MOTOR3, speed & 0xff, speed >> 8};
-        result_cmd = gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 20);
+        result_cmd = gs_i2c_master_transaction(2, BIuC_ADDR, cmd, 3, NULL, 0, 200);
     }
     else
     {
