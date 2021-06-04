@@ -1,136 +1,196 @@
-[INFO ][1570724182][main] Creating tasks...
+[INFO ][1622789614][main] Creating tasks...
 [WARN] (dispatcher) Failed to assign task priority, try as root
-[INFO ][1570724182][Dispatcher] Started
+[INFO ][1622789614][Dispatcher] Started
+[INFO ][1622789614][Executer] Started
 [WARN] (executer) Failed to assign task priority, try as root
-[INFO ][1570724182][Executer] Started
 [WARN] (test) Failed to assign task priority, try as root
-[INFO ][1570724182][osScheduler] Linux scheduler: waiting threads
-[INFO ][1570724182][taskTest] Started
-[INFO ][1570724182][taskTest] ---- Testing commands interface ----
-[INFO ][1570724182][taskTest] Test: test_str_int from string
-[INFO ][1570724182][Executer] Running the command: test_str_int...
-[INFO ][1570724182][cmdTest] con_str_int: STR1_12
-[INFO ][1570724182][Executer] Command result: 1
-[INFO ][1570724182][taskTest] Test: test_double_int from vars
-[INFO ][1570724182][Executer] Running the command: test_double_int...
-[INFO ][1570724182][cmdTest] con_double_int: 1.080000_2.090000_12_23
-[INFO ][1570724182][Executer] Command result: 1
-[INFO ][1570724183][taskTest] Test: test_str_double_int from string
-[INFO ][1570724183][Executer] Running the command: test_str_double_int...
-[INFO ][1570724183][cmdTest] str_double_int: STR1_12.456000_STR2_13.078000_456
-[INFO ][1570724183][Executer] Command result: 1
-[INFO ][1570724183][taskTest] ---- Testing DRP commands ----
-[INFO ][1570724183][taskTest] Test: drp_ebf
-[INFO ][1570724183][Executer] Running the command: drp_ebf...
-[INFO ][1570724184][taskTest] Test: drp_get_vars
-[INFO ][1570724184][Executer] Command result: 1
-[INFO ][1570724184][Executer] Running the command: drp_get_vars...
-	dat_obc_opmode: 0
-	dat_obc_last_reset: 0
-	dat_obc_hrs_alive: 0
-	dat_obc_hrs_wo_reset: 0
-	dat_obc_reset_counter: 0
-	dat_obc_sw_wdt: 0
-	dat_obc_temp_1: 0.000000
-	dat_obc_temp_2: 0.000000
-	dat_obc_temp_3: 0.000000
-	dat_dep_deployed: 0
-	dat_dep_ant_deployed: 0
-	dat_dep_date_time: 0
-	dat_rtc_date_time: 1570724184
-	dat_com_count_tm: 0
-	dat_com_count_tc: 0
-	dat_com_last_tc: 0
-	dat_com_freq: 0
-	dat_com_tx_pwr: 0
-	dat_com_baud: 0
-	dat_com_mode: 0
-	dat_com_bcn_period: 0
-	dat_fpl_last: 0
-	dat_fpl_queue: 0
-	dat_ads_omega_x: 0.000000
-	dat_ads_omega_y: 0.000000
-	dat_ads_omega_z: 0.000000
-	dat_ads_mag_x: 0.000000
-	dat_ads_mag_y: 0.000000
-	dat_ads_mag_z: 0.000000
-	dat_eps_vbatt: 0
-	dat_eps_cur_sun: 0
-	dat_eps_cur_sys: 0
-	dat_eps_temp_bat0: 0
-	dat_drp_temp: 0
-	dat_drp_ads: 0
-	dat_drp_eps: 0
-	dat_drp_lang: 0
-	dat_drp_ack_temp: 0
-	dat_drp_ack_ads: 0
-	dat_drp_ack_eps: 0
-	dat_drp_ack_lang: 0
-[INFO ][1570724184][Executer] Command result: 1
-[INFO ][1570724184][taskTest] Test: drp_set_var
-[INFO ][1570724184][Executer] Running the command: drp_set_var...
-[INFO ][1570724184][Executer] Command result: 1
-[INFO ][1570724185][taskTest] Test: drp_add_hrs_alive
-[INFO ][1570724185][Executer] Running the command: drp_add_hrs_alive...
-[INFO ][1570724185][Executer] Command result: 1
-[INFO ][1570724185][taskTest] Test: drp_get_vars
-[INFO ][1570724185][Executer] Running the command: drp_get_vars...
-	dat_obc_opmode: 123
-	dat_obc_last_reset: 0
-	dat_obc_hrs_alive: 123
-	dat_obc_hrs_wo_reset: 123
-	dat_obc_reset_counter: 0
-	dat_obc_sw_wdt: 0
-	dat_obc_temp_1: 0.000000
-	dat_obc_temp_2: 0.000000
-	dat_obc_temp_3: 0.000000
-	dat_dep_deployed: 0
-	dat_dep_ant_deployed: 0
-	dat_dep_date_time: 0
-	dat_rtc_date_time: 1570724184
-	dat_com_count_tm: 0
-	dat_com_count_tc: 0
-	dat_com_last_tc: 0
-	dat_com_freq: 0
-	dat_com_tx_pwr: 0
-	dat_com_baud: 0
-	dat_com_mode: 0
-	dat_com_bcn_period: 0
-	dat_fpl_last: 0
-	dat_fpl_queue: 0
-	dat_ads_omega_x: 0.000000
-	dat_ads_omega_y: 0.000000
-	dat_ads_omega_z: 0.000000
-	dat_ads_mag_x: 0.000000
-	dat_ads_mag_y: 0.000000
-	dat_ads_mag_z: 0.000000
-	dat_eps_vbatt: 0
-	dat_eps_cur_sun: 0
-	dat_eps_cur_sys: 0
-	dat_eps_temp_bat0: 0
-	dat_drp_temp: 0
-	dat_drp_ads: 0
-	dat_drp_eps: 0
-	dat_drp_lang: 0
-	dat_drp_ack_temp: 0
-	dat_drp_ack_ads: 0
-	dat_drp_ack_eps: 0
-	dat_drp_ack_lang: 0
-[INFO ][1570724185][Executer] Command result: 1
-[INFO ][1570724186][taskTest] ---- Testing OBC commands ----
-[INFO ][1570724186][taskTest] Test: obc_get_mem
-[INFO ][1570724186][Executer] Running the command: obc_get_mem...
-Total non-mmapped bytes (arena):       540672
-# of free chunks (ordblks):            12
-# of free fastbin blocks (smblks):     3
-# of mapped regions (hblks):           0
-Bytes in mapped regions (hblkhd):      0
-Max. total allocated space (usmblks):  0
-Free bytes held in fastbins (fsmblks): 144
-Total allocated space (uordblks):      273360
-Total free space (fordblks):           267312
-Topmost releasable block (keepcost):   27072
-[INFO ][1570724186][Executer] Command result: 45
-[INFO ][1570724186][taskTest] Test: obc_reset
-[INFO ][1570724186][Executer] Running the command: obc_reset...
+[INFO ][1622789614][osScheduler] Linux scheduler: waiting threads
+[INFO ][1622789614][taskTest] Started
+[INFO ][1622789614][taskTest] ---- Testing commands interface ----
+[INFO ][1622789614][taskTest] Test: test_str_int from string
+[INFO ][1622789614][Executer] Running the command: test_str_int...
+[INFO ][1622789614][cmdTest] con_str_int: STR1_12
+[INFO ][1622789614][Executer] Command result: 1
+[INFO ][1622789614][taskTest] Test: test_double_int from vars
+[INFO ][1622789614][Executer] Running the command: test_double_int...
+[INFO ][1622789614][cmdTest] con_double_int: 1.000000 2.090000 12 23
+[INFO ][1622789614][Executer] Command result: 1
+[INFO ][1622789615][taskTest] Test: test_str_double_int from string
+[INFO ][1622789615][Executer] Running the command: test_str_double_int...
+[INFO ][1622789615][cmdTest] str_double_int: STR1_12.456000_STR2_13.078000_456
+[INFO ][1622789615][Executer] Command result: 1
+[INFO ][1622789615][taskTest] ---- Testing DRP commands ----
+[INFO ][1622789615][taskTest] Test: drp_ebf
+[INFO ][1622789615][Executer] Running the command: drp_ebf...
+[RES  ][1622789615][cmdDRP] drp_ebf ok!
+[INFO ][1622789615][Executer] Command result: 1
+[INFO ][1622789616][taskTest] Test: drp_print_vars
+[INFO ][1622789616][Executer] Running the command: drp_print_vars...
+idx, name                , value, type
+  1, obc_last_reset      , 0, 1
+  2, obc_hrs_alive       , 0, 1
+  3, obc_hrs_wo_reset    , 0, 1
+  4, obc_reset_counter   , 0, 1
+  5, obc_sw_wdt          , 0, 1
+  6, obc_temp_1          , -nan, 1
+  7, obc_temp_2          , -nan, 1
+  8, obc_temp_3          , -nan, 1
+  9, obc_executed_cmds   , 1, 1
+ 10, obc_failed_cmds     , 0, 1
+ 11, dep_deployed        , 2, 1
+ 12, dep_ant_deployed    , 1, 1
+ 13, dep_date_time       , 0, 1
+ 15, com_count_tm        , 0, 1
+ 16, com_count_tc        , 0, 1
+ 17, com_last_tc         , 0, 1
+ 24, fpl_last            , 0, 1
+ 25, fpl_queue           , 0, 1
+ 26, ads_omega_x         , -nan, 1
+ 27, ads_omega_y         , -nan, 1
+ 28, ads_omega_z         , -nan, 1
+ 32, ads_mag_x           , -nan, 1
+ 33, ads_mag_y           , -nan, 1
+ 34, ads_mag_z           , -nan, 1
+ 35, ads_pos_x           , -nan, 1
+ 36, ads_pos_y           , -nan, 1
+ 37, ads_pos_z           , -nan, 1
+ 38, ads_tle_epoch       , 0, 1
+ 39, ads_tle_last        , 0, 1
+ 40, ads_q0              , -nan, 1
+ 41, ads_q1              , -nan, 1
+ 42, ads_q2              , -nan, 1
+ 43, ads_q3              , -nan, 1
+ 48, eps_vbatt           , 0, 1
+ 49, eps_cur_sun         , 0, 1
+ 50, eps_cur_sys         , 0, 1
+ 51, eps_temp_bat0       , 0, 1
+ 52, drp_temp            , 0, 1
+ 53, drp_ads             , 0, 1
+ 54, drp_eps             , 0, 1
+ 55, drp_sta             , 0, 1
+ 56, drp_stt             , 0, 1
+ 57, drp_stt_exp_time    , 0, 1
+ 64, drp_mach_action     , 0, 1
+ 65, drp_mach_state      , 0, 1
+ 68, drp_mach_left       , 0, 1
+  0, obc_opmode          , -1, 0
+ 14, rtc_date_time       , 1622789615, 0
+ 18, com_freq            , 437250000, 0
+ 19, com_tx_pwr          , 0, 0
+ 20, com_baud            , 4800, 0
+ 21, com_mode            , 0, 0
+ 22, com_bcn_period      , 60, 0
+ 23, obc_bcn_offset      , 30, 0
+ 29, tgt_omega_x         , 0.000000, 0
+ 30, tgt_omega_y         , 0.000000, 0
+ 31, tgt_omega_z         , 0.000000, 0
+ 44, tgt_q0              , 0.000000, 0
+ 45, tgt_q1              , 0.000000, 0
+ 46, tgt_q2              , 0.000000, 0
+ 47, tgt_q3              , 0.000000, 0
+ 58, drp_ack_temp        , 0, 0
+ 59, drp_ack_ads         , 0, 0
+ 60, drp_ack_eps         , 0, 0
+ 61, drp_ack_sta         , 0, 0
+ 62, drp_ack_stt         , 0, 0
+ 63, drp_ack_stt_exp_time, 0, 0
+ 66, drp_mach_step       , 0, 0
+ 67, drp_mach_payloads   , 0, 0
+[INFO ][1622789616][Executer] Command result: 1
+[INFO ][1622789616][taskTest] Test: drp_set_var
+[INFO ][1622789616][Executer] Running the command: drp_set_var...
+[RES  ][1622789616][cmdDRP] 0: obc_opmode <- 123
+[INFO ][1622789616][Executer] Command result: 1
+[INFO ][1622789617][taskTest] Test: drp_add_hrs_alive
+[INFO ][1622789617][Executer] Running the command: drp_add_hrs_alive...
+[INFO ][1622789617][Executer] Command result: 1
+[INFO ][1622789617][taskTest] Test: drp_get_vars
+[INFO ][1622789617][Executer] Running the command: drp_print_vars...
+idx, name                , value, type
+  1, obc_last_reset      , 0, 1
+  2, obc_hrs_alive       , 123, 1
+  3, obc_hrs_wo_reset    , 123, 1
+  4, obc_reset_counter   , 0, 1
+  5, obc_sw_wdt          , 0, 1
+  6, obc_temp_1          , -nan, 1
+  7, obc_temp_2          , -nan, 1
+  8, obc_temp_3          , -nan, 1
+  9, obc_executed_cmds   , 4, 1
+ 10, obc_failed_cmds     , 0, 1
+ 11, dep_deployed        , 2, 1
+ 12, dep_ant_deployed    , 1, 1
+ 13, dep_date_time       , 0, 1
+ 15, com_count_tm        , 0, 1
+ 16, com_count_tc        , 0, 1
+ 17, com_last_tc         , 0, 1
+ 24, fpl_last            , 0, 1
+ 25, fpl_queue           , 0, 1
+ 26, ads_omega_x         , -nan, 1
+ 27, ads_omega_y         , -nan, 1
+ 28, ads_omega_z         , -nan, 1
+ 32, ads_mag_x           , -nan, 1
+ 33, ads_mag_y           , -nan, 1
+ 34, ads_mag_z           , -nan, 1
+ 35, ads_pos_x           , -nan, 1
+ 36, ads_pos_y           , -nan, 1
+ 37, ads_pos_z           , -nan, 1
+ 38, ads_tle_epoch       , 0, 1
+ 39, ads_tle_last        , 0, 1
+ 40, ads_q0              , -nan, 1
+ 41, ads_q1              , -nan, 1
+ 42, ads_q2              , -nan, 1
+ 43, ads_q3              , -nan, 1
+ 48, eps_vbatt           , 0, 1
+ 49, eps_cur_sun         , 0, 1
+ 50, eps_cur_sys         , 0, 1
+ 51, eps_temp_bat0       , 0, 1
+ 52, drp_temp            , 0, 1
+ 53, drp_ads             , 0, 1
+ 54, drp_eps             , 0, 1
+ 55, drp_sta             , 0, 1
+ 56, drp_stt             , 0, 1
+ 57, drp_stt_exp_time    , 0, 1
+ 64, drp_mach_action     , 0, 1
+ 65, drp_mach_state      , 0, 1
+ 68, drp_mach_left       , 0, 1
+  0, obc_opmode          , 123, 0
+ 14, rtc_date_time       , 1622789615, 0
+ 18, com_freq            , 437250000, 0
+ 19, com_tx_pwr          , 0, 0
+ 20, com_baud            , 4800, 0
+ 21, com_mode            , 0, 0
+ 22, com_bcn_period      , 60, 0
+ 23, obc_bcn_offset      , 30, 0
+ 29, tgt_omega_x         , 0.000000, 0
+ 30, tgt_omega_y         , 0.000000, 0
+ 31, tgt_omega_z         , 0.000000, 0
+ 44, tgt_q0              , 0.000000, 0
+ 45, tgt_q1              , 0.000000, 0
+ 46, tgt_q2              , 0.000000, 0
+ 47, tgt_q3              , 0.000000, 0
+ 58, drp_ack_temp        , 0, 0
+ 59, drp_ack_ads         , 0, 0
+ 60, drp_ack_eps         , 0, 0
+ 61, drp_ack_sta         , 0, 0
+ 62, drp_ack_stt         , 0, 0
+ 63, drp_ack_stt_exp_time, 0, 0
+ 66, drp_mach_step       , 0, 0
+ 67, drp_mach_payloads   , 0, 0
+[INFO ][1622789617][Executer] Command result: 1
+[INFO ][1622789618][taskTest] ---- Testing OBC commands ----
+[INFO ][1622789618][taskTest] Test: obc_get_mem
+[INFO ][1622789618][Executer] Running the command: obc_get_mem...
+[RES  ][1622789618][cmdOBC] Total non-mmapped bytes (arena):       696320
+[RES  ][1622789618][cmdOBC] # of free chunks (ordblks):            24
+[RES  ][1622789618][cmdOBC] # of free fastbin blocks (smblks):     0
+[RES  ][1622789618][cmdOBC] # of mapped regions (hblks):           0
+[RES  ][1622789618][cmdOBC] Bytes in mapped regions (hblkhd):      0
+[RES  ][1622789618][cmdOBC] Max. total allocated space (usmblks):  0
+[RES  ][1622789618][cmdOBC] Free bytes held in fastbins (fsmblks): 0
+[RES  ][1622789618][cmdOBC] Total allocated space (uordblks):      300416
+[RES  ][1622789618][cmdOBC] Total free space (fordblks):           395904
+[RES  ][1622789618][cmdOBC] Topmost releasable block (keepcost):   10992
+[INFO ][1622789618][Executer] Command result: 1
+[INFO ][1622789618][taskTest] Test: obc_reset
+[INFO ][1622789618][Executer] Running the command: obc_reset...
 Resetting system NOW!!
