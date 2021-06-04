@@ -189,7 +189,7 @@ typedef struct __attribute__((packed)) dat_sys_var_short {
  * This list is useful to decide how to store and send the status variables
  */
 static const dat_sys_var_t dat_status_list[] = {
-        {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, -1},         ///< Last reset source
+        {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, 0},         ///< Last reset source
         {dat_obc_hrs_alive,     "obc_hrs_alive",     'u', DAT_IS_STATUS, 0},          ///< Hours since first boot
         {dat_obc_hrs_wo_reset,  "obc_hrs_wo_reset",  'u', DAT_IS_STATUS, 0},          ///< Hours since last reset
         {dat_obc_reset_counter, "obc_reset_counter", 'u', DAT_IS_STATUS, 0},          ///< Number of reset since first boot
@@ -201,10 +201,10 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_obc_failed_cmds,   "obc_failed_cmds",   'u', DAT_IS_STATUS, 0},
         {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 2},          ///< Was the satellite deployed?
         {dat_dep_ant_deployed,  "dep_ant_deployed",  'u', DAT_IS_STATUS, 1},          ///< Was the antenna deployed?
-        {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, -1},         ///< Antenna deployment unix time
+        {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, 0},         ///< Antenna deployment unix time
         {dat_com_count_tm,      "com_count_tm",      'u', DAT_IS_STATUS, 0},          ///< Number of Telemetries sent
         {dat_com_count_tc,      "com_count_tc",      'u', DAT_IS_STATUS, 0},          ///< Number of received Telecommands
-        {dat_com_last_tc,       "com_last_tc",       'u', DAT_IS_STATUS, -1},         ///< Unix time of the last received Telecommand
+        {dat_com_last_tc,       "com_last_tc",       'u', DAT_IS_STATUS, 0},         ///< Unix time of the last received Telecommand
         {dat_fpl_last,          "fpl_last",          'u', DAT_IS_STATUS, 0},          ///< Last executed flight plan (unix time)
         {dat_fpl_queue,         "fpl_queue",         'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
         {dat_ads_omega_x,       "ads_omega_x",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the x axis
@@ -216,16 +216,16 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_ads_pos_x,         "ads_pos_x",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position x (ECI)
         {dat_ads_pos_y,         "ads_pos_y",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position y (ECI)
         {dat_ads_pos_z,         "ads_pos_z",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position z (ECI)
-        {dat_ads_tle_epoch,     "ads_tle_epoch",     'u', DAT_IS_STATUS, -1},         ///< Current TLE epoch, 0 if TLE is invalid
-        {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, -1},         ///< Last time position was propagated
+        {dat_ads_tle_epoch,     "ads_tle_epoch",     'u', DAT_IS_STATUS, 0},         ///< Current TLE epoch, 0 if TLE is invalid
+        {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, 0},         ///< Last time position was propagated
         {dat_ads_q0,            "ads_q0",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
         {dat_ads_q1,            "ads_q1",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
         {dat_ads_q2,            "ads_q2",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
         {dat_ads_q3,            "ads_q3",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
-        {dat_eps_vbatt,         "eps_vbatt",         'u', DAT_IS_STATUS, -1},         ///< Voltage of the battery [mV]
-        {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, -1},         ///< Current from boost converters [mA]
-        {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, -1},         ///< Current from the battery [mA]
-        {dat_eps_temp_bat0,     "eps_temp_bat0",     'u', DAT_IS_STATUS, -1},         ///< Battery temperature sensor
+        {dat_eps_vbatt,         "eps_vbatt",         'u', DAT_IS_STATUS, 0},         ///< Voltage of the battery [mV]
+        {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, 0},         ///< Current from boost converters [mA]
+        {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, 0},         ///< Current from the battery [mA]
+        {dat_eps_temp_bat0,     "eps_temp_bat0",     'u', DAT_IS_STATUS, 0},         ///< Battery temperature sensor
         {dat_drp_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_drp_ads,           "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
         {dat_drp_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
@@ -235,8 +235,8 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
-        {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, 0},          ///< General operation mode
-        {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, 0},          ///< RTC current unix time
+        {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, -1},          ///< General operation mode
+        {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, -1},          ///< RTC current unix time
         {dat_com_freq,          "com_freq",          'u', DAT_IS_CONFIG, SCH_TX_FREQ},        ///< Communications frequency [Hz]
         {dat_com_tx_pwr,        "com_tx_pwr",        'u', DAT_IS_CONFIG, SCH_TX_PWR},         ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
         {dat_com_baud,          "com_baud",          'u', DAT_IS_CONFIG, SCH_TX_BAUD},        ///< Baudrate [bps]

@@ -131,16 +131,16 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
     #if defined(LINUX) || defined(NANOMIND) || defined(AVR32)
         struct mallinfo mi;
         mi = mallinfo();
-        LOGR(tag, "Total non-mmapped bytes (arena):       %d\n", mi.arena);
-        LOGR(tag, "# of free chunks (ordblks):            %d\n", mi.ordblks);
-        LOGR(tag, "# of free fastbin blocks (smblks):     %d\n", mi.smblks);
-        LOGR(tag, "# of mapped regions (hblks):           %d\n", mi.hblks);
-        LOGR(tag, "Bytes in mapped regions (hblkhd):      %d\n", mi.hblkhd);
-        LOGR(tag, "Max. total allocated space (usmblks):  %d\n", mi.usmblks);
-        LOGR(tag, "Free bytes held in fastbins (fsmblks): %d\n", mi.fsmblks);
-        LOGR(tag, "Total allocated space (uordblks):      %d\n", mi.uordblks);
-        LOGR(tag, "Total free space (fordblks):           %d\n", mi.fordblks);
-        LOGR(tag, "Topmost releasable block (keepcost):   %d\n", mi.keepcost);
+        LOGR(tag, "Total non-mmapped bytes (arena):       %d", mi.arena);
+        LOGR(tag, "# of free chunks (ordblks):            %d", mi.ordblks);
+        LOGR(tag, "# of free fastbin blocks (smblks):     %d", mi.smblks);
+        LOGR(tag, "# of mapped regions (hblks):           %d", mi.hblks);
+        LOGR(tag, "Bytes in mapped regions (hblkhd):      %d", mi.hblkhd);
+        LOGR(tag, "Max. total allocated space (usmblks):  %d", mi.usmblks);
+        LOGR(tag, "Free bytes held in fastbins (fsmblks): %d", mi.fsmblks);
+        LOGR(tag, "Total allocated space (uordblks):      %d", mi.uordblks);
+        LOGR(tag, "Total free space (fordblks):           %d", mi.fordblks);
+        LOGR(tag, "Topmost releasable block (keepcost):   %d", mi.keepcost);
         return CMD_OK;
     #elif defined(FREERTOS)
         size_t mem_heap = xPortGetFreeHeapSize();

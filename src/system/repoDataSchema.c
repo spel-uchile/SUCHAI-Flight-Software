@@ -55,7 +55,7 @@ void dat_print_system_var(dat_sys_var_t *status)
         case 'u':
             printf("%3d, %-20s, %u, %d\r\n", status->address, status->name, status->value.u, status->status);
             break;
-        case 'i':
+        case 'd':
             printf("%3d, %-20s, %d, %d\r\n", status->address, status->name, status->value.i, status->status);
             break;
         case 'f':
