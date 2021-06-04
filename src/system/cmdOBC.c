@@ -128,38 +128,23 @@ int obc_reset(char *fmt, char *params, int nparams)
 int obc_get_os_memory(char *fmt, char *params, int nparams)
 {
 
-    #ifdef LINUX
+    #if defined(LINUX) || defined(NANOMIND) || defined(AVR32)
         struct mallinfo mi;
         mi = mallinfo();
-        printf("Total non-mmapped bytes (arena):       %d\n", mi.arena);
-        printf("# of free chunks (ordblks):            %d\n", mi.ordblks);
-        printf("# of free fastbin blocks (smblks):     %d\n", mi.smblks);
-        printf("# of mapped regions (hblks):           %d\n", mi.hblks);
-        printf("Bytes in mapped regions (hblkhd):      %d\n", mi.hblkhd);
-        printf("Max. total allocated space (usmblks):  %d\n", mi.usmblks);
-        printf("Free bytes held in fastbins (fsmblks): %d\n", mi.fsmblks);
-        printf("Total allocated space (uordblks):      %d\n", mi.uordblks);
-        printf("Total free space (fordblks):           %d\n", mi.fordblks);
-        printf("Topmost releasable block (keepcost):   %d\n", mi.keepcost);
-    #else
-        #if defined(NANOMIND) || defined(AVR32)
-            size_t mem_heap = 0;
-            struct mallinfo mi;
-            mi = mallinfo();
-            printf("Total non-mmapped bytes (arena):       %d\n", mi.arena);
-            printf("# of free chunks (ordblks):            %d\n", mi.ordblks);
-            printf("# of free fastbin blocks (smblks):     %d\n", mi.smblks);
-            printf("# of mapped regions (hblks):           %d\n", mi.hblks);
-            printf("Bytes in mapped regions (hblkhd):      %d\n", mi.hblkhd);
-            printf("Max. total allocated space (usmblks):  %d\n", mi.usmblks);
-            printf("Free bytes held in fastbins (fsmblks): %d\n", mi.fsmblks);
-            printf("Total allocated space (uordblks):      %d\n", mi.uordblks);
-            printf("Total free space (fordblks):           %d\n", mi.fordblks);
-            printf("Topmost releasable block (keepcost):   %d\n", mi.keepcost);
-        #else
-            size_t mem_heap = xPortGetFreeHeapSize();
-            printf("Free RTOS memory: %d\n", (int)mem_heap);
-        #endif
+        LOGR(tag, "Total non-mmapped bytes (arena):       %d\n", mi.arena);
+        LOGR(tag, "# of free chunks (ordblks):            %d\n", mi.ordblks);
+        LOGR(tag, "# of free fastbin blocks (smblks):     %d\n", mi.smblks);
+        LOGR(tag, "# of mapped regions (hblks):           %d\n", mi.hblks);
+        LOGR(tag, "Bytes in mapped regions (hblkhd):      %d\n", mi.hblkhd);
+        LOGR(tag, "Max. total allocated space (usmblks):  %d\n", mi.usmblks);
+        LOGR(tag, "Free bytes held in fastbins (fsmblks): %d\n", mi.fsmblks);
+        LOGR(tag, "Total allocated space (uordblks):      %d\n", mi.uordblks);
+        LOGR(tag, "Total free space (fordblks):           %d\n", mi.fordblks);
+        LOGR(tag, "Topmost releasable block (keepcost):   %d\n", mi.keepcost);
+        return CMD_OK;
+    #elif defined(FREERTOS)
+        size_t mem_heap = xPortGetFreeHeapSize();
+        LOGR(tag, "Free RTOS memory: %d\n", (int)mem_heap);
         return CMD_OK;
     #endif
 }
@@ -357,15 +342,23 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
 
 #elif defined LINUX
     int curr_time =  (int)time(NULL);
-    LOGI(tag, "Simulating obc data in Linux \n timestamp: %d", curr_time);
-    // Simulating temp
-    float curr_time_f = (curr_time % 1000)*1.0;
-    struct temp_data data_temp = {curr_time, curr_time_f, curr_time_f+1.0, curr_time_f+2.0};
-    LOGI(tag, "Temperature data in Linux \n temp1: %f \n temp2: %f \n temp3: %f" ,
-         data_temp.obc_temp_1, data_temp.obc_temp_2, data_temp.obc_temp_3);
-    dat_add_payload_sample(&data_temp, temp_sensors);
+    float systemp, millideg;
+    FILE *thermal;
+    int n;
 
-//    dat_get_system_var(dat_status_last_address)
+    LOGD(tag, "Reading obc data in Linux \n timestamp: %d", curr_time);
+    // Reading temp
+    thermal = fopen("/sys/class/thermal/thermal_zone0/temp","r");
+    n = fscanf(thermal,"%f",&millideg);
+    fclose(thermal);
+    if(n!= 1)
+        return CMD_ERROR;
+    // Save temp
+    systemp = millideg / 1000;
+    int index_temp = dat_get_system_var(data_map[temp_sensors].sys_index);
+    struct temp_data data_temp = {index_temp, curr_time, systemp, systemp, systemp};
+    LOGR(tag, "Temp1: %.1f, Temp2 %.1f, Temp3: %.2f", data_temp.obc_temp_1, data_temp.obc_temp_2, data_temp.obc_temp_3);
+    dat_add_payload_sample(&data_temp, temp_sensors);
 #endif
 
     return CMD_OK;
@@ -430,10 +423,34 @@ int obc_update_status(char *fmt, char *params, int nparams)
     dat_set_system_var(dat_ads_mag_z, mag_z.i);
 
 #if LOG_LEVEL >= LOG_LVL_INFO
-    printf("\r\nTemp1: %.1f, Temp2 %.1f, Gyro temp: %.2f\r\n", sensor1/10., sensor2/10., gyro_temp);
-    printf("Gyro x, y, z: %f, %f, %f\r\n", gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z);
-    printf("Mag x, y, z: %f, %f, %f\r\n\r\n",hmc_reading.x, hmc_reading.y, hmc_reading.z);
+    LOGR(tag, "Temp1: %.1f, Temp2 %.1f, Gyro temp: %.2f", sensor1/10., sensor2/10., gyro_temp);
+    LOGR(tag, "Gyro x, y, z: %f, %f, %f", gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z);
+    LOGR(tag, "Mag x, y, z: %f, %f, %f",hmc_reading.x, hmc_reading.y, hmc_reading.z);
 #endif
+#elif defined(LINUX)
+    int curr_time =  (int)time(NULL);
+    float systemp, millideg;
+    FILE *thermal;
+    int n;
+
+    LOGD(tag, "Reading obc data in Linux \n timestamp: %d", curr_time);
+    // Reading temp
+    thermal = fopen("/sys/class/thermal/thermal_zone0/temp","r");
+    n = fscanf(thermal,"%f",&millideg);
+    fclose(thermal);
+    if(n!= 1)
+        return CMD_ERROR;
+
+    // Save temp
+    systemp = millideg / 1000;
+    /* Set sensors status variables (fix type) */
+    value32_t temp_1;
+    temp_1.f = systemp;
+    dat_set_status_var(dat_obc_temp_1, temp_1);
+    dat_set_status_var(dat_obc_temp_2, temp_1);
+    dat_set_status_var(dat_obc_temp_3, temp_1);
+
+    LOGR(tag, "Temp1: %.1f, Temp2 %.1f, Temp3: %.1f", temp_1.f, temp_1.f, temp_1.f);
 #endif
 
     return CMD_OK;
@@ -492,10 +509,7 @@ int obc_set_tle(char *fmt, char *params, int nparams)
 
 int obc_update_tle(char *fmt, char *params, int nparams)
 {
-    portTick init_time = osTaskGetTickCount();
     parseLines(&tle, tle1, tle2);
-    portTick parse_time = osTaskGetTickCount();
-
     //TODO: Check errors
     if(tle.sgp4Error != 0)
     {
@@ -503,13 +517,9 @@ int obc_update_tle(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     }
 
-    LOGV(tag, "Updated to epoch %.8f (%d)", tle.epoch, (int)(tle.epoch/1000.0));
+    LOGR(tag, "TLE updated to epoch %.8f (%d)", tle.epoch, (int)(tle.epoch/1000.0));
     dat_set_system_var(dat_ads_tle_epoch, (int)(tle.epoch/1000.0));
 
-    //TODO: Remove time measurement in future revisions
-    portTick final_time = osTaskGetTickCount();
-    LOGI(tag, "parseLines    : %.06f ms", (parse_time-init_time)/1000.0);
-    LOGI(tag, "obc_update_tle: %.06f ms", (final_time-init_time)/1000.0);
     return CMD_OK;
 }
 
@@ -527,14 +537,10 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
 
     double ts_mili = 1000.0 * (double) ts;
 
-    portTick init_time = osTaskGetTickCount();
     double diff = (double)ts - (double)tle.epoch/1000.0;
     diff /= 60.0;
 
-
-//    getRV(&tle,diff,r,v);
     getRVForDate(&tle, ts_mili, r, v);
-    portTick getrv_time = osTaskGetTickCount();
 
     LOGD(tag, "T : %.8f - %.8f = %.8f", ts_mili/1000.0, tle.epoch/1000.0, diff);
     LOGD(tag, "R : (%.8f, %.8f, %.8f)", r[0], r[1], r[2]);
@@ -544,17 +550,11 @@ int obc_prop_tle(char *fmt, char *params, int nparams)
     if(tle.sgp4Error != 0)
         return CMD_ERROR;
 
-    //TODO: Use value32_t instead
-    value pos[3] = {(float)r[0], (float)r[1], (float)r[2]};
-    dat_set_system_var(dat_ads_pos_x, pos[0].i);
-    dat_set_system_var(dat_ads_pos_y, pos[1].i);
-    dat_set_system_var(dat_ads_pos_z, pos[2].i);
+    value32_t pos[3] = {{.f=(float)r[0]},{.f=(float)r[1]}, {.f=(float)r[2]}};
+    dat_set_status_var(dat_ads_pos_x, pos[0]);
+    dat_set_status_var(dat_ads_pos_y, pos[1]);
+    dat_set_status_var(dat_ads_pos_z, pos[2]);
     dat_set_system_var(dat_ads_tle_last, (int)ts);
-
-    //TODO: Remove time measurement in future revisions
-    portTick final_time = osTaskGetTickCount();
-    LOGI(tag, "getRVForDate: %.06f ms", (getrv_time-init_time)/1000.0);
-    LOGI(tag, "obc_prop_tle: %.06f ms", (final_time-init_time)/1000.0);
 
     return CMD_OK;
 }
