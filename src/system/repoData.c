@@ -535,11 +535,11 @@ int dat_show_time(int format)
     {
         char buffer[80];
         strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
-        printf("%s", buffer);
+        LOGR("%s", buffer);
     }
     if(format >= 1)
     {
-        printf("%u\n", (unsigned int)time_to_show);
+        LOGR(tag, "%u\n", (unsigned int)time_to_show);
     }
 
     return 0;

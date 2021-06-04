@@ -63,7 +63,10 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
             rc += dat_delete_memory_sections();
 
             if(rc == 0)
+            {
+                LOGR(tag, "drp_ebf ok!");
                 return CMD_OK;
+            }
             else
             {
                 LOGE(tag, "%d errors in drp_ebf!", -rc);
@@ -123,8 +126,16 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams)
                 break;
         }
         // Store the variable value
-        dat_set_status_var(var_address, variable);
-        return CMD_OK;
+        int rc = dat_set_status_var(var_address, variable);
+        if(rc == 0)
+        {
+            LOGR(tag, "%d: %s <- %d", variable_def.address, variable_def.name, variable);
+            return CMD_OK;
+        }
+        else
+        {
+            return CMD_ERROR;
+        }
     }
     else
     {
@@ -177,7 +188,13 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams)
 
     // Store the variable value
     int rc = dat_set_status_var(variable_def.address, variable);
-    return rc >= 0 ? CMD_OK : CMD_ERROR;
+    if(rc == 0)
+    {
+        LOGR(tag, "%d: %s <- %d", variable_def.address, variable_def.name, variable);
+        return CMD_OK;
+    }
+    else
+        return CMD_ERROR;
 }
 
 int drp_get_sys_var_name(char *fmt, char *params, int nparams)

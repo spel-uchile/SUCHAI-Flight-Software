@@ -49,9 +49,9 @@ int rw_get_speed(char *fmt, char *params, int nparams)
     uint16_t speed2 = rwdrv10987_get_speed(MOTOR2_ID);
     uint16_t speed3 = rwdrv10987_get_speed(MOTOR3_ID);
 
-    LOGI(tag, "Sampled speed1: %d, speed2: %d, speed3: %d", speed1, speed2, speed3);
+    LOGR(tag, "Sampled speed1: %d, speed2: %d, speed3: %d", speed1, speed2, speed3);
 
-    return 1; //TO DO: check error code
+    return CMD_OK; //TODO: check error code
 }
 
 int rw_get_current(char *fmt, char *params, int nparams)
@@ -62,25 +62,23 @@ int rw_get_current(char *fmt, char *params, int nparams)
     float current2 = rwdrv10987_get_current(MOTOR2_ID); //[mA]
     float current3 = rwdrv10987_get_current(MOTOR3_ID); //[mA]
 
-    LOGI(tag, "Sampled current1: %f, current2: %f, current3: %f", current1, current2, current3);
+    LOGR(tag, "Sampled current1: %f, current2: %f, current3: %f", current1, current2, current3);
 
-    return 1; //TO DO: check error code
+    return 1; //TODO: check error code
 }
 
 int rw_set_speed(char *fmt, char *params, int nparams)
 {
     LOGI(tag, "Speed command");
-
     int motor_id;
     int speed;
 
-    if(sscanf(params, fmt, &motor_id, &speed) == nparams)
-    {
-        LOGI(tag, "Setting motor: %d speed: %d", motor_id, speed);
+    if(params == NULL || sscanf(params, fmt, &motor_id, &speed) != nparams)
+        return CMD_SYNTAX_ERROR;
 
-        rwdrv10987_set_speed(motor_id, speed);
-    }
-    return 1; //TO DO: check error code
+    int rc = rwdrv10987_set_speed(motor_id, speed);
+    LOGR(tag, "Setting motor: %d speed: %d (%d)", motor_id, speed, rc);
+    return rc == GS_OK ? CMD_OK : CMD_ERROR;
 }
 
 /** UPPER ISTAGE COMMANDS **/
@@ -94,16 +92,21 @@ int istage2_get_temp(char *fmt, char *params, int nparams)
     istage_cmd[0] = IS2_START_SENSORS_TEMP;
     rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 250);
     LOGI(tag2, "START_SENSORS_TEMP %d (%d)", istage_ans[0], rc);
-
+    if(rc != GS_OK)
+        return CMD_ERROR;
 
     istage_cmd[0] = IS2_GET_TEMP;
     uint16_t temps[8];
     rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, (char *)temps, 8*sizeof(uint16_t), 250);
-    LOGI(tag2, "IS2_GET_TEMP %d, %d, %d, %d, %d, %d, %d, %d (%d)", temps[0], temps[1], temps[2], temps[3], temps[4], temps[5], temps[6], temps[7], rc);
+    LOGR(tag2, "IS2_GET_TEMP %d, %d, %d, %d, %d, %d, %d, %d (%d)", temps[0], temps[1], temps[2], temps[3], temps[4], temps[5], temps[6], temps[7], rc);
+    if(rc != GS_OK)
+        return CMD_ERROR;
 
     istage_cmd[0] = IS2_STOP_SENSORS_TEMP;
     rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 250);
     LOGI(tag2, "STOP_SENSORS_TEMP (%d)", rc);
+    if(rc != GS_OK)
+        return CMD_ERROR;
 
     return CMD_OK;
 
@@ -122,9 +125,12 @@ int istage2_get_state_panel(char *fmt, char *params, int nparams)
     char istage_cmd[2] = {IS2_READ_SW_FACE, (char)panel};
     char istage_ans[1] = {-1};
     rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 250);
-    LOGI(tag2, "IS2_READ_SW_FACE %d=%d (%d)", panel, istage_ans[0], rc);
+    LOGR(tag2, "IS2_READ_SW_FACE %d=%d (%d)", panel, istage_ans[0], rc);
 
-    return CMD_OK;
+    if(rc != GS_OK)
+        return CMD_ERROR;
+    else
+        return CMD_OK;
 }
 
 int istage2_deploy_panel(char *fmt, char *params, int nparams)
@@ -140,9 +146,12 @@ int istage2_deploy_panel(char *fmt, char *params, int nparams)
     char istage_cmd[2] = {IS2_BURN_FACE, (char)panel};
     char istage_ans[1] = {-1};
     rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 250);
-    LOGI(tag2, "IS2_BURN_FACE %d (%d)", panel, rc);
+    LOGR(tag2, "IS2_BURN_FACE %d (%d)", panel, rc);
 
-    return CMD_OK;
+    if(rc != GS_OK)
+        return CMD_ERROR;
+    else
+        return CMD_OK;
 }
 
 int istage2_set_deploy(char *fmt, char *params, int nparams)
@@ -158,9 +167,12 @@ int istage2_set_deploy(char *fmt, char *params, int nparams)
     char istage_cmd[2] = {IS2_SET_BURN, (char)config};
     char istage_ans[1] = {-1};
     rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 250);
-    LOGI(tag2, "IS2_SET_BURN %d (%d)", config, rc);
+    LOGR(tag2, "IS2_SET_BURN %d (%d)", config, rc);
 
-    return CMD_OK;
+    if(rc != GS_OK)
+        return CMD_ERROR;
+    else
+        return CMD_OK;
 }
 
 int istage2_get_sensors_status(char *fmt, char *params, int nparams)
@@ -169,8 +181,11 @@ int istage2_get_sensors_status(char *fmt, char *params, int nparams)
     char istage_cmd[2] = {IS2_SENSORS_TEMP_STATUS, 0};
     char istage_ans[1] = {-1};
     rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 250);
-    LOGI(tag2, "IS2_SENSORS_TEMP_STATUS %d (%d)", istage_ans[0], rc);
+    LOGR(tag2, "IS2_SENSORS_TEMP_STATUS %d (%d)", istage_ans[0], rc);
 
-    return CMD_OK;
+    if(rc != GS_OK)
+        return CMD_ERROR;
+    else
+        return CMD_OK;
 }
 #endif

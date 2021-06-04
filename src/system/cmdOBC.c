@@ -146,6 +146,9 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
         size_t mem_heap = xPortGetFreeHeapSize();
         LOGR(tag, "Free RTOS memory: %d\n", (int)mem_heap);
         return CMD_OK;
+    #else
+        LOGE(tag, "Not implemented!");
+        return CMD_ERROR;
     #endif
 }
 
@@ -173,7 +176,7 @@ int obc_get_time(char *fmt, char *params, int nparams)
         format = 0;
     }
 
-    int rc = dat_show_time(format);
+    int rc = dat_show_time(format);  // LOGR inside
     return (rc == 0) ? CMD_OK : CMD_ERROR;
 }
 
@@ -185,12 +188,12 @@ int obc_system(char* fmt, char* params, int nparams)
         int rc = system(params);
         if(rc < 0)
         {
-            LOGE(tag, "Call to system failed! (%d)", rc)
+            LOGR(tag, "Call to system failed! (%d)", rc)
             return CMD_ERROR;
         }
         else
         {
-            LOGV(tag, "Call to system returned (%d)", rc);
+            LOGR(tag, "Call to system returned (%d)", rc);
             return CMD_OK;
         }
     }
@@ -222,7 +225,7 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    LOGI(tag, "Setting duty %d to Channel %d", duty, channel);
+    LOGR(tag, "Setting duty %d to Channel %d", duty, channel);
     gs_a3200_pwm_enable(channel);
     gs_a3200_pwm_set_duty(channel, duty);
     return CMD_OK;
@@ -251,7 +254,7 @@ int obc_set_pwm_freq(char* fmt, char* params, int nparams)
     }
     
     float actual_freq = gs_a3200_pwm_set_freq(channel, freq);
-    LOGI(tag, "PWM %d Freq set to: %.4f", channel, actual_freq);
+    LOGR(tag, "PWM %d Freq set to: %.4f", channel, actual_freq);
     return CMD_OK;
 #else
     return CMD_ERROR;
@@ -266,7 +269,7 @@ int obc_pwm_pwr(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     
     /* Turn on/off power channel */
-    LOGI(tag, "PWM enabled: %d", enable>0 ? 1:0);
+    LOGR(tag, "PWM enabled: %d", enable>0 ? 1:0);
     if(enable > 0)
         gs_a3200_pwr_switch_enable(GS_A3200_PWR_PWM);
     else
@@ -458,8 +461,8 @@ int obc_update_status(char *fmt, char *params, int nparams)
 
 int obc_get_tle(char *fmt, char *params, int nparams)
 {
-    LOGI(tag, "%s", tle1);
-    LOGI(tag, "%s", tle2);
+    LOGR(tag, "%s", tle1);
+    LOGR(tag, "%s", tle2);
     return CMD_OK;
 }
 

@@ -130,7 +130,7 @@ void taskCommunications(void *param)
 
                 case SCH_TRX_PORT_DBG:
                     /* Debug port, print to console */
-                    LOGR(tag, "(%d)%s", packet->id.src, (char *)(packet->data));
+                    LOGP(tag, "[%d] %s", packet->id.src, (char *)(packet->data));
                     csp_buffer_free(packet);
                     break;
 

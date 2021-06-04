@@ -42,7 +42,7 @@ int con_debug_msg(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    printf("%s", params);
+    LOGR(tag, "%s", params);
     return CMD_OK;
 }
 
@@ -65,5 +65,6 @@ int con_set_logger(char *fmt, char *params, int nparams)
         return CMD_ERROR;
 
     log_set((log_level_t)lvl, node);
+    LOGR(tag, "Log level %d to node %d", log_lvl, log_node);
     return CMD_OK;
 }

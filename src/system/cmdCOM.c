@@ -60,7 +60,7 @@ int com_ping(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &node) == nparams)
     {
         int rc = csp_ping((uint8_t)node, 3000, 10, CSP_O_NONE);
-        LOGI(tag, "Ping to %d took %d", node, rc);
+        LOGR(tag, "Ping to %d took %d", node, rc);
         if(rc > 0)
             return CMD_OK;
         else
@@ -518,7 +518,7 @@ int com_get_config(char *fmt, char *params, int nparams)
         {
             char param_str[SCH_CMD_MAX_STR_PARAMS];
             param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS) ;
-            LOGI(tag, "Param %s (table %d): %s", param_i->name, table, param_str);
+            LOGR(tag, "Param %s (table %d): %s", param_i->name, table, param_str);
             free(out);
             return CMD_OK;
         }
@@ -582,7 +582,7 @@ int com_set_config(char *fmt, char *params, int nparams)
         {
             char param_str[SCH_CMD_MAX_STR_PARAMS];
             param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS);
-            LOGI(tag, "Param %s (table %d) set to: %s", param_i->name, table, param_str);
+            LOGR(tag, "Param %s (table %d) set to: %s", param_i->name, table, param_str);
             free(out);
             return CMD_OK;
         }
@@ -634,7 +634,7 @@ int com_update_status_vars(char *fmt, char *params, int nparams)
             else
                 LOGE(tag, "Error casting status variable");
 
-            LOGI(tag, "Param %s (table %d) %d", param_i->name, table, dat_get_system_var(vars[i]));
+            LOGR(tag, "Param %s (table %d) %d", param_i->name, table, dat_get_system_var(vars[i]));
             free(out);
         }
     }
@@ -652,20 +652,20 @@ void _com_config_help(void)
 {
     int i;
     LOGI(tag, "List of available TRX parameters:")
-    printf("TABLE %d\n", AX100_PARAM_RUNNING);
+    LOGR(tag, "TABLE %d\n", AX100_PARAM_RUNNING);
     for(i=0; i<ax100_config_count; i++)
     {
-        printf("\t%s\n", ax100_config[i].name);
+        LOGR(tag, "\t%s\n", ax100_config[i].name);
     }
-    printf("TABLE %d\n", AX100_PARAM_TX(0));
+    LOGR(tag, "TABLE %d\n", AX100_PARAM_TX(0));
     for(i=0; i<ax100_config_tx_count; i++)
     {
-        printf("\t%s\n", ax100_tx_config[i].name);
+        LOGR(tag, "\t%s\n", ax100_tx_config[i].name);
     }
-    printf("TABLE %d\n", AX100_PARAM_RX);
+    LOGR(tag, "TABLE %d\n", AX100_PARAM_RX);
     for(i=0; i<ax100_config_tx_count; i++)
     {
-        printf("\t%s\n", ax100_rx_config[i].name);
+        LOGR(tag, "\t%s\n", ax100_rx_config[i].name);
     }
 }
 
@@ -690,11 +690,11 @@ void _com_config_find(char *param_name, int table, param_table_t **param)
     {
         for(i=0; i < ax100_config_count; i++)
         {
-            //printf("%d, %s\n", i, ax100_config[i].name);
+            //LOGD(tag, "%d, %s\n", i, ax100_config[i].name);
             if(strcmp(param_name, ax100_config[i].name) == 0)
             {
                 *param = &(ax100_config[i]);
-                printf("%d, %d, %s\n", i, table, ax100_config[i].name);
+                LOGD(tag, "%d, %d, %s\n", i, table, ax100_config[i].name);
                 return;
             }
         }
@@ -705,11 +705,11 @@ void _com_config_find(char *param_name, int table, param_table_t **param)
     {
         for(i = 0; i < ax100_config_rx_count; i++)
         {
-            // printf("(rx) %d, %s\n", i, ax100_rx_config[i].name);
+            // LOGD(tag, "(rx) %d, %s\n", i, ax100_rx_config[i].name);
             if(strcmp(param_name, ax100_rx_config[i].name) == 0)
             {
                 *param = &(ax100_rx_config[i]);
-                printf("%d, %d, %s\n", i, table, ax100_rx_config[i].name);
+                LOGD(tag, "%d, %d, %s\n", i, table, ax100_rx_config[i].name);
                 return;
             }
         }
@@ -720,11 +720,11 @@ void _com_config_find(char *param_name, int table, param_table_t **param)
     {
         for(i = 0; i < ax100_config_tx_count; i++)
         {
-            // printf("(tx) %d, %s\n", i, ax100_tx_config[i].name);
+            // LOGD(tag, "(tx) %d, %s\n", i, ax100_tx_config[i].name);
             if(strcmp(param_name, ax100_tx_config[i].name) == 0)
             {
                 *param = &(ax100_tx_config[i]);
-                printf("%d, %d, %s\n", i, table, ax100_rx_config[i].name);
+                LOGD(tag, "%d, %d, %s\n", i, table, ax100_rx_config[i].name);
                 return;
             }
         }
