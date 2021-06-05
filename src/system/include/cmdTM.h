@@ -55,10 +55,11 @@ int tm_send_var(char *fmt, char *params, int nparams);
 
 /**
  * Parses a status variables telemetry, @seealso tm_send_status.
+ * @warning Avoid using this command from command line, or tele-command
  *
  * @param fmt Str. Not used.
- * @param param char *. Parameters as pointer to raw data. Receives a
- * status_t structure
+ * @param param char *. Parameters as pointer to raw data. Receives a com_frame_t structure with an array of
+ * dat_sys_var_short_t structs in frame->data
  * @param nparams Int. Not used.
  * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */

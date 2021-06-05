@@ -91,6 +91,11 @@ int tm_parse_status(char *fmt, char *params, int nparams)
     com_frame_t *frame = (com_frame_t *)params;
     dat_sys_var_short_t *status_buff = (dat_sys_var_short_t *)frame->data.data8;
 
+    // Sanity check to params. Detect if params do not come from tm_send_status.
+    // Avoid using this command from command line, or tele-command
+    if(frame->type != TM_TYPE_STATUS || frame->ndata > sizeof(frame->data)/sizeof(dat_sys_var_short_t))
+        return CMD_SYNTAX_ERROR;
+
     int i;
     for(i = 0; i<frame->ndata; i++)
     {
