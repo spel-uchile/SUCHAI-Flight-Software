@@ -21,6 +21,16 @@
 
 static const char *tag = "cmdTM";
 
+/**
+ * Helper function to read and send a range of telemetry
+ * @param start Starting index
+ * @param end Stop index
+ * @param payload Payload id
+ * @param dest_node Node to send TM
+ * @return CMD_OK, CMD_ERROR, or CMD_SYNTAX_ERROR
+ */
+static int _send_tel_from_to(int start, int end, int payload, int dest_node);
+
 void cmd_tm_init(void)
 {
     cmd_add("tm_parse_status", tm_parse_status, "", 0);
@@ -125,12 +135,13 @@ int tm_parse_string(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
-void send_tel_from_to(int from, int des, int payload, int dest_node)
+int _send_tel_from_to(int start, int end, int payload, int dest_node)
 {
+    int rc_send = 0;
     int structs_per_frame = (COM_FRAME_MAX_LEN) / data_map[payload].size;
     uint16_t payload_size = data_map[payload].size;
 
-    int n_samples = des-from;
+    int n_samples = end - start;
     int n_frames = (n_samples)/structs_per_frame;
     if( (n_samples) % structs_per_frame != 0) {
         n_frames += 1;
@@ -146,7 +157,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
     if(conn == NULL)
     {
         LOGE(tag, "Cannot create connection!");
-        return;
+        return CMD_ERROR;
     }
 
     int i;
@@ -169,7 +180,7 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
             }
 
             char buff[payload_size];
-            dat_get_recent_payload_sample(buff, payload, (n_samples+(index_pay-des)) - (i*structs_per_frame+j+1));
+            dat_get_recent_payload_sample(buff, payload, (n_samples+(index_pay - end)) - (i * structs_per_frame + j + 1));
             int mem_offset = (j * payload_size);
             memcpy(frame->data.data8 + mem_offset, buff, payload_size);
         }
@@ -186,12 +197,12 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
         //print_buff(frame->data.data8, payload_size*structs_per_frame);
 
         // Send packet
-        int rc_send = csp_send(conn, packet, 500);
+        rc_send = csp_send(conn, packet, 500);
         if(rc_send == 0)
         {
             csp_buffer_free(packet);
             LOGE(tag, "Error sending frame %d! (%d)", i, rc_send);
-            break;
+            break; // Exit with error
         }
 
         if((i+1)%SCH_COM_MAX_PACKETS == 0)
@@ -200,8 +211,14 @@ void send_tel_from_to(int from, int des, int payload, int dest_node)
 
     // Close connection
     int rc_conn = csp_close(conn);
-    if(rc_conn != CSP_ERR_NONE)
+    if(rc_conn != CSP_ERR_NONE) {
         LOGE(tag, "Error closing connection! (%d)", rc_conn);
+        return CMD_ERROR;
+    }
+    else if(rc_send == 0)
+        return CMD_ERROR;
+    else
+        return CMD_OK;
 }
 
 int tm_get_single(char *fmt, char *params, int nparams)
@@ -301,8 +318,8 @@ int tm_send_last(char *fmt, char *params, int nparams)
             structs_per_frame = index_pay;
         }
 
-        send_tel_from_to(index_pay-structs_per_frame, index_pay, payload, dest_node);
-        return CMD_OK;
+        int rc = _send_tel_from_to(index_pay - structs_per_frame, index_pay, payload, dest_node);
+        return rc;
     }
     else
     {
@@ -329,8 +346,8 @@ int tm_send_all(char *fmt, char *params, int nparams)
         }
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
         int index_ack = dat_get_system_var(data_map[payload].sys_ack);
-        send_tel_from_to(index_ack, index_pay, payload, dest_node);
-        return CMD_OK;
+        int rc = _send_tel_from_to(index_ack, index_pay, payload, dest_node);
+        return rc;
     }
     else
     {
@@ -368,8 +385,8 @@ int tm_send_from(char *fmt, char *params, int nparams)
             des = index_pay;
         }
 
-        send_tel_from_to(index_ack, des, payload, dest_node);
-        return CMD_OK;
+        int rc = _send_tel_from_to(index_ack, des, payload, dest_node);
+        return rc;
     }
     else
     {
