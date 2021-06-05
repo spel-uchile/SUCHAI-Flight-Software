@@ -31,7 +31,7 @@ static const char *tag = "data_storage";
     PGconn *conn = NULL;
 #endif
 
-char* fp_table = "flightPlan";
+char* fp_table = "flightplan";
 char fs_db_name[15];
 char postgres_conf_s[SCH_BUFF_MAX_LEN];
 
@@ -84,8 +84,8 @@ int storage_init(const char *file)
         return -1;
     }
 
-    char* value_str;
-    if ((value_str = PQgetvalue(res, 0, 0)) == NULL)
+    char * value_str = PQgetvalue(res, 0, 0);
+    if (value_str == NULL)
     {
         //Create database
         char create_db[SCH_BUFF_MAX_LEN];
@@ -220,7 +220,7 @@ int storage_table_repo_init(char* table, int drop)
 #endif
 }
 
-int storage_table_flight_plan_init(int drop)
+int storage_table_flight_plan_init(int drop, int * entries)
 {
     char* err_msg;
     char* sql;
@@ -301,16 +301,15 @@ int storage_table_flight_plan_init(int drop)
     return 0;
 }
 
-
-
 int storage_table_payload_init(int drop)
 {
-
+    int rc = 0;
 #if SCH_STORAGE_MODE == 0
     if(drop)
         if(db != NULL)
             free(db);
     db = malloc(SCH_SECTIONS_PER_PAYLOAD*SCH_SIZE_PER_SECTION*last_sensor);
+    rc = db != NULL ? 0 : -1;
 #endif
 
 #if SCH_STORAGE_MODE > 0
@@ -319,7 +318,6 @@ int storage_table_payload_init(int drop)
     {
         char* err_msg;
         char* sql;
-        int rc;
         int i;
         for(i=0; i< last_sensor; ++i)
         {
@@ -356,19 +354,19 @@ int storage_table_payload_init(int drop)
     int i = 0;
     for(i=0; i< last_sensor; ++i)
     {
-        char create_table[SCH_BUFF_MAX_LEN*2];
-        memset(&create_table, 0, SCH_BUFF_MAX_LEN*2);
-        snprintf(create_table, SCH_BUFF_MAX_LEN*2, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
-        char* tok_sym[30];
-        char* tok_var[30];
-        char order[50];
+        char create_table[SCH_BUFF_MAX_LEN*4];
+        memset(&create_table, 0, SCH_BUFF_MAX_LEN*4);
+        snprintf(create_table, SCH_BUFF_MAX_LEN*4, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,", data_map[i].table);
+        char* tok_sym[300];
+        char* tok_var[300];
+        char order[300];
         strcpy(order, data_map[i].data_order);
-        char var_names[SCH_BUFF_MAX_LEN];
-        memset(&var_names, 0, SCH_BUFF_MAX_LEN);
+        char var_names[SCH_BUFF_MAX_LEN*4];
+        memset(&var_names, 0, SCH_BUFF_MAX_LEN*4);
         strcpy(var_names, data_map[i].var_names);
         int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, i);
 
-        int j=0;
+        int j;
         for(j=0; j < nparams; ++j)
         {
             char line[100];
@@ -383,7 +381,6 @@ int storage_table_payload_init(int drop)
 
 #if SCH_STORAGE_MODE ==1
         char* err_msg;
-        int rc;
         rc = sqlite3_exec(db, create_table, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK )
@@ -441,18 +438,19 @@ int storage_repo_get_value_idx(int index, char *table)
     memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
     snprintf(get_value_query,SCH_BUFF_MAX_LEN, "SELECT value FROM %s WHERE idx=%d;", table, index);
     LOGD(tag, "%s",  get_value_query);
-    PGresult *res = PQexec(conn, get_value_query);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-        LOGE(tag, "command storage_repo_get_value_idx failed: %s", PQerrorMessage(conn));
+    PGresult * res = PQexec(conn, get_value_query);
+    int status = PQresultStatus(res);
+    if (status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
+        LOGE(tag, "command storage_repo_get_value_idx failed or return 0: %s", PQerrorMessage(conn));
         PQclear(res);
         return -1;
     }
-    char* value_str;
-    if ((value_str = PQgetvalue(res, 0, 0)) != NULL)
+    char * value_str = PQgetvalue(res, 0, 0);
+    if ( value_str != NULL)
         value = atoi(value_str);
     else
     {
-        LOGE(tag, "The value wasn't found");
+        LOGE(tag, "Value does not for status variable index: %d", index);
     }
     PQclear(res);
 #endif
@@ -494,7 +492,13 @@ int storage_repo_get_value_str(char *name, char *table)
         PQclear(res);
         return -1;
     }
-    value = atoi(PQgetvalue(res, 0, 0));
+    char * value_str = PQgetvalue(res, 0, 0);
+    if (value_str != NULL) {
+        value = atoi(value_str);
+    } else {
+        LOGE(tag, "Value not found for sys variable: %s", name);
+    }
+
 #endif
     return value;
 }
@@ -550,7 +554,7 @@ int storage_repo_set_value_idx(int index, int value, char *table)
     return 0;
 }
 
-int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical)
+int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int periodical, int * entries)
 {
     #if SCH_STORAGE_MODE > 0
         char * insert_query_template =  "INSERT INTO %s (time, command, args, executions, periodical) "
@@ -562,7 +566,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
             memset(&insert_query, 0, sizeof(insert_query));
             snprintf(insert_query,SCH_BUFF_MAX_LEN*2, insert_query_template, fp_table, timetodo, command, args, executions, periodical,
                     command, args, executions, periodical);
-            LOGI(tag, "Flight Plan Postgres Command: %s",  insert_query);
+            LOGD(tag, "Flight Plan Postgres Command: %s",  insert_query);
             PGresult *res = PQexec(conn, insert_query);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Flight Plan Postgres Command INSERT failed: %s", PQerrorMessage(conn));
@@ -599,7 +603,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     return 0;
 }
 
-int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical)
+int storage_flight_plan_get(int timetodo, char* command, char* args, int* executions, int* periodical, int * entries)
 {
     #if SCH_STORAGE_MODE > 0
         #if SCH_STORAGE_MODE == 2
@@ -607,10 +611,13 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
             int col;
 
             char get_value_query[100];
-            sprintf(get_value_query, "SELECT * FROM %s WHERE time = %d", fp_table, timetodo);
-            PGresult *res = PQexec(conn, get_value_query);
-            if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-                LOGE(tag, "command storage_flight_plan_get failed: %s", PQerrorMessage(conn));
+            sprintf(get_value_query, "SELECT * FROM %s WHERE time = %d;", fp_table, timetodo);
+            LOGD(tag, "flight plan get query: %s ", get_value_query);
+            PGresult * res = PQexec(conn, get_value_query);
+            int status = PQresultStatus(res);
+
+            if (status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
+                LOGE(tag, "command storage_flight_plan_get failed or return 0: %s", PQerrorMessage(conn));
                 PQclear(res);
                 return -1;
             }
@@ -629,10 +636,10 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
             *executions = atoi(PQgetvalue(res, 0, 3));
             *periodical = atoi(PQgetvalue(res, 0, 4));
 
-            storage_flight_plan_erase(timetodo);
+            storage_flight_plan_erase(timetodo, entries);
 
             if (*periodical > 0)
-                storage_flight_plan_set(timetodo+*periodical, command, args,*executions,*periodical);
+                storage_flight_plan_set(timetodo+*periodical, command, args,*executions,*periodical, entries);
 
             PQclear(res);
             return 0;
@@ -662,7 +669,7 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
                 *executions = atoi(results[8]);
                 *periodical = atoi(results[9]);
 
-                storage_flight_plan_erase(timetodo);
+                storage_flight_plan_erase(timetodo, entries);
 
                 //if (atoi(results[9]) > 0)
                     //storage_flight_plan_set(timetodo+*periodical,results[6],results[7],*executions,*periodical);
@@ -675,14 +682,14 @@ int storage_flight_plan_get(int timetodo, char* command, char* args, int* execut
     return 0;
 }
 
-int storage_flight_plan_erase(int timetodo)
+int storage_flight_plan_erase(int timetodo, int * entries)
 {
     #if SCH_STORAGE_MODE > 0
         #if SCH_STORAGE_MODE == 2
             char del_query[SCH_BUFF_MAX_LEN];
             memset(&del_query, 0, SCH_BUFF_MAX_LEN);
             snprintf(del_query, SCH_BUFF_MAX_LEN, "DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
-            PGresult *res = PQexec(conn, del_query);
+            PGresult * res = PQexec(conn, del_query);
             if (PQresultStatus(res) != PGRES_COMMAND_OK) {
                 LOGE(tag, "Error in function storage_flight_plan_erase, postgres failed: %s", PQerrorMessage(conn));
                 PQclear(res);
@@ -717,12 +724,12 @@ int storage_flight_plan_erase(int timetodo)
     return 0;
 }
 
-int storage_flight_plan_reset(void)
+int storage_flight_plan_reset(int * entries)
 {
-    return storage_table_flight_plan_init(1);
+    return storage_table_flight_plan_init(1, entries);
 }
 
-int storage_flight_plan_show_table (void) {
+int storage_flight_plan_show_table (int entries) {
     #if SCH_STORAGE_MODE > 0
         #if SCH_STORAGE_MODE == 2
         int row;
@@ -731,8 +738,9 @@ int storage_flight_plan_show_table (void) {
         char get_value_query[SCH_BUFF_MAX_LEN];
         memset(&get_value_query, 0, SCH_BUFF_MAX_LEN);
         snprintf(get_value_query, SCH_BUFF_MAX_LEN, "SELECT * FROM %s", fp_table);
-        PGresult *res = PQexec(conn, get_value_query);
-        if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        PGresult * res = PQexec(conn, get_value_query);
+        int status = PQresultStatus(res);
+        if ( status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK ) {
             LOGE(tag, "command storage_flight_plan_show_table failed: %s", PQerrorMessage(conn));
             PQclear(res);
             return -1;
@@ -830,16 +838,16 @@ int storage_set_payload_data(int index, void* data, int payload)
     return 0;
 #endif
 #if SCH_STORAGE_MODE > 0
-    char* tok_sym[30];
-    char* tok_var[30];
-    char order[50];
+    char* tok_sym[300];
+    char* tok_var[300];
+    char *order = (char *)malloc(300);
     strcpy(order, data_map[payload].data_order);
-    char var_names[200];
+    char *var_names = (char *)malloc(1000);
     strcpy(var_names, data_map[payload].var_names);
     int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
 
-    char values[500];
-    char names[500];
+    char *values = (char *)malloc(1000);
+    char *names = (char *)malloc(1000);
     strcpy(names, "(id, tstz,");
     sprintf(values, "(%d, current_timestamp,", index);
 
@@ -865,8 +873,12 @@ int storage_set_payload_data(int index, void* data, int payload)
 
     strcat(names, ")");
     strcat(values, ")");
-    char insert_row[200];
+    char*  insert_row = (char *)malloc(2000);
     sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
+    free(order);
+    free(var_names);
+    free(values);
+    free(names);
     LOGD(tag, "%s", insert_row);
 
 #if SCH_STORAGE_MODE == 1
@@ -882,6 +894,7 @@ int storage_set_payload_data(int index, void* data, int payload)
     }
 #elif SCH_STORAGE_MODE == 2
     PGresult *res = PQexec(conn, insert_row);
+    free(insert_row);
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         LOGE(tag, "command INSERT failed: %s", PQerrorMessage(conn));
         PQclear(res);
@@ -921,16 +934,16 @@ int storage_get_payload_data(int index, void* data, int payload)
     memcpy(data, add, data_map[payload].size);
 #endif
 #if SCH_STORAGE_MODE > 0
-    char* tok_sym[30];
-    char* tok_var[30];
-    char order[50];
+    char* tok_sym[300];
+    char* tok_var[300];
+    char order[300];
     strcpy(order, data_map[payload].data_order);
-    char var_names[200];
+    char var_names[1000];
     strcpy(var_names, data_map[payload].var_names);
     int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
 
-    char values[500];
-    char names[500];
+    char values[1000];
+    char names[1000];
 
     strcpy(names, "");
     int j;
@@ -945,7 +958,7 @@ int storage_get_payload_data(int index, void* data, int payload)
         }
     }
 
-    char get_value[200];
+    char get_value[2000];
     sprintf(get_value,"SELECT %s FROM %s WHERE id=%d LIMIT 1"
             ,names, data_map[payload].table, index);
     LOGD(tag, "%s",  get_value);
@@ -981,7 +994,8 @@ int storage_get_payload_data(int index, void* data, int payload)
     sqlite3_finalize(stmt);
 #elif SCH_STORAGE_MODE == 2
     PGresult *res = PQexec(conn, get_value);
-    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+    int status = PQresultStatus(res);
+    if (status != PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
         LOGE(tag, "command storage_get_recent_payload_data failed: %s", PQerrorMessage(conn));
         PQclear(res);
         return -1;
@@ -990,7 +1004,9 @@ int storage_get_payload_data(int index, void* data, int payload)
     int val;
     for(j=0; j < nparams; ++j) {
         int param_size = get_sizeof_type(tok_sym[j]);
-        get_psql_value(tok_sym[j], &val, res, j);
+        if (get_psql_value(tok_sym[j], &val, res, j) == -1) {
+            return -1;
+        }
         // TODO: sum data pointer with accumulative param sizes
         memcpy(data+(j*4), &val, param_size);
     }
@@ -1038,7 +1054,11 @@ static int dummy_callback(void *data, int argc, char **argv, char **names)
 const char* get_sql_type(char* c_type)
 {
     if(strcmp(c_type, "%f") == 0) {
+#if SCH_STORAGE_MODE == 2
+        return "DOUBLE PRECISION";
+#else
         return "REAL";
+#endif
     }
     else if(strcmp(c_type, "%d") == 0) {
         return "INTEGER";
@@ -1069,24 +1089,31 @@ const char* get_sql_type(char* c_type)
         }
     }
 #elif SCH_STORAGE_MODE == 2
-    void get_psql_value(char* c_type, void* buff, PGresult *res, int j)
+    int get_psql_value(char* c_type, void* buff, PGresult *res, int j)
     {
+        char * res_str = PQgetvalue(res, 0, j);
+
+        if( res_str == NULL ) {
+            return -1 ;
+        }
+
         if(strcmp(c_type, "%f") == 0) {
             float val;
-            val =(float) atof(PQgetvalue(res, 0, j));
+            val =(float) atof(res_str);
             memcpy(buff, &val, sizeof(float));
         }
         else if(strcmp(c_type, "%d") == 0) {
             int val;
-            val =  atoi(PQgetvalue(res, 0, j));
+            val =  atoi(res_str);
             memcpy(buff, &val, sizeof(int));
         }
         else if(strcmp(c_type, "%u") == 0) {
             unsigned int val;
             // TODO: Change to  strtoul()
-            val = (unsigned int) atol(PQgetvalue(res, 0, j));
+            val = (unsigned int) atol(res_str);
             memcpy(buff, &val, sizeof(unsigned int));
         }
+        return 0;
     }
 #endif
 

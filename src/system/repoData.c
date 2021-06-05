@@ -41,26 +41,14 @@ time_t sec = 0;
     static fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
-sample_machine_t machine;
-
-void initialize_payload_vars(void){
-    int i;
-    for(i=0; i< last_sensor; ++i) {
-        if(dat_get_system_var(data_map[i].sys_index) == -1) {
-            dat_set_system_var(data_map[i].sys_index, 0);
-            dat_set_system_var(data_map[i].sys_ack, 0);
-        }
-    }
-}
+dat_stmachine_t status_machine;
 
 void dat_repo_init(void)
 {
     // Init repository mutex
-    if(osSemaphoreCreate(&repo_data_sem) != CSP_SEMAPHORE_OK)
+    if(osSemaphoreCreate(&repo_data_sem) != OS_SEMAPHORE_OK)
         LOGE(tag, "Unable to create system status repository mutex");
 
-    if(osSemaphoreCreate(&repo_data_fp_sem) != CSP_SEMAPHORE_OK)
-        LOGE(tag, "Unable to create flight plan repository mutex");
 
     LOGD(tag, "Initializing data repositories buffers...")
 #if (SCH_STORAGE_MODE == 0)
@@ -105,7 +93,9 @@ void dat_repo_init(void)
         assertf(rc==0, tag, "Unable to create payload repo");
 
         //Init system flight plan table
-        rc=storage_table_flight_plan_init(0);
+        int entries = dat_get_system_var(dat_fpl_queue);
+        rc=storage_table_flight_plan_init(0, &entries);
+        dat_set_system_var(dat_fpl_queue, entries);
         assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif
@@ -183,7 +173,7 @@ int dat_set_system_var(dat_status_address_t index, int value)
 {
     value32_t v;
     v.i = value;
-    dat_set_status_var(index, v);
+    return dat_set_status_var(index, v);
 }
 
 int dat_set_status_var(dat_status_address_t index, value32_t value)
@@ -329,24 +319,28 @@ static int _dat_del_fp_async(int timetodo)
 
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
 {
+    int entries = dat_get_system_var(dat_fpl_queue);
 
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     //TODO : agregar signal de segment para responder falla
     int rc = _dat_set_fp_async(timetodo, command, args, executions, periodical);
 #else
-    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical);
+    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
     return rc;
 }
 
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* period)
 {
     int rc;
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     int i;
@@ -369,26 +363,30 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
         }
     }
 #else
-    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, period);
+    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, period, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
 
     return rc;
 }
 
 int dat_del_fp(int timetodo)
 {
-
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE ==0
     int rc = _dat_del_fp_async(timetodo);
 #else
-    int rc = storage_flight_plan_erase(timetodo);
+    int rc = storage_flight_plan_erase(timetodo, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
 
     return rc;
 }
@@ -396,7 +394,8 @@ int dat_del_fp(int timetodo)
 int dat_reset_fp(void)
 {
     int rc;
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE == 0
     int i;
@@ -410,17 +409,21 @@ int dat_reset_fp(void)
     }
     rc = 0;
 #else
-    rc = storage_table_flight_plan_init(1);
+    rc = storage_table_flight_plan_init(1, &entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
+
+    dat_set_system_var(dat_fpl_queue, entries);
     return rc;
 }
 
 int dat_show_fp (void)
 {
     int rc;
-    osSemaphoreTake(&repo_data_fp_sem, portMAX_DELAY);
+
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
 #if SCH_STORAGE_MODE ==0
     int cont = 0;
@@ -447,10 +450,10 @@ int dat_show_fp (void)
     }
     rc = 0;
 #else
-    rc = storage_flight_plan_show_table();
+    rc = storage_flight_plan_show_table(entries);
 #endif
     //Exit critical zone
-    osSemaphoreGiven(&repo_data_fp_sem);
+    osSemaphoreGiven(&repo_data_sem);
     return rc;
 }
 
@@ -506,12 +509,12 @@ int dat_set_time(int new_time)
 
     if (rc == -1)
     {
-        LOGE(tag, "Failed attempt at creating a child process for setting the machine clock");
+        LOGE(tag, "Failed attempt at creating a child process for setting the status_machine clock");
         return 1;
     }
     else if (rc == 127)
     {
-        LOGE(tag, "Failed attempt at starting a shell for setting machine clock");
+        LOGE(tag, "Failed attempt at starting a shell for setting status_machine clock");
         return 1;
     }
     else
@@ -532,11 +535,11 @@ int dat_show_time(int format)
     {
         char buffer[80];
         strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
-        printf("%s", buffer);
+        LOGR("%s", buffer);
     }
     if(format >= 1)
     {
-        printf("%u\n", (unsigned int)time_to_show);
+        LOGR(tag, "%u\n", (unsigned int)time_to_show);
     }
 
     return 0;
@@ -562,13 +565,25 @@ int dat_add_payload_sample(void* data, int payload)
     osSemaphoreGiven(&repo_data_sem);
 
     // Update address
-    if(ret==0) {
-        dat_set_system_var(data_map[payload].sys_index, index+1);
-        return index+1;
+    if (ret >= 0) {
+        dat_set_system_var(data_map[payload].sys_index, index+1+ret);
+        return index+1+ret;
     } else {
         LOGE(tag, "Couldn't set data payload %d", payload);
         return -1;
     }
+}
+
+int dat_get_payload_sample(void*data, int payload, int index)
+{
+    int ret;
+
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+
+    ret = storage_get_payload_data(index, data, payload);
+    osSemaphoreGiven(&repo_data_sem);
+
+    return ret;
 }
 
 
@@ -613,11 +628,16 @@ int dat_delete_memory_sections(void)
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Free memory or drop databases
     ret = storage_delete_memory_sections();
-#if SCH_FP_ENABLED
-    storage_flight_plan_reset();
-#endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
+#if SCH_FP_ENABLED
+
+    int entries = dat_get_system_var(dat_fpl_queue);
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    storage_flight_plan_reset(&entries);
+    osSemaphoreGiven(&repo_data_sem);
+    dat_set_system_var(dat_fpl_queue, entries >= 0 ? entries : 0);
+#endif
     return ret;
 }
 
@@ -646,13 +666,19 @@ int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_n
 void get_value_string(char* ret_string, char* c_type, char* buff)
 {
     if(strcmp(c_type, "%f") == 0) {
-        sprintf(ret_string, " %f", *((float*)buff));
+        if (*((int *)buff) == -1) {
+            sprintf(ret_string, " 'nan'");
+        } else {
+            sprintf(ret_string, " %f", *((float*)buff));
+        }
     }
     else if(strcmp(c_type, "%d") == 0) {
         sprintf(ret_string, " %d", *((int*)buff));
     }
     else if(strcmp(c_type, "%u") == 0) {
         sprintf(ret_string, " %u", *((unsigned int*)buff));
+    } else if(strcmp(c_type, "%i") == 0) {
+        sprintf(ret_string," %i", *((int*)buff));
     }
 }
 
@@ -665,7 +691,10 @@ int get_sizeof_type(char* c_type)
         return sizeof(int);
     } else if(strcmp(c_type, "%u") == 0) {
         return sizeof(int);
-    } else {
+    } else if(strcmp(c_type, "%i") == 0) {
+        return sizeof(int);
+    }
+    else {
         return -1;
     }
 }
@@ -676,16 +705,18 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     //FIXME: Use malloc to allocate large buffers, here 1280  bytes allocated!
     //FIXME: Task stack size: 5*256 = 1280 bytes!
 
-    char* tok_sym[30];
-    char* tok_var[30];
-    char *order = (char *)malloc(50);
+    char* tok_sym[300];
+    char* tok_var[300];
+//    char** tok_sym = (char**)malloc(300);
+//    char** tok_var = (char**)malloc(300);
+    char *order = (char *)malloc(300);
     strcpy(order, data_map[payload].data_order);
-    char *var_names = (char *)malloc(200);
+    char *var_names = (char *)malloc(1000);
     strcpy(var_names, data_map[payload].var_names);
     int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, (int)payload);
 
-    char *values = (char *)malloc(500);
-    char *names = (char *)malloc(500);
+    char *values = (char *)malloc(1000);
+    char *names = (char *)malloc(1000);
     strcpy(names, "");
     strcpy(values, "");
 
@@ -709,28 +740,38 @@ int dat_print_payload_struct(void* data, unsigned int payload)
         }
     }
     strcat(names, ":");
-    printf("%s %s\n", names, values);
+    printf( "%s %s\n", names, values);
 
     free(order);
     free(var_names);
     free(values);
     free(names);
+//    free(tok_sym);
+//    free(tok_var);
 
     return 0;
 }
 
-int set_machine_state(machine_action_t action, unsigned int step, int nsamples)
+int dat_set_stmachine_state(dat_stmachine_action_t action, unsigned int step, int nsamples)
 {
     LOGI(tag, "Changing state to  %d %u %d", action, step, nsamples);
     if (action >= 0 && action < ACT_LAST && step > 0 && nsamples > -2) {
         osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-        machine.action = action;
-        machine.step = step;
-        machine.samples_left = nsamples;
+        status_machine.action = action;
+        status_machine.step = step;
+        status_machine.samples_left = nsamples;
         osSemaphoreGiven(&repo_machine_sem);
         return 1;
     }
     return 0;
+}
+
+int dat_stmachine_is_sensor_active(int payload, int active_payloads, int n_payloads) {
+//    printf("max number of active payload %d\n", (1 << n_payloads));
+    if ( active_payloads >= (1 << n_payloads) ) {
+        return 0;
+    }
+    return ( (active_payloads & (1 << payload)) != 0 );
 }
 
 void _get_sat_quaterion(quaternion_t *q,  dat_status_address_t index)

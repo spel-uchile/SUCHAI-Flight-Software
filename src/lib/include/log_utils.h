@@ -32,6 +32,7 @@
  */
 typedef enum {
     LOG_LVL_NONE,       /*!< No log output */
+    LOG_LVL_RESULT,     /*!< Commands results, transmitted to a remote node */
     LOG_LVL_ERROR,      /*!< Critical errors, software module can not recover on its own */
     LOG_LVL_WARN,       /*!< Error conditions from which recovery measures have been taken */
     LOG_LVL_INFO,       /*!< Information messages which describe normal flow of events */
@@ -78,21 +79,22 @@ extern log_level_t log_lvl;
 extern uint8_t log_node;
 
 /// Logging functions @see log_level_t
-#define LOGE(tag, msg, ...) if(log_lvl >= LOG_LVL_ERROR)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("ERROR", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGW(tag, msg, ...) if(log_lvl >= LOG_LVL_WARN)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("WARN ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGI(tag, msg, ...) if(log_lvl >= LOG_LVL_INFO)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("INFO ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGD(tag, msg, ...) if(log_lvl >= LOG_LVL_DEBUG)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("DEBUG", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGV(tag, msg, ...) if(log_lvl >= LOG_LVL_VERBOSE) {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("VERB ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
-#define LOGR(tag, msg, ...)                                {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_print   ("REMOT", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
+#define LOGE(tag, msg, ...)   if(log_lvl >= LOG_LVL_ERROR)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("ERROR", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
+#define LOGW(tag, msg, ...)   if(log_lvl >= LOG_LVL_WARN)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("WARN ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
+#define LOGI(tag, msg, ...)   if(log_lvl >= LOG_LVL_INFO)    {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("INFO ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
+#define LOGD(tag, msg, ...)   if(log_lvl >= LOG_LVL_DEBUG)   {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("DEBUG", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
+#define LOGV(tag, msg, ...)   if(log_lvl >= LOG_LVL_VERBOSE) {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("VERB ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
+#define LOGR(tag, msg, ...)   if(log_lvl >= LOG_LVL_RESULT)  {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_function("RES  ", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
+#define LOGP(tag, msg, ...)                                  {osSemaphoreTake(&log_mutex, portMAX_DELAY); log_print   ("REMOT", tag, msg, ##__VA_ARGS__); osSemaphoreGiven(&log_mutex);}
 
 /// Assert functions
 #define clean_errno() (errno == 0 ? "None" : strerror(errno))
-#define _log_error(T, M, ...) LOGE(T, "(%s:%d: errno: %s) " M, __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)
-#define assertf(A, T, M, ...) if(!(A)) {_log_error(T, M, ##__VA_ARGS__); assert(A); }
+#define log_errno(T, M, ...) LOGE(T, "(%s:%d: errno: %s) " M, __FILE__, __LINE__, clean_errno(), ##__VA_ARGS__)
+#define assertf(A, T, M, ...) if(!(A)) {log_errno(T, M, ##__VA_ARGS__); assert(A); }
 
 /// Debug buffer content
-#define print_buff(buf, size) {int i; printf("["); for(i=0; i<size; i++) printf("0x%02X, ", buf[i]); printf("]\n");}
-#define print_buff16(buf16, size) {int i; printf("["); for(i=0; i<size; i++) printf("0x%04X, ", buf16[i]); printf("]\n");}
+#define print_buff(buf, size) {int i; printf("["); for(i=0; i<(size); i++) printf("0x%02X, ", (buf)[i]); printf("]\n");}
+#define print_buff16(buf16, size) {int i; printf("["); for(i=0; i<(size); i++) printf("0x%04X, ", (buf16)[i]); printf("]\n");}
 
 /// Defines to string
 #define STRINGIFY(x) #x

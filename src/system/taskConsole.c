@@ -21,6 +21,7 @@
 #include "taskConsole.h"
 
 static const char *tag = "Console";
+static const char *cmd_hist = "/tmp/suchai_fs_history.txt";
 
 const char console_banner[] =
 "\n______________________________________________________________________________\n\
@@ -55,7 +56,7 @@ void taskConsole(void *param)
         if(console_read(buffer, SCH_BUFF_MAX_LEN-1) != 0)
             continue;
 
-        new_cmd = cmd_parse_from_str(buffer);
+        new_cmd = cmd_build_from_str(buffer);
 
         if(new_cmd != NULL)
         {
@@ -78,6 +79,11 @@ void taskConsole(void *param)
 int console_init(void)
 {
     LOGD(tag, "Init...\n");
+
+#ifdef LINUX
+    linenoiseHistoryLoad(cmd_hist); /* Load the history at startup */
+#endif
+
     cmd_print_all();
     return 0;
 }
@@ -87,24 +93,43 @@ int console_read(char *buffer, int len)
 #ifdef LINUX
     char *line;
     line = linenoise("SUCHAI> ");
-    if(line != NULL)
-    {
-        linenoiseHistoryAdd(line);
-        strncpy(buffer, line, len);
-        free(line);
-        return 0;
-    }
-    return -1;
+    if(line == NULL)
+        return -1;
+
+    linenoiseHistoryAdd(line);
+    linenoiseHistorySave(cmd_hist);
+    strncpy(buffer, line, len);
+    free(line);
 #else
     char *s = fgets(buffer, len, stdin);
-    // Clean CR and LF character to be compatible with
-    // linenoise behaviour
+    // Clean CR and LF character to be compatible with linenoise behaviour
+    if(s == NULL)
+        return -1;
+
     int i;
     for(i=0; i<len; i++)
     {
         if(s[i] == '\n' || s[i] == '\r')
             s[i] = 0;
     }
-    return (s != NULL) ? 0 : -1;
 #endif
+
+    /* Parse remote commands mode using "<node>: command" */
+    int next;
+    int node;
+    if(sscanf(buffer, "%d: %n", &node, &next) == 1)
+    {
+        if(next < len)
+        {
+            printf("(%d) %s\r\n", next, buffer + next);
+            char *tmp_buff = malloc(len + 1);
+            memset(tmp_buff, 0, len + 1);
+            strncpy(tmp_buff, buffer + next, len - next);
+            memset(buffer, 0, len);
+            snprintf(buffer, len, "com_send_cmd %d %s", node, tmp_buff);
+            printf("%s\r\n", buffer);
+            free(tmp_buff);
+        }
+    }
+    return 0;
 }

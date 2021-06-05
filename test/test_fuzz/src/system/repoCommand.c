@@ -195,7 +195,7 @@ void cmd_add_params_var(cmd_t *cmd, ...)
     }
 }
 
-cmd_t *cmd_parse_from_str(char *buff)
+cmd_t *cmd_build_from_str(char *buff)
 {
     cmd_t *new_cmd = NULL;
     size_t len = strlen(buff);
@@ -321,6 +321,33 @@ void cmd_print_all(void)
 
     osSemaphoreGiven(&repo_cmd_sem);
 
+}
+
+char *cmd_save_all(void)
+{
+    int i;
+    int names_len = 0;
+    int len_cnt = 0;
+    char *cmds_list;
+
+    //Count space to allocate
+    for(i=0; i<cmd_index; i++)
+    {
+        names_len = names_len + (int)strlen(cmd_list[i].name) + 1;
+    }
+
+    //Initialize list of commands
+    cmds_list = (char *)malloc(names_len + 1);
+    memset(cmds_list, '\0', names_len + 1);
+
+    //Copy commands name on the list
+    for(i=0; i<cmd_index; i++) {
+        strncpy(cmds_list + len_cnt, cmd_list[i].name, strlen(cmd_list[i].name));
+        strncpy(cmds_list + len_cnt + strlen(cmd_list[i].name), "\n", 1);
+        len_cnt = len_cnt + (int)strlen(cmd_list[i].name) + 1;
+    }
+
+    return cmds_list;
 }
 
 int cmd_repo_init(void)

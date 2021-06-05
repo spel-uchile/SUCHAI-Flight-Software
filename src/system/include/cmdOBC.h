@@ -33,7 +33,7 @@ void cmd_obc_init(void);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_ident(char* fmt, char* params, int nparams);
 
@@ -45,7 +45,7 @@ int obc_ident(char* fmt, char* params, int nparams);
  * @param fmt Str. Parameters format "d"
  * @param params Str. Parameters as string "1"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_debug(char *fmt, char *params, int nparams);
 
@@ -55,7 +55,7 @@ int obc_debug(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_reset_wdt(char *fmt, char *params, int nparams);
 
@@ -70,7 +70,7 @@ int obc_reset_wdt(char *fmt, char *params, int nparams);
  * @param params Str. Parameters as string: "" or "reboot" in Linux to actually
  *                    reboot the system.
  * @param nparams Int. Number of parameters 0 or 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_reset(char *fmt, char *params, int nparams);
 
@@ -81,7 +81,7 @@ int obc_reset(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_get_os_memory(char *fmt, char *params, int nparams);
 
@@ -91,7 +91,7 @@ int obc_get_os_memory(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d"
  * @param params Str. Parameters as string "<time to set>"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_set_time(char* fmt, char* params,int nparams);
 
@@ -102,7 +102,7 @@ int obc_set_time(char* fmt, char* params,int nparams);
  * @param fmt Str. Parameters format "%d"
  * @param params Str. Parameters as string "<format>"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_get_time(char *fmt, char *params, int nparams);
 
@@ -114,7 +114,7 @@ int obc_get_time(char *fmt, char *params, int nparams);
  * @param fmt str. Parameters format: "%s"
  * @param params  str. Parameters, the system command to execute: eg: "echo hello world"
  * @param nparams int. Number of parameters: 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_system(char* fmt, char* params, int nparams);
 
@@ -127,7 +127,7 @@ int obc_system(char* fmt, char* params, int nparams);
  * @param fmt str. Parameters format: "%d %d"
  * @param params  str. Parameters as string <channel> <duty>,
  * @param nparams int. Number of parameters: 2
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_set_pwm_duty(char* fmt, char* params, int nparams);
 
@@ -140,7 +140,7 @@ int obc_set_pwm_duty(char* fmt, char* params, int nparams);
  * @param fmt str. Parameters format: "%d %f"
  * @param params  str. Parameters as string <channel> <freq>,
  * @param nparams int. Number of parameters: 2
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_set_pwm_freq(char* fmt, char* params, int nparams);
 
@@ -152,7 +152,7 @@ int obc_set_pwm_freq(char* fmt, char* params, int nparams);
  * @param fmt str. Parameters format: "%d"
  * @param params  str. Parameters as string <enable>,
  * @param nparams int. Number of parameters: 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_pwm_pwr(char *fmt, char *params, int nparams);
 
@@ -163,7 +163,7 @@ int obc_pwm_pwr(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_get_sensors(char *fmt, char *params, int nparams);
 
@@ -174,7 +174,7 @@ int obc_get_sensors(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_update_status(char *fmt, char *params, int nparams);
 
@@ -183,8 +183,7 @@ int obc_update_status(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly, CMD_FAIL in case of errors or
- * CMD_ERROR in case of parameter errors.
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_get_tle(char *fmt, char *params, int nparams);
 
@@ -219,8 +218,7 @@ int obc_get_tle(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d %n"
  * @param params Str. Parameters as string "<line (69 chars including line number)>"
  * @param nparams Int. Number of parameters 2
- * @return  CMD_OK if executed correctly, CMD_FAIL in case of errors or
- * CMD_ERROR in case of parameter errors.
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_set_tle(char *fmt, char *params, int nparams);
 
@@ -253,8 +251,7 @@ int obc_set_tle(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly, CMD_FAIL in case of errors or
- * CMD_ERROR in case of parameter errors.
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_update_tle(char *fmt, char *params, int nparams);
 
@@ -286,8 +283,7 @@ int obc_update_tle(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%ld"
  * @param params Str. Parameters as string "<unix_timestamp | 0>"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly, CMD_FAIL in case of errors or
- * CMD_ERROR in case of parameter errors.
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_prop_tle(char *fmt, char *params, int nparams);
 

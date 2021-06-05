@@ -22,13 +22,11 @@
 #include "osDelay.h"
 
 #include "repoCommand.h"
-#include "taskSensors.h"
-
 
 void cmd_sensors_init(void);
 
 /**
- * Control sensors state machine task
+ * Control sensors state status_machine task
  * @param fmt "%u %u %d"
  * @param params <action> <step> <nsamples>
  * action: Next action ACT_PAUSE= 0, ACT_START=1, ACT_STAND_BY=2,
@@ -38,11 +36,11 @@ void cmd_sensors_init(void);
  * @param nparams 3
  * @code
  *
- * //Start machine, every 2 seconds, 10 samples max.
+ * //Start status_machine, every 2 seconds, 10 samples max.
  * set_state 1 2 10
- * //Start machine, every 1 seconds, for ever
+ * //Start status_machine, every 1 seconds, for ever
  * set_state 1 1 -1
- * //Stpo machine [keep 2 seconds, 10 samples]
+ * //Stpo status_machine [keep 2 seconds, 10 samples]
  * set_state 2 2 10
  *
  * @return
@@ -80,16 +78,5 @@ int take_sample(char *fmt, char *params, int nparams);
  * @return CMD_OK if executed correctly
  */
 int init_dummy_sensor(char *fmt, char *params, int nparams);
-
-
-/**
- * Return if payload is active in sensor sampling
- * @param payload
- * @param active_payloads
- * @param n_payloads
- * @return
- */
-int is_payload_active(int payload, int active_payloads, int n_payloads);
-
 
 #endif /* _CMD_SENS_H */

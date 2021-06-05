@@ -30,7 +30,7 @@ void cmd_fp_init(void);
  * @param params Str. Parameters as string
  *  "<day> <month> <year> <hour> <min> <sec> <executions> <period> <command> [args]"
  * @param nparams Int. Number of parameters 10
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int fp_set(char *fmt, char *params, int nparams);
 
@@ -41,7 +41,7 @@ int fp_set(char *fmt, char *params, int nparams);
  * @param params Str. Parameters as string
  *  "<unixtime> <executions> <period> <command> [args]"
  * @param nparams Int. Number of parameters 5
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int fp_set_unix(char *fmt, char *params, int nparams);
 
@@ -53,7 +53,7 @@ int fp_set_unix(char *fmt, char *params, int nparams);
  * @param params Str. Parameters as string
  *  "<seconds> <executions> <period>  <command> [args]"
  * @param nparams Int. Number of parameters 5
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int fp_set_dt(char *fmt, char *params, int nparams);
 
@@ -63,7 +63,7 @@ int fp_set_dt(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d %d %d %d %d %d"
  * @param params Str. Parameters as string "<day> <month> <year> <hour> <min> <sec>"
  * @param nparams Int. Number of parameters 6
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int fp_delete(char* fmt, char* params, int nparams);
 
@@ -73,7 +73,7 @@ int fp_delete(char* fmt, char* params, int nparams);
  * @param fmt Str. Parameters format "%d"
  * @param params Str. Parameters as string "<unix_time>"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int fp_delete_unix(char* fmt, char* params, int nparams);
 
@@ -83,7 +83,7 @@ int fp_delete_unix(char* fmt, char* params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int fp_show(char* fmt, char* params, int nparams);
 
@@ -93,7 +93,7 @@ int fp_show(char* fmt, char* params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int fp_reset(char* fmt, char* params, int nparams);
 

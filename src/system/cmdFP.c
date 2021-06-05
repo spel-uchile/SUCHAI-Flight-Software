@@ -46,7 +46,7 @@ int fp_set(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec, &executions, &period, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     str_time.tm_mday = day;
@@ -64,7 +64,7 @@ int fp_set(char *fmt, char *params, int nparams)
     if (rc == 0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int fp_set_unix(char *fmt, char *params, int nparams)
@@ -79,7 +79,7 @@ int fp_set_unix(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &unixtime, &executions, &periodical, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
@@ -88,7 +88,7 @@ int fp_set_unix(char *fmt, char *params, int nparams)
     if (rc == 0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 
 }
 
@@ -103,7 +103,7 @@ int fp_set_dt(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &seconds, &executions, &periodical, &command, &next) != nparams-1)
     {
         LOGW(tag, "fp_set_cmd used with invalid params: %s", params);
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     time_t current = dat_get_time();
@@ -113,7 +113,7 @@ int fp_set_dt(char *fmt, char *params, int nparams)
     if (rc == 0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int fp_delete(char* fmt, char* params, int nparams)
@@ -126,7 +126,7 @@ int fp_delete(char* fmt, char* params, int nparams)
     if(params == NULL || sscanf(params, fmt, &day, &month, &year, &hour, &min, &sec) != nparams)
     {
         LOGW(tag, "fp_del_cmd used with invalid params: %s", params);
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     str_time.tm_mday = day;
@@ -144,7 +144,7 @@ int fp_delete(char* fmt, char* params, int nparams)
     if(rc==0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int fp_delete_unix(char* fmt, char* params, int nparams)
@@ -155,7 +155,7 @@ int fp_delete_unix(char* fmt, char* params, int nparams)
     if(params == NULL || sscanf(params, fmt, &tmptime) != nparams)
     {
         LOGW(tag, "fp_del_cmd_unix used with invalid params! (%s)", params);
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     unixtime = (time_t) tmptime;
@@ -164,7 +164,7 @@ int fp_delete_unix(char* fmt, char* params, int nparams)
     if (rc == 0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int fp_show(char* fmt, char* params, int nparams)
@@ -175,7 +175,7 @@ int fp_show(char* fmt, char* params, int nparams)
     if(rc==0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int fp_reset(char* fmt, char* params, int nparams)
@@ -186,6 +186,6 @@ int fp_reset(char* fmt, char* params, int nparams)
     if(rc==0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 

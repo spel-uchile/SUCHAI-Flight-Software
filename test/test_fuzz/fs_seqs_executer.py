@@ -54,6 +54,7 @@ def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile)
         seq_json = json.load(json_file)
 
     seq_num = 0
+    return_codes = []
     for seq in seq_json:
         # Execute flight software
         node = FuzzCspZmqNode(addr, hub_ip="127.0.0.1", proto=protocol)
@@ -94,7 +95,11 @@ def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile)
         node.send_message("obc_reset", hdr)
 
         # Get SUCHAI process return code
-        return_code = suchai_process.wait()
+        try:
+            return_code = suchai_process.wait(300)
+        except:
+            e = sys.exc_info()[0]
+            print("Error: {}".format(e))
         end_time = time.time()
 
         if print_logfile:
@@ -109,6 +114,8 @@ def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile)
         print("Execution time (s): ", end_time - init_time)
         print("Memory usage (kb): ", rm_end - rm_start)
 
+        return_codes.append(return_code)
+
         #assert return_code == 0
         #assert end_time - init_time < 10
         #assert rm_end - rm_start
@@ -118,6 +125,8 @@ def execute_file_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile)
 
     # Kill zmqhub.py
     ex_zmqhub.kill()
+
+    assert all(r == 0 for r in return_codes)
 
 
 def execute_files_seqs(exec_dir, path_to_json, log_path, protocol, print_logfile):

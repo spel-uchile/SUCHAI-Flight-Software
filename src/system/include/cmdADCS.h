@@ -36,7 +36,7 @@ void cmd_adcs_init(void);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK | CMD_FAIL | CMD_ERROR
+ * @return CMD_OK | CMD_ERROR_SYNTAX | CMD_ERROR
  */
 int adcs_point(char* fmt, char* params, int nparams);
 
@@ -45,7 +45,7 @@ int adcs_point(char* fmt, char* params, int nparams);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK | CMD_FAIL | CMD_ERROR
+ * @return CMD_OK | CMD_ERROR_SYNTAX | CMD_ERROR
  */
 int adcs_get_quaternion(char* fmt, char* params, int nparams);
 
@@ -54,7 +54,7 @@ int adcs_get_quaternion(char* fmt, char* params, int nparams);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK | CMD_FAIL | CMD_ERROR
+ * @return CMD_OK | CMD_ERROR_SYNTAX | CMD_ERROR
  */
 int adcs_get_omega(char* fmt, char* params, int nparams);
 
@@ -63,7 +63,7 @@ int adcs_get_omega(char* fmt, char* params, int nparams);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK | CMD_FAIL | CMD_ERROR
+ * @return CMD_OK | CMD_ERROR_SYNTAX | CMD_ERROR
  */
 int adcs_get_mag(char* fmt, char* params, int nparams);
 
@@ -72,7 +72,7 @@ int adcs_get_mag(char* fmt, char* params, int nparams);
  * @param fmt Str. Parameters format "%lf"
  * @param params Str. Parameters as string: "<control cycle>"
  * @param nparams Int. Number of parameters 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int adcs_control_torque(char* fmt, char* params, int nparams);
 
@@ -81,7 +81,7 @@ int adcs_control_torque(char* fmt, char* params, int nparams);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int adcs_mag_moment(char* fmt, char* params, int nparams);
 
@@ -90,7 +90,7 @@ int adcs_mag_moment(char* fmt, char* params, int nparams);
  * @param fmt "%lf lf lf lf lf lf"
  * @param params "<x y z> <wx wy wz>"
  * @param nparams 6
- * @return CMD_OK | CMD_ERROR | CMD_FAIL
+ * @return CMD_OK | CMD_ERROR | CMD_ERROR_SYNTAX
  */
 int adcs_set_target(char* fmt, char* params, int nparams);
 
@@ -100,7 +100,7 @@ int adcs_set_target(char* fmt, char* params, int nparams);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK | CMD_ERROR | CMD_FAIL
+ * @return CMD_OK | CMD_ERROR | CMD_ERROR_SYNTAX
  */
 int adcs_target_nadir(char* fmt, char* params, int nparams);
 
@@ -109,7 +109,7 @@ int adcs_target_nadir(char* fmt, char* params, int nparams);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK | CMD_ERROR | CMD_FAIL
+ * @return CMD_OK | CMD_ERROR | CMD_ERROR_SYNTAX
  */
 int adcs_detumbling_mag(char* fmt, char* params, int nparams);
 
@@ -118,7 +118,7 @@ int adcs_detumbling_mag(char* fmt, char* params, int nparams);
  * @param fmt ""
  * @param params ""
  * @param nparams 0
- * @return CMD_OK | CMD_ERROR | CMD_FAIL
+ * @return CMD_OK | CMD_ERROR | CMD_ERROR_SYNTAX
  */
 int adcs_send_attitude(char* fmt, char* params, int nparams);
 

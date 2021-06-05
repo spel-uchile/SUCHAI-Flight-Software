@@ -55,11 +55,11 @@
 
 /* Command definitions */
 /**
- * Define return the command
+ * Define commands return values
  */
-#define CMD_OK 1        ///< Command executed successfully
-#define CMD_FAIL 0      ///< Command not executed as expected
-#define CMD_ERROR -1    ///< Command returned an error
+#define CMD_OK 1             ///< Command executed successfully
+#define CMD_ERROR 0          ///< Command not executed as expected
+#define CMD_SYNTAX_ERROR -1  ///< Command parameters syntax error
 
 /**
  *  Defines the prototype of a command
@@ -134,7 +134,7 @@ cmd_t * cmd_get_idx(int idx);
  * string so the user must free the array.
  *
  * @param idx Int. Command index or id
- * @return Int. CMD_OK if the command was found, CMD_ERROR otherwise.
+ * @return Str. Command name.
  */
 char * cmd_get_name(int idx);
 
@@ -208,7 +208,7 @@ void cmd_add_params_var(cmd_t *cmd, ...);
  *      assert(cmd != NULL);
  * @endcode
  */
-cmd_t *cmd_parse_from_str(char *buff);
+cmd_t *cmd_build_from_str(char *buff);
 
 /**
  * Destroys a command and frees the allocated memory
@@ -219,6 +219,12 @@ void cmd_free(cmd_t *cmd);
 * Print the list of registered commands
 */
 void cmd_print_all(void);
+
+/**
+ * Saves and returns list of available commands
+ * @return char *. List of commands.
+ */
+char *cmd_save_all(void);
 
 /**
  * Initializes the command buffer adding null_cmd

@@ -34,9 +34,12 @@ void cmd_eps_init(void)
     cmd_add("eps_get_hk", eps_get_hk, "", 0);
     cmd_add("eps_get_config", eps_get_config, "", 0);
     cmd_add("eps_set_heater", eps_set_heater, "%d %d", 2);
-    cmd_add("eps_update_status", eps_update_status_vars, "", 0);
     cmd_add("eps_set_output", eps_set_output, "%d %d", 2);
     cmd_add("eps_set_output_all", eps_set_output_all, "%d", 1);
+    cmd_add("eps_set_vboost", eps_set_vboost, "%d", 1);
+    cmd_add("eps_set_mppt", eps_set_pptmode, "%d", 1);
+    cmd_add("eps_reset_wdt", eps_reset_wdt, "", 0);
+    cmd_add("eps_update_status", eps_update_status_vars, "", 0);
 #endif
 }
 
@@ -47,7 +50,7 @@ int eps_hard_reset(char *fmt, char *params, int nparams)
         return CMD_OK;
 
     LOGE(tag, "Unable to reset the EPS!");
-    return CMD_FAIL;
+    return CMD_ERROR;
 }
 
 int eps_get_hk(char *fmt, char *params, int nparams)
@@ -58,22 +61,30 @@ int eps_get_hk(char *fmt, char *params, int nparams)
         eps_hk_print(&hk);
 
         int curr_time = (int)time(NULL);
-        struct eps_data data_eps = {curr_time, hk.cursun, hk.cursys, hk.vbatt,
+        int index_eps = dat_get_system_var(data_map[eps_sensors].sys_index);
+        struct eps_data data_eps = {index_eps, curr_time, hk.cursun, hk.cursys, hk.vbatt,
                 hk.temp[0], hk.temp[1], hk.temp[2], hk.temp[3], hk.temp[4], hk.temp[5]};
 
-        dat_add_payload_sample(&data_eps, eps_sensors);
+        int ret;
+        ret = dat_add_payload_sample(&data_eps, eps_sensors);
 
         LOGI(tag, "WRITING EPS DATA: %u %u %u %d %d %d %d %d %d", hk.cursun, hk.cursys, hk.vbatt,
              hk.temp[0],  hk.temp[1], hk.temp[2], hk.temp[3], hk.temp[4], hk.temp[5]);
+        if (ret == -1) {
+            return CMD_ERROR;
+        }
 
         struct eps_data data_eps_get;
-        dat_get_recent_payload_sample(&data_eps_get, eps_sensors, 0);
+         ret = dat_get_recent_payload_sample(&data_eps_get, eps_sensors, 0);
         LOGI(tag, "READING EPS DATA: %u %u %u %d %d %d %d %d %d", data_eps_get.cursun, data_eps_get.cursys, data_eps_get.vbatt,
              data_eps_get.temp1,  data_eps_get.temp2, data_eps_get.temp3, data_eps_get.temp4, data_eps_get.temp5, data_eps_get.temp6);
+        if (ret == -1) {
+            return CMD_ERROR;
+        }
     }
     else
     {
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
     return CMD_OK;
 }
@@ -88,7 +99,7 @@ int eps_get_config(char *fmt, char *params, int nparams)
     }
     else
     {
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
     return CMD_OK;
 }
@@ -98,7 +109,7 @@ int eps_set_heater(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "NULL params!");
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 
     int heater, on_off;
@@ -114,7 +125,7 @@ int eps_set_heater(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "Invalid params!");
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 }
 
@@ -130,7 +141,7 @@ int eps_update_status_vars(char *fmt, char *params, int nparams)
     }
     else
     {
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
     return CMD_OK;
 }
@@ -142,11 +153,11 @@ int eps_set_output(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &channel, &mode) != nparams)
     {
         LOGE(tag, "Error parsing parameters!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
     if(channel > 7){
         LOGE(tag, "Error parsing parameters: channel > 7 (%d)!", channel);
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
     mode = mode == 0 ? 0 : 1; // Mode is 0 -> OFF or > 0 = 1 -> ON
 
@@ -154,7 +165,7 @@ int eps_set_output(char *fmt, char *params, int nparams)
     if(rc > 0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int eps_set_output_all(char *fmt, char *params, int nparams)
@@ -165,7 +176,7 @@ int eps_set_output_all(char *fmt, char *params, int nparams)
     if(params == NULL || sscanf(params, fmt, &mode) != nparams)
     {
         LOGE(tag, "Error parsing parameters!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     mode = mode == 0 ? 0 : 1; // Mode is 0 -> OFF or > 0 = 1 -> ON
@@ -175,7 +186,39 @@ int eps_set_output_all(char *fmt, char *params, int nparams)
     if(rc > 0)
         return CMD_OK;
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
+}
+
+int eps_set_vboost(char *fmt, char *params, int nparams)
+{
+    int vboost;
+    if(params == NULL || sscanf(params, fmt, &vboost) != nparams)
+    {
+        LOGE(tag, "Error parsing parameters!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    int rc = eps_vboost_set(vboost, vboost, vboost);
+    return rc > 0 ? CMD_OK : CMD_ERROR;
+}
+
+int eps_set_pptmode(char *fmt, char *params, int nparams)
+{
+    int pptmode;
+    if(params == NULL || sscanf(params, fmt, &pptmode) != nparams)
+    {
+        LOGE(tag, "Error parsing parameters!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    int rc = eps_pptmode_set((char)pptmode);
+    return rc > 0 ? CMD_OK : CMD_ERROR;
+}
+
+int eps_reset_wdt(char *fmt, char *params, int nparams)
+{
+    int rc = eps_wdt_gnd_reset();
+    return rc > 0 ? CMD_OK : CMD_ERROR;
 }
 
 #endif //SCH_USE_NANOPOWER

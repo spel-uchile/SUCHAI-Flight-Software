@@ -27,13 +27,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <csp/csp_endian.h>
 #include <csp/csp_interface.h>
 #include <csp/csp_error.h>
-#include <csp/drivers/usart.h>
 #include <csp/arch/csp_semaphore.h>
 
+#include "i2c_usart_linux.h"
 #include "csp_if_i2c_uart.h"
+#include "log_utils.h"
+#include "osDelay.h"
 
 static int i2c_uart_lock_init = 0;
-static csp_bin_sem_handle_t i2c_uart_kiss_lock;
+static csp_bin_sem_handle_t i2c_uart_lock;
+static csp_bin_sem_handle_t i2c_uart_ans_lock;
 
 /**
  * Receive a CSP packet and cast to a I2C_UART frame, ready to be transmitted
@@ -46,28 +49,69 @@ static csp_bin_sem_handle_t i2c_uart_kiss_lock;
 int csp_i2c_uart_tx(csp_iface_t * interface, csp_packet_t * packet, uint32_t timeout) {
 
     /* Cast the CSP packet buffer into an i2c frame */
-    assert(packet->length + sizeof(packet->id) < I2C_MTU);
-    uint8_t data_len =  (uint8_t)(packet->length + sizeof(packet->id));
-    i2c_uart_frame_t * frame = (i2c_uart_frame_t *)packet;
+    uint8_t i2c_addr;
+    int csp_data_len =  packet->length + sizeof(packet->id);
+    int csp_padding_len =  sizeof(packet->padding)+sizeof(packet->length);
+    assert(csp_data_len < I2C_MTU);
 
     /* Insert destination node into the i2c destination field */
     if (csp_rtable_find_mac(packet->id.dst) == CSP_NODE_MAC)
-        frame->addr = (uint8_t)(packet->id.dst);
+        i2c_addr = (uint8_t)(packet->id.dst);
     else
-        frame->addr = csp_rtable_find_mac(packet->id.dst);
+        i2c_addr = csp_rtable_find_mac(packet->id.dst);
 
-    /* Save the outgoing id in the buffer */
+    /* Pack CSP header to network endianness */
     packet->id.ext = csp_hton32(packet->id.ext);
 
-    /* Add the CSP header to the I2C length field */
-    frame->len = data_len+10; //Padding+len+addr+len_tx
-    frame->len_tx = data_len;
+    /* Create a frame and copy data to sent */
+    /* Packet can be size variable, frame is fixed size (filled with zeros) */
+    i2c_uart_frame_t frame;
+    memset(&frame, 0, sizeof(i2c_uart_frame_t));
+    memcpy(&frame, packet, csp_padding_len+csp_data_len);
+
+    /* Fill extra frame data */
+    frame.addr = i2c_addr;
+    frame.len = csp_padding_len+csp_data_len; //The full CSP packet len
+    frame.len_tx = csp_data_len; // Only header and data len (to send via i2c)
+    frame.sync = csp_hton16(I2C_UART_SYNC);
+
+    /** DEBUG **
+    printf("[OUT] Total len: %d. Fram sync: %#X, Frame len: %d. Iface len: %d, Frame Add: %d|\n", (int)sizeof(i2c_uart_frame_t), frame.sync, frame.len, frame.len_tx, frame.addr);
+    printf("[OUT] CSP From: %d. To: %d. Len: %d, \n", packet->id.src, packet->id.dst, packet->length);
+    printf("[OUT] id: %#X (%d, %d)\n", packet->id.ext, packet->id.src, packet->id.dst);
+    packet->id.ext = csp_hton32(packet->id.ext);
+    printf("[OUT] id: %#X (%d, %d)\n", packet->id.ext, packet->id.src, packet->id.dst);
+    */
 
     /* enqueue the frame */
-    printf("%X|%d|%s|\n", frame->addr, frame->len_tx, frame->data);
-    csp_bin_sem_wait(&i2c_uart_kiss_lock, 1000);
-    usart_putstr((const char *)frame, frame->len_tx);
-    csp_bin_sem_post(&i2c_uart_kiss_lock);
+    char *buff = (char *)&frame;
+    /** DEBUG **
+    print_buff(buff, sizeof(i2c_uart_frame_t));
+    print_buff((char *)frame->data, frame->len_tx);
+    */
+    int rc;
+    rc = csp_bin_sem_wait(&i2c_uart_lock, 2000);
+    if(rc != CSP_SEMAPHORE_OK)
+        return CSP_ERR_DRIVER;
+
+    // Transmmit
+    i2c_usart_putstr(buff, sizeof(i2c_uart_frame_t));
+
+    // Wait confirmation
+    /** printf("[I2C_UART] Waiting lock...\n");*/
+    rc = csp_bin_sem_wait(&i2c_uart_ans_lock, 2000);
+    /** printf("[I2C_UART] Released? %d\n", rc); */
+    csp_bin_sem_post(&i2c_uart_lock);
+
+    // Confirmation was not received
+    if(rc != CSP_SEMAPHORE_OK)
+    {
+        csp_log_error("Error sending packet %p (%d)", packet, rc);
+        return CSP_ERR_DRIVER;
+    }
+
+    // Free the packet if the transmission was successful
+    csp_buffer_free(packet);
     return CSP_ERR_NONE;
 }
 
@@ -84,21 +128,31 @@ void csp_i2c_uart_rx(uint8_t *buf, int len, void *pxTaskWoken) {
         return;
     }
 
-    i2c_uart_frame_t *frame = csp_buffer_get(sizeof(i2c_uart_frame_t));
+    i2c_uart_frame_t *frame = csp_buffer_get(I2C_MTU); //Also allocate CSP_BUFFER_PACKET_OVERHEAD
     if (frame == NULL)
         return;
 
     memcpy(frame, buf, len);
-    printf("%X|%d|%s|\n", frame->addr, frame->len_tx, frame->data);
 
-    if ((frame->len < 4) || (frame->len > I2C_MTU)) {
+    /** DEBUG **
+    csp_packet_t *packet2 = (csp_packet_t *) frame;
+    printf("[IN] id: %#X (%d, %d)\n", packet2->id.ext, packet2->id.src, packet2->id.dst);
+    packet2->id.ext = csp_ntoh32(packet2->id.ext);
+    printf("[IN] id: %#X (%d, %d)\r\n", packet2->id.ext, packet2->id.src, packet2->id.dst);
+    printf("[IN ] Total len: %d. Fram sync: %#X, Frame len: %d. Iface len: %d, Frame Add: %d|\r\n", len, frame->sync, frame->len, frame->len_tx, frame->addr);
+    printf("[IN ] CSP From: %d. To: %d. Len: %d, \r\n", packet2->id.src, packet2->id.dst, packet2->length);
+    //print_buff(buf, len);
+    print_buff(frame->data, frame->len_tx);
+    */
+
+    if ((frame->len_tx < 4) || (frame->len_tx > I2C_MTU)) {
         csp_if_i2c_uart.frame++;
         csp_buffer_free_isr(frame);
         return;
     }
 
     /* Strip the CSP header off the length field before converting to CSP packet */
-    frame->len -= sizeof(csp_id_t);
+    frame->len_tx -= sizeof(csp_id_t);
 
     /* Convert the packet from network to host order */
     csp_packet_t *packet = (csp_packet_t *) frame;
@@ -113,20 +167,23 @@ int csp_i2c_uart_init(uint8_t addr, int handle, int speed) {
 
     /* Init lock only once */
     if (i2c_uart_lock_init == 0) {
-        csp_bin_sem_create(&i2c_uart_kiss_lock);
+        csp_bin_sem_create(&i2c_uart_lock);
+        csp_bin_sem_create(&i2c_uart_ans_lock);
+        csp_bin_sem_wait(&i2c_uart_ans_lock, CSP_INFINITY); // Just decrement the semaphore to star locked;
         i2c_uart_lock_init = 1;
     }
 
     /* Create uart */
-    struct usart_conf conf;
+    struct i2c_usart_conf conf;
     conf.baudrate = speed;
-    conf.device = "/dev/ttyS0";
-    if(usart_init(&conf) != CSP_ERR_NONE)
+    conf.device = "/dev/serial0";
+    conf.uart_ans_lock = &i2c_uart_ans_lock;
+    if(i2c_usart_init(&conf) != CSP_ERR_NONE)
     {
         printf("Error initializing USART\n");
         return CSP_ERR_DRIVER;
     }
-    usart_set_callback(csp_i2c_uart_rx);
+    i2c_usart_set_callback(csp_i2c_uart_rx);
 
     /* Register interface */
     csp_iflist_add(&csp_if_i2c_uart);

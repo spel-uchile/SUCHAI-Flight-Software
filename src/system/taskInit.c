@@ -21,13 +21,19 @@
 
 static const char *tag = "taskInit";
 
+int init_update_status_vars(void);
+int init_setup_libcsp(void);
+int init_setup_trx(void);
+int init_create_task(void);
+int init_antenna_deploy(void);
+
 #if SCH_COMM_ENABLE
 static csp_iface_t *csp_if_zmqhub;
 static csp_iface_t csp_if_kiss;
 
 #ifdef GROUNDSTATION
-    static csp_kiss_handle_t csp_kiss_driver;
-    void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
+static csp_kiss_handle_t csp_kiss_driver;
+void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
         csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
     }
 #endif //GROUNDSTATION
@@ -35,69 +41,91 @@ static csp_iface_t csp_if_kiss;
 
 void taskInit(void *param)
 {
+    int rc = 0;
 #ifdef NANOMIND
     on_init_task(NULL);
 #endif
 
     /* Initialize system variables */
-    LOGD(tag, "Initializing system variables values...")
-    dat_set_system_var(dat_obc_hrs_wo_reset, 0);
-    dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
-    dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
-    dat_set_system_var(dat_ads_tle_epoch, 0);  // Reset TLE on boot
-#if (SCH_STORAGE_MODE > 0)
-    initialize_payload_vars();
-#endif
-
-    LOGD(tag, "Initialization commands ...");
+    LOGI(tag, "SETUP VARIABLES...");
+    rc = init_update_status_vars();
     // Init LibCSP system
-    init_communications();
+    LOGI(tag, "SETUP CSP...");
+    init_setup_libcsp();
+#ifdef NANOMIND
+    // Init TRX;
+    LOGI(tag, "SETUP TRX...");
+    rc = init_setup_trx();
+#endif
+    // Create tasks
+    LOGI(tag, "CREATE TASKS...");
+    rc = init_create_task();
 
 #ifdef NANOMIND
-    // Execute deployment activities if first boot
-    int first_boot = dat_get_system_var(dat_dep_deployed) > 0 ? 0 : 1;
-    if(first_boot)
+    LOGI(tag, "DEPLOYMENT...");
+    int deployed = dat_get_system_var(dat_dep_deployed);
+    LOGI(tag, "dat_dep_deployed: %d...", deployed);
+    if(deployed == 0) // First deploy
     {
-        LOGI(tag, "\tFirst boot! Execute init routines");
-        init_routines();
+        LOGI(tag, "FIRST DEPLOY");
+        /* First deploy - 30min TRX Silence */
+        LOGI(tag, "Setting TRX Inhibit to: %d seconds...", 1860);
+        cmd_t *tx_silence = cmd_build_from_str("com_set_config tx_inhibit 1860");
+        cmd_send(tx_silence);
+
+        /* Wait 30 minutes before antenna deployment */
+        int seconds = 0;
+        portTick xLastWakeTime = osTaskGetTickCount();
+        while(seconds < 1800)
+        {
+            LOGI(tag, "Deployment delay: %d/%d seconds...", seconds, 1800);
+            osTaskDelayUntil(&xLastWakeTime, 1000); //Suspend task
+            seconds ++;
+            //TODO CANCEL
+        }
+        dat_set_system_var(dat_dep_deployed, 1);
     }
+
+    deployed = dat_get_system_var(dat_dep_deployed);
+    LOGI(tag, "dat_dep_deployed: %d...", deployed);
+    if(deployed == 1) // Deployed not confirmed, but silence time
+    {
+        LOGI(tag, "ANTENNA DEPLOYMENT");
+        cmd_t *eps_update_status_cmd = cmd_get_str("eps_update_status");
+        cmd_send(eps_update_status_cmd);
+        osDelay(500);
+        int vbat_mV = dat_get_system_var(dat_eps_vbatt);
+
+        // Deploy antenna
+        LOGI(tag, "Deploying antennas: %d (Battery Voltage: %.04f)", vbat_mV>7000, vbat_mV/1000.0);
+        if(vbat_mV > 7000)
+            init_antenna_deploy();
+
+        //Update antenna deployment status
+        cmd_t *cmd_dep = cmd_get_str("gssb_update_status");
+        cmd_send(cmd_dep);
+    }
+
+    LOGI(tag, "Restore TRX Inhibit to: %d seconds", 0);
+    cmd_t *tx_silence = cmd_build_from_str("com_get_config tx_inhibit 0");
+    cmd_send(tx_silence);
 #endif
 
-    LOGD(tag, "Creating client tasks ...");
-    int t_ok;
-    int n_threads = 6;
-    os_thread thread_id[n_threads];
-
-    /* Creating clients tasks */
-#if SCH_CON_ENABLED
-    t_ok = osCreateTask(taskConsole, "console", SCH_TASK_CON_STACK, NULL, 2, &(thread_id[0]));
-    if(t_ok != 0) LOGE(tag, "Task console not created!");
-#endif
-#if SCH_HK_ENABLED
-    t_ok = osCreateTask(taskHousekeeping, "housekeeping", SCH_TASK_HKP_STACK, NULL, 2, &(thread_id[1]));
-    if(t_ok != 0) LOGE(tag, "Task housekeeping not created!");
-#endif
-#if SCH_COMM_ENABLE
-    t_ok = osCreateTask(taskCommunications, "comm", SCH_TASK_COM_STACK, NULL, 2, &(thread_id[2]));
-    if(t_ok != 0) LOGE(tag, "Task communications not created!");
-#endif
-#if SCH_FP_ENABLED
-    t_ok = osCreateTask(taskFlightPlan,"flightplan", SCH_TASK_FPL_STACK, NULL, 2, &(thread_id[3]));
-    if(t_ok != 0) LOGE(tag, "Task flightplan not created!");
-#endif
-#if SCH_SEN_ENABLED
-    t_ok = osCreateTask(taskSensors,"sensors", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[4]));
-    if(t_ok != 0) LOGE(tag, "Task sensors not created!");
-#endif
-#if SCH_ADCS_ENABLED
-    t_ok = osCreateTask(taskADCS,"adcs", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[5]));
-    if(t_ok != 0) LOGE(tag, "Task sensors not created!");
-#endif
-
+    LOGI(tag, "EXIT INIT TASK", 0);
     osTaskDelete(NULL);
 }
 
-void init_communications(void)
+int init_update_status_vars(void) {
+    LOGD(tag, "Initializing system variables values...")
+    int rc = 0;
+    rc += dat_set_system_var(dat_obc_hrs_wo_reset, 0);
+    rc += dat_set_system_var(dat_obc_reset_counter, dat_get_system_var(dat_obc_reset_counter) + 1);
+    rc += dat_set_system_var(dat_obc_sw_wdt, 0);  // Reset the gnd wdt on boot
+    rc += dat_set_system_var(dat_ads_tle_epoch, 0);  // Reset TLE on boot
+    return rc;
+}
+
+int init_setup_libcsp(void)
 {
 #if SCH_COMM_ENABLE
     /* Init communications */
@@ -152,7 +180,7 @@ void init_communications(void)
 #endif //X86||GROUNDSTATION
 
 #ifdef RPI
-    csp_i2c_uart_init(SCH_COMM_ADDRESS, 0, 115200);
+    csp_i2c_uart_init(SCH_COMM_ADDRESS, 0, 19200);
     csp_rtable_set(8, 2, &csp_if_i2c_uart, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C to TRX node
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c_uart, CSP_NODE_MAC); // Rest of the traffic to I2C using node i2c address
 #endif
@@ -184,9 +212,113 @@ void init_communications(void)
     LOGI(tag, "Interfaces");
     csp_route_print_interfaces();
 #endif //SCH_COMM_ENABLE
+
+    return 0;
 }
 
-void init_routines(void)
+int init_setup_trx(void) {
+    LOGD(tag, "\t Init TRX...");
+    cmd_t *trx_cmd;
+    // Set TX_INHIBIT to implement silent time
+    trx_cmd = cmd_get_str("com_set_config");
+    cmd_add_params_var(trx_cmd, 0, "tx_inhibit", TOSTRING(SCH_TX_INHIBIT));
+    cmd_send(trx_cmd);
+    if(log_lvl >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_build_from_str("com_get_config 0 tx_inhibit");
+        cmd_send(trx_cmd);
+    }
+    trx_cmd = cmd_build_from_str("com_set_config 0 bcn_holdoff 60)");
+    cmd_send(trx_cmd);
+    if(log_lvl >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_build_from_str("com_get_config 0 bcn_holdoff");
+        cmd_send(trx_cmd);
+    }
+    // Set TX_PWR
+    trx_cmd = cmd_get_str("com_set_config");
+    cmd_add_params_var(trx_cmd, 0, "tx_pwr", dat_get_status_var(dat_com_tx_pwr).i);
+    cmd_send(trx_cmd);
+    if(log_lvl >= LOG_LVL_DEBUG)
+    {
+        trx_cmd = cmd_build_from_str("com_get_config 0 tx_pwr");
+        cmd_send(trx_cmd);
+    }
+//    // Set TX_BEACON_PERIOD
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 0, "bcn_interval", dat_get_status_var(dat_com_bcn_period).i);
+//    cmd_send(trx_cmd);
+//    if(log_lvl >= LOG_LVL_DEBUG)
+//    {
+//        trx_cmd = cmd_build_from_str("com_get_config 0 bcn_interval");
+//        cmd_send(trx_cmd);
+//    }
+//    // Set TRX Freq
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 1, "freq", dat_get_status_var(dat_com_freq).i);
+//    cmd_send(trx_cmd);
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 5, "freq", dat_get_status_var(dat_com_freq).i);
+//    cmd_send(trx_cmd);
+//    if(log_lvl >= LOG_LVL_DEBUG)
+//    {
+//        trx_cmd = cmd_build_from_str("com_get_config 1 freq");
+//        cmd_send(trx_cmd);
+//        trx_cmd = cmd_build_from_str("com_get_config 5 freq");
+//        cmd_send(trx_cmd);
+//    }
+//    // Set TRX Baud
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 1, "baud", dat_get_status_var(dat_com_baud).i);
+//    cmd_send(trx_cmd);
+//    trx_cmd = cmd_get_str("com_set_config");
+//    cmd_add_params_var(trx_cmd, 5, "baud", dat_get_status_var(dat_com_baud).i);
+//    cmd_send(trx_cmd);
+//    if(log_lvl >= LOG_LVL_DEBUG)
+//    {
+//        trx_cmd = cmd_build_from_str("com_get_config 1 baud");
+//        cmd_send(trx_cmd);
+//        trx_cmd = cmd_build_from_str("com_get_config 5 baud");
+//        cmd_send(trx_cmd);
+//    }
+}
+
+int init_create_task(void) {
+    LOGD(tag, "Creating client tasks ...");
+    int t_ok;
+    int n_threads = 6;
+    os_thread thread_id[n_threads];
+
+    /* Creating clients tasks */
+#if SCH_CON_ENABLED
+    t_ok = osCreateTask(taskConsole, "console", SCH_TASK_CON_STACK, NULL, 2, &(thread_id[0]));
+    if(t_ok != 0) LOGE(tag, "Task console not created!");
+#endif
+#if SCH_HK_ENABLED
+    t_ok = osCreateTask(taskHousekeeping, "housekeeping", SCH_TASK_HKP_STACK, NULL, 2, &(thread_id[1]));
+        if(t_ok != 0) LOGE(tag, "Task housekeeping not created!");
+#endif
+#if SCH_COMM_ENABLE
+    t_ok = osCreateTask(taskCommunications, "comm", SCH_TASK_COM_STACK, NULL, 2, &(thread_id[2]));
+    if(t_ok != 0) LOGE(tag, "Task communications not created!");
+#endif
+#if SCH_FP_ENABLED
+    t_ok = osCreateTask(taskFlightPlan,"flightplan", SCH_TASK_FPL_STACK, NULL, 2, &(thread_id[3]));
+        if(t_ok != 0) LOGE(tag, "Task flightplan not created!");
+#endif
+#if SCH_SEN_ENABLED
+    t_ok = osCreateTask(taskSensors,"sensors", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[4]));
+        if(t_ok != 0) LOGE(tag, "Task sensors not created!");
+#endif
+#if SCH_ADCS_ENABLED
+    t_ok = osCreateTask(taskADCS,"adcs", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[5]));
+        if(t_ok != 0) LOGE(tag, "Task sensors not created!");
+#endif
+
+    return t_ok;
+}
+
+int init_antenna_deploy(void)
 {
     LOGD(tag, "\tAntenna deployment...")
     //Turn on gssb and update antenna deployment status
@@ -216,61 +348,5 @@ void init_routines(void)
     cmd_add_params_var(cmd_dep, 19, 2, 1, 5);
     cmd_send(cmd_dep);
 
-    //Update antenna deployment status
-    cmd_dep = cmd_get_str("gssb_update_status");
-    cmd_send(cmd_dep);
-
-
-    LOGD(tag, "\t Init TRX...");
-    cmd_t *trx_cmd;
-    // Set TX_INHIBIT to implement silent time
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "tx_inhibit", TOSTRING(SCH_TX_INHIBIT));
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_get_str("com_get_config");
-        cmd_add_params_str(trx_cmd, "tx_inhibit");
-        cmd_send(trx_cmd);
-    }
-    // Set TX_PWR
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "tx_pwr", TOSTRING(SCH_TX_PWR));
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_get_str("com_get_config");
-        cmd_add_params_str(trx_cmd, "tx_pwr");
-        cmd_send(trx_cmd);
-    }
-    // Set TX_BEACON_PERIOD
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "bcn_interval", TOSTRING(SCH_TX_BCN_PERIOD));
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_get_str("com_get_config");
-        cmd_add_params_str(trx_cmd, "bcn_interval");
-        cmd_send(trx_cmd);
-    }
-    // Set TRX Freq
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "freq", TOSTRING(SCH_TX_FREQ));
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_get_str("com_get_config");
-        cmd_add_params_str(trx_cmd, "freq");
-        cmd_send(trx_cmd);
-    }
-    // Set TRX Baud
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, "baud", TOSTRING(SCH_TX_BAUD));
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_get_str("com_get_config");
-        cmd_add_params_str(trx_cmd, "baud");
-        cmd_send(trx_cmd);
-    }
+    return 0;
 }

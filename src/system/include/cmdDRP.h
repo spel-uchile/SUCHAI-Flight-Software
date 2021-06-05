@@ -35,7 +35,7 @@ void cmd_drp_init(void);
  * @param fmt Str. Parameters format: "%d"
  * @param params Str. Parameters as string: "<MAGIC_NUMBER>"
  * @param nparams Int. Number of parameters: 1
- * @return CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int drp_execute_before_flight(char *fmt, char *params, int nparams);
 
@@ -46,7 +46,7 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int drp_print_system_vars(char *fmt, char *params, int nparams);
 
@@ -57,7 +57,7 @@ int drp_print_system_vars(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d %f"
  * @param params Str. Parameters as string "<address> <value>"
  * @param nparams Int. Number of parameters 2
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  *
  * @code
  * //From console
@@ -83,7 +83,7 @@ int drp_update_sys_var_idx(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%s %f"
  * @param params Str. Parameters as string "<name> <value>"
  * @param nparams Int. Number of parameters 2
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  *
  *  * @code
  * //From console
@@ -109,7 +109,7 @@ int drp_update_sys_var_name(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%s"
  * @param params Str. Parameters as string "<name>"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int drp_get_sys_var_name(char *fmt, char *params, int nparams);
 
@@ -120,7 +120,7 @@ int drp_get_sys_var_name(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d"
  * @param params Str. Parameters as string "<value>"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int drp_update_hours_alive(char *fmt, char *params, int nparams);
 
@@ -131,7 +131,7 @@ int drp_update_hours_alive(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int drp_clear_gnd_wdt(char *fmt, char *params, int nparams);
 
@@ -146,7 +146,7 @@ int drp_clear_gnd_wdt(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d"
  * @param params Str. Parameters as string "<deployed>"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int drp_set_deployed(char *fmt, char *params, int nparams);
 

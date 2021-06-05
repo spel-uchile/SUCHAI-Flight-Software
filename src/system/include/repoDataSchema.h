@@ -55,6 +55,8 @@ typedef enum dat_status_address_enum {
     dat_obc_temp_1,               ///< Temperature value of the first sensor
     dat_obc_temp_2,               ///< Temperature value of the second sensor
     dat_obc_temp_3,               ///< Temperature value of the gyroscope
+    dat_obc_executed_cmds,        ///< Total number of executed commands
+    dat_obc_failed_cmds,          ///< Total number of failed commands
 
     /// DEP: Deployment related variables.
     dat_dep_deployed,             ///< Was the satellite deployed?
@@ -113,20 +115,24 @@ typedef enum dat_status_address_enum {
     dat_drp_temp,                 ///< Temperature data index
     dat_drp_ads,                  ///< ADS data index
     dat_drp_eps,                  ///< EPS data index
-    dat_drp_lang,                 ///< Langmuir data index
+    dat_drp_sta,                 ///< Status data index
+    dat_drp_stt,
+    dat_drp_stt_exp_time,
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
     dat_drp_ack_ads,              ///< ADS data index acknowledge
     dat_drp_ack_eps,              ///< EPS data index acknowledge
-    dat_drp_ack_lang,             ///< Langmuir data index acknowledge
+    dat_drp_ack_sta,             ///< Status data index acknowledge
+    dat_drp_ack_stt,
+    dat_drp_ack_stt_exp_time,
 
-    /// Sample Machine: Current state of sample machine
-    dat_drp_mach_action,          ///<
-    dat_drp_mach_state,           ///<
-    dat_drp_mach_step,            ///<
-    dat_drp_mach_payloads,        ///<
-    dat_drp_mach_left,            ///<
+    /// Sample Machine: Current state of sample status_machine
+    dat_drp_mach_action,          ///< Current action of sampling state machine
+    dat_drp_mach_state,           ///< Current state of sampling state machine
+    dat_drp_mach_step,            ///< Step in seconds of sampling state machine
+    dat_drp_mach_payloads,        ///< Binary data storing active payload being sampled
+    dat_drp_mach_left,            ///< Samples left for sampling state machine
 
     /// Add a new status variables address here
     //dat_custom,                 ///< Variable description
@@ -159,9 +165,11 @@ typedef union value32_u{
 /**
  * A system variable (status or config) with an address, name, type and value
  */
+#define MAX_VAR_NAME 24
+
 typedef struct __attribute__((packed)) dat_sys_var {
     uint16_t address;   ///< Variable address or index (in the data storage)
-    char name[24];      ///< Variable name (max 24 chars)
+    char name[MAX_VAR_NAME];      ///< Variable name (max 24 chars)
     char type;          ///< Variable type (u: uint, i: int, f: float)
     int8_t status;      ///< Variable is status (1), is config (0), or uninitialized (-1)
     value32_t value;    ///< Variable default value
@@ -181,7 +189,7 @@ typedef struct __attribute__((packed)) dat_sys_var_short {
  * This list is useful to decide how to store and send the status variables
  */
 static const dat_sys_var_t dat_status_list[] = {
-        {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, -1},         ///< Last reset source
+        {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, 0},         ///< Last reset source
         {dat_obc_hrs_alive,     "obc_hrs_alive",     'u', DAT_IS_STATUS, 0},          ///< Hours since first boot
         {dat_obc_hrs_wo_reset,  "obc_hrs_wo_reset",  'u', DAT_IS_STATUS, 0},          ///< Hours since last reset
         {dat_obc_reset_counter, "obc_reset_counter", 'u', DAT_IS_STATUS, 0},          ///< Number of reset since first boot
@@ -189,12 +197,14 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_obc_temp_1,        "obc_temp_1",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the first sensor
         {dat_obc_temp_2,        "obc_temp_2",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the second sensor
         {dat_obc_temp_3,        "obc_temp_3",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the gyroscope
-        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 1},          ///< Was the satellite deployed?
+        {dat_obc_executed_cmds, "obc_executed_cmds", 'u', DAT_IS_STATUS, 0},
+        {dat_obc_failed_cmds,   "obc_failed_cmds",   'u', DAT_IS_STATUS, 0},
+        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 2},          ///< Was the satellite deployed?
         {dat_dep_ant_deployed,  "dep_ant_deployed",  'u', DAT_IS_STATUS, 1},          ///< Was the antenna deployed?
-        {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, -1},         ///< Antenna deployment unix time
+        {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, 0},         ///< Antenna deployment unix time
         {dat_com_count_tm,      "com_count_tm",      'u', DAT_IS_STATUS, 0},          ///< Number of Telemetries sent
         {dat_com_count_tc,      "com_count_tc",      'u', DAT_IS_STATUS, 0},          ///< Number of received Telecommands
-        {dat_com_last_tc,       "com_last_tc",       'u', DAT_IS_STATUS, -1},         ///< Unix time of the last received Telecommand
+        {dat_com_last_tc,       "com_last_tc",       'u', DAT_IS_STATUS, 0},         ///< Unix time of the last received Telecommand
         {dat_fpl_last,          "fpl_last",          'u', DAT_IS_STATUS, 0},          ///< Last executed flight plan (unix time)
         {dat_fpl_queue,         "fpl_queue",         'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
         {dat_ads_omega_x,       "ads_omega_x",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the x axis
@@ -206,25 +216,27 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_ads_pos_x,         "ads_pos_x",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position x (ECI)
         {dat_ads_pos_y,         "ads_pos_y",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position y (ECI)
         {dat_ads_pos_z,         "ads_pos_z",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position z (ECI)
-        {dat_ads_tle_epoch,     "ads_tle_epoch",     'u', DAT_IS_STATUS, -1},         ///< Current TLE epoch, 0 if TLE is invalid
-        {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, -1},         ///< Last time position was propagated
+        {dat_ads_tle_epoch,     "ads_tle_epoch",     'u', DAT_IS_STATUS, 0},         ///< Current TLE epoch, 0 if TLE is invalid
+        {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, 0},         ///< Last time position was propagated
         {dat_ads_q0,            "ads_q0",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
         {dat_ads_q1,            "ads_q1",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
         {dat_ads_q2,            "ads_q2",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
         {dat_ads_q3,            "ads_q3",            'f', DAT_IS_STATUS, -1},         ///< Attitude quaternion (Inertial to body)
-        {dat_eps_vbatt,         "eps_vbatt",         'u', DAT_IS_STATUS, -1},         ///< Voltage of the battery [mV]
-        {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, -1},         ///< Current from boost converters [mA]
-        {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, -1},         ///< Current from the battery [mA]
-        {dat_eps_temp_bat0,     "eps_temp_bat0",     'u', DAT_IS_STATUS, -1},         ///< Battery temperature sensor
+        {dat_eps_vbatt,         "eps_vbatt",         'u', DAT_IS_STATUS, 0},         ///< Voltage of the battery [mV]
+        {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, 0},         ///< Current from boost converters [mA]
+        {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, 0},         ///< Current from the battery [mA]
+        {dat_eps_temp_bat0,     "eps_temp_bat0",     'u', DAT_IS_STATUS, 0},         ///< Battery temperature sensor
         {dat_drp_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_drp_ads,           "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
         {dat_drp_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
-        {dat_drp_lang,          "drp_lang",          'u', DAT_IS_STATUS, 0},          ///< Langmuir data index
+        {dat_drp_sta,           "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
+        {dat_drp_stt,           "drp_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
+        {dat_drp_stt_exp_time,  "drp_stt_exp_time",  'u', DAT_IS_STATUS, 0},          ///< STT data exposure time index
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
-        {dat_obc_opmode,        "obc_opmode",        'i', DAT_IS_CONFIG, 0},          ///< General operation mode
-        {dat_rtc_date_time,     "rtc_date_time",     'i', DAT_IS_CONFIG, 0},          ///< RTC current unix time
+        {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, -1},          ///< General operation mode
+        {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, -1},          ///< RTC current unix time
         {dat_com_freq,          "com_freq",          'u', DAT_IS_CONFIG, SCH_TX_FREQ},        ///< Communications frequency [Hz]
         {dat_com_tx_pwr,        "com_tx_pwr",        'u', DAT_IS_CONFIG, SCH_TX_PWR},         ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
         {dat_com_baud,          "com_baud",          'u', DAT_IS_CONFIG, SCH_TX_BAUD},        ///< Baudrate [bps]
@@ -241,8 +253,10 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
-        {dat_drp_ack_lang,      "drp_ack_lang",      'u', DAT_IS_CONFIG, 0},          ///< Langmuir data index acknowledge
-        {dat_drp_mach_step,     "drp_mach_step",     'i', DAT_IS_CONFIG, 0},          ///<
+        {dat_drp_ack_sta,       "drp_ack_sta",       'u', DAT_IS_CONFIG, 0},          ///< Status data index acknowledge
+        {dat_drp_ack_stt,       "drp_ack_stt",       'u', DAT_IS_CONFIG, 0},          ///< Stt data index acknowledge
+        {dat_drp_ack_stt_exp_time, "drp_ack_stt_exp_time",'u', DAT_IS_CONFIG, 0},     ///< Stt data exp time index acknowledge
+        {dat_drp_mach_step,     "drp_mach_step",     'd', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
 };
 ///< The dat_status_last_var constant serves for looping through all status variables
@@ -268,6 +282,9 @@ typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
+    sta_sensors,            ///< Status Variables
+    stt_sensors,
+    stt_exp_time_sensors,
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -276,7 +293,8 @@ typedef enum payload_id {
  * Struct for storing temperature data.
  */
 typedef struct __attribute__((__packed__)) temp_data {
-    int timestamp;
+    uint32_t index;
+    uint32_t timestamp;
     float obc_temp_1;
     float obc_temp_2;
     float obc_temp_3;
@@ -286,7 +304,8 @@ typedef struct __attribute__((__packed__)) temp_data {
  * Struct for storing data collected by ads sensors.
  */
 typedef struct __attribute__((__packed__)) ads_data {
-    int timestamp;
+    uint32_t index;
+    uint32_t timestamp;
     float acc_x;            ///< Gyroscope acceleration value along the x axis
     float acc_y;            ///< Gyroscope acceleration value along the y axis
     float acc_z;            ///< Gyroscope acceleration value along the z axis
@@ -299,7 +318,8 @@ typedef struct __attribute__((__packed__)) ads_data {
  * Struct for storing data collected by eps housekeeping.
  */
 typedef struct __attribute__((__packed__)) eps_data {
-    int timestamp;
+    uint32_t index;
+    uint32_t timestamp;
     uint32_t cursun;            ///< Current from boost converters [mA]
     uint32_t cursys;            ///< Current out of battery [mA]
     uint32_t vbatt;            ///< Voltage of battery [mV]
@@ -313,16 +333,70 @@ typedef struct __attribute__((__packed__)) eps_data {
 
 
 /**
+ * Struct for storing data collected by status variables.
+ */
+typedef struct __attribute__((__packed__)) sta_data {
+    uint32_t index;
+    uint32_t timestamp;
+    uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
+} sta_data_t;
+
+
+/**
+ * Struct for storing data collected by stt.
+ */
+typedef struct __attribute__((__packed__)) stt_data {
+    uint32_t index;
+    uint32_t timestamp;
+    float ra;
+    float dec;
+    float roll;
+    int time;
+    float exec_time;
+} stt_data_t;
+
+typedef struct __attribute__((__packed__)) stt_exp_time_data{
+    uint32_t index;
+    uint32_t timestamp;
+    int exp_time;
+    int n_stars;
+}stt_exp_time_data_t;
+
+/**
  * Data Map Struct for data schema definition.
  */
-extern struct __attribute__((__packed__)) map {
+typedef struct __attribute__((__packed__)) map {
     char table[30];
     uint16_t  size;
     uint32_t sys_index;
     uint32_t sys_ack;
-    char data_order[50];
-    char var_names[200];
-} data_map[last_sensor];
+    char * data_order;
+    char *  var_names;
+} data_map_t;
+
+static char status_var_string[] = "sat_index timestamp obc_last_reset obc_hrs_alive obc_hrs_wo_reset obc_reset_counter "
+                                  "obc_sw_wdt obc_temp_1 obc_temp_2 obc_temp_3 obc_executed_cmds obc_failed_cmds "
+                                  "dep_deployed dep_ant_deployed dep_date_time com_count_tm com_count_tc com_last_tc "
+                                  "fpl_last fpl_queue ads_omega_x ads_omega_y ads_omega_z ads_mag_x ads_mag_y ads_mag_z "
+                                  "ads_pos_x ads_pos_y ads_pos_z ads_tle_epoch ads_tle_last ads_q0 ads_q1 ads_q2 ads_q3"
+                                  " eps_vbatt eps_cur_sun eps_cur_sys eps_temp_bat0 drp_temp drp_ads drp_eps drp_sta drp_stt drp_stt_exp_time"
+                                  "drp_mach_action drp_mach_state drp_mach_left obc_opmode rtc_date_time com_freq "
+                                  "com_tx_pwr com_baud com_mode com_bcn_period obc_bcn_offset tgt_omega_x tgt_omega_y "
+                                  "tgt_omega_z tgt_q0 tgt_q1 tgt_q2 tgt_q3 drp_ack_temp drp_ack_ads drp_ack_eps "
+                                  "drp_ack_sta drp_ack_stt dr_ack_stt_exp_time drp_mach_step drp_mach_payloads";
+
+static char status_var_types[] = "%u %u %u %u %u %u %u %f %f %f %u %u %u %u %u %u %u %u %u %u %f %f %f %f %f %f %f %f "
+                                 "%f %u %u %f %f %f %f %u %u %u %u %u %u %u %u %u %u %u %u %i %i %u %u %u %u %u %u %u %u %f "
+                                 "%f %f %f %f %f %f %u %u %u %u %u %u %u %i %u";
+
+static data_map_t data_map[] = {
+{"temp_data",      (uint16_t) (sizeof(temp_data_t)),dat_drp_temp,dat_drp_ack_temp, "%u %u %f %f %f",                   "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+{ "ads_data",      (uint16_t) (sizeof(ads_data_t)), dat_drp_ads, dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f",          "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+{ "eps_data",      (uint16_t) (sizeof(eps_data_t)), dat_drp_eps, dat_drp_ack_eps,  "%u %u %u %u %u %d %d %d %d %d %d", "sat_index timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
+{"sta_data",       (uint16_t) (sizeof(sta_data_t)), dat_drp_sta, dat_drp_ack_sta, status_var_types, status_var_string},
+{"stt_data",       (uint16_t) (sizeof(stt_data_t)), dat_drp_stt, dat_drp_ack_stt, "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+{"stt_exp_time",   (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
+};
 
 /** The repository's name */
 #define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name

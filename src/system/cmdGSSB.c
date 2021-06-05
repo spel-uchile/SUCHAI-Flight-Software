@@ -21,8 +21,8 @@
 #include "cmdGSSB.h"
 
 #define CMD_ERROR_NONE CMD_OK
-#define CMD_ERROR_SYNTAX  CMD_ERROR
-#define CMD_ERROR_FAIL CMD_FAIL
+#define CMD_ERROR_SYNTAX  CMD_SYNTAX_ERROR
+#define CMD_ERROR_FAIL CMD_ERROR
 #define GS_OK 0
 
 static const char* tag = "cmdGSSB";
@@ -69,7 +69,7 @@ int gssb_pwr(char *fmt, char *params, int nparams)
     int vcc_on, vcc2_on;
     if(sscanf(params, fmt, &vcc_on, &vcc2_on) != nparams)
         return CMD_ERROR_SYNTAX;
-    
+
     if (vcc_on > 0)
         gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
     else
@@ -82,7 +82,7 @@ int gssb_pwr(char *fmt, char *params, int nparams)
 
     osDelay(100);
 
-    LOGI(tag, "Set GSSB switch state to: %d %d", vcc_on, vcc2_on);
+    LOGR(tag, "Set GSSB switch state to: %d %d", vcc_on, vcc2_on);
     return CMD_OK;
 }
 
@@ -98,8 +98,8 @@ int gssb_select_addr(char *fmt, char *params, int nparams)
     {
         if(addr > 0)
             i2c_addr = addr;
-        
-        LOGI(tag, "Selected I2C addr %#X (%d)", i2c_addr, i2c_addr);
+
+        LOGR(tag, "Selected I2C addr %#X (%d)", i2c_addr, i2c_addr);
         return CMD_ERROR_NONE;
     }
 
@@ -119,7 +119,7 @@ int gssb_bus_scan(char *fmt, char *params, int nparams)
         end = 100;
     }
 
-    printf("Scanning I2C bus from %d to %d...\n", start, end);
+    LOGR(tag, "Scanning I2C bus from %d to %d...", start, end);
     if(start > 128 || end > 128)
         return CMD_ERROR_SYNTAX;
 
@@ -127,7 +127,7 @@ int gssb_bus_scan(char *fmt, char *params, int nparams)
 
     for (addr = (uint8_t)start; addr < (uint8_t)end; addr++) {
         if (devices[addr] == GS_OK) {
-            printf("\tFound device at: %#X (%d)\r\n", addr, addr);
+            LOGR(tag, "\tFound device at: %#X (%d)", addr, addr);
         }
     }
 
@@ -148,9 +148,8 @@ int gssb_read_sunsensor(char *fmt, char *params, int nparams)
     if (gs_gssb_sun_read_sensor_samples(i2c_addr, i2c_timeout_ms, sun) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("\r\n ---- Values ----\r\n");
     for (i = 0; i < 4; i++) {
-        printf("Data %d: %d\r\n", i, sun[i]);
+        LOGR(tag, "GSSB %d sun sensor %d: %d", i2c_addr, i, sun[i]);
     }
 
     return CMD_ERROR_NONE;
@@ -169,7 +168,7 @@ int gssb_get_temp(char *fmt, char *params, int nparams)
     if (gs_gssb_sun_get_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Temp: %f\r\n", temp);
+    LOGR(tag, "GSSB %d temp: %.4f °C", i2c_addr, temp);
 
     return CMD_ERROR_NONE;
 }
@@ -211,14 +210,14 @@ int gssb_set_i2c_addr(char *fmt, char *params, int nparams)
         return CMD_ERROR_SYNTAX;
 
     // Set new i2c address
-    printf("Setting address to %#X...", (uint8_t)new_i2c_addr);
+    LOGR(tag, "Setting address to %#X...", (uint8_t)new_i2c_addr);
     gs_gssb_set_i2c_addr(i2c_addr, i2c_timeout_ms, (uint8_t)new_i2c_addr);
 
     // Check if the new i2c address works
     if (gs_gssb_get_uuid(new_i2c_addr, i2c_timeout_ms, &uuid) != GS_OK) {
         return CMD_ERROR_FAIL;
     }
-    printf("Changed address from %hhu to %hhu\n\ron dev: %" PRIu32 "\n\n\rWorking address is %hhu\n\r", i2c_addr,
+    LOGD(tag, "Changed address from %hhu to %hhu\ron dev: %" PRIu32 "\rWorking address is %hhu\r", i2c_addr,
             new_i2c_addr, uuid, new_i2c_addr);
     i2c_addr = new_i2c_addr;
 
@@ -243,7 +242,7 @@ int gssb_get_version(char *fmt, char *params, int nparams)
         return CMD_ERROR_FAIL;
 
     rx_buff[19] = '\0';
-    printf("Git version: %s\r\n", (char *) rx_buff);
+    LOGR(tag, "Git version: %s", (char *) rx_buff);
 
     return CMD_ERROR_NONE;
 }
@@ -254,7 +253,7 @@ int gssb_get_uuid(char *fmt, char *params, int nparams)
 
     if (gs_gssb_get_uuid(i2c_addr, i2c_timeout_ms, &uuid) != GS_OK)
         return CMD_ERROR_FAIL;
-    printf("Device UUID: %"PRIu32"\r\n", uuid);
+    LOGR(tag, "Device UUID: %"PRIu32"", uuid);
 
     return CMD_ERROR_NONE;
 }
@@ -265,25 +264,24 @@ int gssb_get_model(char *fmt, char *params, int nparams)
 
     if (gs_gssb_get_model(i2c_addr, i2c_timeout_ms, &model) != GS_OK)
         return CMD_ERROR_FAIL;
-    printf("Model: ");
     switch(model){
         case GS_GSSB_MODEL_MSP:
-            printf("MSP\n\r");
+            LOGR(tag, "Model: MSP");
             break;
         case GS_GSSB_MODEL_AR6:
-            printf("AR6\n\r");
+            LOGR(tag, "Model: AR6");
             break;
         case GS_GSSB_MODEL_ISTAGE:
-            printf("Interstage\n\r");
+            LOGR(tag, "Model: Interstage");
             break;
         case GS_GSSB_MODEL_ANT6:
-            printf("ANT6\n\r");
+            LOGR(tag, "Model: ANT6");
             break;
         case GS_GSSB_MODEL_I4:
-            printf("I4\n\r");
+            LOGR(tag, "Model: I4");
             break;
         default:
-            printf("Unknown\r\n");
+            LOGR(tag, "Model: Unknown");
     }
     return CMD_ERROR_NONE;
 }
@@ -295,7 +293,7 @@ int gssb_interstage_temp(char *fmt, char *params, int nparams)
     if (gs_gssb_istage_get_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Temp: %f\r\n", temp);
+    LOGR(tag, "Temp: %f", temp);
 
     return CMD_ERROR_NONE;
 }
@@ -307,7 +305,7 @@ int gssb_msp_outside_temp(char *fmt, char *params, int nparams)
     if (gs_gssb_msp_get_outside_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Outside temp: %i\r\n", temp);
+    LOGR(tag, "Outside temp: %i", temp);
 
     return CMD_ERROR_NONE;
 }
@@ -325,7 +323,7 @@ int gssb_msp_outside_temp_calibrate(char *fmt, char *params, int nparams)
         return CMD_ERROR_SYNTAX;
 
     if ((curr > 400000) || (curr < 100000)) {
-        printf("Current of %d out of range [100000 - 400000]\r\n", curr);
+        LOGW(tag, "Current of %d out of range [100000 - 400000]", curr);
         return CMD_ERROR_SYNTAX;
     } else {
         /* Current is typed in nano Ampere but send in 10⁻⁸ Ampere to fit in 16 bit*/
@@ -333,7 +331,7 @@ int gssb_msp_outside_temp_calibrate(char *fmt, char *params, int nparams)
     }
 
     if ((res > 200000) || (res < 50000)) {
-        printf("Resistance of %d out of range [50000 - 200000]\r\n", res);
+        LOGW(tag, "Resistance of %d out of range [50000 - 200000]", res);
         return CMD_ERROR_SYNTAX;
     } else {
         /* Resistance is typed in mili Ohm but send in centi Ohm to fit in 16 bit */
@@ -354,7 +352,7 @@ int gssb_internal_temp(char *fmt, char *params, int nparams)
     if (gs_gssb_istage_get_internal_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Internal temp: %i\r\n", temp);
+    LOGR(tag, "Internal temp: %i", temp);
 
     return CMD_ERROR_NONE;
 }
@@ -365,7 +363,7 @@ int gssb_interstage_burn(char *fmt, char *params, int nparams)
     if (gs_gssb_istage_burn(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Istage burning...\n");
+    LOGR(tag, "Istage burning...");
     return CMD_ERROR_NONE;
 }
 
@@ -377,7 +375,7 @@ int gssb_common_sun_voltage(char *fmt, char *params, int nparams)
     if (gs_gssb_istage_get_sun_voltage(i2c_addr, i2c_timeout_ms, &voltage) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Sun voltage: %i\r\n", voltage);
+    LOGR(tag, "Sun voltage: %i", voltage);
 
     return CMD_ERROR_NONE;
 }
@@ -391,19 +389,21 @@ int gssb_interstage_get_burn_settings(char *fmt, char *params, int nparams)
 
         if (gs_gssb_istage_get_burn_settings(i2c_addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
-        if (settings.status == 2)
-            printf("\r\nDeploy mode:\t\t ARMED AUTO\r\n");
-        else
-            printf("\r\nDeploy mode:\t\t NOT ARMED\r\n");
-        printf("Deploy delay from boot:\t %"PRIu16" s\r\n", settings.short_cnt_down);
+        if (settings.status == 2){
+            LOGR(tag, "Deploy mode:\t\t ARMED AUTO");
+        }
+        else {
+            LOGR(tag, "Deploy mode:\t\t NOT ARMED");
+        }
+        LOGR(tag, "Deploy delay from boot:\t %"PRIu16" s", settings.short_cnt_down);
 
-        printf("\r\n-------- Deploy algorithm config ----------\r\n");
-        printf("Knife on time:\t\t %i ms\r\n", settings.std_time_ms);
-        printf("Increment:\t\t %i ms\r\n", settings.increment_ms);
-        printf("Max repeats:\t\t %i\r\n", settings.max_repeat);
-        printf("Repeat time:\t\t %i s\r\n", settings.rep_time_s);
-        printf("Switch polarity:\t %"PRIu8"\r\n", settings.switch_polarity);
-        printf("Settings locked:\t %"PRIu8"\r\n", settings.locked);
+        LOGR(tag, "-------- Deploy algorithm config ----------");
+        LOGR(tag, "Knife on time:\t\t %i ms", settings.std_time_ms);
+        LOGR(tag, "Increment:\t\t %i ms", settings.increment_ms);
+        LOGR(tag, "Max repeats:\t\t %i", settings.max_repeat);
+        LOGR(tag, "Repeat time:\t\t %i s", settings.rep_time_s);
+        LOGR(tag, "Switch polarity:\t %"PRIu8"", settings.switch_polarity);
+        LOGR(tag, "Settings locked:\t %"PRIu8"", settings.locked);
 
     /* Else set settings */
     }else {
@@ -431,7 +431,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
         //int tmp;
         //tmp = atoi(ctx->argv[1]);
         if ((std_time > 65535) || (std_time < 0)) {
-            printf("Knife on time of %d out of range [0 - 65535]\r\n", std_time);
+            LOGE(tag, "Knife on time of %d out of range [0 - 65535]", std_time);
             return CMD_ERROR_SYNTAX;
         } else {
             settings.std_time_ms = (uint16_t) std_time;
@@ -439,7 +439,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
 
         //tmp = atoi(ctx->argv[2]);
         if ((increment_ms > 65535) || (increment_ms < 0)) {
-            printf("Increment of %d out of range [0 - 65535]\r\n", increment_ms);
+            LOGE(tag, "Increment of %d out of range [0 - 65535]", increment_ms);
             return CMD_ERROR_SYNTAX;
         } else {
             settings.increment_ms = (uint16_t) increment_ms;
@@ -447,7 +447,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
 
         //tmp = atoi(ctx->argv[3]);
         if ((short_cnt_down > 65535) || (short_cnt_down < 0)) {
-            printf("Auto deploy delay of %d out of range [0 - 65535]\r\n", short_cnt_down);
+            LOGE(tag, "Auto deploy delay of %d out of range [0 - 65535]", short_cnt_down);
             return CMD_ERROR_SYNTAX;
         } else {
             settings.short_cnt_down = (uint16_t) short_cnt_down;
@@ -455,7 +455,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
 
         //tmp = atoi(ctx->argv[4]);
         if ((max_repeat > 255) || (max_repeat < 0)) {
-            printf("Max repeats of %d out of range [0 - 255]\r\n", max_repeat);
+            LOGE(tag, "Max repeats of %d out of range [0 - 255]", max_repeat);
             return CMD_ERROR_SYNTAX;
         } else {
             settings.max_repeat = (uint8_t) max_repeat;
@@ -463,7 +463,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
 
         //tmp = atoi(ctx->argv[5]);
         if ((rep_time_s > 255) || (rep_time_s < 0)) {
-            printf("Time between repeats of %d out of range [0 - 255]\r\n", rep_time_s);
+            LOGE(tag, "Time between repeats of %d out of range [0 - 255]", rep_time_s);
             return CMD_ERROR_SYNTAX;
         } else {
             settings.rep_time_s = (uint8_t) rep_time_s;
@@ -471,7 +471,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
 
         //tmp = atoi(ctx->argv[6]);
         if ((switch_polarity > 1) || (switch_polarity < 0)) {
-            printf("Polarity can only be selected to 0 or 1 not %d\r\n", switch_polarity);
+            LOGE(tag,"Polarity can only be selected to 0 or 1 not %d", switch_polarity);
             return CMD_ERROR_SYNTAX;
         } else {
             settings.switch_polarity = (uint8_t) switch_polarity;
@@ -479,7 +479,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
 
         //tmp = atoi(ctx->argv[7]);
         if ((reboot_deploy_cnt > 255) || (reboot_deploy_cnt < 0)) {
-            printf("Reboot deploy number of %d out of range [0 - 255]\r\n", reboot_deploy_cnt);
+            LOGE(tag,"Reboot deploy number of %d out of range [0 - 255]", reboot_deploy_cnt);
             return CMD_ERROR_SYNTAX;
         } else {
             settings.reboot_deploy_cnt = (uint8_t) reboot_deploy_cnt;
@@ -488,14 +488,14 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
         if (gs_gssb_istage_settings_unlock(i2c_addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
 
-        printf("Setting burn settings...\n");
+        LOGI(tag, "Setting burn settings...");
         if (gs_gssb_istage_set_burn_settings(i2c_addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
 
         /* We need to have a delay as we write the settings to EEPROM which takes some time */
         osDelay(50);
 
-        printf("Setting burn cnt...\n");
+        LOGI(tag, "Setting burn cnt...");
         if (gs_gssb_istage_set_burn_settings_cnt(i2c_addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
 
@@ -503,11 +503,11 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
         osDelay(20);
 
         if (gs_gssb_istage_settings_lock(i2c_addr, i2c_timeout_ms) != GS_OK) {
-            printf("\r\n Warning could not lock settings after they was unlocked\r\n");
+            LOGW(tag, " Warning could not lock settings after they was unlocked");
             return CMD_ERROR_FAIL;
         }
 
-        printf("Resetting interstage...\n");
+        LOGI(tag,"Resetting interstage...");
         gs_gssb_soft_reset(i2c_addr, i2c_timeout_ms);
     } else {
         return CMD_ERROR_SYNTAX;
@@ -539,7 +539,7 @@ int gssb_interstage_arm(char *fmt, char *params, int nparams)
         return CMD_ERROR_FAIL;
 
     if (gs_gssb_istage_settings_lock(i2c_addr, i2c_timeout_ms) != GS_OK) {
-        printf("\r\n Warning could not lock settings after they was unlocked\r\n");
+        LOGW(tag, " Warning could not lock settings after they was unlocked");
         return CMD_ERROR_FAIL;
     }
 
@@ -559,17 +559,17 @@ int gssb_interstage_state(char *fmt, char *params, int nparams)
         return CMD_ERROR_SYNTAX;
 
     if (gs_gssb_istage_settings_unlock(i2c_addr, i2c_timeout_ms) != GS_OK) {
-        LOGE(tag,"Error unlocking istage settings\n");
+        LOGE(tag,"Error unlocking istage settings");
         return CMD_ERROR_FAIL;
     }
 
     if (gs_gssb_istage_set_state(i2c_addr, i2c_timeout_ms, (uint8_t)armed_manual) != GS_OK) {
-        LOGE(tag,"Error setting istage state\n");
+        LOGE(tag,"Error setting istage state");
         return CMD_ERROR_FAIL;
     }
 
     if (gs_gssb_istage_settings_lock(i2c_addr, i2c_timeout_ms) != GS_OK) {
-        LOGE(tag, "Warning could not lock settings after they was unlocked\n");
+        LOGE(tag, "Warning could not lock settings after they was unlocked");
         return CMD_ERROR_FAIL;
     }
 
@@ -590,14 +590,14 @@ int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams)
         if (gs_gssb_istage_settings_lock(i2c_addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
     }
-    printf("Parameters unlock: %d", unlock);
+    LOGR(tag, "Parameters unlock: %d", unlock);
     return CMD_ERROR_NONE;
 }
 
 
 int gssb_soft_reset(char *fmt, char *params, int nparams)
 {
-    printf("Resetting device %#X...", i2c_addr);
+    LOGR(tag, "Resetting device %#X...", i2c_addr);
     if (gs_gssb_soft_reset(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
 
@@ -609,7 +609,7 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
 {
     gs_gssb_istage_status_t status;
     const char *state_str;
-    
+
     if (gs_gssb_istage_status(i2c_addr, i2c_timeout_ms, &status) != GS_OK)
         return CMD_ERROR_FAIL;
 
@@ -632,18 +632,19 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
             break;
     };
 
-    printf("Current state:\t\t\t\t %s\r\n", state_str);
-    if (status.release_status == 1)
-        printf("Antenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("Antenna state:\t\t\t\t %s\r\n", "Not released");
-    printf("\r\n");
+    LOGR(tag, "Current state:\t\t\t\t %s", state_str);
+    if (status.release_status == 1) {
+        LOGR(tag, "Antenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "Antenna state:\t\t\t\t %s", "Not released");
+    }
 
-    printf("Delay till deploy:\t\t\t %"PRIu16" s\r\n", status.deploy_in_s);
-    printf("Number of attempts since boot:\t\t %"PRIu8"\r\n", status.number_of_deploys);
-    printf("Knife that will be used in next deploy:\t %"PRIu8"\r\n", status.active_knife);
-    printf("Total deploy attempts:\t\t\t %"PRIu16"\r\n", status.total_number_of_deploys);
-    printf("Reboot deploy cnt:\t\t\t %"PRIu8"\r\n", status.reboot_deploy_cnt);
+    LOGR(tag, "Delay till deploy:\t\t\t %"PRIu16" s", status.deploy_in_s);
+    LOGR(tag, "Number of attempts since boot:\t\t %"PRIu8"", status.number_of_deploys);
+    LOGR(tag, "Knife that will be used in next deploy:\t %"PRIu8"", status.active_knife);
+    LOGR(tag, "Total deploy attempts:\t\t\t %"PRIu16"", status.total_number_of_deploys);
+    LOGR(tag, "Reboot deploy cnt:\t\t\t %"PRIu8"", status.reboot_deploy_cnt);
 
     return CMD_ERROR_NONE;
 }
@@ -658,7 +659,7 @@ int gssb_ar6_burn(char *fmt, char *params, int nparams)
         return CMD_ERROR_SYNTAX;
 
     if ((duration > 20) || (duration < 0)) {
-        printf("Duration out of range [0 - 20]\r\n");
+        LOGE(tag, "Duration out of range [0 - 20]");
         return CMD_ERROR_SYNTAX;
     }
 
@@ -676,45 +677,49 @@ int gssb_ar6_get_status(char *fmt, char *params, int nparams)
     if (gs_gssb_ar6_get_release_status(i2c_addr, i2c_timeout_ms, &status.release) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Antenna release\n\r");
-    if (status.release.state == 1)
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Burning");
-    else
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Idle");
+    LOGR(tag, "Antenna release\r");
+    if (status.release.state == 1) {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Burning");
+    }
+    else {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Idle");
+    }
 
-    printf("\tBurn time left:\t\t\t\t %hhu\r\n", status.release.burn_time_left);
+    LOGR(tag, "\tBurn time left:\t\t\t\t %hhu", status.release.burn_time_left);
 
-    if (status.release.status == 1)
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Not released");
+    if (status.release.status == 1) {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Not released");
+    }
 
-    printf("\tBurn attempts:\t\t\t\t %hhu\r\n", status.release.burn_tries);
+    LOGR(tag, "\tBurn attempts:\t\t\t\t %hhu", status.release.burn_tries);
 
     if (gs_gssb_ant6_get_backup_status(i2c_addr, i2c_timeout_ms, &status.backup) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Backup\n\r");
-    printf("\tState:\t\t\t\t\t ");
+    LOGR(tag, "Backup\r");
+    LOGR(tag, "\tState:\t\t\t\t\t ");
     if (status.backup.state == 0) {
-        printf("Finished successful\r\n");
+        LOGR(tag, "Finished successful");
     } else if (status.backup.state == 1) {
-        printf("Waiting to deploy\r\n");
-        printf("\tSeconds to backup deploy:\t\t %"PRIu32"\r\n", status.backup.seconds_to_deploy);
+        LOGR(tag, "Waiting to deploy");
+        LOGR(tag, "\tSeconds to backup deploy:\t\t %"PRIu32"", status.backup.seconds_to_deploy);
     } else if (status.backup.state == 2) {
-        printf("Deploying\r\n");
+        LOGR(tag, "Deploying");
     } else if (status.backup.state == 3) {
-        printf("Finished unsuccessful\r\n");
+        LOGR(tag, "Finished unsuccessful");
     } else if (status.backup.state == 4) {
-        printf("Not active\r\n");
+        LOGR(tag, "Not active");
     }
 
     if (gs_gssb_ar6_get_board_status(i2c_addr, i2c_timeout_ms, &status.board) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Board\n\r");
-    printf("\tSeconds since boot:\t\t\t %"PRIu32"\r\n", status.board.seconds_since_boot);
-    printf("\tNumber of reboots:\t\t\t %hhu\r\n", status.board.reboot_count);
+    LOGR(tag, "Board\r");
+    LOGR(tag, "\tSeconds since boot:\t\t\t %"PRIu32"", status.board.seconds_since_boot);
+    LOGR(tag, "\tNumber of reboots:\t\t\t %hhu", status.board.reboot_count);
 
     return CMD_ERROR_NONE;
 }
@@ -730,12 +735,12 @@ int gssb_common_burn_channel(char *fmt, char *params, int nparams)
         return CMD_ERROR_SYNTAX;
 
     if ((channel > 10) || (channel < 0)) {
-        printf("Channels out of range [0 - 10]\r\n");
+        LOGW(tag, "Channels out of range [0 - 10]");
         return CMD_ERROR_SYNTAX;
     }
 
     if ((duration > 60) || (duration < 0)) {
-        printf("Duration out of range [0 - 60]\r\n");
+        LOGW(tag, "Duration out of range [0 - 60]");
         return CMD_ERROR_SYNTAX;
     }
 
@@ -771,60 +776,68 @@ int gssb_ant6_get_status_all_channels(char *fmt, char *params, int nparams)
     if (gs_gssb_ant6_get_release_status(i2c_addr, i2c_timeout_ms, &status.release) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Channel 0\n\r");
-    if (status.release.channel_0_state == 1)
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Burning");
-    else
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Idle");
+    LOGR(tag, "Channel 0\r");
+    if (status.release.channel_0_state == 1) {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Burning");
+    }
+    else {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Idle");
+    }
 
-    printf("\tBurn time left:\t\t\t\t %hhu\r\n", status.release.channel_0_burn_time_left);
+    LOGR(tag, "\tBurn time left:\t\t\t\t %hhu", status.release.channel_0_burn_time_left);
 
-    if (status.release.channel_0_status == 1)
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Not released");
+    if (status.release.channel_0_status == 1) {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Not released");
+    }
 
-    printf("\tBurn attempts:\t\t\t\t %hhu\r\n", status.release.channel_0_burn_tries);
+    LOGR(tag, "\tBurn attempts:\t\t\t\t %hhu", status.release.channel_0_burn_tries);
 
-    printf("Channel 1\n\r");
-    if (status.release.channel_1_state == 1)
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Burning");
-    else
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Idle");
+    LOGR(tag, "Channel 1\r");
+    if (status.release.channel_1_state == 1) {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Burning");
+    }
+    else {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Idle");
+    }
 
-    printf("\tBurn time left:\t\t\t\t %hhu\r\n", status.release.channel_1_burn_time_left);
+    LOGR(tag, "\tBurn time left:\t\t\t\t %hhu", status.release.channel_1_burn_time_left);
 
-    if (status.release.channel_1_status == 1)
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Not released");
+    if (status.release.channel_1_status == 1) {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Not released");
+    }
 
-    printf("\tBurn attempts:\t\t\t\t %hhu\r\n", status.release.channel_1_burn_tries);
+    LOGR(tag, "\tBurn attempts:\t\t\t\t %hhu", status.release.channel_1_burn_tries);
 
     if (gs_gssb_ant6_get_backup_status(i2c_addr, i2c_timeout_ms, &status.backup) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Backup\n\r");
-    printf("\tState:\t\t\t\t\t ");
+    LOGR(tag, "Backup\r");
+    LOGR(tag, "\tState:\t\t\t\t\t ");
     if (status.backup.state == 0) {
-        printf("Finished successful\r\n");
+        LOGR(tag, "Finished successful");
     } else if (status.backup.state == 1) {
-        printf("Waiting to deploy\r\n");
-        printf("\tSeconds to backup deploy:\t\t %"PRIu32"\r\n", status.backup.seconds_to_deploy);
+        LOGR(tag, "Waiting to deploy");
+        LOGR(tag, "\tSeconds to backup deploy:\t\t %"PRIu32"", status.backup.seconds_to_deploy);
     } else if (status.backup.state == 2) {
-        printf("Deploying\r\n");
+        LOGR(tag, "Deploying");
     } else if (status.backup.state == 3) {
-        printf("Finished unsuccessful\r\n");
+        LOGR(tag, "Finished unsuccessful");
     } else if (status.backup.state == 4) {
-        printf("Not active\r\n");
+        LOGR(tag, "Not active");
     }
 
     if (gs_gssb_ant6_get_board_status(i2c_addr, i2c_timeout_ms, &status.board) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Board\n\r");
-    printf("\tSeconds since boot:\t\t\t %"PRIu32"\r\n", status.board.seconds_since_boot);
-    printf("\tNumber of reboots:\t\t\t %hhu\r\n", status.board.reboot_count);
+    LOGR(tag, "Board\r");
+    LOGR(tag, "\tSeconds since boot:\t\t\t %"PRIu32"", status.board.seconds_since_boot);
+    LOGR(tag, "\tNumber of reboots:\t\t\t %hhu", status.board.reboot_count);
 
     return CMD_ERROR_NONE;
 }
@@ -837,70 +850,82 @@ int gssb_i4_get_status_all_channels(char *fmt, char *params, int nparams)
     if (gs_gssb_i4_get_release_status(i2c_addr, i2c_timeout_ms, &status.release) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Channel 0\n\r");
-    if (status.release.channel_0_state == 1)
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Burning");
-    else
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Idle");
+    LOGR(tag, "Channel 0\r");
+    if (status.release.channel_0_state == 1) {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Burning");
+    }
+    else {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Idle");
+    }
 
-    printf("\tBurn time left:\t\t\t\t %hhu\r\n", status.release.channel_0_burn_time_left);
+    LOGR(tag, "\tBurn time left:\t\t\t\t %hhu", status.release.channel_0_burn_time_left);
 
-    if (status.release.channel_0_status_0 == 1)
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Not released");
+    if (status.release.channel_0_status_0 == 1) {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Not released");
+    }
 
-    if (status.release.channel_0_status_1 == 2)
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Not released");
+    if (status.release.channel_0_status_1 == 2) {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Not released");
+    }
 
-    printf("\tBurn attempts:\t\t\t\t %hhu\r\n", status.release.channel_0_burn_tries);
+    LOGR(tag, "\tBurn attempts:\t\t\t\t %hhu", status.release.channel_0_burn_tries);
 
-    printf("Channel 1\n\r");
-    if (status.release.channel_1_state == 1)
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Burning");
-    else
-        printf("\tBurn state:\t\t\t\t %s\r\n", "Idle");
+    LOGR(tag, "Channel 1\r");
+    if (status.release.channel_1_state == 1) {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Burning");
+    }
+    else {
+        LOGR(tag, "\tBurn state:\t\t\t\t %s", "Idle");
+    }
 
-    printf("\tBurn time left:\t\t\t\t %hhu\r\n", status.release.channel_1_burn_time_left);
+    LOGR(tag, "\tBurn time left:\t\t\t\t %hhu", status.release.channel_1_burn_time_left);
 
-    if (status.release.channel_1_status_0 == 1)
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Not released");
+    if (status.release.channel_1_status_0 == 1) {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Not released");
+    }
 
-    if (status.release.channel_1_status_1== 2)
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Released");
-    else
-        printf("\tAntenna state:\t\t\t\t %s\r\n", "Not released");
+    if (status.release.channel_1_status_1== 2) {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Released");
+    }
+    else {
+        LOGR(tag, "\tAntenna state:\t\t\t\t %s", "Not released");
+    }
 
-    printf("\tBurn attempts:\t\t\t\t %hhu\r\n", status.release.channel_1_burn_tries);
+    LOGR(tag, "\tBurn attempts:\t\t\t\t %hhu", status.release.channel_1_burn_tries);
 
     if (gs_gssb_i4_get_backup_status(i2c_addr, i2c_timeout_ms, &status.backup) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Backup\n\r");
-    printf("\tState:\t\t\t\t\t ");
+    LOGR(tag, "Backup\r");
+    LOGR(tag, "\tState:\t\t\t\t\t ");
     if (status.backup.state == 0) {
-        printf("Finished successful\r\n");
+        LOGR(tag, "Finished successful");
     } else if (status.backup.state == 1) {
-        printf("Waiting to deploy\r\n");
-        printf("\tSeconds to backup deploy:\t\t %"PRIu32"\r\n", status.backup.seconds_to_deploy);
+        LOGR(tag, "Waiting to deploy");
+        LOGR(tag, "\tSeconds to backup deploy:\t\t %"PRIu32"", status.backup.seconds_to_deploy);
     } else if (status.backup.state == 2) {
-        printf("Deploying\r\n");
+        LOGR(tag, "Deploying");
     } else if (status.backup.state == 3) {
-        printf("Finished unsuccessful\r\n");
+        LOGR(tag, "Finished unsuccessful");
     } else if (status.backup.state == 4) {
-        printf("Not active\r\n");
+        LOGR(tag, "Not active");
     }
 
     if (gs_gssb_i4_get_board_status(i2c_addr, i2c_timeout_ms, &status.board) != GS_OK)
         return CMD_ERROR_FAIL;
 
-    printf("Board\n\r");
-    printf("\tSeconds since boot:\t\t\t %"PRIu32"\r\n", status.board.seconds_since_boot);
-    printf("\tNumber of reboots:\t\t\t %hhu\r\n", status.board.reboot_count);
+    LOGR(tag, "Board\r");
+    LOGR(tag, "\tSeconds since boot:\t\t\t %"PRIu32"", status.board.seconds_since_boot);
+    LOGR(tag, "\tNumber of reboots:\t\t\t %hhu", status.board.reboot_count);
 
     return CMD_ERROR_NONE;
 }
@@ -928,21 +953,21 @@ int gssb_common_backup_settings(char *fmt, char *params, int nparams)
 
     if (sscanf(params, fmt, &minutes, &backup_active, &max_burn_duration) == nparams) {
         if ((minutes > 5000) || (minutes < 0)) {
-            printf("Minutes until deploy out of range [0 - 5000]\r\n");
+            LOGE(tag, "Minutes until deploy out of range [0 - 5000]");
             return CMD_ERROR_SYNTAX;
         } else {
             settings.minutes = (uint16_t)minutes;
         }
 
         if ((backup_active != 1) && (backup_active != 0)) {
-            printf("Backup active out of range [0 - 1]\r\n");
+            LOGE(tag, "Backup active out of range [0 - 1]");
             return CMD_ERROR_SYNTAX;
         } else {
             settings.backup_active = (uint8_t)backup_active;
         }
 
         if ((max_burn_duration > 127) || (max_burn_duration < 0)) {
-            printf("Max burn duration out of range [0 - 127]\r\n");
+            LOGE(tag, "Max burn duration out of range [0 - 127]");
             return CMD_ERROR_SYNTAX;
         } else {
             settings.max_burn_duration = (uint8_t)max_burn_duration;
@@ -953,7 +978,7 @@ int gssb_common_backup_settings(char *fmt, char *params, int nparams)
         //if (gs_gssb_i4_set_backup_settings(i2c_addr, i2c_timeout_ms, settings) != GS_OK)
             return CMD_ERROR_FAIL;
 
-        printf("\n\rReboot board for changes to take effect\n\r");
+        LOGR(tag, "\rReboot board for changes to take effect\r");
     } else {
         if (gs_gssb_ant6_get_backup_settings(i2c_addr, i2c_timeout_ms, &settings) != GS_OK)
         //if (gs_gssb_ar6_get_backup_settings(i2c_addr, i2c_timeout_ms, &settings) != GS_OK)
@@ -961,13 +986,13 @@ int gssb_common_backup_settings(char *fmt, char *params, int nparams)
             return CMD_ERROR_FAIL;
     }
 
-    printf("Backup deploy settings:\n\r\tMinutes until deploy:\t\t\t %hi\n\r\tBackup deployment:\t\t\t ", settings.minutes);
+    LOGR(tag, "Backup deploy settings:\r\tMinutes until deploy:\t\t\t %hi\r\tBackup deployment:\t\t\t ", settings.minutes);
     if (settings.backup_active == 1) {
-        printf("Active\n\r");
+        LOGR(tag, "Active\r");
     } else {
-        printf("Not active\n\r");
+        LOGR(tag, "Not active\r");
     }
-    printf("\tMax burn duration:\t\t\t %hhu\n\r", settings.max_burn_duration);
+    LOGR(tag, "\tMax burn duration:\t\t\t %hhu\r", settings.max_burn_duration);
 
     return CMD_ERROR_NONE;
 }
@@ -999,7 +1024,7 @@ int gssb_update_status(char *fmt, char *params, int nparams)
         return CMD_OK;
     }
     else
-        return CMD_FAIL;
+        return CMD_ERROR;
 }
 
 int gssb_antenna_release(char *fmt, char *params, int nparams)
@@ -1043,9 +1068,9 @@ int gssb_antenna_release(char *fmt, char *params, int nparams)
         osDelay(20);
         if (gs_gssb_istage_settings_lock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
-        printf("Resetting interstage...\n");
+        LOGI(tag, "Resetting interstage...");
         gs_gssb_soft_reset(addr, i2c_timeout_ms);
-        LOGD(tag, "istage on: %d. Off: %d. Rep: %d. (rc: %d)",
+        LOGR(tag, "istage on: %d. Off: %d. Rep: %d. (rc: %d)",
              knife_on, knife_off, repeats, rc);
 
         // Deploy manual
@@ -1056,7 +1081,7 @@ int gssb_antenna_release(char *fmt, char *params, int nparams)
         // Burn
         if (gs_gssb_istage_burn(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
-        LOGI(tag, "istage %#x deploying! (rc: %d)", addr, rc);
+        LOGR(tag, "GSSB istage %d deploying! (rc: %d)", addr, rc);
 
         return CMD_OK;
     }

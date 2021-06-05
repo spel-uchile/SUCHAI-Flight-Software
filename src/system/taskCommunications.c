@@ -43,7 +43,7 @@ void taskCommunications(void *param)
         LOGE(tag, "Error biding socket (%d)!", rc)
         return;
     }
-    if((rc = csp_listen(sock, 5)) != CSP_ERR_NONE)
+    if((rc = csp_listen(sock, SCH_CSP_SOCK_LEN)) != CSP_ERR_NONE)
     {
         LOGE(tag, "Error listening to socket (%d)", rc)
         return;
@@ -82,22 +82,22 @@ void taskCommunications(void *param)
 
                 case SCH_TRX_PORT_TM:
                     // Create a response packet and send
-                    rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    csp_send(conn, rep_ok, 1000);
-                    #ifdef SCH_RESEND_TM_NODE
-                    tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
-                    #endif
-                    // Process TM packet
-                    com_receive_tm(packet);
-                    csp_buffer_free(packet);
+                    //rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    //csp_send(conn, rep_ok, 1000);
+
                     #ifdef SCH_RESEND_TM_NODE
                     // Resend a copy of the packet to another node
+                    tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
                     assert(tmp_packet != NULL);
                     assert(tmp_packet != packet);
                     rc = csp_sendto(CSP_PRIO_NORM, SCH_RESEND_TM_NODE, SCH_TRX_PORT_TM, csp_conn_sport(conn), CSP_O_NONE, tmp_packet, 1000);
                     if(rc == -1)
                         csp_buffer_free(tmp_packet);
                     #endif
+
+                    // Process TM packet
+                    com_receive_tm(packet);
+                    csp_buffer_free(packet);
                     break;
 
                 case SCH_TRX_PORT_RPT:
@@ -130,7 +130,7 @@ void taskCommunications(void *param)
 
                 case SCH_TRX_PORT_DBG:
                     /* Debug port, print to console */
-                    LOGR(tag, "(%d)%s", packet->id.src, (char *)(packet->data));
+                    LOGP(tag, "[%d] %s", packet->id.src, (char *)(packet->data));
                     csp_buffer_free(packet);
                     break;
 
@@ -140,7 +140,6 @@ void taskCommunications(void *param)
                     break;
             }
         }
-
         /* Close current connection, and handle next */
         csp_close(conn);
     }
@@ -169,7 +168,7 @@ static void com_receive_tc(csp_packet_t *packet)
     {
         // Parse and send command for execution
         LOGI(tag, "TC: %s", cmd_str);
-        cmd_t *new_cmd = cmd_parse_from_str(cmd_str);
+        cmd_t *new_cmd = cmd_build_from_str(cmd_str);
         if (new_cmd != NULL)
             cmd_send(new_cmd);
 
@@ -188,7 +187,7 @@ static void com_receive_cmd(csp_packet_t *packet)
 {
     // Make sure the buffer is a null terminated string
     packet->data[packet->length] = '\0';
-    cmd_t *new_cmd = cmd_parse_from_str((char *)(packet->data));
+    cmd_t *new_cmd = cmd_build_from_str((char *)(packet->data));
 
     // Send command to execution if not null
     if(new_cmd != NULL)
@@ -205,17 +204,23 @@ static void com_receive_tm(csp_packet_t *packet)
     com_frame_t *frame = (com_frame_t *)packet->data;
 
     frame->nframe = csp_ntoh16(frame->nframe);
-    frame->type = csp_ntoh16(frame->type);
     frame->ndata = csp_ntoh32(frame->ndata);
 
     LOGI(tag, "Received: %d bytes", packet->length);
+    LOGI(tag, "Node    : %d", frame->node);
     LOGI(tag, "Frame   : %d", frame->nframe);
-    LOGI(tag, "Type    : %d", (frame->type));
-    LOGI(tag, "Samples : %d", (frame->ndata));
+    LOGI(tag, "Type    : %d", frame->type);
+    LOGI(tag, "Samples : %d", frame->ndata);
 
     if(frame->type == TM_TYPE_STATUS)
     {
         cmd_parse_tm = cmd_get_str("tm_parse_status");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
+    else if(frame->type == TM_TYPE_HELP)
+    {
+        cmd_parse_tm = cmd_get_str("tm_parse_string");
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }
@@ -236,6 +241,33 @@ static void com_receive_tm(csp_packet_t *packet)
             delay = j*data_map[payload].size; // Select next struct
             dat_add_payload_sample((frame->data.data8)+delay, payload); //Save next struct
         }
+    }
+    else if(frame->type == TM_TYPE_FILE)
+    {
+        print_buff(frame->data.data8, COM_FRAME_MAX_LEN);
+#ifdef LINUX
+        FILE *fptr;
+        char fname[100] = "testfile.jpg";
+
+
+        fptr = fopen(fname,"rb");
+
+        if(fptr == NULL) {
+            fptr = fopen(fname,"wb");
+        } else {
+            if (frame->nframe != 1) {
+                fclose(fptr);
+                fptr = fopen(fname,"ab");
+            }
+        }
+
+        int cur_size = (int) ftell(fptr);
+        int written = fwrite(frame->data.data8, 1, COM_FRAME_MAX_LEN, fptr);
+
+        LOGI(tag, "current file size: %d, %d", cur_size, written);
+
+        fclose(fptr);
+#endif
     }
     else
     {

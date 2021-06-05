@@ -85,7 +85,9 @@ test_unit:
   script:
     - echo "Testing in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
-    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_unit
+    - cd $HOME/suchai-docker
+    - docker-compose -f sat-gnd-com.yml  run  suchai_sat sh install_test_linux.sh test_unit
+    - docker-compose -f sat-gnd-com.yml down
     - docker system prune -f
   only:
     - master
@@ -125,7 +127,9 @@ test_fuzz:
   script:
     - echo "Testing in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux.sh
-    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux.sh test_fuzz
+    - cd $HOME/suchai-docker
+    - docker-compose -f sat-gnd-com.yml  run  suchai_sat sh install_test_linux.sh test_fuzz
+    - docker-compose -f sat-gnd-com.yml down
     - docker system prune -f
   only:
     - master

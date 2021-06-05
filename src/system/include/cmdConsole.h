@@ -26,7 +26,7 @@ void cmd_console_init(void);
  * @param fmt Str. Parameters format "%s"
  * @param params Str. Parameters as string "test"
  * @param nparams Int. Number of parameters 1
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int con_debug_msg(char *fmt, char *params, int nparams);
 
@@ -36,7 +36,7 @@ int con_debug_msg(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
  * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int con_help(char *fmt, char *params, int nparams);
 
@@ -48,7 +48,7 @@ int con_help(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d %d"
  * @param params Str. Parameters as string "<level> <node>"
  * @param nparams Int. Number of parameters 2
- * @return  CMD_OK if executed correctly or CMD_FAIL in case of errors
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  *
  * Example
  * @code

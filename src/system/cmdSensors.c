@@ -35,22 +35,22 @@ void cmd_sensors_init(void)
 int set_state(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     unsigned int action;
     unsigned int step;
     int nsamples;
     if(nparams == sscanf(params, fmt, &action, &step, &nsamples)){
-        int rc = set_machine_state(action, step, nsamples);
-        return rc ? CMD_OK : CMD_FAIL;
+        int rc = dat_set_stmachine_state(action, step, nsamples);
+        return rc ? CMD_OK : CMD_ERROR;
     }
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int activate_sensor(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     int payload;
     int activate;
@@ -59,55 +59,60 @@ int activate_sensor(char *fmt, char *params, int nparams)
         if(payload < 0 ) {
             if (activate == 0) {
                 osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-                machine.active_payloads = 0;
+                status_machine.active_payloads = 0;
                 osSemaphoreGiven(&repo_machine_sem);
 
             } else  {
                 osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-                machine.active_payloads = 0;
+                status_machine.active_payloads = 0;
                 int i;
-                for (i=0; i < machine.total_sensors; i++) {
-                    machine.active_payloads +=  1 << i ;
+                for (i=0; i < status_machine.total_sensors; i++) {
+                    status_machine.active_payloads +=  1 << i ;
                 }
                 osSemaphoreGiven(&repo_machine_sem);
             }
             return CMD_OK;
         }
 
-        if ( payload >= machine.total_sensors ) {
-            return CMD_ERROR;
+        if (payload >= status_machine.total_sensors ) {
+            return CMD_SYNTAX_ERROR;
         }
 
-        if( activate == 1  && !is_payload_active(payload, machine.active_payloads, machine.total_sensors) ) {
+        if( activate == 1  && !dat_stmachine_is_sensor_active(payload,
+                                                              status_machine.active_payloads,
+                                                              status_machine.total_sensors) ) {
             osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-            machine.active_payloads = ((unsigned  int)1 << payload) | machine.active_payloads;
+            status_machine.active_payloads = ((unsigned  int)1 << payload) | status_machine.active_payloads;
             osSemaphoreGiven(&repo_machine_sem);
             return CMD_OK;
-        } else if ( activate == 0 && is_payload_active(payload, machine.active_payloads, machine.total_sensors) ) {
+        } else if ( activate == 0 && dat_stmachine_is_sensor_active(payload,
+                                                                    status_machine.active_payloads,
+                                                                    status_machine.total_sensors) ) {
             osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
-            machine.active_payloads = ((unsigned  int)1 << payload) ^ machine.active_payloads;
+            status_machine.active_payloads = ((unsigned  int)1 << payload) ^ status_machine.active_payloads;
             osSemaphoreGiven(&repo_machine_sem);
             return CMD_OK;
         }
     }
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int take_sample(char *fmt, char *params, int nparams)
 {
+    //TODO: SEPARATE EACH TAKE SAMPLE IN A FUNCTION
     if(params == NULL)
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
 
     int payload;
     if(nparams == sscanf(params, fmt, &payload)) {
 
+        int ret;
+
         if( payload >= last_sensor) {
-            return CMD_ERROR;
+            return CMD_SYNTAX_ERROR;
         }
 
         int curr_time =  (int)time(NULL);
-
-
         if( payload == 0 ) // Temperature
         {
             int16_t sensor1=1, sensor2=2;
@@ -119,8 +124,13 @@ int take_sample(char *fmt, char *params, int nparams)
             gs_mpu3300_read_temp(&gyro_temp);
 #endif
             /* Save temperature data */
-            struct temp_data data_temp = {curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
-            dat_add_payload_sample(&data_temp, temp_sensors);
+            int index_temp = dat_get_system_var(data_map[temp_sensors].sys_index);
+            struct temp_data data_temp = {index_temp, curr_time, (float)(sensor1/10.0), (float)(sensor2/10.0), gyro_temp};
+            ret = dat_add_payload_sample(&data_temp, temp_sensors);
+
+            if (ret != 0) {
+                return CMD_ERROR;
+            }
             return CMD_OK;
         }
         else if ( payload == 1) // ADS
@@ -141,13 +151,17 @@ int take_sample(char *fmt, char *params, int nparams)
             mag_z = hmc_reading.z;
 #endif
             /* Save ADCS data */
-            struct ads_data data_ads = {curr_time,
+            int index_ads = dat_get_system_var(data_map[ads_sensors].sys_index);
+            struct ads_data data_ads = {index_ads, curr_time,
                                         gyro_x, gyro_y, gyro_z,
                                         mag_x, mag_y, mag_z};
-            dat_add_payload_sample(&data_ads, ads_sensors);
+            ret = dat_add_payload_sample(&data_ads, ads_sensors);
+            if (ret != 0) {
+                return CMD_ERROR;
+            }
             return CMD_OK;
         }
-        else if ( payload == 2) // EPS
+        else if (payload == 2) // EPS
         {
             uint32_t cursun=1;
             uint32_t cursys=2;
@@ -161,7 +175,7 @@ int take_sample(char *fmt, char *params, int nparams)
 
 #ifdef NANOMIND
             eps_hk_t hk = {};
-            eps_hk_print(&hk);
+            eps_hk_get(&hk);
             cursun = hk.cursun;
             cursys = hk.cursys;
             vbatt = hk.vbatt;
@@ -172,25 +186,39 @@ int take_sample(char *fmt, char *params, int nparams)
             temp5 = hk.temp[4];
             temp6 = hk.temp[5];
 #endif
-            struct eps_data data_eps = {curr_time, cursun, cursys, vbatt,
+            int index_eps = dat_get_system_var(data_map[eps_sensors].sys_index);
+            struct eps_data data_eps = {index_eps, curr_time, cursun, cursys, vbatt,
                                         temp1, temp2, temp3, temp4, temp5, temp6};
-            dat_add_payload_sample(&data_eps, eps_sensors);
+            ret = dat_add_payload_sample(&data_eps, eps_sensors);
+            if (ret != 0) {
+                return CMD_ERROR;
+            }
+            return CMD_OK;
+        } else if (payload == 3) {
+
+            // Pack status variables to a structure
+            int i;
+            uint32_t status_buff[dat_status_last_var];
+            for(i = 0; i<dat_status_last_var; i++)
+            {
+                status_buff[i] = dat_get_status_var(dat_status_list[i].address).u;
+            }
+
+            int index_sta = dat_get_system_var(data_map[sta_sensors].sys_index);
+            struct sta_data data_sta = {index_sta, curr_time};
+            memcpy(data_sta.sta_buff, status_buff, sizeof(status_buff));
+            ret = dat_add_payload_sample(&data_sta, sta_sensors);
+            if (ret == -1) {
+                return CMD_ERROR;
+            }
             return CMD_OK;
         }
     }
-    return CMD_ERROR;
+    return CMD_SYNTAX_ERROR;
 }
 
 int init_dummy_sensor(char *fmt, char *params, int nparams)
 {
     LOGI(tag, "Initializing dummy sensor");
     return CMD_OK;
-}
-
-int is_payload_active(int payload, int active_payloads, int n_payloads) {
-//    printf("max number of active payload %d\n", (1 << n_payloads));
-    if ( active_payloads >= (1 << n_payloads) ) {
-        return 0;
-    }
-    return ( (active_payloads & (1 << payload)) != 0 );
 }

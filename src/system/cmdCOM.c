@@ -24,7 +24,7 @@ static char trx_node = SCH_TRX_ADDRESS;
 
 #ifdef SCH_USE_NANOCOM
 static void _com_config_help(void);
-static void _com_config_find(char *param_name, int *table, gs_param_table_instance_t **param);
+static void _com_config_find(char *param_name, int table, param_table_t **param);
 #endif
 
 void cmd_com_init(void)
@@ -37,11 +37,14 @@ void cmd_com_init(void)
     cmd_add("com_debug", com_debug, "", 0);
     cmd_add("com_set_node", com_set_node, "%d", 1);
     cmd_add("com_get_node", com_get_node, "", 0);
+    cmd_add("com_set_time_node", com_set_time_node, "%d", 1);
+    cmd_add("com_set_tle_node", com_set_tle_node, "%d %s", 2);
 #ifdef SCH_USE_NANOCOM
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
-    cmd_add("com_get_config", com_get_config, "%s", 1);
-    cmd_add("com_set_config", com_set_config, "%s %s", 2);
+    cmd_add("com_get_config", com_get_config, "%d %s", 2);
+    cmd_add("com_set_config", com_set_config, "%d %s %s", 3);
     cmd_add("com_update_status", com_update_status_vars, "", 0);
+    cmd_add("com_set_beacon", com_set_beacon, "%d %d", 2);
 #endif
 }
 
@@ -50,18 +53,20 @@ int com_ping(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node;
     if(sscanf(params, fmt, &node) == nparams)
     {
         int rc = csp_ping((uint8_t)node, 3000, 10, CSP_O_NONE);
-        LOGI(tag, "Ping to %d took %d", node, rc);
+        LOGR(tag, "Ping to %d took %d", node, rc);
         if(rc > 0)
             return CMD_OK;
+        else
+            return CMD_ERROR;
     }
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_rpt(char *fmt, char *params, int nparams)
@@ -69,7 +74,7 @@ int com_send_rpt(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node;
@@ -85,7 +90,7 @@ int com_send_rpt(char *fmt, char *params, int nparams)
         if(packet == NULL)
         {
             LOGE(tag, "Could not allocate packet!");
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
         packet->length = (uint16_t)(msg_len+1);
         memcpy(packet->data, msg, msg_len+1);
@@ -103,12 +108,12 @@ int com_send_rpt(char *fmt, char *params, int nparams)
         {
             LOGE(tag, "Error sending data to repeater. (rc: %d)", rc);
             csp_buffer_free(packet);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
 
     LOGE(tag, "Error parsing parameters!");
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_cmd(char *fmt, char *params, int nparams)
@@ -116,7 +121,7 @@ int com_send_cmd(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node, next, n_args;
@@ -143,12 +148,12 @@ int com_send_cmd(char *fmt, char *params, int nparams)
         else
         {
             LOGE(tag, "Error sending command. (rc: %d, re: %d)", rc, rep[0]);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
 
     LOGE(tag, "Error parsing parameters!");
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_tc_frame(char *fmt, char *params, int nparams)
@@ -156,7 +161,7 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node, next, n_args;
@@ -182,12 +187,12 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
         else
         {
             LOGE(tag, "Error sending TC. (rc: %d, re: %d)", rc, rep[0]);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
 
     LOGE(tag, "Error parsing parameters! (np: %d, n: %d)", n_args, next);
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_send_data(char *fmt, char *params, int nparams)
@@ -195,7 +200,7 @@ int com_send_data(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     uint8_t rep[1] = {0};
@@ -214,16 +219,16 @@ int com_send_data(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 }
 
-int _com_send_data(int node, void *data, size_t len, int type, int n_data)
+int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame)
 {
     int rc_conn = 0;
     int rc_send = 0;
-    int nframe = 0;
-    int size_data = (int)len/n_data;
+    int nframe = n_frame;
+    int size_data = (type ==TM_TYPE_PAYLOAD) ? (int)len/n_data : len;
 
     // New connection
     csp_conn_t *conn;
@@ -237,11 +242,14 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
         packet->length = sizeof(com_frame_t);
         com_frame_t *frame = (com_frame_t *)(packet->data);
+        frame->node = SCH_COMM_ADDRESS;
         frame->nframe = csp_hton16((uint16_t)nframe++);
-        frame->type = csp_hton16((uint16_t)type);
+        frame->type = (uint8_t)type;
         size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;
         int data_sent = n_data < COM_FRAME_MAX_LEN/size_data ? n_data : (int)sent/size_data;
-        frame->ndata = csp_hton32((uint32_t)data_sent);
+
+        frame->ndata = (type ==TM_TYPE_PAYLOAD) ? csp_hton32((uint32_t)data_sent) : csp_hton32((uint32_t)n_data);
+
         memcpy(frame->data.data8, data, sent);
 
         // Send packet
@@ -255,8 +263,13 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
 
         // Process more data
         len -= sent;
-        n_data -= data_sent;
+        if (type == TM_TYPE_PAYLOAD) {
+            n_data -= data_sent;
+        }
         data += sent;
+
+        if(nframe%SCH_COM_MAX_PACKETS == 0)
+            osDelay(SCH_COM_TX_DELAY_MS);
     }
 
     // Close connection
@@ -264,7 +277,7 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data)
     if(rc_conn != CSP_ERR_NONE)
         LOGE(tag, "Error closing connection! (%d)", rc_conn);
 
-    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_FAIL;
+    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_ERROR;
 }
 
 void _hton32_buff(uint32_t *buff, int len)
@@ -287,6 +300,8 @@ int com_debug(char *fmt, char *params, int nparams)
     csp_route_print_table();
     LOGD(tag, "Interfaces");
     csp_route_print_interfaces();
+    LOGD(tag, "Connections")
+    csp_conn_print_table();
 
     return CMD_OK;
 }
@@ -296,22 +311,132 @@ int com_set_node(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_ERROR;
+        return CMD_SYNTAX_ERROR;
     }
 
     int node;
     if(sscanf(params, fmt, &node) == nparams)
     {
         trx_node = node;
-        LOGI(tag, "TRX node set to %d", node);
+        LOGR(tag, "TRX node set to %d", node);
         return CMD_OK;
     }
-    return CMD_FAIL;
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_get_node(char *fmt, char *params, int nparams)
 {
-    printf("TRX Node: %d\n", trx_node);
+    LOGR(tag, "TRX Node: %d\n", trx_node);
+    return CMD_OK;
+}
+
+int com_set_time_node(char *fmt, char *params, int nparams)
+{
+    int node;
+    if(params == NULL || sscanf(params, fmt, &node) != nparams)
+    {
+        LOGE(tag, "Error parsing params!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    char cmd[SCH_CMD_MAX_STR_NAME];
+    sprintf(cmd, "%d obc_set_time %d", node, (int)dat_get_time());
+    LOGI(tag, "Sending command 'com_send_cmd %s' to %d", cmd, node);
+    com_send_cmd("%d %n", cmd, 2);
+}
+
+int com_set_tle_node(char *fmt, char *params, int nparams)
+{
+    char sat[50]; // TLE sat max name is 24
+    int rc, node;
+    memset(sat, 0, 50);
+    // fmt: %s
+    if(params == NULL || sscanf(params, fmt, &node, sat) != nparams)
+    {
+        LOGE(tag, "Error parsing params!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    // Download cubesat TLE file
+    rc = system("wget https://www.celestrak.com/NORAD/elements/cubesat.txt -O /tmp/cubesat.tle");
+    if(rc < 0)
+    {
+        LOGW(tag, "Error downloading TLE file (%d)", rc);
+        return CMD_ERROR;
+    }
+
+    // Search the required satellite tle
+    char line[100];
+    snprintf(line, 100, "cat /tmp/cubesat.tle | grep -A 2 %s > /tmp/%s.tle", sat, sat);
+    LOGI(tag, "%s", line);
+    rc = system(line);
+    if(rc < 0)
+    {
+        LOGE(tag, "Error grep TLE for %s (%d)", sat, rc);
+        return CMD_ERROR;
+    }
+
+    // Read the required TLE file
+    memset(line, 0, 100);
+    snprintf(line, 100, "/tmp/%s.tle", sat);
+    LOGI(tag, "%s", line);
+    FILE *file = fopen(line, "r");
+    if(file == NULL)
+    {
+        LOGE(tag, "Error reading file %s", line);
+    }
+
+    char cmd[SCH_CMD_MAX_STR_NAME];
+    // Read satellite name... skip
+    memset(line, 0, 100);
+    char *tle = fgets(line, 100, file);
+    if(tle == NULL)
+        return CMD_ERROR;
+    LOGD(tag, line);
+
+    // Read and send first TLE line
+    memset(line, 0, 100);
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+
+    tle = fgets(line, 100, file);
+    if(tle == NULL)
+        return CMD_ERROR;
+    memset(line+69, 0, 100-69); // Clean the string from \r, \n others
+    LOGD(tag, line);
+
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_tle %s", node, line);
+    LOGD(tag, cmd);
+    rc = com_send_cmd("%d %n", cmd, 2);
+    if(rc != CMD_OK)
+        return CMD_ERROR;
+
+    // Read and send second TLE line
+    memset(line, 0, 100);
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+
+    tle = fgets(line, 100, file);
+    if(tle == NULL)
+        return CMD_ERROR;
+    memset(line+69, 0, 100-69); // Clean the string from \r, \n others
+    LOGD(tag, line);
+
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_tle %s", node, line);
+    LOGD(tag, cmd);
+    rc = com_send_cmd("%d %n", cmd, 2);
+    if(rc != CMD_OK)
+        return CMD_ERROR;
+
+    // Send update tle command
+    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_update_tle", node);
+    LOGD(tag, cmd);
+    rc = com_send_cmd("%d %n", cmd, 2);
+    if(rc != CMD_OK)
+        return CMD_ERROR;
+
+    fclose(file);
+
+    LOGR(tag, "TLE sent ok!")
     return CMD_OK;
 }
 
@@ -322,16 +447,8 @@ int com_reset_wdt(char *fmt, char *params, int nparams)
     int rc, node, n_args = 0;
 
     // If no params received, try to reset the default trx_node node
-    if(params == NULL)
-        node = trx_node;
-    else
-    {
-        //format: <node>
-        n_args = sscanf(params, fmt, &node);
-        // If no params received, try to reset the current trx_node
-        if(n_args != nparams)
-            node = trx_node;
-    }
+    if(params == NULL || sscanf(params, fmt, &node) != nparams)
+        node = (int)trx_node;
 
     // Send and empty message to GNDWDT_RESET (9) port
     rc = csp_transaction(CSP_PRIO_CRITICAL, node, AX100_PORT_GNDWDT_RESET, 1000, NULL, 0, NULL, 0);
@@ -344,33 +461,33 @@ int com_reset_wdt(char *fmt, char *params, int nparams)
     else
     {
         LOGE(tag, "Error sending GND Reset. (rc: %d)", rc);
-        return CMD_FAIL;
+        return CMD_ERROR;
     }
 }
 
 int com_get_hk(char *fmt, char *params, int nparams)
 {
     //TODO: Implement
-    return CMD_FAIL;
+    return CMD_ERROR;
 }
 
 int com_get_config(char *fmt, char *params, int nparams)
 {
     int rc, n_args;
+    int table;
     char param[SCH_CMD_MAX_STR_PARAMS];
     memset(param, '\0', SCH_CMD_MAX_STR_PARAMS);
 
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
-    // Format: <param_name>
-    n_args = sscanf(params, fmt, &param);
+    // Format: <table> <param_name>
+    n_args = sscanf(params, fmt, &table, &param);
     if(n_args == nparams)
     {
-        int table = 0;
         param_table_t *param_i;
 
         // If param is 'help' then show the available param names
@@ -382,13 +499,13 @@ int com_get_config(char *fmt, char *params, int nparams)
 
         // Find the given parameter by name and get the size, index, type and
         // table; param_i is set to NULL if the parameter is not found.
-        _com_config_find(param, &table, &param_i);
+        _com_config_find(param, table, &param_i);
 
         // Warning if the parameter name was not found
         if(param_i == NULL)
         {
-            LOGW(tag, "Param %s not found!", param);
-            return CMD_FAIL;
+            LOGW(tag, "Param %s not found in table %d", param, table);
+            return CMD_ERROR;
         }
 
         // Actually get the parameter value
@@ -401,7 +518,7 @@ int com_get_config(char *fmt, char *params, int nparams)
         {
             char param_str[SCH_CMD_MAX_STR_PARAMS];
             param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS) ;
-            LOGI(tag, "Param %s (table %d): %s", param_i->name, table, param_str);
+            LOGR(tag, "Param %s (table %d): %s", param_i->name, table, param_str);
             free(out);
             return CMD_OK;
         }
@@ -409,14 +526,16 @@ int com_get_config(char *fmt, char *params, int nparams)
         {
             LOGE(tag, "Error getting parameter %s! (rc: %d)", param, rc);
             free(out);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_set_config(char *fmt, char *params, int nparams)
 {
     int rc, n_args;
+    int table;
     char param[SCH_CMD_MAX_STR_PARAMS];
     char value[SCH_CMD_MAX_STR_PARAMS];
     memset(param, '\0', SCH_CMD_MAX_STR_PARAMS);
@@ -425,14 +544,13 @@ int com_set_config(char *fmt, char *params, int nparams)
     if(params == NULL)
     {
         LOGE(tag, "Null arguments!");
-        return CMD_FAIL;
+        return CMD_SYNTAX_ERROR;
     }
 
     // Format: <param_name> <value>
-    n_args = sscanf(params, fmt, &param, &value);
+    n_args = sscanf(params, fmt, &table, &param, &value);
     if(n_args == nparams)
     {
-        int table = 0;
         param_table_t *param_i;
 
         // If param is 'help' then show the available param names
@@ -444,13 +562,13 @@ int com_set_config(char *fmt, char *params, int nparams)
 
         // Find the given parameter by name and get the size, index, type and
         // table; param_i is set to NULL if the parameter is not found.
-        _com_config_find(param, &table, &param_i);
+        _com_config_find(param, table, &param_i);
 
         // Warning if the parameter name was not found
         if(param_i == NULL)
         {
-            LOGW(tag, "Param %s not found!", param);
-            return CMD_FAIL;
+            LOGW(tag, "Param %s not found in table %d!", param, table);
+            return CMD_ERROR;
         }
 
         // Actually get the parameter value
@@ -464,7 +582,7 @@ int com_set_config(char *fmt, char *params, int nparams)
         {
             char param_str[SCH_CMD_MAX_STR_PARAMS];
             param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS);
-            LOGI(tag, "Param %s (table %d) set to: %s", param_i->name, table, param_str);
+            LOGR(tag, "Param %s (table %d) set to: %s", param_i->name, table, param_str);
             free(out);
             return CMD_OK;
         }
@@ -472,14 +590,17 @@ int com_set_config(char *fmt, char *params, int nparams)
         {
             LOGE(tag, "Error setting parameter %s! (rc: %d)", param, rc);
             free(out);
-            return CMD_FAIL;
+            return CMD_ERROR;
         }
     }
+
+    return CMD_SYNTAX_ERROR;
 }
 
 int com_update_status_vars(char *fmt, char *params, int nparams)
 {
     char *names[5] = {"freq", "tx_pwr", "baud", "mode", "bcn_interval"};
+    int tables[5] = {AX100_PARAM_TX(0), AX100_PARAM_RUNNING, AX100_PARAM_TX(0), AX100_PARAM_TX(0), AX100_PARAM_RUNNING};
     dat_status_address_t vars[5] = {dat_com_freq, dat_com_tx_pwr, dat_com_bcn_period,
                              dat_com_mode, dat_com_bcn_period};
     int table = 0;
@@ -491,10 +612,12 @@ int com_update_status_vars(char *fmt, char *params, int nparams)
     {
         // Find the given parameter by name and get the size, index, type and
         // table; param_i is set to NULL if the parameter is not found.
-        _com_config_find(names[i], &table, &param_i);
+        table = tables[i];
+        _com_config_find(names[i], table, &param_i);
 
         // Warning if the parameter name was not found
-        assert(param_i != NULL);
+        if(param_i == NULL)
+            LOGE(tag, "Parameter (%d) %s not found!", table, names[i]);
 
         // Actually get the parameter value
         void *out = malloc(param_i->size);
@@ -511,7 +634,7 @@ int com_update_status_vars(char *fmt, char *params, int nparams)
             else
                 LOGE(tag, "Error casting status variable");
 
-            LOGI(tag, "Param %s (table %d) %d", param_i->name, table, dat_get_system_var(vars[i]));
+            LOGR(tag, "Param %s (table %d) %d", param_i->name, table, dat_get_system_var(vars[i]));
             free(out);
         }
     }
@@ -529,13 +652,20 @@ void _com_config_help(void)
 {
     int i;
     LOGI(tag, "List of available TRX parameters:")
+    LOGR(tag, "TABLE %d\n", AX100_PARAM_RUNNING);
     for(i=0; i<ax100_config_count; i++)
     {
-        printf("\t%s\n", ax100_config[i].name);
+        LOGR(tag, "\t%s\n", ax100_config[i].name);
     }
+    LOGR(tag, "TABLE %d\n", AX100_PARAM_TX(0));
     for(i=0; i<ax100_config_tx_count; i++)
     {
-        printf("\t%s\n", ax100_tx_config[i].name);
+        LOGR(tag, "\t%s\n", ax100_tx_config[i].name);
+    }
+    LOGR(tag, "TABLE %d\n", AX100_PARAM_RX);
+    for(i=0; i<ax100_config_tx_count; i++)
+    {
+        LOGR(tag, "\t%s\n", ax100_rx_config[i].name);
     }
 }
 
@@ -549,78 +679,89 @@ void _com_config_help(void)
  * @param param param_table_t *. The parameter type, size and index will be
  * stored here. If the parameter is not found, this pointer is set to NULL.
  */
-void _com_config_find(char *param_name, int *table, gs_param_table_instance_t **param)
+void _com_config_find(char *param_name, int table, param_table_t **param)
 {
     int i = 0;
-    int table_tmp = -1;
     *param = NULL;
-
-    char *token;
-    token = strtok(param_name, "-");
-
-    // ej: tx-freq
-    if(strcmp(token, "tx") == 0)
-    {
-        table_tmp = AX100_PARAM_TX(0);
-        param_name = strtok(NULL, "-");
-    }
-    // ej: rx-freq
-    else if(strcmp(token, "rx") == 0)
-    {
-        table_tmp = AX100_PARAM_RX;
-        param_name = strtok(NULL, "-");
-    }
-    // ej: tx_pwr or baud
-    else
-    {
-        param_name = token;
-        table_tmp = -1;
-    }
 
 
     // Find the given parameter name in the AX100 CONFIG table
-    for(i=0; i < ax100_config_count; i++)
+    if(table == AX100_PARAM_RUNNING)
     {
-        //printf("%d, %s\n", i, ax100_config[i].name);
-        if(strcmp(param_name, ax100_config[i].name) == 0)
+        for(i=0; i < ax100_config_count; i++)
         {
-            *param = &(ax100_config[i]);
-            *table = AX100_PARAM_RUNNING;
-            printf("%d, %d, %s\n", i, *table, ax100_config[i].name);
-            return;
+            //LOGD(tag, "%d, %s\n", i, ax100_config[i].name);
+            if(strcmp(param_name, ax100_config[i].name) == 0)
+            {
+                *param = &(ax100_config[i]);
+                LOGD(tag, "%d, %d, %s\n", i, table, ax100_config[i].name);
+                return;
+            }
         }
     }
 
     // Find the given parameter name in the AX100 RX table
-    if(*param == NULL)
+    if(table == AX100_PARAM_RX)
     {
         for(i = 0; i < ax100_config_rx_count; i++)
         {
-            // printf("(rx) %d, %s\n", i, ax100_rx_config[i].name);
+            // LOGD(tag, "(rx) %d, %s\n", i, ax100_rx_config[i].name);
             if(strcmp(param_name, ax100_rx_config[i].name) == 0)
             {
                 *param = &(ax100_rx_config[i]);
-                *table = table_tmp != -1 ? table_tmp : AX100_PARAM_RX;
-                printf("%d, %d, %s\n", i, *table, ax100_rx_config[i].name);
+                LOGD(tag, "%d, %d, %s\n", i, table, ax100_rx_config[i].name);
                 return;
             }
         }
     }
 
     // Find the given parameter name in the AX100 TX table
-    if(*param == NULL)
+    if(table == AX100_PARAM_TX(0))
     {
         for(i = 0; i < ax100_config_tx_count; i++)
         {
-            // printf("(tx) %d, %s\n", i, ax100_tx_config[i].name);
+            // LOGD(tag, "(tx) %d, %s\n", i, ax100_tx_config[i].name);
             if(strcmp(param_name, ax100_tx_config[i].name) == 0)
             {
                 *param = &(ax100_tx_config[i]);
-                *table = table_tmp != -1 ? table_tmp : AX100_PARAM_TX(0);
-                printf("%d, %d, %s\n", i, *table, ax100_rx_config[i].name);
+                LOGD(tag, "%d, %d, %s\n", i, table, ax100_rx_config[i].name);
                 return;
             }
         }
     }
+
+    *param = NULL;
+    return;
+}
+
+int com_set_beacon(char *fmt, char *params, int nparams)
+{
+    int period;
+    int offset;
+    if(params == NULL || sscanf(params, fmt, &period, &offset) != nparams)
+    {
+        LOGE(tag, "Error parsing params!");
+        return CMD_SYNTAX_ERROR;
+    }
+    dat_set_system_var(dat_com_bcn_period, period);
+
+    char bcn_interval_configuration[32];
+    memset(bcn_interval_configuration, 0, 32);
+    snprintf(bcn_interval_configuration, 32, "0 bcn_interval %d", period);
+
+    char bcn_offset_configuration[32];
+    memset(bcn_offset_configuration, 0,32);
+    snprintf(bcn_offset_configuration, 32, "0 bcn_holdoff %d", offset);
+
+    int rc_interval = com_set_config("%d %s %s", bcn_interval_configuration, 3);
+    int rc_offset = com_set_config("%d %s %s", bcn_offset_configuration, 3);
+
+    if(rc_interval == CMD_OK && rc_offset == CMD_OK)
+    {
+        LOGR(tag, "Set beacon period: %d, offset %d", period, offset);
+        return CMD_OK;
+    }
+    else
+        return CMD_ERROR;
 }
 #endif //SCH_USE_NANOCOM

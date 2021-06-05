@@ -30,49 +30,53 @@
 #include "osSemphr.h"
 #include "repoDataSchema.h"
 
+//TODO: Delete
 typedef union sensors_value{
     float f;
     int32_t i;
 } value;
 
-typedef enum machine_action {
+typedef enum dat_stmachine_action_emum {
     ACT_PAUSE= 0,
     ACT_START,
     ACT_STAND_BY,
     ACT_LAST
-} machine_action_t;
+} dat_stmachine_action_t;
 
-typedef enum machine_state {
+typedef enum dat_stmachine_state_enum {
     ST_PAUSE = 0,
     ST_SAMPLING,
     ST_LAST
-} machine_state_t;
+} dat_stmachine_state_t;
 
-typedef struct sample_machine{
-    machine_state_t state;
-    machine_action_t action;
+typedef struct dat_stmachine_s{
+    dat_stmachine_state_t state;
+    dat_stmachine_action_t action;
     unsigned int active_payloads;
     unsigned int step;
     int samples_left;
     unsigned int total_sensors;
-} sample_machine_t;
+} dat_stmachine_t;
 
-extern sample_machine_t machine;
+extern dat_stmachine_t status_machine;
 
 /**
- * Change sample machine state.
+ * Change sample status_machine state.
  *
  * @param machine action to take (ST_PAUSE, ST_SAMPLING)
  * @param step seconds period of sampling measure in seconds
- * @param nsamples maximum samples to take, if value is-1 the machine will take unlimited samples
+ * @param nsamples maximum samples to take, if value is-1 the status_machine will take unlimited samples
  */
-int set_machine_state(machine_action_t action, unsigned int step, int nsamples);
-
+int dat_set_stmachine_state(dat_stmachine_action_t action, unsigned int step, int nsamples);
 
 /**
- * Initializes payload storage helper variables
+ * Return if sensor is active in sensor sampling
+ * @param payload
+ * @param active_payloads
+ * @param n_payloads
+ * @return
  */
-void initialize_payload_vars(void);
+int dat_stmachine_is_sensor_active(int payload, int active_payloads, int n_payloads);
 
 /**
  * Initializes data repositories, including:
@@ -233,6 +237,15 @@ int dat_show_time(int format);
  * @return 0 if OK, -1 if an error occurred
  */
 int dat_add_payload_sample(void* data, int payload);
+
+/**
+ *
+ * @param data
+ * @param payload
+ * @param index
+ * @return
+ */
+int dat_get_payload_sample(void*data, int payload, int index);
 
 /**
  * Gets a data struct from the payload table.
