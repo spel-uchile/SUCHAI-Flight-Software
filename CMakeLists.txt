@@ -7,7 +7,7 @@ set(SOURCE_FILES
         src/drivers/x86/sgp4/src/c/SGP4.c
         src/drivers/x86/sgp4/src/c/TLE.c
         src/drivers/x86/linenoise/linenoise.c
-        src/drivers/x86/data_storage.c
+#        src/drivers/x86/data_storage.c
         src/drivers/x86/init.c
         src/os/Linux/osDelay.c
         src/os/Linux/osQueue.c
@@ -17,6 +17,7 @@ set(SOURCE_FILES
         src/os/Linux/pthread_queue.c
         src/lib/math_utils.c
         src/lib/log_utils.c
+        src/lib/storage/storage_ram.c
         src/system/globals.c
         src/system/cmdDRP.c
         src/system/cmdOBC.c
