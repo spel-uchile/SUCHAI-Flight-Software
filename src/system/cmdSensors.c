@@ -219,6 +219,6 @@ int take_sample(char *fmt, char *params, int nparams)
 
 int init_dummy_sensor(char *fmt, char *params, int nparams)
 {
-    LOGI(tag, "Initializing dummy sensor");
+    LOGD(tag, "Initializing dummy sensor");
     return CMD_OK;
 }

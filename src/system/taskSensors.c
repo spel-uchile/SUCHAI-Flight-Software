@@ -30,7 +30,7 @@ void taskSensors(void *param)
     cmd_t *cmd_init;
     cmd_t *cmd_get;
     int nsensors = 4;
-    char *init_cmds[] = {"init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor", "init_dummy_sensor"};
+    char *init_cmds[] = {"sen_init_dummy", "sen_init_dummy", "sen_init_dummy", "sen_init_dummy"};
     char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "sen_take_sample", "sen_take_sample"};
 
 
