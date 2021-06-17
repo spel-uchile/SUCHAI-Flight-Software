@@ -28,14 +28,18 @@ int osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setstacksize(&attr, size);
+    pthread_t tmp_thread_id;
+    pthread_t *thread_id = &tmp_thread_id;
+    if(thread != NULL)
+        thread_id = (pthread_t *)thread;
 
-    int created = pthread_create(thread , &attr , (void *)(*functionTask) , parameters);
-    pthread_setname_np(*thread, name);
+    int created = pthread_create(thread_id , &attr , (void *)(*functionTask) , parameters);
+    pthread_setname_np(*thread_id, name);
 
     // Set Real Time scheduling and thread priority
     // Only with proper permissions
     const struct sched_param _priority = {(int) priority};
-    if(pthread_setschedparam(*thread, SCHED_FIFO, &_priority) != 0)
+    if(pthread_setschedparam(*thread_id, SCHED_FIFO, &_priority) != 0)
         printf("[WARN] (%s) Failed to assign task priority, try as root\n", name);
 
     pthread_attr_destroy(&attr);
