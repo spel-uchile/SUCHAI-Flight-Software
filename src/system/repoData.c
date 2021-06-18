@@ -490,22 +490,11 @@ int dat_set_time(int new_time)
 #elif defined(LINUX)
     // TODO: This needs to be tested on a raspberry LINUX system, to see if the
     //  sudo call asks for permissions or not
+    char cmd[64];
+    memset(cmd, 0, 64);
+    snprintf(cmd, 64, "%s%d", "sudo date +%s -s @", new_time);
 
-    size_t command_length = 28;
-
-    time_t new_time_typed = (time_t)new_time;
-    char* arg = ctime(&new_time_typed);
-
-    size_t arg_length = strlen(arg);
-
-    char command[sizeof(char)*(command_length+arg_length+1)];
-    command[command_length+arg_length] = '\0';
-
-    strncpy(command, "sudo hwclock --set --date '", command_length-1);
-    strncpy(command+command_length-1, arg, arg_length);
-    strncpy(command+command_length+arg_length-1, "'", 1);
-
-    int rc = system(command);
+    int rc = system(cmd);
 
     if (rc == -1)
     {
