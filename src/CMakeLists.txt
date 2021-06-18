@@ -20,7 +20,6 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 endif()
 
 set(SOURCE_FILES
-        drivers/x86/data_storage.c
         drivers/x86/init.c
         os/Linux/osDelay.c
         os/Linux/osQueue.c
@@ -28,6 +27,7 @@ set(SOURCE_FILES
         os/Linux/osSemphr.c
         os/Linux/osThread.c
         os/Linux/pthread_queue.c
+        lib/storage/storage_ram.c
         lib/utils/math_utils.c
         lib/utils/log_utils.c
         lib/igrf/igrf13.c
@@ -57,6 +57,7 @@ add_library(suchai-fs-core ${SOURCE_FILES})
 
 target_include_directories(suchai-fs-core PUBLIC
         system/include
+        lib/storage/include
         lib/utils/include/suchai
         lib/igrf/include
         lib/linenoise

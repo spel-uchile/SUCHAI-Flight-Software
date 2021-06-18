@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "storage/storage.h"
+#include "suchai/storage.h"
 
 ///< Status variables buffer
 static value32_t *status_db = NULL;
