@@ -11,11 +11,9 @@ in the data repository module.
 ##How these methods worked
 ####*dat_set_system_var*
 This function took an index from the status variables set and a 
-value to save. If an internal memory must be used, then the value 
-chose was stored into *DAT_SYSTEM_VAR_BUFF* array in the position 
-of the index taken. If an external memory must be used, the value
-was stored into an SQLite table named *DAT_REPO_SYSTEM* in the same
-way as the process to save it into an internal memory.
+value to save. Independt of the storage system, the value 
+chosen is stored into *status table* array in the position 
+of the index taken.
 
 ####*dat_get_system_var*
 This method looked for the value stored on an index -indicated 
@@ -52,7 +50,7 @@ option, which will be named *SCH_STORAGE_TRIPLE_WR*.
 
 ####How *dat_set_system_var* works now
 In first place, as long as the *SCH_STORAGE_TRIPLE_WR* is 
-enabled, the size of *DAT_SYSTEM_VAR_BUFF* (internal memory) 
+enabled, the size of *status table* (internal memory, flash or database table) 
 needs to be three times bigger than it was before (three copies
 are saved for each variable). This is stablished on the initial 
 conditions for the data repository module. On the other hand, 

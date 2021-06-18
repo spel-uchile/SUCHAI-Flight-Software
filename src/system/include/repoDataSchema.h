@@ -12,17 +12,18 @@
 #define REPO_DATA_SCHEMA_H
 
 #include "log_utils.h"
+#include "storage/storage.h"
 
-/**
- * Struct for storing a single timed command, set to execute in the future.
- */
-typedef struct __attribute__((packed)) fp_entry {
-    int unixtime;               ///< Unix-time, sets when the command should next execute
-    char* cmd;                  ///< Command to execute
-    char* args;                 ///< Command's arguments
-    int executions;             ///< Amount of times the command will be executed per periodic cycle
-    int periodical;             ///< Period of time between executions
-} fp_entry_t;
+///**
+// * Struct for storing a single timed command, set to execute in the future.
+// */
+//typedef struct __attribute__((packed)) fp_entry {
+//    int unixtime;               ///< Unix-time, sets when the command should next execute
+//    char* cmd;                  ///< Command to execute
+//    char* args;                 ///< Command's arguments
+//    int executions;             ///< Amount of times the command will be executed per periodic cycle
+//    int periodical;             ///< Period of time between executions
+//} fp_entry_t;
 
 /**
  * Enum constants for dynamically identifying system status fields at execution time.
@@ -141,14 +142,14 @@ typedef enum dat_status_address_enum {
     dat_status_last_address           ///< Dummy element, the amount of status variables
 } dat_status_address_t;
 
-/**
- * A 32 bit variable that can be interpreted as int, uint or float
- */
-typedef union value32_u{
-    int32_t i;
-    uint32_t u;
-    float f;
-} value32_t;
+///**
+// * A 32 bit variable that can be interpreted as int, uint or float
+// */
+//typedef union value32_u{
+//    int32_t i;
+//    uint32_t u;
+//    float f;
+//} value32_t;
 
 ///< Define opeartion modes
 #define DAT_OBC_OPMODE_NORMAL        (0) ///< Normal operation
@@ -399,7 +400,9 @@ static data_map_t data_map[] = {
 };
 
 /** The repository's name */
-#define DAT_REPO_SYSTEM "dat_system"    ///< Status variables table name
+#define DAT_TABLE_STATUS "dat_status"     ///< Status variables table name
+#define DAT_TABLE_DATA   "dat_data"       ///< Data storage table name
+#define DAT_TABLE_FP     "dat_flightplan" //< Flight plan table name
 
 /**
  * Search and return a status variable definition from dat_status_list by index or by name

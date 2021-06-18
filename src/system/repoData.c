@@ -1,12 +1,12 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2020, Tamara Gutierrez Rojo tamigr.2293@gmail.com
- *      Copyright 2020, Diego Ortego Prieto, diortego@dcc.uchile.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2021, Camilo Rojas Milla, camrojas@uchile.cl
+ *      Copyright 2021, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2021, Tamara Gutierrez Rojo tamigr.2293@gmail.com
+ *      Copyright 2021, Diego Ortego Prieto, diortego@dcc.uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,19 +26,8 @@
 #include "repoData.h"
 
 static const char *tag = "repoData";
-char* table = "flightPlan";
 #ifdef AVR32
 time_t sec = 0;
-#endif
-
-
-#if SCH_STORAGE_MODE == 0
-    #if SCH_STORAGE_TRIPLE_WR == 1
-        static value32_t DAT_SYSTEM_VAR_BUFF[dat_status_last_address * 3];
-    #else
-        int DAT_SYSTEM_VAR_BUFF[dat_status_last_address];
-    #endif
-    static fp_entry_t data_base [SCH_FP_MAX_ENTRIES];
 #endif
 
 dat_stmachine_t status_machine;
@@ -48,66 +37,71 @@ void dat_repo_init(void)
     // Init repository mutex
     if(osSemaphoreCreate(&repo_data_sem) != OS_SEMAPHORE_OK)
         LOGE(tag, "Unable to create system status repository mutex");
+    int rc;
 
-
+    //Init storage system
     LOGD(tag, "Initializing data repositories buffers...")
-#if (SCH_STORAGE_MODE == 0)
+    char fs_db_file[strlen(SCH_STORAGE_FILE) + 10];
+    sprintf(fs_db_file, "%s.%u.db",SCH_STORAGE_FILE, SCH_COMM_ADDRESS);
+    rc = storage_init(fs_db_file);
+    if(rc != SCH_ST_OK)
+        LOGE(tag, "Unable to initialize data storage! (mode %d, db: %s)", SCH_STORAGE_MODE, fs_db_file);
+
+    //Init status repo
+    int status_copies = 1;
+#if SCH_STORAGE_TRIPLE_WR
+    status_copies = 3;
+#endif
+    rc = storage_table_status_init(DAT_TABLE_STATUS, status_copies*dat_status_last_var, 0);
+    if(rc != SCH_ST_OK)
     {
-        // Reset variables (we do not have persistent storage here)
+        LOGE(tag, "Unable to create STATUS repository!. (table %s, len: %d, drop: %d)",
+             DAT_TABLE_STATUS, status_copies*dat_status_last_var, 0);
+    }
+#if SCH_STORAGE_MODE == SCH_ST_RAM
+    else // Reset variables (we do not have persistent storage here)
+    {
         int index;
         for(index=0; index < dat_status_last_address; index++)
         {
             dat_set_status_var(index, dat_get_status_var_def(index).value);
         }
-
-        //Init internal flight plan table
-        int i;
-        for(i=0;i<SCH_FP_MAX_ENTRIES;i++)
-        {
-            data_base[i].unixtime = 0;
-            data_base[i].cmd = NULL;
-            data_base[i].args = NULL;
-            data_base[i].executions = 0;
-            data_base[i].periodical = 0;
-        }
-
-        //Init payloads repo
-        int rc = storage_table_payload_init(0);
-        assertf(rc==0, tag, "Unable to create payload repo");
-    }
-#elif (SCH_STORAGE_MODE > 0)
-    {
-        //Init storage system
-        int rc;
-        char fs_db_file[sizeof(SCH_STORAGE_FILE) + 10];
-        sprintf(fs_db_file, "%s.%u.db",SCH_STORAGE_FILE, SCH_COMM_ADDRESS);
-        rc = storage_init(fs_db_file);
-        assertf(rc==0, tag, "Unable to create non-volatile data repository");
-
-        //Init system repo
-        rc = storage_table_repo_init(DAT_REPO_SYSTEM, 0);
-        assertf(rc==0, tag, "Unable to create system variables repository");
-
-        //Init payloads repo
-        rc = storage_table_payload_init(0);
-        assertf(rc==0, tag, "Unable to create payload repo");
-
-        //Init system flight plan table
-        int entries = dat_get_system_var(dat_fpl_queue);
-        rc=storage_table_flight_plan_init(0, &entries);
-        dat_set_system_var(dat_fpl_queue, entries);
-        assertf(rc==0, tag, "Unable to create flight plan table");
     }
 #endif
+
+    //Init payloads repo
+    rc = storage_table_payload_init(DAT_TABLE_DATA, last_sensor, 0);
+    if(rc != SCH_ST_OK)
+        LOGE(tag, "Unable to create PAYLOAD repository!. (table %s, len: %d, drop: %d)",
+             DAT_TABLE_DATA, last_sensor, 0);
+
+    //Init system flight plan table
+    rc = storage_table_flight_plan_init(DAT_TABLE_FP, SCH_FP_MAX_ENTRIES, 0);
+    if(rc != SCH_ST_OK)
+    {
+        LOGE(tag, "Unable to create FLIGHT-PLAN repository!. (table %s, len: %d, drop: %d)",
+             DAT_TABLE_FP, SCH_FP_MAX_ENTRIES, 0);
+    }
+    else // Update flight plan queue and purge old entries
+    {
+        int i, fp_entries = 0;
+        int time_min = (int)dat_get_time()+1;
+        fp_entry_t fp_i;
+        for(i=0; i<SCH_FP_MAX_ENTRIES; i++)
+        {
+            storage_flight_plan_get_idx(i, &fp_i);
+            if(fp_i.unixtime > time_min)  // Cunt valid entries
+                fp_entries ++;
+            else if(fp_i.unixtime > 0)    // Delete old entries
+                storage_flight_plan_delete_row_idx(i);
+        }
+        dat_set_system_var(dat_fpl_queue, fp_entries);
+    }
 }
 
 void dat_repo_close(void)
 {
-#if SCH_STORAGE_MODE != 0
-    {
-        storage_close();
-    }
-#endif
+    storage_close();
 }
 
 /**
@@ -123,16 +117,8 @@ int _dat_set_system_var(dat_status_address_t index, int value)
     int rc = 0;
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    //Uses internal memory
-#if SCH_STORAGE_MODE == 0
     value32_t var = {.i=value};
-    DAT_SYSTEM_VAR_BUFF[index] = var;
-    //Uses external memory
-#else
-    rc = storage_repo_set_value_idx(index, value, DAT_REPO_SYSTEM);
-#endif
-
+    rc = storage_status_set_value_idx(index, var, DAT_TABLE_STATUS);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
@@ -153,15 +139,7 @@ int _dat_get_system_var(dat_status_address_t index)
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    //Use internal (volatile) memory
-#if SCH_STORAGE_MODE == 0
-    value = DAT_SYSTEM_VAR_BUFF[index];
-    //Uses external (non-volatile) memory
-#else
-    value.i = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
-#endif
-
+    storage_status_get_value_idx(index, &value, DAT_TABLE_STATUS);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
@@ -182,24 +160,13 @@ int dat_set_status_var(dat_status_address_t index, value32_t value)
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
-    //Uses internal memory
-#if SCH_STORAGE_MODE == 0
-    DAT_SYSTEM_VAR_BUFF[index] = value;
+    rc = storage_status_set_value_idx(index, value, DAT_TABLE_STATUS);
     //Uses tripled writing
     #if SCH_STORAGE_TRIPLE_WR == 1
-        DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address] = value;
-        DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address * 2] = value;
+    int rc2 = storage_status_set_value_idx(index + dat_status_last_address, value, DAT_TABLE_STATUS);
+    int rc3 = storage_status_set_value_idx(index + dat_status_last_address*2, value, DAT_TABLE_STATUS);
+    rc = rc | rc2 | rc3;
     #endif
-    //Uses external memory
-#else
-    rc = storage_repo_set_value_idx(index, value.i, DAT_REPO_SYSTEM);
-    //Uses tripled writing
-    #if SCH_STORAGE_TRIPLE_WR == 1
-        int rc2 = storage_repo_set_value_idx(index + dat_status_last_address, value.i, DAT_REPO_SYSTEM);
-        int rc3 = storage_repo_set_value_idx(index + dat_status_last_address*2, value.i, DAT_REPO_SYSTEM);
-        rc = rc & rc2 & rc3;
-    #endif
-#endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
@@ -224,32 +191,18 @@ int dat_get_system_var(dat_status_address_t index)
 
 value32_t dat_get_status_var(dat_status_address_t index)
 {
-    value32_t value_1;
-#if SCH_STORAGE_TRIPLE_WR == 1
-    value32_t value_2;
-    value32_t value_3;
-#endif
-
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
 
-    //Use internal (volatile) memory
-#if SCH_STORAGE_MODE == 0
-    value_1 = DAT_SYSTEM_VAR_BUFF[index];
+    value32_t value_1;
+    storage_status_get_value_idx(index, &value_1, DAT_TABLE_STATUS);
     //Uses tripled writing
     #if SCH_STORAGE_TRIPLE_WR == 1
-        value_2 = DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address];
-        value_3 = DAT_SYSTEM_VAR_BUFF[index + dat_status_last_address * 2];
+    value32_t value_2;
+    value32_t value_3;
+    storage_status_get_value_idx(index+dat_status_last_var, &value_2, DAT_TABLE_STATUS);
+    storage_status_get_value_idx(index+dat_status_last_var*2, &value_3, DAT_TABLE_STATUS);
     #endif
-    //Uses external (non-volatile) memory
-#else
-    value_1.i = storage_repo_get_value_idx(index, DAT_REPO_SYSTEM);
-    //Uses tripled writing
-    #if SCH_STORAGE_TRIPLE_WR == 1
-        value_2.i = storage_repo_get_value_idx(index + dat_status_last_address, DAT_REPO_SYSTEM);
-        value_3.i = storage_repo_get_value_idx(index + dat_status_last_address * 2, DAT_REPO_SYSTEM);
-    #endif
-#endif
 
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
@@ -273,102 +226,38 @@ value32_t dat_get_status_var_name(char *name)
     return dat_get_status_var(var.address);
 }
 
-#if SCH_STORAGE_MODE == 0
-static int _dat_set_fp_async(int timetodo, char* command, char* args, int executions, int periodical)
-{
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(data_base[i].unixtime == -1)
-        {
-            data_base[i].unixtime = timetodo;
-            data_base[i].executions = executions;
-            data_base[i].periodical = periodical;
-
-            data_base[i].cmd = malloc(sizeof(char)*SCH_CMD_MAX_STR_NAME);
-            data_base[i].args = malloc(sizeof(char)*SCH_CMD_MAX_STR_PARAMS);
-
-            strncpy(data_base[i].cmd, command, SCH_CMD_MAX_STR_NAME);
-            strncpy(data_base[i].args,args, SCH_CMD_MAX_STR_FORMAT);
-
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-static int _dat_del_fp_async(int timetodo)
-{
-    int i;
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(timetodo == data_base[i].unixtime)
-        {
-            data_base[i].unixtime = -1;
-            data_base[i].executions = 0;
-            data_base[i].periodical = 0;
-            free(data_base[i].args);
-            free(data_base[i].cmd);
-            return 0;
-        }
-    }
-    return 1;
-}
-#endif
-
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
 {
     int entries = dat_get_system_var(dat_fpl_queue);
 
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
-#if SCH_STORAGE_MODE == 0
-    //TODO : agregar signal de segment para responder falla
-    int rc = _dat_set_fp_async(timetodo, command, args, executions, periodical);
-#else
-    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical, &entries);
-#endif
+    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical, SCH_COMM_ADDRESS);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
-
-    dat_set_system_var(dat_fpl_queue, entries);
+    if(rc == SCH_ST_OK)
+        dat_set_system_var(dat_fpl_queue, entries+1);
+    else
+        LOGE(tag, "Cannot put FP entry (time: %d, entries %d, cmd %s)", timetodo, entries, command);
     return rc;
 }
 
 int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int* period)
 {
-    int rc;
+    int rc, node;
     int entries = dat_get_system_var(dat_fpl_queue);
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
-#if SCH_STORAGE_MODE == 0
-    int i;
-    rc = -1;  // not found by default
-    for(i = 0;i < SCH_FP_MAX_ENTRIES;i++)
-    {
-        if(elapsed_sec == data_base[i].unixtime)
-        {
-            strcpy(command, data_base[i].cmd);
-            strcpy(args,data_base[i].args);
-            *executions = data_base[i].executions;
-            *period = data_base[i].periodical;
-
-//            if (data_base[i].periodical > 0)
-//                _dat_set_fp_async(elapsed_sec+*period, data_base[i].cmd, data_base[i].args, *executions, *period);
-
-            _dat_del_fp_async(elapsed_sec);
-            rc = 0;  // found, then break!
-            break;
-        }
-    }
-#else
-    rc =storage_flight_plan_get(elapsed_sec, command, args, executions, period, &entries);
-#endif
+    rc =storage_flight_plan_get_args(elapsed_sec, command, args, executions, period, &node);
+    if(rc == SCH_ST_OK)
+        rc = storage_flight_plan_delete_row(elapsed_sec);
+    else
+        LOGD(tag, "Cannot read FP entry (time: %d, entries %d)", elapsed_sec, entries);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
-    dat_set_system_var(dat_fpl_queue, entries);
+    if(rc == SCH_ST_OK)
+        dat_set_system_var(dat_fpl_queue, --entries);
 
     return rc;
 }
@@ -378,15 +267,11 @@ int dat_del_fp(int timetodo)
     int entries = dat_get_system_var(dat_fpl_queue);
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
-#if SCH_STORAGE_MODE ==0
-    int rc = _dat_del_fp_async(timetodo);
-#else
-    int rc = storage_flight_plan_erase(timetodo, &entries);
-#endif
+    int rc = storage_flight_plan_delete_row(timetodo);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
-
-    dat_set_system_var(dat_fpl_queue, entries);
+    if(rc == SCH_ST_OK)
+        dat_set_system_var(dat_fpl_queue, --entries);
 
     return rc;
 }
@@ -394,64 +279,36 @@ int dat_del_fp(int timetodo)
 int dat_reset_fp(void)
 {
     int rc;
-    int entries = dat_get_system_var(dat_fpl_queue);
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
-#if SCH_STORAGE_MODE == 0
-    int i;
-    for(i=0;i<SCH_FP_MAX_ENTRIES;i++)
-    {
-        data_base[i].unixtime = -1;
-        data_base[i].cmd = NULL;
-        data_base[i].args = NULL;
-        data_base[i].executions = 0;
-        data_base[i].periodical = 0;
-    }
-    rc = 0;
-#else
-    rc = storage_table_flight_plan_init(1, &entries);
-#endif
+    rc = storage_flight_plan_reset();
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
-
-    dat_set_system_var(dat_fpl_queue, entries);
+    if(rc == SCH_ST_OK)
+        dat_set_system_var(dat_fpl_queue, 0);
     return rc;
 }
 
 int dat_show_fp (void)
 {
-    int rc;
-
-    int entries = dat_get_system_var(dat_fpl_queue);
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-    //Enter critical zone
-#if SCH_STORAGE_MODE ==0
-    int cont = 0;
     int i;
+    int rc=SCH_ST_OK;
     char buffer[80];
 
-    for(i = 0;i < SCH_FP_MAX_ENTRIES; i++)
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //Enter critical zone
+    LOGR(tag,"Time\tCommand\tArguments\tExecutions\tPeriodical\tNode");
+    for(i = 0; i < SCH_FP_MAX_ENTRIES; i++)
     {
-        if(data_base[i].unixtime!=-1)
+        fp_entry_t fp_i;
+        rc |= storage_flight_plan_get_idx(i, &fp_i);
+        if(fp_i.unixtime > 0)
         {
-            if(cont == 0)
-            {
-                printf("When\tCommand\tArguments\tExecutions\tPeriodical\n");
-                cont++;
-            }
-            time_t time_to_show = data_base[i].unixtime;
+            time_t time_to_show = fp_i.unixtime;
             strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
-            printf("%s\t%s\t%s\t%d\t%d\n",buffer,data_base[i].cmd,data_base[i].args,data_base[i].executions,data_base[i].periodical);
+            LOGR(tag, "%s\t%s\t%s\t%d\t%d\t%d\n", buffer, fp_i.cmd, fp_i.args, fp_i.executions, fp_i.periodical, fp_i.node);
         }
     }
-    if(cont == 0)
-    {
-        LOGI(tag, "Flight plan table empty");
-    }
-    rc = 0;
-#else
-    rc = storage_flight_plan_show_table(entries);
-#endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
     return rc;
@@ -548,39 +405,34 @@ int dat_show_time(int format)
 int dat_add_payload_sample(void* data, int payload)
 {
     int ret;
-
     int index = dat_get_system_var(data_map[payload].sys_index);
     LOGI(tag, "Adding data for payload %d in index %d", payload, index);
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-//FIXME: use STORAGE_MODE
-#if defined(LINUX) || defined(NANOMIND)
-    ret = storage_set_payload_data(index, data, payload);
-#else
-    ret=0;
-#endif
+    ret = storage_payload_set_data(payload, index, data, data_map[payload].size);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
-    // Update address
-    if (ret >= 0) {
+    // Update index
+    if (ret >= SCH_ST_OK)
+    {
+        // Ret contains how many indexes was skipped due to flash errors
         dat_set_system_var(data_map[payload].sys_index, index+1+ret);
         return index+1+ret;
-    } else {
-        LOGE(tag, "Couldn't set data payload %d", payload);
+    }
+    else
+    {
+        LOGE(tag, "Couldn't set data (payload %d, index %d, ret %d)", payload, index, ret);
         return -1;
     }
 }
 
 int dat_get_payload_sample(void*data, int payload, int index)
 {
-    int ret;
-
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-
-    ret = storage_get_payload_data(index, data, payload);
+    //TODO: Should we check if the index is valid?
+    int ret = storage_payload_get_data(payload, index, data, data_map[payload].size);
     osSemaphoreGiven(&repo_data_sem);
 
     return ret;
@@ -590,57 +442,43 @@ int dat_get_payload_sample(void*data, int payload, int index)
 int dat_get_recent_payload_sample(void* data, int payload, int offset)
 {
     int ret;
-
     int index = dat_get_system_var(data_map[payload].sys_index);
     LOGV(tag, "Obtaining data of payload %d, in index %d, sys_var: %d", payload, index,data_map[payload].sys_index );
 
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-//FIXME: Is this conditional required?
-//FIXME: Use STORAGE_MODE
-#if defined(LINUX) || defined(NANOMIND)
     if(index-1-offset >= 0) {
-        ret = storage_get_payload_data(index-1-offset, data, payload);
+        ret = storage_payload_get_data(payload, index-1-offset, data, data_map[payload].size);
     }
     else {
         LOGE(tag, "Asked for too large offset (%d) on payload (%d)", offset, payload);
         ret = -1;
     }
-#else
-    ret=0;
-#endif
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
+
     return ret;
 }
 
 int dat_delete_memory_sections(void)
 {
     int ret;
-    // Resetting memory system vars
-    for(int i = 0; i < last_sensor; ++i)
-    {
-        // Lock is acquired inside the function
-        dat_set_system_var(data_map[i].sys_index, 0);
-    }
 
-    //Enter critical zone
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Free memory or drop databases
-    ret = storage_delete_memory_sections();
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //Enter critical zone
+    ret = storage_payload_reset();
+    ret = storage_flight_plan_reset();
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
-#if SCH_FP_ENABLED
 
-    int entries = dat_get_system_var(dat_fpl_queue);
-    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-    storage_flight_plan_reset(&entries);
-    osSemaphoreGiven(&repo_data_sem);
-    dat_set_system_var(dat_fpl_queue, entries >= 0 ? entries : 0);
-#endif
+    // Resetting memory system vars
+    for(int i = 0; i < last_sensor; ++i)
+        dat_set_system_var(data_map[i].sys_index, 0);
+    dat_set_system_var(dat_fpl_queue, 0);
+
     return ret;
 }
-
 
 int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i)
 {

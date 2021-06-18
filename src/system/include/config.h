@@ -87,16 +87,22 @@
 #define SCH_COM_TX_DELAY_MS     3000               /// Delay (ms) between continuous transmissions
 
 /* Data repository settings */
-#define SCH_STORAGE_MODE        1    ///< Status repository location. (0) RAM, (1) Single external.
+#define SCH_ST_RAM              0
+#define SCH_ST_SQLITE           1
+#define SCH_ST_POSTGRES         2
+#define SCH_ST_FLASH            3
+#define SCH_STORAGE_MODE        SCH_ST_RAM    ///< Status repository location. (0) RAM, (1) Single external.
 #define SCH_STORAGE_TRIPLE_WR   1   ///< Tripled writing enabled (0 | 1)
 #define SCH_STORAGE_FILE        "/tmp/suchai.db"   ///< File to store the database, only if @SCH_STORAGE_MODE is 1
 #define SCH_STORAGE_PGUSER      "spel"
 #define SCH_STORAGE_PGPASS      "proyectosuchai2020"
 #define SCH_STORAGE_PGHOST      "localhost"
 
-#define SCH_SECTIONS_PER_PAYLOAD 10                 ///< Memory blocks for storing each payload type TODO: Make configurable per payload
-#define SCH_SIZE_PER_SECTION 256*1024              ///< Size of each memory block in flash storage
-#define SCH_FLASH_INIT_MEMORY 0                    ///< Initial address in flash storage
+#define SCH_FP_MAX_ENTRIES       (255)       ///< Max number of flight plan entries
+#define SCH_CMD_MAX_ENTRIES      (255)       ///< Max number of commands in the repository
+#define SCH_SECTIONS_PER_PAYLOAD (10)        ///< Memory blocks for storing each payload type TODO: Make configurable per payload
+#define SCH_SIZE_PER_SECTION     (256*1024)  ///< Size of each memory block in flash storage
+#define SCH_FLASH_INIT_MEMORY 0              ///< Initial address in flash storage
 
 /**
  * Memory settings.
@@ -121,8 +127,6 @@
 #define SCH_BUFF_MAX_LEN          (256)     ///< General buffers max length in bytes
 #define SCH_BUFFERS_CSP           (100)     ///< Number of available CSP buffers
 #define SCH_CSP_SOCK_LEN          (100)     ///< Max number of packets in a connection queue
-#define SCH_FP_MAX_ENTRIES        (25)      ///< Max number of flight plan entries
-#define SCH_CMD_MAX_ENTRIES       (255)      ///< Max number of commands in the repository
 #define SCH_CMD_MAX_STR_PARAMS    (256)      ///< Limit for the parameters length
 #define SCH_CMD_MAX_STR_NAME      (256)      ///< Limit for the length of the name of a command
 #define SCH_CMD_MAX_STR_FORMAT    (128)      ///< Limit for the length of the format field of a command
