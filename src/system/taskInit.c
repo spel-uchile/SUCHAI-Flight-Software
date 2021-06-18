@@ -307,14 +307,6 @@ int init_create_task(void) {
     t_ok = osCreateTask(taskFlightPlan,"flightplan", SCH_TASK_FPL_STACK, NULL, 2, &(thread_id[3]));
         if(t_ok != 0) LOGE(tag, "Task flightplan not created!");
 #endif
-#if SCH_SEN_ENABLED
-    t_ok = osCreateTask(taskSensors,"sensors", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[4]));
-        if(t_ok != 0) LOGE(tag, "Task sensors not created!");
-#endif
-#if SCH_ADCS_ENABLED
-    t_ok = osCreateTask(taskADCS,"adcs", SCH_TASK_SEN_STACK, NULL, 2, &(thread_id[5]));
-        if(t_ok != 0) LOGE(tag, "Task sensors not created!");
-#endif
 
     return t_ok;
 }
