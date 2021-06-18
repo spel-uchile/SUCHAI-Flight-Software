@@ -108,7 +108,7 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "igrf13.h"
+#include "igrf/igrf13.h"
 //#include "../sgp4/sgp4ext.h"
 
 double testglobal[3];

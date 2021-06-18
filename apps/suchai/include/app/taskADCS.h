@@ -17,7 +17,7 @@
 #include "math_utils.h"
 
 #include "repoCommand.h"
-#include "igrf13.h"
+#include "igrf/igrf13.h"
 
 void taskADCS(void *param);
 

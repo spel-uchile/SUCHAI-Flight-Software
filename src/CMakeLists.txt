@@ -30,6 +30,7 @@ set(SOURCE_FILES
         os/Linux/pthread_queue.c
         lib/utils/math_utils.c
         lib/utils/log_utils.c
+        lib/igrf/igrf13.c
         lib/sgp4/src/c/SGP4.c
         lib/sgp4/src/c/TLE.c
         lib/linenoise/linenoise.c
@@ -57,6 +58,7 @@ add_library(suchai-fs-core ${SOURCE_FILES})
 target_include_directories(suchai-fs-core PUBLIC
         system/include
         lib/utils/include/suchai
+        lib/igrf/include
         lib/linenoise
         lib/sgp4/src/c
         lib/libcsp/libcsp/include

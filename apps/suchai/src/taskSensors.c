@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskSensors.h"
+#include "app/taskSensors.h"
 
 static const char *tag = "Sensors";
 

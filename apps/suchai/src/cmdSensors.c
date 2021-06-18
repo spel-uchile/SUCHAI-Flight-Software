@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cmdSensors.h"
+#include "app/cmdSensors.h"
 
 static const char* tag = "cmdSens";
 

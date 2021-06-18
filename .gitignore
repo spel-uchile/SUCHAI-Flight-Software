@@ -57,3 +57,6 @@ src/system/include/config.h
 # Python Cache
 *__pycache__
 *.pyc
+
+# File explorers
+*.directory
