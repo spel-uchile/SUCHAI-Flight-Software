@@ -14,7 +14,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 # The compiled library code is here
-add_subdirectory(apps/simple)
+set(APP simple)
+add_subdirectory(apps/${APP})
 add_subdirectory(src)
 
 # Framework entry point
