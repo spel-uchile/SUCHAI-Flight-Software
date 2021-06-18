@@ -44,23 +44,13 @@
 #include "repoCommand.h"
 
 /* Task includes */
-#include "taskInit.h"
 #include "taskDispatcher.h"
 #include "taskExecuter.h"
+#include "taskInit.h"
 #include "taskWatchdog.h"
-#include "taskConsole.h"
-#if SCH_HK_ENABLED
-#include "taskHousekeeping.h"
-#endif
-#if SCH_COMM_ENABLE
-#include "taskCommunications.h"
-#endif
-#if SCH_FP_ENABLED
-#include "taskFlightPlan.h"
-#endif
 
 /**
- * ESP32 already define main in the esp-id framework, the entry point
+ * ESP32 already define main in the esp-idf framework, the entry point
  * is app_main() instead
  */
 #ifdef ESP32

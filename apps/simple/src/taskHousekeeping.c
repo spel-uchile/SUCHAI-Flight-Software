@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskHousekeeping.h"
+#include "app/taskHousekeeping.h"
 
 static const char *tag = "Housekeeping";
 

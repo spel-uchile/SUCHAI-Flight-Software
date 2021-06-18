@@ -1,9 +1,12 @@
 [submodule "src/lib/linenoise"]
 	path = src/lib/linenoise
 	url = ../linenoise.git
+	update = merge
 [submodule "src/lib/libcsp"]
 	path = src/lib/libcsp
 	url = ../libcsp-gs.git
+	update = merge
 [submodule "src/lib/sgp4"]
 	path = src/lib/sgp4
 	url = ../sgp4.git
+	update = merge

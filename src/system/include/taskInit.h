@@ -22,22 +22,23 @@
 
 /* Task includes */
 #include "taskConsole.h"
-#if SCH_HK_ENABLED
-#include "taskHousekeeping.h"
-#endif
 #if SCH_COMM_ENABLE
 #include "taskCommunications.h"
 #endif
 #if SCH_FP_ENABLED
 #include "taskFlightPlan.h"
 #endif
-#if SCH_SEN_ENABLED
-#include "taskSensors.h"
-#endif
-#if SCH_ADCS_ENABLED
-#include "taskADCS.h"
-#endif
 
 void taskInit(void *param);
+
+/**
+ * This function is called at the end of taskInit to execute
+ * specific app initialization routines
+ *
+ * @note APP MUST PROVIDE AN IMPLEMENTATION OF THIS FUNCTION
+ *
+ * @param params pointer to taskInit params
+ */
+extern void initAppHook(void *params);
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_TASKINIT_H

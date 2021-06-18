@@ -111,6 +111,11 @@ void taskInit(void *param)
     cmd_send(tx_silence);
 #endif
 
+    /**
+     * Call app initialization routine
+     */
+    initAppHook(param);
+
     LOGI(tag, "EXIT INIT TASK", 0);
     osTaskDelete(NULL);
 }
@@ -293,10 +298,6 @@ int init_create_task(void) {
 #if SCH_CON_ENABLED
     t_ok = osCreateTask(taskConsole, "console", SCH_TASK_CON_STACK, NULL, 2, &(thread_id[0]));
     if(t_ok != 0) LOGE(tag, "Task console not created!");
-#endif
-#if SCH_HK_ENABLED
-    t_ok = osCreateTask(taskHousekeeping, "housekeeping", SCH_TASK_HKP_STACK, NULL, 2, &(thread_id[1]));
-        if(t_ok != 0) LOGE(tag, "Task housekeeping not created!");
 #endif
 #if SCH_COMM_ENABLE
     t_ok = osCreateTask(taskCommunications, "comm", SCH_TASK_COM_STACK, NULL, 2, &(thread_id[2]));
