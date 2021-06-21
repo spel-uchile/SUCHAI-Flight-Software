@@ -151,7 +151,7 @@ int init_setup_libcsp(void)
 
     /* Init CSP */
     csp_set_hostname(SCH_NAME);
-    csp_init(SCH_COMM_ADDRESS); // Init CSP with address MY_ADDRESS
+    csp_init(SCH_COMM_NODE); // Init CSP with address MY_ADDRESS
 
     /**
      * Set interfaces and routes
@@ -173,7 +173,7 @@ int init_setup_libcsp(void)
 
 #if defined(X86) || defined(GROUNDSTATION)
     /* Set ZMQ interface as a default route*/
-    uint8_t addr = (uint8_t)SCH_COMM_ADDRESS;
+    uint8_t addr = (uint8_t)SCH_COMM_NODE;
     uint8_t *rxfilter = &addr;
     unsigned  int rxfilter_count = 1;
 
@@ -185,7 +185,7 @@ int init_setup_libcsp(void)
 #endif //X86||GROUNDSTATION
 
 #ifdef RPI
-    csp_i2c_uart_init(SCH_COMM_ADDRESS, 0, 19200);
+    csp_i2c_uart_init(SCH_COMM_NODE, 0, 19200);
     csp_rtable_set(8, 2, &csp_if_i2c_uart, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C to TRX node
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c_uart, CSP_NODE_MAC); // Rest of the traffic to I2C using node i2c address
 #endif
@@ -194,8 +194,8 @@ int init_setup_libcsp(void)
     //csp_set_model("A3200");
     /* Init csp i2c interface with address 1 and 400 kHz clock */
     LOGI(tag, "csp_i2c_init...");
-    sch_a3200_init_twi0(GS_AVR_I2C_MULTIMASTER, SCH_COMM_ADDRESS, 400000);
-    t_ok = csp_i2c_init(SCH_COMM_ADDRESS, 0, 400000);
+    sch_a3200_init_twi0(GS_AVR_I2C_MULTIMASTER, SCH_COMM_NODE, 400000);
+    t_ok = csp_i2c_init(SCH_COMM_NODE, 0, 400000);
     if(t_ok != CSP_ERR_NONE) LOGE(tag, "\tcsp_i2c_init failed!");
 
     /**

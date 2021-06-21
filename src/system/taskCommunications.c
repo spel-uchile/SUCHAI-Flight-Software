@@ -102,7 +102,7 @@ void taskCommunications(void *param)
 
                 case SCH_TRX_PORT_RPT:
                     // Digital repeater port, resend the received packet
-                    if(csp_conn_dst(conn) == SCH_COMM_ADDRESS)
+                    if(csp_conn_dst(conn) == SCH_COMM_NODE)
                     {
                         rc = csp_sendto(CSP_PRIO_NORM, CSP_BROADCAST_ADDR,
                                         SCH_TRX_PORT_RPT, SCH_TRX_PORT_RPT,

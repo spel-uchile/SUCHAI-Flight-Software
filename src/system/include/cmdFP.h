@@ -12,7 +12,7 @@
 #ifndef CMD_FLIGHTPLAN_H
 #define CMD_FLIGHTPLAN_H
 
-#include "config.h"
+#include "suchai/config.h"
 
 #include "repoCommand.h"
 #include "repoData.h"

@@ -5,7 +5,7 @@
 #ifndef SUCHAI_FLIGHT_SOFTWARE_TASKTEST_H
 #define SUCHAI_FLIGHT_SOFTWARE_TASKTEST_H
 
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
 
 #include "osDelay.h"

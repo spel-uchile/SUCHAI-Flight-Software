@@ -14,7 +14,7 @@
 #include "string.h"
 #include "stdint.h"
 
-#include "config.h"
+#include "suchai/config.h"
 
 #include "drivers.h"
 #include "repoCommand.h"

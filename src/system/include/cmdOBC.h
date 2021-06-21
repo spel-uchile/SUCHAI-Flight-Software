@@ -16,7 +16,7 @@
 #include <malloc.h>
 
 #include "drivers.h"
-#include "config.h"
+#include "suchai/config.h"
 
 #include "osDelay.h"
 #include "repoCommand.h"

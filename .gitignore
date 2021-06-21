@@ -38,8 +38,8 @@
 
 # Cmake folders
 build/
-build_linux/
-cmake-build-debug/
+build_*/
+cmake-build-*/
 build_rpi/
 
 # Play Ground
@@ -60,3 +60,7 @@ src/system/include/config.h
 
 # File explorers
 *.directory
+.DS_Store
+Desktop.ini
+._*
+Thumbs.db

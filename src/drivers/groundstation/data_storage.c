@@ -58,7 +58,7 @@ int storage_init(const char *file)
         return 0;
     }
 #elif SCH_STORAGE_MODE == 2
-    sprintf(fs_db_name, "fs_db_%u", SCH_COMM_ADDRESS);
+    sprintf(fs_db_name, "fs_db_%u", SCH_COMM_NODE);
     // Check if database exist by connecting to its own db
     snprintf(postgres_conf_s, SCH_BUFF_MAX_LEN, "host=%s user=%s dbname=%s password=%s", SCH_STORAGE_PGHOST, SCH_STORAGE_PGUSER, SCH_STORAGE_PGUSER, SCH_STORAGE_PGPASS);
     conn = PQconnectdb(postgres_conf_s);

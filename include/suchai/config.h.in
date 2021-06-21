@@ -1,0 +1,105 @@
+/**
+ * @file  config.h
+ *
+ * @author Carlos Gonzalez C
+ * @author Camilo Rojas M
+ * @author Tomas Opazo T
+ * @author Tamara Gutierrez R
+ * @author Matias Ramirez M
+ * @author Ignacio Ibanez A
+ * @author Diego Ortego P
+ *
+ * @date 2021
+ * @copyright GNU GPL v3
+ *
+ * This header contains system wide settings to customize different submodules
+ */
+
+#ifndef SUCHAI_CONFIG_H
+#define	SUCHAI_CONFIG_H
+
+/* Select one operating system */
+#cmakedefine LINUX                       1
+#cmakedefine FREERTOS                    2
+#cmakedefine SCH_OS                      @SCH_OS@  ///< Operating system port | FREERTOS
+/* Select the correct architecture */
+#cmakedefine X86                         10
+#cmakedefine RPI                         11
+#cmakedefine ESP32                       12
+#cmakedefine NANOMIND                    13
+#cmakedefine SCH_ARCH                    @SCH_ARCH@  ///< Hardware port X86 | RPI | ESP32 | NANOMIND
+/* Select the correct app */
+#cmakedefine SCH_APP                     @SCH_APP@
+
+/* System debug configurations */
+#cmakedefine SCH_LOG_LEVEL               @SCH_LOG_LVL@  ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#cmakedefine SCH_NAME                    @SCH_NAME@  ///< Project code name
+#cmakedefine SCH_DEVICE_ID               @SCH_DEVICE_ID@  ///< Device unique ID
+#cmakedefine SCH_SW_VERSION              @SCH_SW_VERSION@  ///< Software version
+
+/* General system settings, enable/disable core tasks */
+#cmakedefine01 SCH_CON_ENABLED
+#cmakedefine01 SCH_COMM_ENABLE
+#cmakedefine01 SCH_FP_ENABLED
+#cmakedefine01 SCH_HK_ENABLED
+#cmakedefine SCH_MAX_WDT_TIMER           @SCH_MAX_WDT_TIMER@  ///< Seconds to send wdt_reset command
+#cmakedefine SCH_MAX_GND_WDT_TIMER       @SCH_MAX_GND_WDT_TIMER@  ///< Seconds to reset the OBC if the ground watchdog was not clear
+#define SCH_UART_BAUDRATE           (500000)  ///< UART baud rate for serial console
+#define SCH_KISS_UART_BAUDRATE      (500000)  ///< UART baud rate for kiss communication
+#define SCH_KISS_DEVICE             "/dev/ttyUSB0"  ///< Kiss device path
+
+/* Communications system settings */
+#define SCH_TRX_PORT_TM              (9)  ///< Telemetry port
+#define SCH_TRX_PORT_TC              (10)  ///< Telecommands port
+#define SCH_TRX_PORT_RPT             (11)  ///< Digirepeater port (resend packets)
+#define SCH_TRX_PORT_CMD             (12)  ///< Commands port (execute console commands)
+#define SCH_TRX_PORT_DBG             (13)  ///< Debug port, logs output
+#cmakedefine SCH_COMM_NODE                @SCH_COMM_NODE@  ///< Node address
+#cmakedefine SCH_COM_MAX_PACKETS          @SCH_COM_MAX_PACKETS@  /// Max number of packets to transmit in a row before a small pause
+#cmakedefine SCH_COM_TX_DELAY_MS          @SCH_COM_TX_DELAY_MS@  /// Delay (ms) between continuous transmissions
+#cmakedefine SCH_CSP_BUFFERS              @SCH_CSP_BUFFERS@  ///< Number of available CSP buffers
+#cmakedefine SCH_CSP_SOCK_LEN             @SCH_CSP_SOCK_LEN@  ///< Max number of packets in a connection queue
+#cmakedefine SCH_COMM_ZMQ_OUT             @SCH_COMM_ZMQ_OUT@  ///< CSP ZMQ Out socket URI
+#cmakedefine SCH_COMM_ZMQ_IN              @SCH_COMM_ZMQ_IN@  ///< CSP ZMQ In socket URI
+
+/* Data repository settings */
+#cmakedefine SCH_ST_RAM                   0
+#cmakedefine SCH_ST_SQLITE                1
+#cmakedefine SCH_ST_POSTGRES              2
+#cmakedefine SCH_ST_FLASH                 3
+#cmakedefine SCH_STORAGE_MODE             @SCH_STORAGE_MODE@  ///< Status repository location. (0) RAM, (1) Single external.
+#cmakedefine SCH_STORAGE_TRIPLE_WR        @SCH_STORAGE_TRIPLE_WR@  ///< Status variable tripled writing enabled (0 | 1)
+#cmakedefine SCH_STORAGE_FILE             @SCH_STORAGE_FILE@  ///< File to store the database, only if @SCH_STORAGE_MODE is SCH_ST_SQLITE
+#cmakedefine SCH_STORAGE_PGUSER           @SCH_STORAGE_PGUSER@  ///< PSQL User, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
+#cmakedefine SCH_STORAGE_PGPASS           @SCH_STORAGE_PGPASS@  ///< PSQL password, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
+#cmakedefine SCH_STORAGE_PGHOST           @SCH_STORAGE_PGHOST@  ///< PSQL host, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
+
+#define SCH_FP_MAX_ENTRIES           (255)  ///< Max number of flight plan entries
+#define SCH_CMD_MAX_ENTRIES          (255)  ///< Max number of commands in the repository
+#define SCH_SECTIONS_PER_PAYLOAD     (10)  ///< Memory blocks for storing each payload type TODO: Make configurable per payload
+#define SCH_SIZE_PER_SECTION         (256*1024)  ///< Size of each memory block in flash storage
+
+/**
+ * Memory settings.
+ *
+ * Control the memory used by task stacks, static allocated buffers, etc.
+ * Note that in FreeRTOS the stack size is measured in words not bytes, so the
+ * final stack size depends on the architecture stack wide
+ * (@see https://www.freertos.org/a00125.html)
+ */
+#define SCH_TASK_DEF_STACK            (5*256)  ///< Default task stack size in words
+#define SCH_TASK_DIS_STACK            (5*256)  ///< Dispatcher task stack size in words
+#define SCH_TASK_EXE_STACK            (5*256)  ///< Executer task stack size in words
+#define SCH_TASK_WDT_STACK            (5*256)  ///< Watchdog task stack size in words
+#define SCH_TASK_INI_STACK            (7*256)  ///< Init task stack size in words
+#define SCH_TASK_COM_STACK            (5*256)  ///< Communications task stack size in words
+#define SCH_TASK_FPL_STACK            (5*256)  ///< Flight plan task stack size in words
+#define SCH_TASK_CON_STACK            (5*256)  ///< Console task stack size in words
+#define SCH_TASK_CSP_STACK            (5*256)  ///< CSP route task stack size in words
+
+#define SCH_BUFF_MAX_LEN              (256)  ///< General buffers max length in bytes
+#define SCH_CMD_MAX_STR_PARAMS        (256)  ///< Limit for the parameters length
+#define SCH_CMD_MAX_STR_NAME          (256)  ///< Limit for the length of the name of a command
+#define SCH_CMD_MAX_STR_FORMAT        (128)  ///< Limit for the length of the format field of a command
+
+#endif //SUCHAI_CONFIG_H

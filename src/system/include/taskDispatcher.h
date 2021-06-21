@@ -13,7 +13,7 @@
 #ifndef T_DISPATCHER_H
 #define T_DISPATCHER_H
 
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
 
 #include "osQueue.h"

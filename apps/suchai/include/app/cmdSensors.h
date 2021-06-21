@@ -16,7 +16,7 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#include "config.h"
+#include "suchai/config.h"
 
 #include "os/os.h"
 #include "osDelay.h"

@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "i2c_usart_linux.h"
 #include "csp_if_i2c_uart.h"
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 #include "osDelay.h"
 
 static int i2c_uart_lock_init = 0;

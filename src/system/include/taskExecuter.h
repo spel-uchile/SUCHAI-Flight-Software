@@ -14,8 +14,8 @@
 #define T_EXECUTER_H
 
 #include "globals.h"
-#include "config.h"
-#include "log_utils.h"
+#include "suchai/config.h"
+#include "suchai/log_utils.h"
 
 #include "osQueue.h"
 

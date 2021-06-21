@@ -14,11 +14,11 @@ software nodes and the zmq node.
     
 2. Modify the config.h to set the first node, then compile and execute the software
 
-        #define SCH_COMM_ADDRESS        10  ///< Node address
+        #define SCH_COMM_NODE        10  ///< Node address
 
 3. Modify the config.h to set the second node, then compile and execute the software
 
-        #define SCH_COMM_ADDRESS        11  ///< Node address
+        #define SCH_COMM_NODE        11  ///< Node address
         
 With this setup we have two CSP nodes that can talk each others
 

@@ -1,7 +1,7 @@
 #ifndef _INIT_H
 #define _INIT_H
 
-#include "config.h"
+#include "suchai/config.h"
 #include "drivers.h"
 #include "repoData.h"
 

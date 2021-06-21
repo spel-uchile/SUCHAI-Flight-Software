@@ -10,7 +10,7 @@
 #define _OS_QUEUE_H_
 
 #include <stdint.h>
-#include "config.h"
+#include "suchai/config.h"
 
 #ifdef LINUX
 	#include "pthread_queue.h"

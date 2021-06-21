@@ -10,9 +10,9 @@
 #define CMD_GSSB_H
 
 #include "drivers.h"
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 
 #include "osDelay.h"
 #include "repoCommand.h"

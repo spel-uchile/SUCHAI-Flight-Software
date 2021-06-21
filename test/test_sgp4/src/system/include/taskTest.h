@@ -7,7 +7,7 @@
 
 #include <math.h>
 
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
 
 #include "osDelay.h"

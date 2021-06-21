@@ -12,12 +12,12 @@
 #define SUCHAI_FLIGHT_SOFTWARE_CMDRW_H
 
 #include "drivers.h"
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 #include "rwdrv10987.h"
 
-//#include "config.h"
+//#include "suchai/config.h"
 //#include "osDelay.h"
 
 #ifdef LINUX

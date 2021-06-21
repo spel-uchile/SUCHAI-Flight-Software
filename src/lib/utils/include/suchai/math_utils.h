@@ -13,9 +13,10 @@
 #ifndef MATH_UTILS_H
 #define MATH_UTILS_H
 
+#include <stdlib.h>
 #include <math.h>
-#include "config.h"
 #include <assert.h>
+#include "suchai/config.h"
 
 /**
  * Quaternion structure

@@ -12,11 +12,11 @@
 #ifndef T_FLIGHTPLAN_H
 #define T_FLIGHTPLAN_H
 
-#include <log_utils.h>
+#include <suchai/log_utils.h>
 #include <stdlib.h>
 #include <time.h>
 
-#include "config.h"
+#include "suchai/config.h"
 
 #include "osDelay.h"
 #include "osQueue.h"

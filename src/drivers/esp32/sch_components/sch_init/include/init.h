@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <signal.h>
 #include "drivers.h"
-#include "log_utils.h"
-#include "config.h"
+#include "suchai/log_utils.h"
+#include "suchai/config.h"
 
 /* system includes */
 #include "repoData.h"

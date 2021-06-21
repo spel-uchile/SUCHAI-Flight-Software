@@ -12,7 +12,7 @@
 #ifndef _OS_THREAD_H_
 #define _OS_THREAD_H_
 
-#include "config.h"
+#include "suchai/config.h"
 
 #ifdef LINUX
     #include <pthread.h>

@@ -12,7 +12,7 @@
 #define CMD_CONSOLE_H
 
 
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 #include "repoCommand.h"
 
 /**

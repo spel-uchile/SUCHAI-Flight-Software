@@ -12,10 +12,12 @@
 #ifndef SCH_STORAGE_H
 #define SCH_STORAGE_H
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <assert.h>
-#include "config.h"
+#include "suchai/config.h"
 
 #define SCH_ST_OK    (0)
 #define SCH_ST_ERROR (-1)
@@ -81,7 +83,7 @@ static inline void fp_entry_clear(fp_entry_t *fp_entry)
         fp_entry->unixtime = -1;
         fp_entry->executions = 0;
         fp_entry->periodical = 0;
-        fp_entry->node = SCH_COMM_ADDRESS;
+        fp_entry->node = SCH_COMM_NODE;
         fp_entry->cmd = NULL;
         fp_entry->args = NULL;
     }

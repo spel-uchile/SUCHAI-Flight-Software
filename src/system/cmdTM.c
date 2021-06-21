@@ -167,7 +167,7 @@ int _send_tel_from_to(int start, int end, int payload, int dest_node)
         packet->length = sizeof(com_frame_t);
         memset(packet->data, 0, sizeof(com_frame_t));
         com_frame_t *frame = (com_frame_t *)(packet->data);
-        frame->node = SCH_COMM_ADDRESS;
+        frame->node = SCH_COMM_NODE;
         frame->nframe = csp_hton16((uint16_t) i);
         frame->type = (uint8_t)(TM_TYPE_PAYLOAD + payload);
         frame->ndata = csp_hton32((uint32_t)structs_per_frame);

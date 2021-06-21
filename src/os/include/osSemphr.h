@@ -9,7 +9,7 @@
 #ifndef _OS_SEMPHR_H_
 #define _OS_SEMPHR_H_
 
-#include "config.h"
+#include "suchai/config.h"
 #include "os/os.h"
 
 #ifdef LINUX

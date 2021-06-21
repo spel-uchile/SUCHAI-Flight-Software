@@ -19,7 +19,7 @@
 
 #include "taskInit.h"
 #include "osThread.h"
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 #include "app/taskHousekeeping.h"
 
 /**
@@ -30,6 +30,6 @@
  */
 void initAppHook(void *params)
 {
-    int t_ok = osCreateTask(taskHousekeeping, "housekeeping", SCH_TASK_HKP_STACK, NULL, 2, NULL);
+    int t_ok = osCreateTask(taskHousekeeping, "housekeeping", 1024, NULL, 2, NULL);
     if(t_ok != 0) LOGE("simple-app", "Task housekeeping not created!");
 }

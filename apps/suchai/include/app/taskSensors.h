@@ -10,7 +10,7 @@
 #ifndef _TASKSENSORS_H
 #define _TASKSENSORS_H
 
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
 
 #include "osQueue.h"

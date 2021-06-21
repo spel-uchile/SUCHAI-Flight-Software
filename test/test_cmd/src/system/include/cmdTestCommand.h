@@ -14,8 +14,8 @@
 #include <errno.h>
 #include <assert.h>
 
-#include "config.h"
-#include "log_utils.h"
+#include "suchai/config.h"
+#include "suchai/log_utils.h"
 #include "repoCommand.h"
 
 /* Function definitions */

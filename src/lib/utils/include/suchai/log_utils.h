@@ -20,7 +20,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "config.h"
+#include "suchai/config.h"
 #include "os/os.h"
 #include "osSemphr.h"
 

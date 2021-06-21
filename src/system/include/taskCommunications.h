@@ -14,7 +14,7 @@
 
 #include <stdlib.h>
 
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
 
 #include <csp/csp.h>

@@ -54,7 +54,7 @@ void cmd_obc_init(void)
 int obc_ident(char* fmt, char* params, int nparams)
 {
     printf("Name: %s\nID  : %d\nVer : %s\nNode: %d\n",
-            SCH_NAME, SCH_DEVICE_ID, SCH_SW_VERSION, SCH_COMM_ADDRESS);
+            SCH_NAME, SCH_DEVICE_ID, SCH_SW_VERSION, SCH_COMM_NODE);
     return CMD_OK;
 }
 

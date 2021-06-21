@@ -12,7 +12,7 @@
 #ifndef CMD_DRP_H
 #define CMD_DRP_H
 
-#include "config.h"
+#include "suchai/config.h"
 
 #include "repoData.h"
 #include "repoCommand.h"

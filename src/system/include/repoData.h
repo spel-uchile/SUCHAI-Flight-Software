@@ -22,10 +22,10 @@
 #ifndef DATA_REPO_H
 #define DATA_REPO_H
 
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
-#include "log_utils.h"
-#include "math_utils.h"
+#include "suchai/log_utils.h"
+#include "suchai/math_utils.h"
 //#include "data_storage.h"
 #include "suchai/storage.h"
 #include "osSemphr.h"

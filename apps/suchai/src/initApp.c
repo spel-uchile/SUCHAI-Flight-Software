@@ -19,7 +19,7 @@
 
 #include "taskInit.h"
 #include "osThread.h"
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 #include "app/taskADCS.h"
 #include "app/taskSensors.h"
 

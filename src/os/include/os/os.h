@@ -10,7 +10,7 @@
 #ifndef _OS_H
 #define _OS_H
 
-#include "config.h"
+#include "suchai/config.h"
 
 #ifdef LINUX
     #define portMAX_DELAY (uint32_t) 0xffffffff

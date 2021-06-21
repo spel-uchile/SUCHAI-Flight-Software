@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "drivers.h"
-#include "log_utils.h"
-#include "config.h"
+#include "suchai/log_utils.h"
+#include "suchai/config.h"
 #include "globals.h"
 #include "repoData.h"
 

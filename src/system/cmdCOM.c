@@ -20,7 +20,8 @@
 #include "cmdCOM.h"
 
 static const char *tag = "cmdCOM";
-static char trx_node = SCH_TRX_ADDRESS;
+//static char trx_node = SCH_TRX_ADDRESS;
+static char trx_node = SCH_COMM_NODE;
 
 #ifdef SCH_USE_NANOCOM
 static void _com_config_help(void);
@@ -242,7 +243,7 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
         packet->length = sizeof(com_frame_t);
         com_frame_t *frame = (com_frame_t *)(packet->data);
-        frame->node = SCH_COMM_ADDRESS;
+        frame->node = SCH_COMM_NODE;
         frame->nframe = csp_hton16((uint16_t)nframe++);
         frame->type = (uint8_t)type;
         size_t sent = len < COM_FRAME_MAX_LEN ? len : COM_FRAME_MAX_LEN;

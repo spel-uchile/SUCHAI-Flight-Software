@@ -11,8 +11,8 @@
 #define CMDEPS_H
 
 #include "drivers.h"
-#include "config.h"
-#include "log_utils.h"
+#include "suchai/config.h"
+#include "suchai/log_utils.h"
 
 #include "repoCommand.h"
 #include "repoData.h"

@@ -11,9 +11,9 @@
 #ifndef SCH_PERSISTENT_H
 #define SCH_PERSISTENT_H
 
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 #include <stdio.h>
-#include "config.h"
+#include "suchai/config.h"
 #include "repoData.h"
 
 #if SCH_STORAGE_MODE == 1

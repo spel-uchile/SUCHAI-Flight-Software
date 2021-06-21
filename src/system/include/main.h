@@ -28,9 +28,9 @@
 /* Global includes */
 #include "drivers.h"
 #include "init.h"
-#include "config.h"
+#include "suchai/config.h"
 #include "globals.h"
-#include "log_utils.h"
+#include "suchai/log_utils.h"
 
 /* OS includes */
 #include "osThread.h"

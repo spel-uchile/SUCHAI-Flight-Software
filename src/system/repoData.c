@@ -42,7 +42,7 @@ void dat_repo_init(void)
     //Init storage system
     LOGD(tag, "Initializing data repositories buffers...")
     char fs_db_file[strlen(SCH_STORAGE_FILE) + 10];
-    sprintf(fs_db_file, "%s.%u.db",SCH_STORAGE_FILE, SCH_COMM_ADDRESS);
+    sprintf(fs_db_file, "%s.%u.db",SCH_STORAGE_FILE, SCH_COMM_NODE);
     rc = storage_init(fs_db_file);
     if(rc != SCH_ST_OK)
         LOGE(tag, "Unable to initialize data storage! (mode %d, db: %s)", SCH_STORAGE_MODE, fs_db_file);
@@ -232,7 +232,7 @@ int dat_set_fp(int timetodo, char* command, char* args, int executions, int peri
 
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
-    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical, SCH_COMM_ADDRESS);
+    int rc = storage_flight_plan_set(timetodo, command, args, executions, periodical, SCH_COMM_NODE);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
     if(rc == SCH_ST_OK)

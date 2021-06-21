@@ -14,11 +14,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "config.h"
+#include "suchai/config.h"
 
 #ifdef LINUX
     #include "osThread.h"
-    #include "log_utils.h"
+    #include "suchai/log_utils.h"
 #else
     #include "FreeRTOS.h"
     #include "task.h"
