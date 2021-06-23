@@ -16,6 +16,8 @@
 #include <stdint.h>
 #include <assert.h>
 #include "config.h"
+#include "repoDataSchema.h"
+
 
 #define SCH_ST_OK    (0)
 #define SCH_ST_ERROR (-1)
@@ -30,11 +32,11 @@
 /**
  * A 32 bit variable that can be interpreted as int, uint or float
  */
-typedef union value32_u{
-    int32_t i;
-    uint32_t u;
-    float f;
-} value32_t;
+//typedef union value32_u{
+//    int32_t i;
+//    uint32_t u;
+//    float f;
+//} value32_t;
 
 /**
  * Struct for storing a single timed command, set to execute in the future.

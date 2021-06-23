@@ -12,7 +12,6 @@
 #define REPO_DATA_SCHEMA_H
 
 #include "log_utils.h"
-#include "storage/storage.h"
 
 ///**
 // * Struct for storing a single timed command, set to execute in the future.
@@ -145,11 +144,11 @@ typedef enum dat_status_address_enum {
 ///**
 // * A 32 bit variable that can be interpreted as int, uint or float
 // */
-//typedef union value32_u{
-//    int32_t i;
-//    uint32_t u;
-//    float f;
-//} value32_t;
+typedef union value32_u{
+    int32_t i;
+    uint32_t u;
+    float f;
+} value32_t;
 
 ///< Define opeartion modes
 #define DAT_OBC_OPMODE_NORMAL        (0) ///< Normal operation

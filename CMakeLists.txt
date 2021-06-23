@@ -18,6 +18,7 @@ set(SOURCE_FILES
         src/lib/math_utils.c
         src/lib/log_utils.c
         src/lib/storage/storage_ram.c
+#        src/lib/storage/storage_sqlite.c
         src/system/globals.c
         src/system/cmdDRP.c
         src/system/cmdOBC.c
@@ -44,6 +45,7 @@ set(SOURCE_FILES
 
 include_directories(
         src/lib/include
+        src/lib/include/storage
         src/system/include
         src/lib/include
         src/os/include
