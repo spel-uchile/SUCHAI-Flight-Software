@@ -96,6 +96,12 @@ int console_read(char *buffer, int len)
     if(line == NULL)
         return -1;
 
+    if(!strncmp(line, "/exit", 5))
+    {
+        free(line);
+        exit(0);
+    }
+
     linenoiseHistoryAdd(line);
     linenoiseHistorySave(cmd_hist);
     strncpy(buffer, line, len);

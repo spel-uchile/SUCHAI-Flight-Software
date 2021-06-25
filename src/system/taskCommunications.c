@@ -272,7 +272,12 @@ static void com_receive_tm(csp_packet_t *packet)
     else
     {
         LOGW(tag, "Undefined telemetry type %d!", frame->type);
+        //Print raw data as bytes, int16, and ascii.
+        //Do not use LOG functions after this line
+        osSemaphoreTake(&log_mutex, portMAX_DELAY);
         print_buff(packet->data, packet->length);
-        print_buff16(packet->data16, packet->length/2);
+        print_buff_fmt(packet->data32, packet->length/sizeof(uint32_t), "%d, ");
+        print_buff_ascii(packet->data, packet->length);
+        osSemaphoreGiven(&log_mutex);
     }
 }
