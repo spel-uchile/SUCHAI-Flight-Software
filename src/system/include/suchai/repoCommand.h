@@ -17,15 +17,15 @@
 #include "globals.h"
 
 /* Add files with commands */
-#include "cmdOBC.h"
-#include "cmdDRP.h"
-#include "cmdConsole.h"
+#include "suchai/cmdOBC.h"
+#include "suchai/cmdDRP.h"
+#include "suchai/cmdConsole.h"
 #if SCH_FP_ENABLED
-#include "cmdFP.h"
+#include "suchai/cmdFP.h"
 #endif
 #if SCH_COMM_ENABLE
-#include "cmdCOM.h"
-#include "cmdTM.h"
+#include "suchai/cmdCOM.h"
+#include "suchai/cmdTM.h"
 #endif
 
 

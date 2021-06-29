@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cmdConsole.h"
+#include "suchai/cmdConsole.h"
 
 static const char *tag = "cmdConsole";
 

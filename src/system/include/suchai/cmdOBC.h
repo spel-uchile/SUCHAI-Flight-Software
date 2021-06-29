@@ -22,8 +22,8 @@
 #endif
 
 #include "suchai/osDelay.h"
-#include "repoCommand.h"
-#include "repoData.h"
+#include "suchai/repoCommand.h"
+#include "suchai/repoData.h"
 
 /**
  * Register on board computer related (OBC) commands

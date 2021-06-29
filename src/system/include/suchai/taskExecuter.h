@@ -19,7 +19,7 @@
 
 #include "suchai/osQueue.h"
 
-#include "repoCommand.h"
+#include "suchai/repoCommand.h"
 
 void taskExecuter(void *param);
 

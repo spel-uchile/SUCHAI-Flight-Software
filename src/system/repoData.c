@@ -23,7 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "repoData.h"
+#include "suchai/repoData.h"
 
 static const char *tag = "repoData";
 #ifdef AVR32

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskFlightPlan.h"
+#include "suchai/taskFlightPlan.h"
 
 static const char *tag = "FlightPlan"; 
 

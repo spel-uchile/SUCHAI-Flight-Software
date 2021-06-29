@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "repoCommand.h"
+#include "suchai/repoCommand.h"
 
 const static char *tag = "repoCmd";
 

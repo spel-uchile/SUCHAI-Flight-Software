@@ -14,8 +14,8 @@
 
 #include "suchai/config.h"
 
-#include "repoCommand.h"
-#include "repoData.h"
+#include "suchai/repoCommand.h"
+#include "suchai/repoData.h"
 
 /**
  * This function registers the list of command in the system, initializing the

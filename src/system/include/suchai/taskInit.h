@@ -21,12 +21,12 @@
 #include "suchai/osDelay.h"
 
 /* Task includes */
-#include "taskConsole.h"
+#include "suchai/taskConsole.h"
 #if SCH_COMM_ENABLE
-#include "taskCommunications.h"
+#include "suchai/taskCommunications.h"
 #endif
 #if SCH_FP_ENABLED
-#include "taskFlightPlan.h"
+#include "suchai/taskFlightPlan.h"
 #endif
 
 void taskInit(void *param);

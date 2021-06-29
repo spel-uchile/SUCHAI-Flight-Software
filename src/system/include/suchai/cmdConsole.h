@@ -13,7 +13,7 @@
 
 
 #include "suchai/log_utils.h"
-#include "repoCommand.h"
+#include "suchai/repoCommand.h"
 
 /**
  * Registers the console commands in the system

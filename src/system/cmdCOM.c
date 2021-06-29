@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cmdCOM.h"
+#include "suchai/cmdCOM.h"
 
 static const char *tag = "cmdCOM";
 

@@ -14,9 +14,9 @@
 #include "suchai/config.h"
 #include "suchai/log_utils.h"
 
-#include "repoCommand.h"
-#include "repoData.h"
-#include "cmdCOM.h"
+#include "suchai/repoCommand.h"
+#include "suchai/repoData.h"
+#include "suchai/cmdCOM.h"
 
 #define TM_TYPE_GENERIC 0
 #define TM_TYPE_STATUS  1

@@ -23,7 +23,7 @@
 #include "suchai/osQueue.h"
 #include "suchai/osDelay.h"
 
-#include "repoCommand.h"
+#include "suchai/repoCommand.h"
 
 void taskConsole(void *param);
 int console_init(void);

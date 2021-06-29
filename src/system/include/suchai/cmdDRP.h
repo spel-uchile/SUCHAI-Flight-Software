@@ -14,8 +14,8 @@
 
 #include "suchai/config.h"
 
-#include "repoData.h"
-#include "repoCommand.h"
+#include "suchai/repoData.h"
+#include "suchai/repoCommand.h"
 
 #define SCH_DRP_MAGIC (1010)    ///< Magic number to execute critical commands
 

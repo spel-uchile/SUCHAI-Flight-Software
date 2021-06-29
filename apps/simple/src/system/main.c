@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mainFS.h"
-#include "taskInit.h"
+#include "suchai/mainFS.h"
+#include "suchai/taskInit.h"
 #include "suchai/osThread.h"
 #include "suchai/log_utils.h"
 #include "app/system/taskHousekeeping.h"

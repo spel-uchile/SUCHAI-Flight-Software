@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "taskConsole.h"
+#include "suchai/taskConsole.h"
 
 static const char *tag = "Console";
 static const char *cmd_hist = "/tmp/suchai_fs_history.txt";

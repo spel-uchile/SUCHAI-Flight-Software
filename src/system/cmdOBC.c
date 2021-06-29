@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cmdOBC.h"
+#include "suchai/cmdOBC.h"
 
 static const char* tag = "cmdOBC";
 

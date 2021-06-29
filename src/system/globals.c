@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "globals.h"
+#include "suchai/globals.h"
 
 osQueue dispatcher_queue;         ///< Commands queue
 osQueue executer_cmd_queue;       ///< Executer commands queue

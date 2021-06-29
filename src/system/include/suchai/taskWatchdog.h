@@ -19,8 +19,8 @@
 #include "suchai/osQueue.h"
 #include "suchai/osDelay.h"
 
-#include "repoCommand.h"
-#include "repoData.h"
+#include "suchai/repoCommand.h"
+#include "suchai/repoData.h"
 
 void taskWatchdog(void *param);
 

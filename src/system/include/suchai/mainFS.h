@@ -41,14 +41,14 @@
 #include "os/os.h"
 
 /* system includes */
-#include "repoData.h"
-#include "repoCommand.h"
+#include "suchai/repoData.h"
+#include "suchai/repoCommand.h"
 
 /* Task includes */
-#include "taskDispatcher.h"
-#include "taskExecuter.h"
-#include "taskInit.h"
-#include "taskWatchdog.h"
+#include "suchai/taskDispatcher.h"
+#include "suchai/taskExecuter.h"
+#include "suchai/taskInit.h"
+#include "suchai/taskWatchdog.h"
 
 int suchai_main(void);
 

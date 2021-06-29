@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cmdTM.h"
+#include "suchai/cmdTM.h"
 
 static const char *tag = "cmdTM";
 
