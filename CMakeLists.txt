@@ -13,7 +13,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 # The compiled library code is here
-set(APP groundstation CACHE STRING "Application name")
+set(APP simple CACHE STRING "Application name")
 message("APP apps/${APP}")
 include_directories(apps/${APP}/include)
 add_subdirectory(apps/${APP})
