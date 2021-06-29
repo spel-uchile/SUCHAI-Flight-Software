@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "suchai/config.h"
 #include "os/os.h"
@@ -92,8 +93,10 @@ extern uint8_t log_node;
 #define assertf(A, T, M, ...) if(!(A)) {log_errno(T, M, ##__VA_ARGS__); assert(A); }
 
 /// Debug buffer content
-#define print_buff(buf, size) {int i; printf("["); for(i=0; i<(size); i++) printf("0x%02X, ", (buf)[i]); printf("]\n");}
-#define print_buff16(buf16, size) {int i; printf("["); for(i=0; i<(size); i++) printf("0x%04X, ", (buf16)[i]); printf("]\n");}
+#define print_buff(buf, size) {int i; printf("["); for(i=0; i<(size); i++) printf("%#02X,", (buf)[i]); printf("]\r\n");}
+#define print_buff16(buf16, size) {int i; printf("["); for(i=0; i<(size); i++) printf("0x%04X, ", (buf16)[i]); printf("]\r\n");}
+#define print_buff_fmt(buf, size, fmt) {int i; printf("["); for(i=0; i<(size); i++) printf(fmt, (buf)[i]); printf("]\r\n");}
+#define print_buff_ascii(buf, size) {int i; printf("["); for(i=0; i<(size); i++) if(isprint((buf)[i])) printf("%c", (buf)[i]); else printf("."); printf("]\r\n");}
 
 /// Defines to string
 #define STRINGIFY(x) #x
