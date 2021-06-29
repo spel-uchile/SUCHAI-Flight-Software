@@ -2,13 +2,10 @@
 ## CONFIGURE LIBRARIES AND SUBMODULES
 ####
 INCLUDE (CheckIncludeFile)
-# Define libcsp path and build command
-set(LIBCSP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/libcsp/libcsp/lib/libcsp.a)
-set(buildcsp python2 ./waf configure --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-rtable cidr --with-driver-usart=linux --install-csp --prefix=LIBCSP_PATH build install)
 
 # Update lib submodules and build csp
 find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+if(GIT_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../.git")
     # Get version
     execute_process(COMMAND ${GIT_EXECUTABLE} describe --abbrev=4
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -21,11 +18,6 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
             RESULT_VARIABLE GIT_SUBMOD_RESULT)
     if(NOT GIT_SUBMOD_RESULT EQUAL "0")
         message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-    else()
-        # Build libcsp if not found
-        if(NOT EXISTS "${LIBCSP_PATH}")
-            execute_process(COMMAND ${buildcsp} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/LIBCSP_PATH)
-        endif()
     endif()
 endif()
 
@@ -96,12 +88,13 @@ set(SCH_STORAGE_PGPASS 0 CACHE STRING "PSQL password, only if @SCH_STORAGE_MODE 
 set(SCH_STORAGE_PGHOST 0 CACHE STRING "PSQL password, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES")
 
 # Generate core config.h
+get_filename_component(CONFIG_H_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../include" ABSOLUTE)
 configure_file (
-        "${PROJECT_SOURCE_DIR}/include/suchai/config.h.in"
-        "${PROJECT_SOURCE_DIR}/include/suchai/config.h"
+        "${CONFIG_H_PATH}/suchai/config.h.in"
+        "${CONFIG_H_PATH}/suchai/config.h"
 )
-message("Configuration file written to ${PROJECT_SOURCE_DIR}/include/suchai/config.h")
-
+include_directories(${CONFIG_H_PATH})
+message("Configuration file written to ${CONFIG_H_PATH}/suchai/config.h")
 ####
 ## INCLUDE TARGETS AND LINK
 ####
@@ -110,7 +103,6 @@ add_subdirectory(lib)
 add_subdirectory(os)
 add_subdirectory(system)
 
-target_link_libraries(suchai-fs-core PUBLIC ${LIBCSP_PATH})
 target_link_libraries(suchai-fs-core PUBLIC suchai-fs-os)
 target_link_libraries(suchai-fs-core PUBLIC suchai-fs-drivers)
 target_link_libraries(suchai-fs-core PUBLIC suchai-fs-lib)

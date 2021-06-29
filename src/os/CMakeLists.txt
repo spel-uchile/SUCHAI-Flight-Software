@@ -20,7 +20,7 @@ endif()
 add_library(suchai-fs-os ${SOURCE_FILES})
 # Use pthread_setname_np included in <features.h>
 target_compile_definitions(suchai-fs-os PUBLIC _GNU_SOURCE)
-target_include_directories(suchai-fs-os PUBLIC include ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(suchai-fs-os PUBLIC include)
 target_link_libraries(suchai-fs-os PRIVATE -lpthread)
 
 if(${SCH_OS} STREQUAL FREERTOS)

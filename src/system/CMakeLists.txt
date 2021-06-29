@@ -25,4 +25,4 @@ endif()
 SET(SOURCE_FILES_SYSTEM ${SOURCE_FILES_BASE} ${SOURCE_FILES_OPT})
 
 add_library(suchai-fs-core ${SOURCE_FILES_SYSTEM})
-target_include_directories(suchai-fs-core PUBLIC ${PROJECT_SOURCE_DIR}/include include)
+target_include_directories(suchai-fs-core PUBLIC include ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
