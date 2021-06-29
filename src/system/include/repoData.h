@@ -28,8 +28,8 @@
 #include "suchai/math_utils.h"
 //#include "data_storage.h"
 #include "suchai/storage.h"
-#include "osSemphr.h"
-#include "repoDataSchema.h"
+#include "suchai/osSemphr.h"
+#include "app/system/repoDataSchema.h"
 
 //TODO: Delete
 typedef union sensors_value{

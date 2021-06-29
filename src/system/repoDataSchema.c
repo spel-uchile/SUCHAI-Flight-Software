@@ -7,7 +7,7 @@
  * This file initilize some structs needed for data schema.
  */
 
-#include "repoDataSchema.h"
+#include "app/system/repoDataSchema.h"
 static const char *tag = "repoDataSchema";
 
 dat_sys_var_t dat_get_status_var_def(dat_status_address_t address)

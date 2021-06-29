@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osQueue.h"
+#include "suchai/osQueue.h"
 
 osQueue osQueueCreate(int length, size_t item_size)
 {

@@ -10,9 +10,9 @@
 #ifndef CMD_COM_H
 #define CMD_COM_H
 
-#include "stdlib.h"
-#include "string.h"
-#include "stdint.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
 
 #include "suchai/config.h"
 
@@ -198,25 +198,6 @@ void _ntoh32_buff(uint32_t *buff, int len);
  * @return CMD_OK
  */
 int com_debug(char *fmt, char *params, int nparams);
-
-/**
- * Set module global variable trx_node. Future command calls will use this node
- *
- * @param fmt Str. Parameters format: "%d"
- * @param params Str. Parameters: <node>, the TRX node number
- * @param nparams Str. Number of parameters: 1
- * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
- */
-int com_set_node(char *fmt, char *params, int nparams);
-
-/**
- * Send (and set) current time to node
- * @param fmt Str. Parameters format: "%d"
- * @param params  Str. Parameters: <node>
- * @param nparams Str. Number of parameters: 1
- * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
- */
-int com_get_node(char *fmt, char *params, int nparams);
 
 /**
  * Get <current_time> and send obc_set_time <current_time> to <node>

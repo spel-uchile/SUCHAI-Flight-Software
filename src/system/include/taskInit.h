@@ -16,9 +16,9 @@
 #include "init.h"
 #include "drivers.h"
 
-#include "osThread.h"
-#include "osQueue.h"
-#include "osDelay.h"
+#include "suchai/osThread.h"
+#include "suchai/osQueue.h"
+#include "suchai/osDelay.h"
 
 /* Task includes */
 #include "taskConsole.h"

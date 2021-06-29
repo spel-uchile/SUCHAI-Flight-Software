@@ -12,17 +12,15 @@
 #ifndef _OS_SCHEDULER_H_
 #define _OS_SCHEDULER_H_
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "suchai/config.h"
+#include "osThread.h"
 
-#ifdef LINUX
-    #include "osThread.h"
-    #include "suchai/log_utils.h"
-#else
+#ifdef FREERTOS
     #include "FreeRTOS.h"
     #include "task.h"
-    #include "osThread.h"
+#else
+    #include <stdio.h>
+    #include <stdlib.h>
 #endif
 
 void osScheduler(os_thread* threads_id, int n_threads);

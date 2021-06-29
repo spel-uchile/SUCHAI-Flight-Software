@@ -10,8 +10,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "osQueue.h"
-#include "osSemphr.h"
+#include "suchai/osQueue.h"
+#include "suchai/osSemphr.h"
 
 extern osQueue dispatcher_queue;         ///< Commands queue
 extern osQueue executer_cmd_queue;       ///< Executer commands queue

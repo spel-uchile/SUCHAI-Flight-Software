@@ -18,21 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osScheduler.h"
-
-const static char *tag = "osScheduler";
+#include "suchai/osThread.h"
 
 /**
- * starts the scheduler of the system operating
+ * create a task in FreeRTOS
  */
-void osScheduler(os_thread* threads_id, int n_threads)
+int osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, void * parameters, unsigned int priority, os_thread *thread)
 {
-    LOGI(tag, "Linux scheduler: waiting threads")
+#ifdef AVR32
+    // FreeRTOS 7.0.0
+    portBASE_TYPE created = xTaskCreate((*functionTask), (signed char*)name, size, parameters, priority, NULL);
+#else
+    // FreeRTOS > 8.0.0
+    BaseType_t created = xTaskCreate((*functionTask), name, size, parameters, priority, NULL);
+#endif
+    return created == pdPASS ? 0 : 1;
+}
 
-    int i;
-    for(i = 0; i < n_threads; i++){
-        pthread_join(threads_id[i], NULL);
-    }
-
-    exit(0);
+void osTaskDelete(void *task_handle)
+{
+    vTaskDelete(task_handle);
 }

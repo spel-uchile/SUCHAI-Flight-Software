@@ -16,8 +16,8 @@
 #include "suchai/config.h"
 #include "globals.h"
 
-#include "osQueue.h"
-#include "osDelay.h"
+#include "suchai/osQueue.h"
+#include "suchai/osDelay.h"
 
 #include "repoCommand.h"
 #include "repoData.h"

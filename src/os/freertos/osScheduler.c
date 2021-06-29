@@ -18,19 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osQueue.h"
+#include "suchai/osScheduler.h"
 
-osQueue osQueueCreate(int length, size_t item_size)
+/**
+ * starts the scheduler of the system operating
+ */
+void osScheduler(os_thread* thread_id, int n_thread)
 {
-	return os_pthread_queue_create(length, item_size);
-}
+    printf("[INFO] Starting FreeRTOS scheduler...\n");
+    vTaskStartScheduler();
 
-int osQueueSend(osQueue queue, void * value, uint32_t timeout)
-{
-	return os_pthread_queue_send(queue, value, timeout);
+    while(1)
+    {
+    	  printf("[ERROR] FreeRTOS scheduler stopped!\n");
+    }
 }
-
-int osQueueReceive(osQueue queue, void * buf, uint32_t timeout){
-    return os_pthread_queue_receive(queue, buf, timeout);
-}
-

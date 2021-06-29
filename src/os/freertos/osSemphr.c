@@ -18,18 +18,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osScheduler.h"
 
-/**
- * starts the scheduler of the system operating
- */
-void osScheduler(os_thread* thread_id, int n_thread)
-{
-    printf("[INFO] Starting FreeRTOS scheduler...\n");
-    vTaskStartScheduler();
+#include "suchai/osSemphr.h"
 
-    while(1)
-    {
-    	  printf("[ERROR] FreeRTOS scheduler stopped!\n");
-    }
+int osSemaphoreCreate(osSemaphore* mutex){
+	*mutex = xSemaphoreCreateMutex();
+	if (*mutex) {
+		return OS_SEMAPHORE_OK;
+	} else {
+		return OS_SEMAPHORE_ERROR;
+	}
+}
+
+int osSemaphoreTake(osSemaphore *mutex, uint32_t timeout){
+	if (timeout != portMAX_DELAY)
+		timeout = timeout / portTICK_RATE_MS;
+	if (xSemaphoreTake(*mutex, timeout) == pdPASS) {
+		return OS_SEMAPHORE_OK;
+	} else {
+		return OS_SEMAPHORE_ERROR;
+	}
+}
+
+int osSemaphoreGiven(osSemaphore *mutex){
+	if (xSemaphoreGive(*mutex) == pdPASS) {
+		return OS_SEMAPHORE_OK;
+	} else {
+		return OS_SEMAPHORE_ERROR;
+	}
 }

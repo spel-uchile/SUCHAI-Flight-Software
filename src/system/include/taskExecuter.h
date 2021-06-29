@@ -17,7 +17,7 @@
 #include "suchai/config.h"
 #include "suchai/log_utils.h"
 
-#include "osQueue.h"
+#include "suchai/osQueue.h"
 
 #include "repoCommand.h"
 

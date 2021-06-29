@@ -71,7 +71,7 @@ int storage_table_status_init(char *table, int n_variables, int drop)
     if(status_db == NULL) return SCH_ST_ERROR;
 
     // Reset variables (we do not have persistent storage here)
-    memset(status_db, 0, status_entries);
+    memset(status_db, 0, status_entries*sizeof(value32_t));
     return SCH_ST_OK;
 }
 

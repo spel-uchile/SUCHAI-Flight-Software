@@ -22,8 +22,7 @@
 
 #include "suchai/config.h"
 #include "os/os.h"
-#include "osSemphr.h"
-
+#include "suchai/osSemphr.h"
 #include "csp/csp.h"
 
 /**

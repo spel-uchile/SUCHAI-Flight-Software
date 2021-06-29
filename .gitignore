@@ -52,7 +52,7 @@ src/drivers/Linux/libcsp/libcsp
 docs/html/
 
 # Custom
-src/system/include/config.h
+*/config.h
 
 # Python Cache
 *__pycache__

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.16...3.19)
 # Project name and a few useful settings. Other commands can pick up the results
 project(
   SUCHAI-Flight-Software
-  VERSION 3.0
   DESCRIPTION "SUCHAI Nanosatellite Flight Software Framework"
   LANGUAGES C)
 
@@ -14,11 +13,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 # The compiled library code is here
-set(APP simple)
+set(APP groundstation CACHE STRING "Application name")
+message("APP apps/${APP}")
+include_directories(apps/${APP}/include)
 add_subdirectory(apps/${APP})
 add_subdirectory(src)
-
-# Framework entry point
-add_executable(suchai-fs src/system/main.c)
-target_link_libraries(suchai-fs suchai-fs-core)
-target_link_libraries(suchai-fs suchai-app)

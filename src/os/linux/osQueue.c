@@ -18,23 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "suchai/osQueue.h"
 
-#include "osDelay.h"
-
-void osDelay(uint32_t mseconds){
-    portTick ticks = mseconds/portTICK_RATE_MS;
-    vTaskDelay(ticks);
+osQueue osQueueCreate(int length, size_t item_size)
+{
+	return os_pthread_queue_create(length, item_size);
 }
 
-portTick osDefineTime(uint32_t mseconds){
-    return mseconds/portTICK_RATE_MS;
+int osQueueSend(osQueue queue, void * value, uint32_t timeout)
+{
+	return os_pthread_queue_send(queue, value, timeout);
 }
 
-portTick osTaskGetTickCount(void){
-	return xTaskGetTickCount();
+int osQueueReceive(osQueue queue, void * buf, uint32_t timeout){
+    return os_pthread_queue_receive(queue, buf, timeout);
 }
 
-void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds){
-    portTick ticks = osDefineTime(mseconds);
-	vTaskDelayUntil(lastTime, ticks);
-}

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osSemphr.h"
+#include "suchai/osSemphr.h"
 
 int osSemaphoreCreate(osSemaphore* mutex)
 {

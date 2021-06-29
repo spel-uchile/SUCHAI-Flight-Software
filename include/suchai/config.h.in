@@ -28,6 +28,7 @@
 #cmakedefine ESP32                       12
 #cmakedefine NANOMIND                    13
 #cmakedefine SCH_ARCH                    @SCH_ARCH@  ///< Hardware port X86 | RPI | ESP32 | NANOMIND
+#cmakedefine SCH_HAVE_MALLOC
 /* Select the correct app */
 #cmakedefine SCH_APP                     @SCH_APP@
 

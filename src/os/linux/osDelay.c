@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osDelay.h"
+#include "suchai/osDelay.h"
 
 portTick osDefineTime(uint32_t mseconds)
 {
-    //use time
+    // Translate user time (ms) to system ticks (us)
     return (portTick)mseconds*1000;
 }
 

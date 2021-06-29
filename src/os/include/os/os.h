@@ -12,13 +12,7 @@
 
 #include "suchai/config.h"
 
-#ifdef LINUX
-    #define portMAX_DELAY (uint32_t) 0xffffffff
-    #define pdPASS				     1
-    #define configMINIMAL_STACK_SIZE 1
-    #define portBASE_TYPE	short
-    #define ClrWdt(){};
-#else
+#ifdef FREERTOS
     #include "FreeRTOSConfig.h"
     #include "FreeRTOS.h"
     #include "task.h"
@@ -26,6 +20,12 @@
  	#include "semphr.h"
     #include "timers.h"
     #include "portable.h"
+#else
+    #define portMAX_DELAY (uint32_t) 0xffffffff
+    #define pdPASS				     1
+    #define configMINIMAL_STACK_SIZE 1
+    #define portBASE_TYPE	short
+    #define ClrWdt(){};
 #endif
 
 

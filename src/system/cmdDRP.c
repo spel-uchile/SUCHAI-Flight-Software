@@ -35,7 +35,6 @@ void cmd_drp_init(void)
     cmd_add("drp_get_var_name", drp_get_sys_var_name, "%s", 1);
     cmd_add("drp_add_hrs_alive", drp_update_hours_alive, "%d", 1);
     cmd_add("drp_clear_gnd_wdt", drp_clear_gnd_wdt, "", 0);
-    cmd_add("drp_set_deployed", drp_set_deployed, "%d", 1);
 }
 
 int drp_execute_before_flight(char *fmt, char *params, int nparams)
@@ -272,16 +271,4 @@ int drp_clear_gnd_wdt(char *fmt, char *params, int nparams)
 {
     dat_set_system_var(dat_obc_sw_wdt, 0);
     return CMD_OK;
-}
-
-int drp_set_deployed(char *fmt, char *params, int nparams)
-{
-    int deployed;
-    if(params == NULL || sscanf(params, fmt, &deployed) != nparams)
-    {
-        return CMD_SYNTAX_ERROR;
-    }
-
-    int rc = dat_set_system_var(dat_dep_deployed, deployed);
-    return rc == 0 ? CMD_OK : CMD_ERROR;
 }

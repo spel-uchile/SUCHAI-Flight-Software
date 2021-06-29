@@ -20,8 +20,8 @@
 #include "linenoise.h"
 #endif
 
-#include "osQueue.h"
-#include "osDelay.h"
+#include "suchai/osQueue.h"
+#include "suchai/osDelay.h"
 
 #include "repoCommand.h"
 

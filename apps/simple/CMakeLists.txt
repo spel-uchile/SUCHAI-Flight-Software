@@ -1,9 +1,12 @@
-
+###
+# SIMPLE APP CMAKE FILE
+##
 set(SOURCE_FILES
-        src/taskHousekeeping.c
-        src/initApp.c
+        src/system/main.c
+        src/system/taskHousekeeping.c
+        src/system/cmdAPP.c
 )
 
-add_library(suchai-app ${SOURCE_FILES})
-target_include_directories(suchai-app PRIVATE include/)
-target_link_libraries(suchai-app PRIVATE suchai-fs-core)
+add_executable(suchai-app ${SOURCE_FILES})
+target_include_directories(suchai-app PUBLIC include)
+target_link_libraries(suchai-app PUBLIC suchai-fs-core)

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osScheduler.h"
+#include "suchai/osScheduler.h"
 
 const static char *tag = "osScheduler";
 
@@ -27,8 +27,6 @@ const static char *tag = "osScheduler";
  */
 void osScheduler(os_thread* threads_id, int n_threads)
 {
-    LOGI(tag, "Linux scheduler: waiting threads")
-
     int i;
     for(i = 0; i < n_threads; i++){
         pthread_join(threads_id[i], NULL);

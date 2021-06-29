@@ -14,16 +14,16 @@
 
 #include "suchai/config.h"
 
-#ifdef LINUX
-    #include <pthread.h>
-    #include <features.h>
-    #include <stdio.h>
-    typedef pthread_t os_thread;
-#else
+#ifdef FREERTOS
     #include "FreeRTOSConfig.h"
     #include "FreeRTOS.h"
     #include "task.h"
     typedef portBASE_TYPE os_thread;
+#else
+    #include <pthread.h>
+    #include <features.h>
+    #include <stdio.h>
+    typedef pthread_t os_thread;
 #endif
 
 /**

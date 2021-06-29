@@ -13,18 +13,18 @@
 #define _OS_DELAY_H_
 
 #include "os/os.h"
-#include "time.h"
 #include "stdint.h"
+#include "suchai/config.h"
 
-#ifdef LINUX
+#ifdef FREERTOS
+	#include "FreeRTOS.h"
+	#include "task.h"
+	typedef portTickType portTick;  // Always ticks counts (int)
+#else
     #include <unistd.h>
     #include <sys/time.h>
     #include <pthread.h>
  	typedef  __useconds_t portTick; // Always useconds (uint32_t)
-#else
-	#include "FreeRTOS.h"
-	#include "task.h"
-	typedef portTickType portTick;  // Always ticks counts (int)
 #endif
 
 /**

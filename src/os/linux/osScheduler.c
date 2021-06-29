@@ -18,32 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "suchai/osScheduler.h"
 
-#include "osSemphr.h"
+const static char *tag = "osScheduler";
 
-int osSemaphoreCreate(osSemaphore* mutex){
-	*mutex = xSemaphoreCreateMutex();
-	if (*mutex) {
-		return OS_SEMAPHORE_OK;
-	} else {
-		return OS_SEMAPHORE_ERROR;
-	}
-}
+/**
+ * starts the scheduler of the system operating
+ */
+void osScheduler(os_thread* threads_id, int n_threads)
+{
+    int i;
+    for(i = 0; i < n_threads; i++){
+        pthread_join(threads_id[i], NULL);
+    }
 
-int osSemaphoreTake(osSemaphore *mutex, uint32_t timeout){
-	if (timeout != portMAX_DELAY)
-		timeout = timeout / portTICK_RATE_MS;
-	if (xSemaphoreTake(*mutex, timeout) == pdPASS) {
-		return OS_SEMAPHORE_OK;
-	} else {
-		return OS_SEMAPHORE_ERROR;
-	}
-}
-
-int osSemaphoreGiven(osSemaphore *mutex){
-	if (xSemaphoreGive(*mutex) == pdPASS) {
-		return OS_SEMAPHORE_OK;
-	} else {
-		return OS_SEMAPHORE_ERROR;
-	}
+    exit(0);
 }

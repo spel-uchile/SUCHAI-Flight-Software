@@ -18,16 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "osSemphr.h"
+#include "suchai/osSemphr.h"
 
 int osSemaphoreCreate(osSemaphore* mutex)
 {
 	if (pthread_mutex_init(mutex, NULL) == 0)
 	{
-		return CSP_SEMAPHORE_OK;
+		return OS_SEMAPHORE_OK;
 	} else
 	{
-		return CSP_SEMAPHORE_ERROR;
+		return OS_SEMAPHORE_ERROR;
 	}
 }
 
@@ -46,7 +46,7 @@ int osSemaphoreTake(osSemaphore *mutex, uint32_t timeout)
 	else
 	{
 		if (clock_gettime(CLOCK_REALTIME, &ts))
-			return CSP_SEMAPHORE_ERROR;
+			return OS_SEMAPHORE_ERROR;
 
 		sec = timeout / 1000;
 		nsec = (timeout - 1000 * sec) * 1000000;
@@ -62,19 +62,19 @@ int osSemaphoreTake(osSemaphore *mutex, uint32_t timeout)
 	}
 
 	if (ret != 0)
-		return CSP_SEMAPHORE_ERROR;
+		return OS_SEMAPHORE_ERROR;
 
-	return CSP_SEMAPHORE_OK;
+	return OS_SEMAPHORE_OK;
 }
 
 int osSemaphoreGiven(osSemaphore *mutex)
 {
 	if (pthread_mutex_unlock(mutex) == 0)
 	{
-		return CSP_SEMAPHORE_OK;
+		return OS_SEMAPHORE_OK;
 	}
 	else
 	{
-		return CSP_SEMAPHORE_ERROR;
+		return OS_SEMAPHORE_ERROR;
 	}
 }

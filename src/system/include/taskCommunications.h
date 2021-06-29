@@ -21,8 +21,8 @@
 #include <csp/csp_types.h>
 #include <csp/csp_endian.h>
 
-#include "osQueue.h"
-#include "osDelay.h"
+#include "suchai/osQueue.h"
+#include "suchai/osDelay.h"
 
 #include "repoCommand.h"
 #include "cmdTM.h"

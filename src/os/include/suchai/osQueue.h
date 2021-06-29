@@ -9,14 +9,14 @@
 #ifndef _OS_QUEUE_H_
 #define _OS_QUEUE_H_
 
-#include <stdint.h>
 #include "suchai/config.h"
 
-#ifdef LINUX
-	#include "pthread_queue.h"
-#else
+#ifdef FREERTOS
     #include "FreeRTOS.h"
     #include "queue.h"
+#else
+    #include <stdint.h>
+    #include "pthread_queue.h"
 #endif
 
 typedef void* osQueue;
@@ -24,6 +24,7 @@ typedef void* osQueue;
 osQueue osQueueCreate(int length, size_t item_size);
 int osQueueSend(osQueue queues, void *value, uint32_t timeout);
 int osQueueReceive(osQueue queue, void *buf, uint32_t timeout);
+//TODO: Also provide the following functions
 //void os_queue_remove(csp_queue_handle_t queue);
 //int os_queue_enqueue(csp_queue_handle_t handle, void *value, uint32_t timeout);
 //int os_queue_enqueue_isr(csp_queue_handle_t handle, void * value, CSP_BASE_TYPE * task_woken);

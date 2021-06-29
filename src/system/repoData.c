@@ -252,7 +252,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     if(rc == SCH_ST_OK)
         rc = storage_flight_plan_delete_row(elapsed_sec);
     else
-        LOGD(tag, "Cannot read FP entry (time: %d, entries %d)", elapsed_sec, entries);
+        LOGV(tag, "Cannot read FP entry (time: %d, entries %d)", elapsed_sec, entries);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 

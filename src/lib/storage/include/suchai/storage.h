@@ -17,16 +17,11 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
+
 #include "suchai/config.h"
 
 #define SCH_ST_OK    (0)
 #define SCH_ST_ERROR (-1)
-
-#if SCH_STORAGE_MODE == SCH_ST_SQLITE
-    #include <sqlite3.h>
-#elif SCH_STORAGE_MODE == SCH_ST_POSTGRES
-    #include <libpq-fe.h>
-#endif
 
 
 /**
@@ -83,7 +78,7 @@ static inline void fp_entry_clear(fp_entry_t *fp_entry)
         fp_entry->unixtime = -1;
         fp_entry->executions = 0;
         fp_entry->periodical = 0;
-        fp_entry->node = SCH_COMM_NODE;
+        fp_entry->node = 0;
         fp_entry->cmd = NULL;
         fp_entry->args = NULL;
     }
@@ -303,10 +298,10 @@ int storage_payload_reset_table(int payload);
  */
 const char* get_sql_type(char* c_type);
 
-#if SCH_STORAGE_MODE == SCH_ST_SQLITE
-    void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
-#elif SCH_STORAGE_MODE == SCH_ST_POSTGRES
-    void get_psql_value(char* c_type, void* buff, PGresult *res, int j);
-#endif
+//#if SCH_STORAGE_MODE == SCH_ST_SQLITE
+//    void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
+//#elif SCH_STORAGE_MODE == SCH_ST_POSTGRES
+//    void get_psql_value(char* c_type, void* buff, PGresult *res, int j);
+//#endif
 
 #endif //SCH_STORAGE_H
