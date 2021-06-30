@@ -29,6 +29,7 @@
 //#include "data_storage.h"
 #include "storage.h"
 #include "osSemphr.h"
+#include "repoDataSchema.h"
 
 //TODO: Delete
 typedef union sensors_value{
