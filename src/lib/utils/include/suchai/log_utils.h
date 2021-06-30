@@ -41,8 +41,8 @@ typedef enum {
 } log_level_t;
 
 // Define default log level
-#ifndef LOG_LEVEL
-#define LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
+#ifndef SCH_LOG_LEVEL
+#define SCH_LOG_LEVEL ((log_level_t)LOG_LVL_DEBUG)
 #endif
 
 #define LOGOUT stdout   ///<! Log to stdout

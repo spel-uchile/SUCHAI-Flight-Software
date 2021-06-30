@@ -33,7 +33,7 @@
 #cmakedefine SCH_APP                     @SCH_APP@
 
 /* System debug configurations */
-#cmakedefine SCH_LOG_LEVEL               @SCH_LOG_LVL@  ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#cmakedefine SCH_LOG_LEVEL               @SCH_LOG_LEVEL@  ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
 #cmakedefine SCH_NAME                    @SCH_NAME@  ///< Project code name
 #cmakedefine SCH_DEVICE_ID               @SCH_DEVICE_ID@  ///< Device unique ID
 #cmakedefine SCH_SW_VERSION              @SCH_SW_VERSION@  ///< Software version
