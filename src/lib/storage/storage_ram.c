@@ -101,6 +101,7 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
     return SCH_ST_OK;
 }
 
+/* TODO: Use the function to allocate each payload table. Data storage have all the info */
 int storage_table_payload_init(char *table, int n_entries, int drop)
 {
     if(!storage_is_open)
@@ -152,7 +153,8 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 }
 
 /****** FLIGHT PLAN VARIABLES FUNCTIONS *******/
-
+/* TODO: Use the concept of table */
+//int storage_flight_plan_set_st(fp_entry_t *row, char *table)
 int storage_flight_plan_set_st(fp_entry_t *row)
 {
     if(!storage_is_open || flightplan_db == NULL || row == NULL)

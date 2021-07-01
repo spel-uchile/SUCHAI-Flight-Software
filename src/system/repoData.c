@@ -89,8 +89,8 @@ void dat_repo_init(void)
         fp_entry_t fp_i;
         for(i=0; i<SCH_FP_MAX_ENTRIES; i++)
         {
-            storage_flight_plan_get_idx(i, &fp_i);
-            if(fp_i.unixtime > time_min)  // Cunt valid entries
+            int ok = storage_flight_plan_get_idx(i, &fp_i);
+            if(ok == SCH_ST_OK && fp_i.unixtime > time_min)  // Cunt valid entries
                 fp_entries ++;
             else if(fp_i.unixtime > 0)    // Delete old entries
                 storage_flight_plan_delete_row_idx(i);
@@ -301,11 +301,11 @@ int dat_show_fp (void)
     for(i = 0; i < SCH_FP_MAX_ENTRIES; i++)
     {
         fp_entry_t fp_i;
-        rc |= storage_flight_plan_get_idx(i, &fp_i);
-        if(fp_i.unixtime > 0)
+        int ok = storage_flight_plan_get_idx(i, &fp_i);
+        if(ok == SCH_ST_OK && fp_i.unixtime > 0)
         {
             time_t time_to_show = fp_i.unixtime;
-            strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
+            strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC", gmtime(&time_to_show));
             LOGR(tag, "%s\t%s\t%s\t%d\t%d\t%d\n", buffer, fp_i.cmd, fp_i.args, fp_i.executions, fp_i.periodical, fp_i.node);
         }
     }

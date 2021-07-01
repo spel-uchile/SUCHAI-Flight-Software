@@ -19,32 +19,47 @@
  */
 
 #include "storage.h"
+//TODO Remove dependency on repoDataSchema and repoData
+#include "repoDataSchema.h"
+#include "repoData.h"
+#include <sqlite3.h>
 
 ///< Status variables buffer
-static value32_t *status_db = NULL;
 static size_t status_entries = 0;
 
 ///< Flight plan buffer
-static fp_entry_t *flightplan_db = NULL;
-static size_t flightplan_entries = 0;
+static char* fp_table = NULL;
 
 ///< Payloads storage buffer
-static uint8_t *payload_db = NULL;
-static uint8_t **payloads_sections_addresses = NULL;
+//static uint8_t *payload_db = NULL;
+//static uint8_t **payloads_sections_addresses = NULL;
 static int payloads_entries = 0;
 
 static int storage_is_open = 0;
 
 static sqlite3 *db = NULL;
 
-char* fp_table = "flightplan";
-char fs_db_name[15];
-char postgres_conf_s[SCH_BUFF_MAX_LEN];
+/**
+ * TODO: ADD documentation
+ * @param c_type
+ * @param buff
+ * @param stmt
+ * @param j
+ */
+void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
+
+/**
+ * Translate to sql format a c format type
+ * @param c_type
+ * @return string in sql syntax
+ */
+const char* get_sql_type(char* c_type);
 
 int storage_init(const char *db_name)
 {
     if(db != NULL) sqlite3_close(db);
-    if(sqlite3_open(db_name, &db) != SQLITE_OK) return SCH_ST_ERROR;
+    if(sqlite3_open(db_name, &db) != SQLITE_OK)
+        return SCH_ST_ERROR;
     storage_is_open = 1;
     return SCH_ST_OK;
 }
@@ -57,6 +72,8 @@ int storage_close(void)
         storage_is_open = 0;
         return SCH_ST_OK;
     }
+
+    if(fp_table != NULL) free(fp_table);
     return SCH_ST_ERROR;
 }
 
@@ -104,7 +121,7 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
 
     /* Drop table if drop variables is true */
     if (drop) {
-        sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s", fp_table);
+        sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s", table);
         rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK ) {
@@ -120,8 +137,9 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
                           "command text, "
                           "args text , "
                           "executions int , "
-                          "periodical int );",
-                          fp_table);
+                          "periodical int ,"
+                          "node int);",
+                          table);
 
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
@@ -130,10 +148,15 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
         sqlite3_free(sql);
         return SCH_ST_ERROR;
     }
-    else sqlite3_free(sql);
+    else
+        sqlite3_free(sql);
+
+    if(fp_table != NULL) free(fp_table);
+    fp_table = strdup(table);
     return SCH_ST_OK;
 }
 
+/* TODO: Use the function to allocate each payload table. Data storage have all the info */
 int storage_table_payload_init(char *table, int n_entries, int drop)
 {
     int rc = 0;
@@ -242,9 +265,12 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 }
 
 /****** FLIGHT PLAN VARIABLES FUNCTIONS *******/
-
+/* TODO: Use the concept of table */
+//int storage_flight_plan_set_st(fp_entry_t *row, char *table)
 int storage_flight_plan_set_st(fp_entry_t *row)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
 
     int timetodo = row->unixtime;
     int executions = row->executions;
@@ -257,8 +283,8 @@ int storage_flight_plan_set_st(fp_entry_t *row)
 
     char *err_msg;
     char *sql = sqlite3_mprintf(
-            "INSERT OR REPLACE INTO %s (time, command, args, executions, periodical)\n VALUES (%d, \"%s\", \"%s\", %d, %d);",
-            fp_table, timetodo, command, args, executions, period);
+            "INSERT OR REPLACE INTO %s (time, command, args, executions, periodical, node)\n VALUES (%d, \"%s\", \"%s\", %d, %d, %d);",
+            fp_table, timetodo, command, args, executions, period, node);
 
     /* Execute SQL statement */
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
@@ -295,6 +321,9 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
 
 int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
     char **results;
     char *err_msg;
     int row_int;
@@ -311,13 +340,12 @@ int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
         return SCH_ST_ERROR;
     }
     else {
-        strcpy(row->cmd, results[6]);
-        strcpy(row->args, results[7]);
-        row->executions = atoi(results[8]);
-        row->periodical = atoi(results[9]);
-
-        // TODO: Check if delete is needed
-        // storage_flight_plan_erase(timetodo, entries);
+        row->unixtime = atoi(results[col+0]);
+        row->cmd = strdup(results[col+1]);
+        row->args = strdup(results[col+2]);
+        row->executions = atoi(results[col+3]);
+        row->periodical = atoi(results[col+4]);
+        row->node = atoi(results[col+5]);
 
         sqlite3_free(sql);
     }
@@ -326,12 +354,35 @@ int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 
 int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
 
-//    if(!storage_is_open || flightplan_db == NULL || row == NULL || index > flightplan_entries)
-//        return SCH_ST_ERROR;
-//
-//    fp_entry_copy(flightplan_db + index, row);
-//    return SCH_ST_OK;
+    char **results;
+    char *err_msg;
+    int row_int;
+    int col;
+
+    char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE rowid = %d", fp_table, index+1);
+
+    sqlite3_get_table(db, sql, &results, &row_int,&col,&err_msg);
+
+    if(row_int==0 || col==0) {
+        sqlite3_free(sql);
+        sqlite3_free(err_msg);
+        sqlite3_free_table(results);
+        return SCH_ST_ERROR;
+    }
+    else {
+        row->unixtime = atoi(results[col+0]);
+        row->cmd = strdup(results[col+1]);
+        row->args = strdup(results[col+2]);
+        row->executions = atoi(results[col+3]);
+        row->periodical = atoi(results[col+4]);
+        row->node = atoi(results[col+5]);
+
+        sqlite3_free(sql);
+    }
+    return SCH_ST_OK;
 }
 
 int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* executions, int* period, int* node)
@@ -355,6 +406,9 @@ int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* e
 
 int storage_flight_plan_delete_row(int timetodo)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
     char *err_msg;
     char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
 
@@ -374,12 +428,35 @@ int storage_flight_plan_delete_row(int timetodo)
 
 int storage_flight_plan_delete_row_idx(int index)
 {
-    return SCH_ST_ERROR;
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
+    char *err_msg;
+    char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE rowid = %d", fp_table, index+1);
+
+    /* Execute SQL statement */
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+    if (rc != SQLITE_OK) {
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return SCH_ST_ERROR;
+    }
+
+    sqlite3_free(err_msg);
+    sqlite3_free(sql);
+    return SCH_ST_OK;
 }
 
 int storage_flight_plan_reset(void)
 {
-    return storage_table_flight_plan_init(1, 0, 1);
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
+    char *table = strdup(fp_table);  //flight_plan_init frees fp_table before copy
+    int rc = storage_table_flight_plan_init(table, 0, 1);
+    free(table);
+    return rc;
 }
 
 /****** PAYLOAD STORAGE FUNCTIONS *******/
@@ -387,25 +464,6 @@ int storage_flight_plan_reset(void)
 /**
  * Auxiliary functions
  */
-
-int _get_sample_address(int payload, int index, size_t size, uint8_t **address)
-{
-    int samples_per_section = SCH_SIZE_PER_SECTION / size;
-    int sample_section = index / samples_per_section;
-    int index_in_section = index % samples_per_section;
-    int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + sample_section;
-    if(sample_section > SCH_SECTIONS_PER_PAYLOAD)
-        return SCH_ST_ERROR;
-    if(section_index > payloads_entries * SCH_SIZE_PER_SECTION)
-        return SCH_ST_ERROR;
-
-    *address = payloads_sections_addresses[section_index] + index_in_section * size;
-    if(*address > payload_db + payloads_entries * SCH_SECTIONS_PER_PAYLOAD * SCH_SIZE_PER_SECTION)
-        return SCH_ST_ERROR;
-
-    return SCH_ST_OK;
-}
-
 const char* get_sql_type(char* c_type)
 {
     if(strcmp(c_type, "%f") == 0) {
