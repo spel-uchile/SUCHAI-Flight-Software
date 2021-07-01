@@ -11,7 +11,6 @@ if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
 endif()
 
 set(SOURCE_FILES
-        storage/storage_ram.c
         utils/math_utils.c
         utils/log_utils.c
         igrf/igrf13.c
@@ -19,6 +18,16 @@ set(SOURCE_FILES
         sgp4/src/c/TLE.c
         linenoise/linenoise.c
 )
+
+if( SCH_STORAGE_MODE STREQUAL "SCH_ST_RAM")
+    message("Using storage/storage_ram.c")
+    list(APPEND SOURCE_FILES storage/storage_ram.c)
+elseif(${SCH_STORAGE_MODE} STREQUAL SCH_ST_SQLITE)
+    message("Using storage/storage_sqlite.c")
+    list(APPEND SOURCE_FILES storage/storage_sqlite.c)
+else()
+    message(FATAL_ERROR "Invalid storage mode ${SCH_STORAGE_MODE}!")
+endif()
 
 # Use pthread_setname_np included in <features.h>
 add_library(suchai-fs-lib ${SOURCE_FILES})
@@ -34,4 +43,10 @@ target_include_directories(suchai-fs-lib PUBLIC
 target_link_libraries(suchai-fs-lib PRIVATE suchai-fs-os)
 target_link_libraries(suchai-fs-lib PRIVATE -lm -lzmq)
 target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)
+# Link proper storage libraries
+if(SCH_STORAGE_MODE STREQUAL "SCH_ST_SQLITE")
+    target_link_libraries(suchai-fs-lib PRIVATE -lsqlite3)
+elseif(SCH_STORAGE_MODE STREQUAL "SCH_ST_POSTGRES")
+    target_link_libraries(suchai-fs-lib PRIVATE -lpq)
+endif()
 

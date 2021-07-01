@@ -18,7 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "storage.h"
+#include "suchai/storage.h"
+#include "app/system/repoDataSchema.h"
+#include <sqlite3.h>
 
 ///< Status variables buffer
 static value32_t *status_db = NULL;
@@ -40,6 +42,22 @@ static sqlite3 *db = NULL;
 char* fp_table = "flightplan";
 char fs_db_name[15];
 char postgres_conf_s[SCH_BUFF_MAX_LEN];
+
+/**
+ * TODO: ADD documentation
+ * @param c_type
+ * @param buff
+ * @param stmt
+ * @param j
+ */
+void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
+
+/**
+ * Translate to sql format a c format type
+ * @param c_type
+ * @return string in sql syntax
+ */
+const char* get_sql_type(char* c_type);
 
 int storage_init(const char *db_name)
 {
@@ -387,25 +405,6 @@ int storage_flight_plan_reset(void)
 /**
  * Auxiliary functions
  */
-
-int _get_sample_address(int payload, int index, size_t size, uint8_t **address)
-{
-    int samples_per_section = SCH_SIZE_PER_SECTION / size;
-    int sample_section = index / samples_per_section;
-    int index_in_section = index % samples_per_section;
-    int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + sample_section;
-    if(sample_section > SCH_SECTIONS_PER_PAYLOAD)
-        return SCH_ST_ERROR;
-    if(section_index > payloads_entries * SCH_SIZE_PER_SECTION)
-        return SCH_ST_ERROR;
-
-    *address = payloads_sections_addresses[section_index] + index_in_section * size;
-    if(*address > payload_db + payloads_entries * SCH_SECTIONS_PER_PAYLOAD * SCH_SIZE_PER_SECTION)
-        return SCH_ST_ERROR;
-
-    return SCH_ST_OK;
-}
-
 const char* get_sql_type(char* c_type)
 {
     if(strcmp(c_type, "%f") == 0) {

@@ -23,14 +23,6 @@
 #define SCH_ST_OK    (0)
 #define SCH_ST_ERROR (-1)
 
-#if SCH_STORAGE_MODE == SCH_ST_SQLITE
-    #include <sqlite3.h>
-    #include "repoDataSchema.h"
-#elif SCH_STORAGE_MODE == SCH_ST_POSTGRES
-    #include <libpq-fe.h>
-#endif
-
-
 /**
  * A 32 bit variable that can be interpreted as int, uint or float
  */
@@ -297,18 +289,5 @@ int storage_payload_get_data(int payload, int index, void* data, size_t size);
  */
 int storage_payload_reset(void);
 int storage_payload_reset_table(int payload);
-
-/**
- * Translate to sql format a c format type
- * @param c_type
- * @return string in sql syntax
- */
-const char* get_sql_type(char* c_type);
-
-//#if SCH_STORAGE_MODE == SCH_ST_SQLITE
-//    void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
-//#elif SCH_STORAGE_MODE == SCH_ST_POSTGRES
-//    void get_psql_value(char* c_type, void* buff, PGresult *res, int j);
-//#endif
 
 #endif //SCH_STORAGE_H
