@@ -28,8 +28,8 @@ static const char* tag2 = "cmdIstage";
 void cmd_rw_init(void)
 {
     /** RW COMMANDS **/
-    cmd_add("rw_get_speed", rw_get_speed, "", 0);
-    cmd_add("rw_get_current", rw_get_current, "", 0);
+    cmd_add("rw_get_speed", rw_get_speed, "%d", 1);
+    cmd_add("rw_get_current", rw_get_current, "%d", 1);
     cmd_add("rw_set_speed", rw_set_speed, "%d %d", 2);
     /** UPPER ISTAGE COMMANDS **/
 #ifdef SCH_USE_ISTAGE2
@@ -43,28 +43,52 @@ void cmd_rw_init(void)
 
 int rw_get_speed(char *fmt, char *params, int nparams)
 {
-    LOGI(tag, "Getting all speeds");
+    int motorid;
+    if(params == NULL || sscanf(params, fmt, &motorid) != nparams) {
+        motorid = -1;
+    }
 
-    uint16_t speed1 = rwdrv10987_get_speed(MOTOR1_ID);
-    uint16_t speed2 = rwdrv10987_get_speed(MOTOR2_ID);
-    uint16_t speed3 = rwdrv10987_get_speed(MOTOR3_ID);
-
-    LOGR(tag, "Sampled speed1: %d, speed2: %d, speed3: %d", speed1, speed2, speed3);
+    if(motorid > 0 && motorid < 4)
+    {
+        LOGI(tag, "Getting speed %d", motorid);
+        uint16_t speed = rwdrv10987_get_speed(motorid);
+        LOGR(tag, "Sampled speed%d: %d", motorid, speed);
+    }
+    else
+    {
+        LOGI(tag, "Getting all speeds");
+        uint16_t speed1 = rwdrv10987_get_speed(MOTOR1_ID);
+        uint16_t speed2 = rwdrv10987_get_speed(MOTOR2_ID);
+        uint16_t speed3 = rwdrv10987_get_speed(MOTOR3_ID);
+        LOGR(tag, "Sampled speed1: %d, speed2: %d, speed3: %d", speed1, speed2, speed3);
+    }
 
     return CMD_OK; //TODO: check error code
 }
 
 int rw_get_current(char *fmt, char *params, int nparams)
 {
-    LOGI(tag, "Sampling all currents");
+    int motorid;
+    if(params == NULL || sscanf(params, fmt, &motorid) != nparams) {
+        motorid = -1;
+    }
 
-    float current1 = rwdrv10987_get_current(MOTOR1_ID); //[mA]
-    float current2 = rwdrv10987_get_current(MOTOR2_ID); //[mA]
-    float current3 = rwdrv10987_get_current(MOTOR3_ID); //[mA]
+    if(motorid > 0 && motorid < 4)
+    {
+        LOGI(tag, "Sampling current %d", motorid)
+        float current = rwdrv10987_get_current(motorid); //[mA]
+        LOGR(tag, "Sampled current%d: %f", motorid, current);
+    }
+    else
+    {
+        LOGI(tag, "Sampling all currents");
+        float current1 = rwdrv10987_get_current(MOTOR1_ID); //[mA]
+        float current2 = rwdrv10987_get_current(MOTOR2_ID); //[mA]
+        float current3 = rwdrv10987_get_current(MOTOR3_ID); //[mA]
+        LOGR(tag, "Sampled current1: %f, current2: %f, current3: %f", current1, current2, current3);
+    }
 
-    LOGR(tag, "Sampled current1: %f, current2: %f, current3: %f", current1, current2, current3);
-
-    return 1; //TODO: check error code
+    return CMD_OK; //TODO: check error code
 }
 
 int rw_set_speed(char *fmt, char *params, int nparams)
