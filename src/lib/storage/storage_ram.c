@@ -101,8 +101,7 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
     return SCH_ST_OK;
 }
 
-/* TODO: Use the function to allocate each payload table. Data storage have all the info */
-int storage_table_payload_init(char *table, int n_entries, int drop)
+int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries, int drop)
 {
     if(!storage_is_open)
         return SCH_ST_ERROR;
@@ -302,39 +301,39 @@ int _get_sample_address(int payload, int index, size_t size, uint8_t **address)
     return SCH_ST_OK;
 }
 
-int storage_payload_set_data(int payload, int index, void *data, size_t size)
+int storage_payload_set_data(int payload, int index, void *data, data_map_t *schema)
 {
     if(!storage_is_open) return SCH_ST_ERROR;
     if(payload_db == NULL || payloads_sections_addresses == NULL) return SCH_ST_ERROR;
-    if(data == NULL) return SCH_ST_ERROR;
+    if(data == NULL || schema == NULL) return SCH_ST_ERROR;
 
     uint8_t *sample_address;
-    int rc = _get_sample_address(payload, index, size, &sample_address);
+    int rc = _get_sample_address(payload, index, schema->size, &sample_address);
     if(rc != SCH_ST_OK)
         return SCH_ST_ERROR;
 
-    memcpy(sample_address, data, size);
+    memcpy(sample_address, data, schema->size);
     return SCH_ST_OK;
 }
 
-int storage_payload_get_data(int payload, int index, void *data, size_t size)
+int storage_payload_get_data(int payload, int index, void *data, data_map_t *schema)
 {
     if(!storage_is_open) return SCH_ST_ERROR;
     if(payload_db == NULL || payloads_sections_addresses == NULL) return SCH_ST_ERROR;
     if(data == NULL) return SCH_ST_ERROR;
 
     uint8_t *sample_address;
-    int rc = _get_sample_address(payload, index, size, &sample_address);
+    int rc = _get_sample_address(payload, index, schema->size, &sample_address);
     if(rc != SCH_ST_OK)
         return SCH_ST_ERROR;
 
-    memcpy(data, sample_address, size);
+    memcpy(data, sample_address, schema->size);
     return SCH_ST_OK;
 }
 
 int storage_payload_reset(void)
 {
-    return storage_table_payload_init(NULL, payloads_entries, 1);
+    return storage_table_payload_init(NULL, NULL, payloads_entries, 1);
 }
 
 int storage_payload_reset_table(int payload)

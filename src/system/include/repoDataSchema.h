@@ -364,17 +364,6 @@ typedef struct __attribute__((__packed__)) stt_exp_time_data{
     int n_stars;
 }stt_exp_time_data_t;
 
-/**
- * Data Map Struct for data schema definition.
- */
-typedef struct __attribute__((__packed__)) map {
-    char table[30];
-    uint16_t  size;
-    uint32_t sys_index;
-    uint32_t sys_ack;
-    char * data_order;
-    char *  var_names;
-} data_map_t;
 
 static char status_var_string[] = "sat_index timestamp obc_last_reset obc_hrs_alive obc_hrs_wo_reset obc_reset_counter "
                                   "obc_sw_wdt obc_temp_1 obc_temp_2 obc_temp_3 obc_executed_cmds obc_failed_cmds "

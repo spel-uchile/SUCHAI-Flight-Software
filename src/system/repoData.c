@@ -70,7 +70,7 @@ void dat_repo_init(void)
 #endif
 
     //Init payloads repo
-    rc = storage_table_payload_init(DAT_TABLE_DATA, last_sensor, 0);
+    rc = storage_table_payload_init(DAT_TABLE_DATA, data_map, last_sensor, 0);
     if(rc != SCH_ST_OK)
         LOGE(tag, "Unable to create PAYLOAD repository!. (table %s, len: %d, drop: %d)",
              DAT_TABLE_DATA, last_sensor, 0);
@@ -408,9 +408,11 @@ int dat_add_payload_sample(void* data, int payload)
     int index = dat_get_system_var(data_map[payload].sys_index);
     LOGI(tag, "Adding data for payload %d in index %d", payload, index);
 
+    if(payload >= last_sensor) return SCH_ST_ERROR;
+
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
-    ret = storage_payload_set_data(payload, index, data, data_map[payload].size);
+    ret = storage_payload_set_data(payload, index, data, &data_map[payload]);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
 
@@ -432,7 +434,7 @@ int dat_get_payload_sample(void*data, int payload, int index)
 {
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //TODO: Should we check if the index is valid?
-    int ret = storage_payload_get_data(payload, index, data, data_map[payload].size);
+    int ret = storage_payload_get_data(payload, index, data, &data_map[payload]);
     osSemaphoreGiven(&repo_data_sem);
 
     return ret;
@@ -448,7 +450,7 @@ int dat_get_recent_payload_sample(void* data, int payload, int offset)
     //Enter critical zone
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     if(index-1-offset >= 0) {
-        ret = storage_payload_get_data(payload, index-1-offset, data, data_map[payload].size);
+        ret = storage_payload_get_data(payload, index-1-offset, data, &data_map[payload]);
     }
     else {
         LOGE(tag, "Asked for too large offset (%d) on payload (%d)", offset, payload);
@@ -480,112 +482,40 @@ int dat_delete_memory_sections(void)
     return ret;
 }
 
-int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names, int i)
-{
-    const char s[2] = " ";
-    tok_sym[0] = strtok(order, s);
-
-    int j=0;
-    while(tok_sym[j] != NULL) {
-        j++;
-        tok_sym[j] = strtok(NULL, s);
-    }
-
-    tok_var[0] = strtok(var_names, s);
-
-    j=0;
-    while(tok_var[j] != NULL) {
-        j++;
-        tok_var[j] = strtok(NULL, s);
-    }
-    return j;
-}
-
-void get_value_string(char* ret_string, char* c_type, char* buff)
-{
-    if(strcmp(c_type, "%f") == 0) {
-        if (*((int *)buff) == -1) {
-            sprintf(ret_string, " 'nan'");
-        } else {
-            sprintf(ret_string, " %f", *((float*)buff));
-        }
-    }
-    else if(strcmp(c_type, "%d") == 0) {
-        sprintf(ret_string, " %d", *((int*)buff));
-    }
-    else if(strcmp(c_type, "%u") == 0) {
-        sprintf(ret_string, " %u", *((unsigned int*)buff));
-    } else if(strcmp(c_type, "%i") == 0) {
-        sprintf(ret_string," %i", *((int*)buff));
-    }
-}
-
-int get_sizeof_type(char* c_type)
-{
-    if(strcmp(c_type, "%f") == 0) {
-        return sizeof(float);
-    }
-    else if(strcmp(c_type, "%d") == 0) {
-        return sizeof(int);
-    } else if(strcmp(c_type, "%u") == 0) {
-        return sizeof(int);
-    } else if(strcmp(c_type, "%i") == 0) {
-        return sizeof(int);
-    }
-    else {
-        return -1;
-    }
-}
-
 int dat_print_payload_struct(void* data, unsigned int payload)
 {
-    //FIXME: Buffers allocated in stack with magical numbers! Use defined values
-    //FIXME: Use malloc to allocate large buffers, here 1280  bytes allocated!
-    //FIXME: Task stack size: 5*256 = 1280 bytes!
+    char *types = strdup(data_map[payload].data_order);
+    char *names = strdup(data_map[payload].var_names);
 
-    char* tok_sym[300];
-    char* tok_var[300];
-//    char** tok_sym = (char**)malloc(300);
-//    char** tok_var = (char**)malloc(300);
-    char *order = (char *)malloc(300);
-    strcpy(order, data_map[payload].data_order);
-    char *var_names = (char *)malloc(1000);
-    strcpy(var_names, data_map[payload].var_names);
-    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, (int)payload);
-
-    char *values = (char *)malloc(1000);
-    char *names = (char *)malloc(1000);
-    strcpy(names, "");
-    strcpy(values, "");
-
-    int j;
-    for(j=0; j < nparams; ++j) {
-        int param_size = get_sizeof_type(tok_sym[j]);
-        char buff[param_size];
-        memcpy(buff, data+(j*param_size), param_size);
-
-        char name[20];
-        sprintf(name, " %s", tok_var[j]);
-        strcat(names, name);
-
-        char val[20];
-        get_value_string(val, tok_sym[j], buff);
-        strcat(values, val);
-
-        if(j != nparams-1){
-            strcat(names, ",");
-            strcat(values, ",");
+    const char *sep = " ";
+    char *type_tmp, *name_tmp;
+    char *type = strtok_r(types, sep, &type_tmp);
+    char *name = strtok_r(names, sep, &name_tmp);
+    while(type != NULL && name != NULL)
+    {
+        printf("%s: ", name);
+        switch (type[1]) {
+            case 'f':
+                printf(type, *(float *)data);
+                data += sizeof(float);
+                break;
+            case 'u':
+            case 'i':
+            case 'd':
+                printf(type, *(int32_t *)data);
+                data += sizeof(int32_t);
+                break;
+            default:
+                data += sizeof(int);
         }
-    }
-    strcat(names, ":");
-    printf( "%s %s\n", names, values);
+        printf("\n");
 
-    free(order);
-    free(var_names);
-    free(values);
+        type = strtok_r(NULL, sep, &type_tmp);
+        name = strtok_r(NULL, sep, &name_tmp);
+    }
+
+    free(types);
     free(names);
-//    free(tok_sym);
-//    free(tok_var);
 
     return 0;
 }
