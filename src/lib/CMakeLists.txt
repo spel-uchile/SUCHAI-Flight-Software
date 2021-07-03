@@ -6,7 +6,7 @@ set(LIBCSP_BUILD_CMD python2 ./waf configure --with-os=posix --enable-if-zmqhub 
 # Build libcsp if not found
 if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("Building libcsp...")
-    execute_process(COMMAND ${LIBCSP_BUILD_CMD} configure WORKING_DIRECTORY "${LIBCSP_PATH}" RESULT_VARIABLE CSP_RESULTS)
+    execute_process(COMMAND ${LIBCSP_BUILD_CMD} WORKING_DIRECTORY "${LIBCSP_PATH}" RESULT_VARIABLE CSP_RESULTS)
     message("${CSP_RESULTS}")
 endif()
 
