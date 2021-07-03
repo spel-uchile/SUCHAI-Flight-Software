@@ -606,7 +606,7 @@ int storage_payload_set_data(int payload, int index, void *data, data_map_t *sch
     return SCH_ST_OK;
 }
 
-int storage_payload_get_data(int index, void *data, data_map_t *schema)
+int storage_payload_get_data(int payload, int index, void *data, data_map_t *schema)
 {
     if(data == NULL || schema == NULL)
         return SCH_ST_ERROR;

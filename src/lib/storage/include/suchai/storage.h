@@ -89,7 +89,7 @@ static inline void fp_entry_clear(fp_entry_t *fp_entry)
         fp_entry->unixtime = -1;
         fp_entry->executions = 0;
         fp_entry->periodical = 0;
-        fp_entry->node = SCH_COMM_ADDRESS;
+        fp_entry->node = SCH_COMM_NODE;
         fp_entry->cmd = NULL;
         fp_entry->args = NULL;
     }

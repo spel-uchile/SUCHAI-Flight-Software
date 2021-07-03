@@ -191,18 +191,6 @@ typedef struct __attribute__((__packed__)) sta_data {
     uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
 } sta_data_t;
 
-/**
- * Data Map Struct for data schema definition.
- */
-typedef struct __attribute__((__packed__)) map {
-    char table[30];
-    uint16_t  size;
-    uint32_t sys_index;
-    uint32_t sys_ack;
-    char * data_order;
-    char *  var_names;
-} data_map_t;
-
 static data_map_t data_map[] = {
 {"temp_data",      (uint16_t) (sizeof(temp_data_t)),dat_drp_temp,dat_drp_ack_temp, "%u %u %f",                   "sat_index timestamp obc_temp_1"},
 };
