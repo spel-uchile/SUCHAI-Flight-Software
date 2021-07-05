@@ -58,63 +58,89 @@ SUCHAI flight software was designed to run in multiple embedded architectures
 using FreeRTOS. It was also ported to Linux to facilitate the development and debugging. 
 Currently, it has been tested in the following OS/Architectures:
 
-* Ubuntu 18.04 x86_64
-* Manjaro x86_64
-* ArchLinux x86_64
-* Debian Stretch RPi 3 (armv7l)
-* FreeRTOS ESP32
-* FreeRTOS AVR32 UC3 (avr32uc3)
-* FreeRTOS Nanomind A3200 (avr32uc3)
+* Ubuntu 18.04, 20.04 (x86_64)
+* ArchLinux, Manjaro Linux (x86_64)
+* Raspbian 9 Stretch, 10 Buster (RPi 3, 3+, 4, ZeroW)
+* FreeRTOS (ESP32, Nanomind A3200 AVR32UC3)
 
 ### Linux build
 
 #### Requirements
-Linux installation requires the following libraries:
-* build-essential
-* cmake
-* pkg-config
-* pthread (libpthread-stubs0-dev)
-* cunit (libcunit1-dev)
-* sqlite3 (libsqlite3-dev)
-* zmq (libzmq3-dev)
-* unzip
-* postgresql
-* libpq-dev
-* python (python 2)
-* python3
+Linux's installation requires the following libraries:
+
+| Library name            | Ubuntu and family | Archlinux and family  |
+| ----------------------- | --------------- | ------------------------|
+| cmake >= 3.16           | cmake           | cmake                   |
+| gcc >= 7.5              | gcc             | gcc                     |
+| make >= 4.1             | make            | make                    |
+| python2 >= 2.7.17       | python          | python2                 |
+| zmq >= 4.2.5            | libzmq3-dev     | zeromq                  |
+| pkg-config >= 0.29.1    | pkg-config      | pkgconf                 |
+| (opt) sqlite >= 3.22    | libsqlite3-dev  | sqlite                  |
+| (opt) libpq >= 10.17    | libpq-dev       | libpq-dev               |
+| (opt) cunit >= 2.1.3    | libcunit1-dev   | postgresql              |
+
 
 #### Clone
 Clone this repository
 
 ```bash
-git clone https://github.com/spel-uchile/SUCHAI-Flight-Software
-cd SUCHAI-Flight-Software
+git clone https://gitlab.com/spel-uchile/suchai-flight-software.git
+cd suchai-flight-software
 ```
-Go to the folder, locate ```config.h``` file to customize parameters and 
-functionalities.
 
 #### Build
-Use the ```compile.py``` python script to easily install drivers, create the
-settings header ```configure.h``` and build:
+Use the ```cmake``` to easily install internal dependencies, create the
+settings header ```include/config.h``` and build the example app in `apps/simple`:
 
 ```bash
-python3 compile.py LINUX X86 --drivers
+cmake -B build
+cmake --build build
 ```
 
-This will download and build the libcsp too. Subsequents builds do not require
-the ```--drivers``` params. Use ```--help``` to learn how to customize the
-build:
+Use the `-DAPP` option to build another app inside the `apps` directory
 
 ```bash
-python3 compile.py --help
+cmake -B build -DAPP=simple
+cmake --build build
+```
+
+Use ```-HL``` or check `include/config.h.in` to learn how to customize the build. Pass arguments with -D option.
+For example, select the log level and the storage mode with `-DSCH_LOG` and `-DSCH_ST_MODE`
+
+```bash
+cmake -B build -HL
+cmake -B build -DSCH_LOG=INFO -DSCH_ST_MODE=SQLITE
+cmake --build build
 ```
 
 ### Run
-Go to the build folder ex: ```cd build_x86``` and execute
+Go to the app build folder ex: ```cd build/apps/simple``` and execute
 
 ```bash
-./SUCHAI_Flight_Software
+cd build/apps/simple
+./suchai-app
 ```
+
+The output should be similar to
+
+```
+[INFO ][1625522858][Console] 
+______________________________________________________________________________
+                     ___ _   _  ___ _  _   _   ___ 
+                    / __| | | |/ __| || | /_\ |_ _|
+                    \__ \ |_| | (__| __ |/ _ \ | | 
+                    |___/\___/ \___|_||_/_/ \_\___|
+______________________________________________________________________________
+
+
+[INFO ][1625522858][FlightPlan] Started
+[INFO ][1625522858][Communications] Started
+SUCHAI>
+```
+
+Type `help` to see the list of commands. Type `\exit` to exit the software.
+
 
 #### Using ZMQ interface
 In Linux, LibCSP uses the ZMQ interface to communicate different nodes. To pass
