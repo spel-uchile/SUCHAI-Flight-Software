@@ -19,50 +19,34 @@
  */
 
 #include "suchai/storage.h"
-#include "app/system/repoDataSchema.h"
 #include <sqlite3.h>
 
 ///< Status variables buffer
-static value32_t *status_db = NULL;
 static size_t status_entries = 0;
 
 ///< Flight plan buffer
-static fp_entry_t *flightplan_db = NULL;
-static size_t flightplan_entries = 0;
+static char* fp_table = NULL;
 
 ///< Payloads storage buffer
-static uint8_t *payload_db = NULL;
-static uint8_t **payloads_sections_addresses = NULL;
 static int payloads_entries = 0;
+static data_map_t *payloads_schema = NULL;
+static char *payloads_table = NULL;
 
 static int storage_is_open = 0;
 
 static sqlite3 *db = NULL;
 
-char* fp_table = "flightplan";
-char fs_db_name[15];
-char postgres_conf_s[SCH_BUFF_MAX_LEN];
-
-/**
- * TODO: ADD documentation
- * @param c_type
- * @param buff
- * @param stmt
- * @param j
- */
-void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
-
-/**
- * Translate to sql format a c format type
- * @param c_type
- * @return string in sql syntax
- */
-const char* get_sql_type(char* c_type);
+static void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
+static const char* get_sql_type(char* c_type);
+static int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names);
+static void get_value_string(char* ret_string, char* c_type, const char* buff);
+static int get_sizeof_type(char* c_type);
 
 int storage_init(const char *db_name)
 {
     if(db != NULL) sqlite3_close(db);
-    if(sqlite3_open(db_name, &db) != SQLITE_OK) return SCH_ST_ERROR;
+    if(sqlite3_open(db_name, &db) != SQLITE_OK)
+        return SCH_ST_ERROR;
     storage_is_open = 1;
     return SCH_ST_OK;
 }
@@ -75,6 +59,8 @@ int storage_close(void)
         storage_is_open = 0;
         return SCH_ST_OK;
     }
+
+    if(fp_table != NULL) free(fp_table);
     return SCH_ST_ERROR;
 }
 
@@ -122,7 +108,7 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
 
     /* Drop table if drop variables is true */
     if (drop) {
-        sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s", fp_table);
+        sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s", table);
         rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK ) {
@@ -138,8 +124,9 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
                           "command text, "
                           "args text , "
                           "executions int , "
-                          "periodical int );",
-                          fp_table);
+                          "periodical int ,"
+                          "node int);",
+                          table);
 
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
 
@@ -148,17 +135,24 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
         sqlite3_free(sql);
         return SCH_ST_ERROR;
     }
-    else sqlite3_free(sql);
+    else
+        sqlite3_free(sql);
+
+    if(fp_table != NULL) free(fp_table);
+    fp_table = strdup(table);
     return SCH_ST_OK;
 }
 
-int storage_table_payload_init(char *table, int n_entries, int drop)
+int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries, int drop)
 {
+    if(table == NULL || data_map == NULL)
+        return SCH_ST_ERROR;
+
     int rc = 0;
     if(drop) {
         char *err_msg;
         char *sql;
-        for( int i = 0; i < last_sensor; ++i) {
+        for( int i = 0; i < n_entries; ++i) {
             sql = sqlite3_mprintf("DROP TABLE IF EXISTS %s",  data_map[i].table);
             rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
             if (rc != SQLITE_OK ) {
@@ -169,7 +163,7 @@ int storage_table_payload_init(char *table, int n_entries, int drop)
         }
     }
 
-    for(int i=0; i < last_sensor; ++i) {
+    for(int i=0; i < n_entries; ++i) {
         char create_table[SCH_BUFF_MAX_LEN * 4];
         memset(&create_table, 0, SCH_BUFF_MAX_LEN * 4);
         snprintf(create_table, SCH_BUFF_MAX_LEN * 4, "CREATE TABLE IF NOT EXISTS %s(id INTEGER, tstz TIMESTAMPTZ,",
@@ -181,7 +175,7 @@ int storage_table_payload_init(char *table, int n_entries, int drop)
         char var_names[SCH_BUFF_MAX_LEN * 4];
         memset(&var_names, 0, SCH_BUFF_MAX_LEN * 4);
         strcpy(var_names, data_map[i].var_names);
-        int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, i);
+        int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names);
 
         for (int j = 0; j < nparams; ++j) {
             char line[100];
@@ -201,6 +195,11 @@ int storage_table_payload_init(char *table, int n_entries, int drop)
             return SCH_ST_ERROR;
         }
     }
+
+    payloads_entries = n_entries;
+    payloads_table = strdup(table);
+    payloads_schema = data_map;
+
     return SCH_ST_OK;
 }
 
@@ -260,9 +259,12 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 }
 
 /****** FLIGHT PLAN VARIABLES FUNCTIONS *******/
-
+/* TODO: Use the concept of table */
+//int storage_flight_plan_set_st(fp_entry_t *row, char *table)
 int storage_flight_plan_set_st(fp_entry_t *row)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
 
     int timetodo = row->unixtime;
     int executions = row->executions;
@@ -275,8 +277,8 @@ int storage_flight_plan_set_st(fp_entry_t *row)
 
     char *err_msg;
     char *sql = sqlite3_mprintf(
-            "INSERT OR REPLACE INTO %s (time, command, args, executions, periodical)\n VALUES (%d, \"%s\", \"%s\", %d, %d);",
-            fp_table, timetodo, command, args, executions, period);
+            "INSERT OR REPLACE INTO %s (time, command, args, executions, periodical, node)\n VALUES (%d, \"%s\", \"%s\", %d, %d, %d);",
+            fp_table, timetodo, command, args, executions, period, node);
 
     /* Execute SQL statement */
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
@@ -313,6 +315,9 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
 
 int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
     char **results;
     char *err_msg;
     int row_int;
@@ -329,13 +334,12 @@ int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
         return SCH_ST_ERROR;
     }
     else {
-        strcpy(row->cmd, results[6]);
-        strcpy(row->args, results[7]);
-        row->executions = atoi(results[8]);
-        row->periodical = atoi(results[9]);
-
-        // TODO: Check if delete is needed
-        // storage_flight_plan_erase(timetodo, entries);
+        row->unixtime = atoi(results[col+0]);
+        row->cmd = strdup(results[col+1]);
+        row->args = strdup(results[col+2]);
+        row->executions = atoi(results[col+3]);
+        row->periodical = atoi(results[col+4]);
+        row->node = atoi(results[col+5]);
 
         sqlite3_free(sql);
     }
@@ -344,12 +348,35 @@ int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 
 int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
 
-//    if(!storage_is_open || flightplan_db == NULL || row == NULL || index > flightplan_entries)
-//        return SCH_ST_ERROR;
-//
-//    fp_entry_copy(flightplan_db + index, row);
-//    return SCH_ST_OK;
+    char **results;
+    char *err_msg;
+    int row_int;
+    int col;
+
+    char* sql = sqlite3_mprintf("SELECT * FROM %s WHERE rowid = %d", fp_table, index+1);
+
+    sqlite3_get_table(db, sql, &results, &row_int,&col,&err_msg);
+
+    if(row_int==0 || col==0) {
+        sqlite3_free(sql);
+        sqlite3_free(err_msg);
+        sqlite3_free_table(results);
+        return SCH_ST_ERROR;
+    }
+    else {
+        row->unixtime = atoi(results[col+0]);
+        row->cmd = strdup(results[col+1]);
+        row->args = strdup(results[col+2]);
+        row->executions = atoi(results[col+3]);
+        row->periodical = atoi(results[col+4]);
+        row->node = atoi(results[col+5]);
+
+        sqlite3_free(sql);
+    }
+    return SCH_ST_OK;
 }
 
 int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* executions, int* period, int* node)
@@ -373,6 +400,9 @@ int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* e
 
 int storage_flight_plan_delete_row(int timetodo)
 {
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
     char *err_msg;
     char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE time = %d", fp_table, timetodo);
 
@@ -392,12 +422,35 @@ int storage_flight_plan_delete_row(int timetodo)
 
 int storage_flight_plan_delete_row_idx(int index)
 {
-    return SCH_ST_ERROR;
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
+    char *err_msg;
+    char *sql = sqlite3_mprintf("DELETE FROM %s\n WHERE rowid = %d", fp_table, index+1);
+
+    /* Execute SQL statement */
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+    if (rc != SQLITE_OK) {
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return SCH_ST_ERROR;
+    }
+
+    sqlite3_free(err_msg);
+    sqlite3_free(sql);
+    return SCH_ST_OK;
 }
 
 int storage_flight_plan_reset(void)
 {
-    return storage_table_flight_plan_init(1, 0, 1);
+    if(fp_table == NULL)
+        return SCH_ST_ERROR;
+
+    char *table = strdup(fp_table);  //flight_plan_init frees fp_table before copy
+    int rc = storage_table_flight_plan_init(table, 0, 1);
+    free(table);
+    return rc;
 }
 
 /****** PAYLOAD STORAGE FUNCTIONS *******/
@@ -438,18 +491,76 @@ void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j)
     }
 }
 
-
-int storage_payload_set_data(int payload, int index, void *data, size_t size)
+int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names)
 {
-    if(payload >= last_sensor) return SCH_ST_ERROR;
+    const char s[2] = " ";
+    tok_sym[0] = strtok(order, s);
+
+    int j=0;
+    while(tok_sym[j] != NULL) {
+        j++;
+        tok_sym[j] = strtok(NULL, s);
+    }
+
+    tok_var[0] = strtok(var_names, s);
+
+    j=0;
+    while(tok_var[j] != NULL) {
+        j++;
+        tok_var[j] = strtok(NULL, s);
+    }
+    return j;
+}
+
+void get_value_string(char* ret_string, char* c_type, const char* buff)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        if (*((int *)buff) == -1) {
+            sprintf(ret_string, " 'nan'");
+        } else {
+            sprintf(ret_string, " %f", *((float*)buff));
+        }
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        sprintf(ret_string, " %d", *((int*)buff));
+    }
+    else if(strcmp(c_type, "%u") == 0) {
+        sprintf(ret_string, " %u", *((unsigned int*)buff));
+    } else if(strcmp(c_type, "%i") == 0) {
+        sprintf(ret_string," %i", *((int*)buff));
+    }
+}
+
+int get_sizeof_type(char* c_type)
+{
+    if(strcmp(c_type, "%f") == 0) {
+        return sizeof(float);
+    }
+    else if(strcmp(c_type, "%d") == 0) {
+        return sizeof(int);
+    } else if(strcmp(c_type, "%u") == 0) {
+        return sizeof(int);
+    } else if(strcmp(c_type, "%i") == 0) {
+        return sizeof(int);
+    }
+    else {
+        return -1;
+    }
+}
+
+
+int storage_payload_set_data(int payload, int index, void *data, data_map_t *schema)
+{
+    if(data == NULL || schema == NULL)
+        return SCH_ST_ERROR;
 
     char* tok_sym[300];
     char* tok_var[300];
     char *order = (char *)malloc(300);
-    strcpy(order, data_map[payload].data_order);
+    strcpy(order, schema->data_order);
     char *var_names = (char *)malloc(1000);
-    strcpy(var_names, data_map[payload].var_names);
-    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
+    strcpy(var_names, schema->var_names);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names);
 
     char *values = (char *)malloc(1000);
     char *names = (char *)malloc(1000);
@@ -478,7 +589,7 @@ int storage_payload_set_data(int payload, int index, void *data, size_t size)
     strcat(names, ")");
     strcat(values, ")");
     char*  insert_row = (char *)malloc(2000);
-    sprintf(insert_row, "INSERT INTO %s %s VALUES %s",data_map[payload].table, names, values);
+    sprintf(insert_row, "INSERT INTO %s %s VALUES %s", schema->table , names, values);
     free(order);
     free(var_names);
     free(values);
@@ -495,17 +606,18 @@ int storage_payload_set_data(int payload, int index, void *data, size_t size)
     return SCH_ST_OK;
 }
 
-int storage_payload_get_data(int payload, int index, void *data, size_t size)
+int storage_payload_get_data(int payload, int index, void *data, data_map_t *schema)
 {
-    if(payload >= last_sensor) return SCH_ST_ERROR;
+    if(data == NULL || schema == NULL)
+        return SCH_ST_ERROR;
 
     char* tok_sym[300];
     char* tok_var[300];
     char order[300];
-    strcpy(order, data_map[payload].data_order);
+    strcpy(order, schema->data_order);
     char var_names[1000];
-    strcpy(var_names, data_map[payload].var_names);
-    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names, payload);
+    strcpy(var_names, schema->var_names);
+    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names);
 
     char values[1000];
     char names[1000];
@@ -524,8 +636,7 @@ int storage_payload_get_data(int payload, int index, void *data, size_t size)
     }
 
     char get_value[2000];
-    sprintf(get_value,"SELECT %s FROM %s WHERE id=%d LIMIT 1"
-            ,names, data_map[payload].table, index);
+    sprintf(get_value,"SELECT %s FROM %s WHERE id=%d LIMIT 1", names, schema->table, index);
 
     char* err_msg;
     int rc;
@@ -555,7 +666,7 @@ int storage_payload_get_data(int payload, int index, void *data, size_t size)
 
 int storage_payload_reset(void)
 {
-    return storage_table_payload_init(NULL, payloads_entries, 1);
+    return storage_table_payload_init(payloads_table, payloads_schema, payloads_entries, 1);
 }
 
 int storage_payload_reset_table(int payload)

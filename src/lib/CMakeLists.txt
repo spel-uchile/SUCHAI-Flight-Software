@@ -1,12 +1,12 @@
 # Define libcsp path and build command
 set(LIBCSP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libcsp)
 set(LIBCSP_PPREFIX ${LIBCSP_PATH}/libcsp)
-set(LIBCSP_BUILD_CMD python2 ./waf --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-rtable cidr --with-driver-usart=linux --install-csp --prefix=${LIBCSP_PPREFIX} configure build install)
+set(LIBCSP_BUILD_CMD python2 ./waf configure --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-rtable cidr --with-driver-usart=linux --install-csp --prefix=${LIBCSP_PPREFIX} build install)
 
 # Build libcsp if not found
 if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("Building libcsp...")
-    execute_process(COMMAND ${LIBCSP_BUILD_CMD} configure WORKING_DIRECTORY "${LIBCSP_PATH}" RESULT_VARIABLE CSP_RESULTS)
+    execute_process(COMMAND ${LIBCSP_BUILD_CMD} WORKING_DIRECTORY "${LIBCSP_PATH}" RESULT_VARIABLE CSP_RESULTS)
     message("${CSP_RESULTS}")
 endif()
 

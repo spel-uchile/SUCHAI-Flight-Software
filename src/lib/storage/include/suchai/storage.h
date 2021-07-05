@@ -44,6 +44,18 @@ typedef struct __attribute__((packed)) fp_entry {
     char* args;                 ///< Command's arguments
 } fp_entry_t;
 
+/**
+ * Data Map Struct for data schema definition.
+ */
+typedef struct __attribute__((__packed__)) map {
+    char table[30];
+    uint16_t  size;
+    uint32_t sys_index;
+    uint32_t sys_ack;
+    char * data_order;
+    char *  var_names;
+} data_map_t;
+
 static inline void fp_entry_copy(fp_entry_t *src, fp_entry_t *dst)
 {
     assert(src != NULL);
@@ -77,7 +89,7 @@ static inline void fp_entry_clear(fp_entry_t *fp_entry)
         fp_entry->unixtime = -1;
         fp_entry->executions = 0;
         fp_entry->periodical = 0;
-        fp_entry->node = 0;
+        fp_entry->node = SCH_COMM_NODE;
         fp_entry->cmd = NULL;
         fp_entry->args = NULL;
     }
@@ -140,11 +152,13 @@ int storage_table_flight_plan_init(char *table,  int n_entries, int drop);
  * @note: non-reentrant function, use mutex to sync access
  *
  * @param table Str. Table name
+ * @param data_map. Array with telemetry data definitions
  * @param n_entries Int. Number of sensors/payloads to store
  * @param drop Int. Set to 1 to drop the existing table before create one
  * @return 0 OK, -1 Error
  */
-int storage_table_payload_init(char *table, int n_entries, int drop);
+int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries, int drop);
+
 
 /****** STATUS VARIABLES FUNCTIONS *******/
 
@@ -265,7 +279,8 @@ int storage_flight_plan_reset(void);
  * @param payload Int. payload to store
  * @return 0 OK, -1 Error
  */
-int storage_payload_set_data(int payload, int index, void *data, size_t size);
+int storage_payload_set_data(int payload, int index, void *data, data_map_t *schema);
+
 
 /**
  * Get a value for specific payload with index value
@@ -279,7 +294,7 @@ int storage_payload_set_data(int payload, int index, void *data, size_t size);
  * @param payload Int. payload to get value
  * @return 0 OK, -1 Error
  */
-int storage_payload_get_data(int payload, int index, void* data, size_t size);
+int storage_payload_get_data(int payload, int index, void *data, data_map_t *schema);
 
 /**
  * Delete payload databases
