@@ -41,6 +41,7 @@ target_include_directories(suchai-fs-lib PUBLIC
         libcsp/libcsp/include)
 
 target_link_libraries(suchai-fs-lib PRIVATE suchai-fs-os)
+target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)
 target_link_libraries(suchai-fs-lib PRIVATE -lm -lzmq)
 target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)
 # Link proper storage libraries
