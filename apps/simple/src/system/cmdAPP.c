@@ -70,6 +70,11 @@ int obc_update_status(char *fmt, char *params, int nparams)
     LOGD(tag, "Reading obc data in Linux \n timestamp: %d", curr_time);
     // Reading temp
     thermal = fopen("/sys/class/thermal/thermal_zone0/temp","r");
+    if(thermal == NULL)
+    {
+        LOGW(tag, "Could not read temperatures!");
+        return CMD_ERROR;
+    }
     n = fscanf(thermal,"%f",&millideg);
     fclose(thermal);
     if(n!= 1)
