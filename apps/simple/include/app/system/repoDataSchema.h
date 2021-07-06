@@ -70,7 +70,7 @@ typedef enum dat_status_address_enum {
     dat_fpl_queue,                ///< Flight plan queue length
 
     /// Memory: Current payload memory addresses
-    dat_drp_temp,                 ///< Temperature data index
+    dat_drp_idx_temp,                 ///< Temperature data index
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
@@ -143,13 +143,27 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_com_last_tc,       "com_last_tc",       'u', DAT_IS_STATUS, 0},         ///< Unix time of the last received Telecommand
         {dat_fpl_last,          "fpl_last",          'u', DAT_IS_STATUS, 0},          ///< Last executed flight plan (unix time)
         {dat_fpl_queue,         "fpl_queue",         'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
-        {dat_drp_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, -1},          ///< General operation mode
         {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, -1},          ///< RTC current unix time
+        {dat_drp_idx_temp,      "drp_idx_temp",      'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
 };
 ///< The dat_status_last_var constant serves for looping through all status variables
 static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_status_list[0]);
+
+
+/**
+ * PAYLOAD DATA DEFINITIONS
+ */
+
+/**
+ * Struct for storing temperature data.
+ */
+typedef struct __attribute__((__packed__)) temp_data {
+    uint32_t index;
+    uint32_t timestamp;
+    float obc_temp_1;
+} temp_data_t;
 
 /**
  * Enum constants for dynamically identifying payload fields at execution time.
@@ -166,21 +180,10 @@ static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_stat
  * }
  * @endcode
  */
-
 typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
-
-/**
- * Struct for storing temperature data.
- */
-typedef struct __attribute__((__packed__)) temp_data {
-    uint32_t index;
-    uint32_t timestamp;
-    float obc_temp_1;
-} temp_data_t;
-
 
 /**
  * Struct for storing data collected by status variables.
@@ -192,7 +195,7 @@ typedef struct __attribute__((__packed__)) sta_data {
 } sta_data_t;
 
 static data_map_t data_map[] = {
-{"temp_data",      (uint16_t) (sizeof(temp_data_t)),dat_drp_temp,dat_drp_ack_temp, "%u %u %f",                   "sat_index timestamp obc_temp_1"},
+    {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_drp_idx_temp, dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
 };
 
 /** The repository's name */
