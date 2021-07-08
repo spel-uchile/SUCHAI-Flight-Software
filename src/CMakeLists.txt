@@ -68,8 +68,8 @@ set(SCH_COM_MAX_PACKETS 10 CACHE STRING "Max. packets to transmit in a row")
 set(SCH_COM_TX_DELAY_MS 3000 CACHE STRING "Delay (ms) between continuous transmissions")
 set(SCH_CSP_BUFFERS 100 CACHE STRING "Available CSP buffers")
 set(SCH_CSP_SOCK_LEN 100 CACHE STRING "Max number of packets in a connection queue")
-set(SCH_COMM_ZMQ_OUT \"tcp://127.0.0.1:8001\" CACHE STRING "CSP ZMQ OUT socket URI")
-set(SCH_COMM_ZMQ_IN  \"tcp://127.0.0.1:8002\" CACHE STRING "CSP ZMQ IN socket URI")
+set(SCH_COMM_ZMQ_IN  \"tcp://127.0.0.1:8001\" CACHE STRING "CSP ZMQ IN socket URI")
+set(SCH_COMM_ZMQ_OUT \"tcp://127.0.0.1:8002\" CACHE STRING "CSP ZMQ OUT socket URI")
 ##
 # Data repository system settings
 ##

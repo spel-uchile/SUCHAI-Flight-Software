@@ -60,8 +60,8 @@
 #cmakedefine SCH_COM_TX_DELAY_MS          @SCH_COM_TX_DELAY_MS@  /// Delay (ms) between continuous transmissions
 #cmakedefine SCH_CSP_BUFFERS              @SCH_CSP_BUFFERS@  ///< Number of available CSP buffers
 #cmakedefine SCH_CSP_SOCK_LEN             @SCH_CSP_SOCK_LEN@  ///< Max number of packets in a connection queue
-#cmakedefine SCH_COMM_ZMQ_OUT             @SCH_COMM_ZMQ_OUT@  ///< CSP ZMQ Out socket URI
 #cmakedefine SCH_COMM_ZMQ_IN              @SCH_COMM_ZMQ_IN@  ///< CSP ZMQ In socket URI
+#cmakedefine SCH_COMM_ZMQ_OUT             @SCH_COMM_ZMQ_OUT@  ///< CSP ZMQ Out socket URI
 
 /* Data repository settings */
 #cmakedefine SCH_ST_RAM                   0
