@@ -40,7 +40,7 @@ int osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, 
     // Only with proper permissions
     const struct sched_param _priority = {(int) priority};
     if(pthread_setschedparam(*thread_id, SCHED_FIFO, &_priority) != 0)
-        printf("[WARN] (%s) Failed to assign task priority, try as root\n", name);
+        printf("[WARN] (%s) Failed to assign task priority, try as root\r\n", name);
 
     pthread_attr_destroy(&attr);
 
@@ -55,8 +55,8 @@ void osTaskDelete(void *task_handle)
     else
         thread = *(pthread_t *)task_handle;
 
-    printf("[INFO] Canceling thread %lu\n", thread);
+    printf("[INFO] Canceling thread %lu\r\n", thread);
     int s = pthread_cancel(thread);
-    if (s != 0) printf("[WARN] Failed to cancel thread %lu\n", thread);
+    if (s != 0) printf("[WARN] Failed to cancel thread %lu\r\n", thread);
 }
 

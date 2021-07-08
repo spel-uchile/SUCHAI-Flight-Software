@@ -34,10 +34,10 @@ int suchai_main(void)
 {
     /* On reset */
     on_reset();
-    printf("\n\n--------- FLIGHT SOFTWARE START ---------\n");
-    printf("\t Version: %s\n", SCH_SW_VERSION);
-    printf("\t Device : %d (%s)\n", SCH_DEVICE_ID, SCH_NAME);
-    printf("-----------------------------------------\n\n");
+    printf("\r\n\r\n--------- FLIGHT SOFTWARE START ---------\r\n");
+    printf("\t Version: %s\r\n", SCH_SW_VERSION);
+    printf("\t Device : %d (%s)\r\n", SCH_DEVICE_ID, SCH_NAME);
+    printf("-----------------------------------------\r\n\r\n");
 
     /* Init software subsystems */
     log_init(SCH_LOG_LEVEL, -1);      // Logging system

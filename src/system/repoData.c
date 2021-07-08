@@ -497,7 +497,7 @@ int dat_print_payload_struct(void* data, unsigned int payload)
             default:
                 data += sizeof(int);
         }
-        printf("\n");
+        printf("\r\n");
 
         type = strtok_r(NULL, sep, &type_tmp);
         name = strtok_r(NULL, sep, &name_tmp);
