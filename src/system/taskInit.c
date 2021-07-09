@@ -56,7 +56,9 @@ void taskInit(void *param)
     /**
      * Call app initialization routine
      */
+#ifdef SCH_HOOK_INIT
     initAppHook(param);
+#endif
 
     LOGI(tag, "EXIT INIT TASK", 0);
     osTaskDelete(NULL);

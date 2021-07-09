@@ -58,6 +58,8 @@ set(SCH_SW_VERSION \"${GIT_REPO_VERSION}\" CACHE STRING "Software version")
 set(SCH_CON_ENABLED 1 CACHE BOOL "Enable serial console task")
 set(SCH_COMM_ENABLE 1 CACHE BOOL "Enable communications task")
 set(SCH_FP_ENABLED 1 CACHE BOOL "Enable flight plan task")
+set(SCH_HOOK_INIT 1 CACHE BOOL "Enable task init hook function")
+set(SCH_HOOK_COMM 0 CACHE BOOL "Enable task communications hook function")
 set(SCH_MAX_WDT_TIMER 60 CACHE STRING "Period in seconds to send reset_wdt command")
 set(SCH_MAX_GND_WDT_TIMER 48*3600 CACHE STRING "Software watchdog timer")
 ##

@@ -43,6 +43,8 @@
 #cmakedefine01 SCH_COMM_ENABLE
 #cmakedefine01 SCH_FP_ENABLED
 #cmakedefine01 SCH_HK_ENABLED
+#cmakedefine SCH_HOOK_INIT
+#cmakedefine SCH_HOOK_COMM
 #cmakedefine SCH_MAX_WDT_TIMER           @SCH_MAX_WDT_TIMER@  ///< Seconds to send wdt_reset command
 #cmakedefine SCH_MAX_GND_WDT_TIMER       @SCH_MAX_GND_WDT_TIMER@  ///< Seconds to reset the OBC if the ground watchdog was not clear
 #define SCH_UART_BAUDRATE           (500000)  ///< UART baud rate for serial console

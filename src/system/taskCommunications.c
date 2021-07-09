@@ -71,20 +71,7 @@ void taskCommunications(void *param)
 
             switch (csp_conn_dport(conn))
             {
-                case SCH_TRX_PORT_TC:
-                    // Create a response packet and send
-                    rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    csp_send(conn, rep_ok, 1000);
-                    /* Process incoming TC */
-                    com_receive_tc(packet);
-                    csp_buffer_free(packet);
-                    break;
-
                 case SCH_TRX_PORT_TM:
-                    // Create a response packet and send
-                    //rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    //csp_send(conn, rep_ok, 1000);
-
                     #ifdef SCH_RESEND_TM_NODE
                     // Resend a copy of the packet to another node
                     tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
@@ -97,6 +84,15 @@ void taskCommunications(void *param)
 
                     // Process TM packet
                     com_receive_tm(packet);
+                    csp_buffer_free(packet);
+                    break;
+
+                case SCH_TRX_PORT_TC:
+                    // Create a response packet and send
+                    rep_ok = csp_buffer_clone(rep_ok_tmp);
+                    csp_send(conn, rep_ok, 1000);
+                    /* Process incoming TC */
+                    com_receive_tc(packet);
                     csp_buffer_free(packet);
                     break;
 
@@ -135,6 +131,11 @@ void taskCommunications(void *param)
                     break;
 
                 default:
+                    #ifdef SCH_HOOK_COMM
+                    /* Let user application handle a packet */
+                    if(csp_conn_dport(conn) > CSP_UPTIME)
+                        taskCommunicationsHook(conn, packet);
+                    #endif
                     /* Let the service handler reply pings, buffer use, etc. */
                     csp_service_handler(conn, packet);
                     break;
