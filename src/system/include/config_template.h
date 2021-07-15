@@ -70,11 +70,12 @@
 #define SCH_TNC_ADDRESS         9                  ///< TNC node address
 #define SCH_TRX_ADDRESS         5                  ///< TRX node address
 #define SCH_EPS_ADDRESS         2                  ///< EPS node address
-#define SCH_TRX_PORT_TM         (9)                ///< Telemetry port
 #define SCH_TRX_PORT_TC         (10)               ///< Telecommands port
 #define SCH_TRX_PORT_RPT        (11)               ///< Digirepeater port (resend packets)
 #define SCH_TRX_PORT_CMD        (12)               ///< Commands port (execute console commands)
 #define SCH_TRX_PORT_DBG        (13)               ///< Debug port, logs output
+#define SCH_TRX_PORT_DBG_TM     (14)               ///< Debug port, logs frames
+#define SCH_TRX_PORT_TM         (15)               ///< Telemetry port
 #define SCH_COMM_ZMQ_OUT        "{{SCH_ZMQ_OUT}}"  ///< Out socket URI
 #define SCH_COMM_ZMQ_IN         "{{SCH_ZMQ_IN}}"   ///< In socket URI
 #define SCH_TX_INHIBIT          10                 /// Default silent time in seconds [0, 1800 (30min)]

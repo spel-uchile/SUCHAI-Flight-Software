@@ -280,6 +280,67 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
     return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_ERROR;
 }
 
+int com_send_telemetry(int node, int port, int type, void *data, size_t n_bytes, int n_structs, int n_frame)
+{
+    int rc_conn = 0;
+    int rc_send = 0;
+    int nframe = n_frame;
+    int size_data = n_bytes / n_structs;
+    int structs_per_frame = COM_FRAME_MAX_LEN / size_data;
+
+    // New connection
+    csp_conn_t *conn;
+    conn = csp_connect(CSP_PRIO_NORM, node, port, 500, CSP_O_NONE);
+    if(conn == NULL)
+        return CMD_ERROR;
+
+    // Send one or more frames
+    while(n_bytes > 0)
+    {
+        int structs_sent = n_structs < structs_per_frame ? n_structs : structs_per_frame;
+        size_t bytes_sent = structs_sent * size_data;
+
+        // Create packet and frame
+        csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
+        packet->length = sizeof(com_frame_t);
+        com_frame_t *frame = (com_frame_t *)(packet->data);
+        frame->node = SCH_COMM_ADDRESS;
+        frame->nframe = csp_hton16((uint16_t)nframe++);
+        frame->type = (uint8_t)type;
+        frame->ndata = csp_hton32((uint32_t)structs_sent);
+        memcpy(frame->data.data8, data, bytes_sent);
+
+        // Send packet
+        rc_send = csp_send(conn, packet, 500);
+        if(rc_send == 0)
+        {
+            csp_buffer_free(packet);
+            LOGE(tag, "Error sending frame! (%d)", rc_send);
+            break;
+        }
+
+        // Process more data
+        n_bytes -= bytes_sent;
+        n_structs -= structs_sent;
+
+        if(nframe%SCH_COM_MAX_PACKETS == 0)
+            osDelay(SCH_COM_TX_DELAY_MS);
+    }
+
+    // Close connection
+    rc_conn = csp_close(conn);
+    if(rc_conn != CSP_ERR_NONE)
+        LOGE(tag, "Error closing connection! (%d)", rc_conn);
+
+    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_ERROR;
+}
+
+int com_send_debug(int node, char *data, size_t len)
+{
+    com_send_telemetry(node, SCH_TRX_PORT_DBG_TM, 0, data, len, (int)len, 0);
+}
+
+
 void _hton32_buff(uint32_t *buff, int len)
 {
     int i;

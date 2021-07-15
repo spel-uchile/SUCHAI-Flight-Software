@@ -36,6 +36,7 @@ void taskCommunications(void *param)
     csp_packet_t *tmp_packet;
     csp_packet_t *rep_ok_tmp;
     csp_packet_t *rep_ok;
+    com_frame_t *rcv_frame;
 
     csp_socket_t *sock = csp_socket(CSP_SO_NONE);
     if((rc = csp_bind(sock, CSP_ANY)) != CSP_ERR_NONE)
@@ -80,26 +81,6 @@ void taskCommunications(void *param)
                     csp_buffer_free(packet);
                     break;
 
-                case SCH_TRX_PORT_TM:
-                    // Create a response packet and send
-                    //rep_ok = csp_buffer_clone(rep_ok_tmp);
-                    //csp_send(conn, rep_ok, 1000);
-
-                    #ifdef SCH_RESEND_TM_NODE
-                    // Resend a copy of the packet to another node
-                    tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
-                    assert(tmp_packet != NULL);
-                    assert(tmp_packet != packet);
-                    rc = csp_sendto(CSP_PRIO_NORM, SCH_RESEND_TM_NODE, SCH_TRX_PORT_TM, csp_conn_sport(conn), CSP_O_NONE, tmp_packet, 1000);
-                    if(rc == -1)
-                        csp_buffer_free(tmp_packet);
-                    #endif
-
-                    // Process TM packet
-                    com_receive_tm(packet);
-                    csp_buffer_free(packet);
-                    break;
-
                 case SCH_TRX_PORT_RPT:
                     // Digital repeater port, resend the received packet
                     if(csp_conn_dst(conn) == SCH_COMM_ADDRESS)
@@ -134,7 +115,35 @@ void taskCommunications(void *param)
                     csp_buffer_free(packet);
                     break;
 
+                case SCH_TRX_PORT_DBG_TM:
+                    /* Debug port, print frames to console */
+                    rcv_frame = (com_frame_t *)packet->data;
+                    LOGP(tag, "[%d][%d]\r\n%s", rcv_frame->node, rcv_frame->nframe, rcv_frame->data.data8);
+                    csp_buffer_free(packet);
+                    break;
+
+                case SCH_TRX_PORT_TM:
+                    #ifdef SCH_RESEND_TM_NODE
+                    // Resend a copy of the packet to another node
+                    tmp_packet = (csp_packet_t *)csp_buffer_clone(packet);
+                    assert(tmp_packet != NULL);
+                    assert(tmp_packet != packet);
+                    rc = csp_sendto(CSP_PRIO_NORM, SCH_RESEND_TM_NODE, SCH_TRX_PORT_TM, csp_conn_sport(conn), CSP_O_NONE, tmp_packet, 1000);
+                    if(rc == -1)
+                        csp_buffer_free(tmp_packet);
+                    #endif
+
+                    // Process TM packet
+                    com_receive_tm(packet);
+                    csp_buffer_free(packet);
+                    break;
+
                 default:
+                    #ifdef SCH_HOOK_COMM
+                    /* Let user application handle a packet */
+                    if(csp_conn_dport(conn) >= SCH_TRX_PORT_APP)
+                        taskCommunicationsHook(conn, packet);
+                    #endif
                     /* Let the service handler reply pings, buffer use, etc. */
                     csp_service_handler(conn, packet);
                     break;
