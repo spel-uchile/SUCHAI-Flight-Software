@@ -17,8 +17,8 @@
 #include <signal.h>
 
 /* system includes */
-#include "repoData.h"
-#include "repoCommand.h"
+#include "suchai/repoData.h"
+#include "suchai/repoCommand.h"
 
 #if SCH_COMM_ENABLE
 #include <csp/csp.h>

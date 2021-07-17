@@ -48,7 +48,7 @@ int con_debug_msg(char *fmt, char *params, int nparams)
 
 int con_help(char *fmt, char *params, int nparams)
 {
-    printf("List of commands:\n");
+    printf("List of commands:\r\n");
     cmd_print_all();
     return CMD_OK;
 }

@@ -20,8 +20,6 @@
 
 #include "init.h"
 
-static const char *tag = "on_reset";
-
 void on_reset(void)
 {
     /* Register INT/TERM signals */

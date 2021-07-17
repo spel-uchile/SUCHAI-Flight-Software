@@ -88,7 +88,7 @@ int drp_execute_before_flight(char *fmt, char *params, int nparams)
 int drp_print_system_vars(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Displaying system variables list");
-    printf("idx, %-20s, value, type\n", "name");
+    printf("idx, %-20s, value, type\r\n", "name");
     int i;
     for(i=0; i<dat_status_last_var; i++)
     {

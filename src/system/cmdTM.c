@@ -189,11 +189,10 @@ int _send_tel_from_to(int start, int end, int payload, int dest_node)
         for(k=0; k<sizeof(frame->data.data32); k++)
             frame->data.data32[k] = csp_hton32(frame->data.data32[k]);
 
-        LOGI(tag, "Sending %d structs of payload %d", frame->ndata, (int)payload);
         LOGI(tag, "Node    : %d", frame->node);
-        LOGI(tag, "Frame   : %d", frame->nframe);
+        LOGI(tag, "Frame   : %d", csp_ntoh16(frame->nframe));
         LOGI(tag, "Type    : %d", frame->type);
-        LOGI(tag, "Samples : %d", frame->ndata);
+        LOGI(tag, "Samples : %d", csp_ntoh16(frame->ndata));
         //print_buff(frame->data.data8, payload_size*structs_per_frame);
 
         // Send packet

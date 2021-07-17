@@ -27,6 +27,14 @@
 #include "suchai/repoCommand.h"
 #include "suchai/cmdTM.h"
 
+/**
+ * Application specific function to process incoming packets
+ * If SCH_HOOK_COMM is defined, the application must provide an taskCommunicationHook implementation
+ * @param conn Current CSP connection
+ * @param packet Received csp packet
+ */
+void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet);
+
 void taskCommunications(void *param);
 
 #endif //T_COMMUNICATIONS_H

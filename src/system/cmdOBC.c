@@ -42,7 +42,7 @@ void cmd_obc_init(void)
 
 int obc_ident(char* fmt, char* params, int nparams)
 {
-    printf("Name: %s\nID  : %d\nVer : %s\nNode: %d\n",
+    printf("Name: %s\r\nID  : %d\r\nVer : %s\r\nNode: %d\r\n",
             SCH_NAME, SCH_DEVICE_ID, SCH_SW_VERSION, SCH_COMM_NODE);
     return CMD_OK;
 }
@@ -95,7 +95,7 @@ int obc_reset_wdt(char *fmt, char *params, int narams)
 
 int obc_reset(char *fmt, char *params, int nparams)
 {
-    printf("Resetting system NOW!!\n");
+    printf("Resetting system NOW!!\r\n");
 
     #ifdef LINUX
         if(params != NULL && strcmp(params, "reboot")==0)

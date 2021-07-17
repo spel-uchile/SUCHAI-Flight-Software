@@ -166,6 +166,8 @@ int com_send_data(char *fmt, char *params, int nparams);
  * @return CMD_OK | CMD_ERROR | CMD_ERROR
  */
 int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame);
+int com_send_telemetry(int node, int port, int type, void *data, size_t n_bytes, int n_structs, int n_frame);
+int com_send_debug(int node, char *data, size_t len);
 
 /**
  * Auxiliary function to convert an array of 32bit values to network (big) endian.

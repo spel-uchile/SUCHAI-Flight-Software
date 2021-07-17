@@ -58,6 +58,8 @@ set(SCH_SW_VERSION \"${GIT_REPO_VERSION}\" CACHE STRING "Software version")
 set(SCH_CON_ENABLED 1 CACHE BOOL "Enable serial console task")
 set(SCH_COMM_ENABLE 1 CACHE BOOL "Enable communications task")
 set(SCH_FP_ENABLED 1 CACHE BOOL "Enable flight plan task")
+set(SCH_HOOK_INIT 1 CACHE BOOL "Enable task init hook function")
+set(SCH_HOOK_COMM 0 CACHE BOOL "Enable task communications hook function")
 set(SCH_MAX_WDT_TIMER 60 CACHE STRING "Period in seconds to send reset_wdt command")
 set(SCH_MAX_GND_WDT_TIMER 48*3600 CACHE STRING "Software watchdog timer")
 ##
@@ -68,8 +70,8 @@ set(SCH_COM_MAX_PACKETS 10 CACHE STRING "Max. packets to transmit in a row")
 set(SCH_COM_TX_DELAY_MS 3000 CACHE STRING "Delay (ms) between continuous transmissions")
 set(SCH_CSP_BUFFERS 100 CACHE STRING "Available CSP buffers")
 set(SCH_CSP_SOCK_LEN 100 CACHE STRING "Max number of packets in a connection queue")
-set(SCH_COMM_ZMQ_OUT \"tcp://127.0.0.1:8001\" CACHE STRING "CSP ZMQ OUT socket URI")
-set(SCH_COMM_ZMQ_IN  \"tcp://127.0.0.1:8002\" CACHE STRING "CSP ZMQ IN socket URI")
+set(SCH_COMM_ZMQ_IN  \"tcp://127.0.0.1:8001\" CACHE STRING "CSP ZMQ IN socket URI")
+set(SCH_COMM_ZMQ_OUT \"tcp://127.0.0.1:8002\" CACHE STRING "CSP ZMQ OUT socket URI")
 ##
 # Data repository system settings
 ##

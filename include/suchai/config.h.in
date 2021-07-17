@@ -43,6 +43,8 @@
 #cmakedefine01 SCH_COMM_ENABLE
 #cmakedefine01 SCH_FP_ENABLED
 #cmakedefine01 SCH_HK_ENABLED
+#cmakedefine SCH_HOOK_INIT
+#cmakedefine SCH_HOOK_COMM
 #cmakedefine SCH_MAX_WDT_TIMER           @SCH_MAX_WDT_TIMER@  ///< Seconds to send wdt_reset command
 #cmakedefine SCH_MAX_GND_WDT_TIMER       @SCH_MAX_GND_WDT_TIMER@  ///< Seconds to reset the OBC if the ground watchdog was not clear
 #define SCH_UART_BAUDRATE           (500000)  ///< UART baud rate for serial console
@@ -50,18 +52,20 @@
 #define SCH_KISS_DEVICE             "/dev/ttyUSB0"  ///< Kiss device path
 
 /* Communications system settings */
-#define SCH_TRX_PORT_TM              (9)  ///< Telemetry port
 #define SCH_TRX_PORT_TC              (10)  ///< Telecommands port
 #define SCH_TRX_PORT_RPT             (11)  ///< Digirepeater port (resend packets)
 #define SCH_TRX_PORT_CMD             (12)  ///< Commands port (execute console commands)
 #define SCH_TRX_PORT_DBG             (13)  ///< Debug port, logs output
+#define SCH_TRX_PORT_DBG_TM          (14)  ///< Debug telemetry port, logs frames
+#define SCH_TRX_PORT_TM              (15)  ///< Telemetry port
+#define SCH_TRX_PORT_APP             (16)  ///< Telemetry port
 #cmakedefine SCH_COMM_NODE                @SCH_COMM_NODE@  ///< Node address
 #cmakedefine SCH_COM_MAX_PACKETS          @SCH_COM_MAX_PACKETS@  /// Max number of packets to transmit in a row before a small pause
 #cmakedefine SCH_COM_TX_DELAY_MS          @SCH_COM_TX_DELAY_MS@  /// Delay (ms) between continuous transmissions
 #cmakedefine SCH_CSP_BUFFERS              @SCH_CSP_BUFFERS@  ///< Number of available CSP buffers
 #cmakedefine SCH_CSP_SOCK_LEN             @SCH_CSP_SOCK_LEN@  ///< Max number of packets in a connection queue
-#cmakedefine SCH_COMM_ZMQ_OUT             @SCH_COMM_ZMQ_OUT@  ///< CSP ZMQ Out socket URI
 #cmakedefine SCH_COMM_ZMQ_IN              @SCH_COMM_ZMQ_IN@  ///< CSP ZMQ In socket URI
+#cmakedefine SCH_COMM_ZMQ_OUT             @SCH_COMM_ZMQ_OUT@  ///< CSP ZMQ Out socket URI
 
 /* Data repository settings */
 #cmakedefine SCH_ST_RAM                   0

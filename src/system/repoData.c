@@ -393,9 +393,13 @@ int dat_show_time(int format)
 
 int dat_add_payload_sample(void* data, int payload)
 {
+    if(data == NULL)
+        return -1;
+
     int ret;
     int index = dat_get_system_var(data_map[payload].sys_index);
-    LOGI(tag, "Adding data for payload %d in index %d", payload, index);
+    uint32_t sample = *(uint32_t *)data;
+    LOGI(tag, "Adding sample %d for payload %d in index %d", sample, payload, index);
 
     if(payload >= last_sensor) return SCH_ST_ERROR;
 
@@ -409,8 +413,9 @@ int dat_add_payload_sample(void* data, int payload)
     if (ret >= SCH_ST_OK)
     {
         // Ret contains how many indexes was skipped due to flash errors
-        dat_set_system_var(data_map[payload].sys_index, index+1+ret);
-        return index+1+ret;
+        index += 1+ret;
+        dat_set_system_var(data_map[payload].sys_index, index);
+        return index;
     }
     else
     {
@@ -497,7 +502,7 @@ int dat_print_payload_struct(void* data, unsigned int payload)
             default:
                 data += sizeof(int);
         }
-        printf("\n");
+        printf("\r\n");
 
         type = strtok_r(NULL, sep, &type_tmp);
         name = strtok_r(NULL, sep, &name_tmp);
