@@ -39,7 +39,7 @@ set(SCH_ARCH "X86" CACHE STRING "Select ARCH from ${SCH_ARCH_LIST}")
 if(SCH_ARCH IN_LIST SCH_ARCH_LIST)
     set(${SCH_ARCH} ON)
 else()
-    message(FATAL_ERROR "Invalid SCH_OS selected, please select from ${SCH_ARCH_LIST}")
+    message(FATAL_ERROR "Invalid SCH_ARCH selected, please select from ${SCH_ARCH_LIST}")
 endif()
 CHECK_INCLUDE_FILE(malloc.h SCH_HAVE_MALLOC)
 ##
