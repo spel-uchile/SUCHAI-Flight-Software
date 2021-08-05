@@ -37,7 +37,6 @@ void cmd_rw_init(void)
     cmd_add("is2_get_state", istage2_get_state_panel, "%d", 1);
     cmd_add("is2_deploy", istage2_deploy_panel, "%d", 1);
     cmd_add("is2_set_deploy", istage2_set_deploy, "%d", 1);
-    cmd_add("is2_get_status", istage2_get_sensors_status, "", 0);
 #endif
 }
 
@@ -114,20 +113,30 @@ int istage2_get_temp(char *fmt, char *params, int nparams)
     char istage_ans[1];
 
     istage_cmd[0] = IS2_START_SENSORS_TEMP;
-    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 250);
+    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 500);
     LOGI(tag2, "START_SENSORS_TEMP %d (%d)", istage_ans[0], rc);
     if(rc != GS_OK)
         return CMD_ERROR;
 
+    osDelay(100);
+
+    istage_cmd[0] = I2S_SAMPLE_TEMP;
+    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 500);
+    LOGI(tag2, "SAMPLE_TEMP %d (%d)", istage_ans[0], rc);
+    if(rc != GS_OK)
+        return CMD_ERROR;
+
+    osDelay(500);
+
     istage_cmd[0] = IS2_GET_TEMP;
-    uint16_t temps[8];
-    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, (char *)temps, 8*sizeof(uint16_t), 250);
-    LOGR(tag2, "IS2_GET_TEMP %d, %d, %d, %d, %d, %d, %d, %d (%d)", temps[0], temps[1], temps[2], temps[3], temps[4], temps[5], temps[6], temps[7], rc);
+    uint32_t temps[8];
+    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, (char *)temps, sizeof(temps), 500);
+    LOGR(tag2, "IS2_GET_TEMP %f, %f, %f, %f, %f, %f, %f, %f (%d)", temps[0], temps[1], temps[2], temps[3], temps[4], temps[5], temps[6], temps[7], rc);
     if(rc != GS_OK)
         return CMD_ERROR;
 
     istage_cmd[0] = IS2_STOP_SENSORS_TEMP;
-    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 250);
+    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 500);
     LOGI(tag2, "STOP_SENSORS_TEMP (%d)", rc);
     if(rc != GS_OK)
         return CMD_ERROR;
@@ -147,9 +156,9 @@ int istage2_get_state_panel(char *fmt, char *params, int nparams)
     }
 
     char istage_cmd[2] = {IS2_READ_SW_FACE, (char)panel};
-    char istage_ans[1] = {-1};
-    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 250);
-    LOGR(tag2, "IS2_READ_SW_FACE %d=%d (%d)", panel, istage_ans[0], rc);
+    char istage_ans[2] = {-1, -1};
+    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 2, 500);
+    LOGR(tag2, "IS2_READ_SW_FACE %d=%d (%d)", panel, istage_ans[1], rc);
 
     if(rc != GS_OK)
         return CMD_ERROR;
@@ -168,8 +177,7 @@ int istage2_deploy_panel(char *fmt, char *params, int nparams)
     }
 
     char istage_cmd[2] = {IS2_BURN_FACE, (char)panel};
-    char istage_ans[1] = {-1};
-    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 250);
+    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 500);
     LOGR(tag2, "IS2_BURN_FACE %d (%d)", panel, rc);
 
     if(rc != GS_OK)
@@ -189,23 +197,8 @@ int istage2_set_deploy(char *fmt, char *params, int nparams)
     }
 
     char istage_cmd[2] = {IS2_SET_BURN, (char)config};
-    char istage_ans[1] = {-1};
-    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 250);
+    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, NULL, 0, 500);
     LOGR(tag2, "IS2_SET_BURN %d (%d)", config, rc);
-
-    if(rc != GS_OK)
-        return CMD_ERROR;
-    else
-        return CMD_OK;
-}
-
-int istage2_get_sensors_status(char *fmt, char *params, int nparams)
-{
-    int rc;
-    char istage_cmd[2] = {IS2_SENSORS_TEMP_STATUS, 0};
-    char istage_ans[1] = {-1};
-    rc = gs_i2c_master_transaction(ISTAGE_GSSB_TWI_HANDLER, ISTAGE_UPPER_ADD, istage_cmd, 2, istage_ans, 1, 250);
-    LOGR(tag2, "IS2_SENSORS_TEMP_STATUS %d (%d)", istage_ans[0], rc);
 
     if(rc != GS_OK)
         return CMD_ERROR;

@@ -35,12 +35,13 @@
 typedef enum upper_istage_cmd_enum
 {
     IS2_START_SENSORS_TEMP=30,
-    IS2_STOP_SENSORS_TEMP,
-    IS2_GET_TEMP,
-    IS2_READ_SW_FACE,
-    IS2_BURN_FACE,
-    IS2_SET_BURN,
-    IS2_SENSORS_TEMP_STATUS
+    IS2_STOP_SENSORS_TEMP, //31
+    IS2_GET_TEMP,  //32
+    IS2_READ_SW_FACE,  //33
+    IS2_BURN_FACE, //34
+    IS2_SET_BURN,  //35
+    IS2_SENSORS_TEMP_STATUS, //36
+    I2S_SAMPLE_TEMP //37
 }upper_istage_cmd_t;
 
 #define ISTAGE_UPPER_ADD 0x40
