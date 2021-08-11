@@ -1,7 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ static const char *tag = "Communications";
 static void com_receive_tc(csp_packet_t *packet);
 static void com_receive_cmd(csp_packet_t *packet);
 static void com_receive_tm(csp_packet_t *packet);
+static void com_receive_file(csp_packet_t *packet);
 
 void taskCommunications(void *param)
 {
@@ -72,6 +73,12 @@ void taskCommunications(void *param)
 
             switch (csp_conn_dport(conn))
             {
+                case SCH_TRX_PORT_FILE:
+                    // Process TM packet
+                    com_receive_file(packet);
+                    csp_buffer_free(packet);
+                    break;
+
                 case SCH_TRX_PORT_TC:
                     // Create a response packet and send
                     rep_ok = csp_buffer_clone(rep_ok_tmp);
@@ -251,33 +258,6 @@ static void com_receive_tm(csp_packet_t *packet)
             dat_add_payload_sample((frame->data.data8)+delay, payload); //Save next struct
         }
     }
-    else if(frame->type == TM_TYPE_FILE)
-    {
-        print_buff(frame->data.data8, COM_FRAME_MAX_LEN);
-#ifdef LINUX
-        FILE *fptr;
-        char fname[100] = "testfile.jpg";
-
-
-        fptr = fopen(fname,"rb");
-
-        if(fptr == NULL) {
-            fptr = fopen(fname,"wb");
-        } else {
-            if (frame->nframe != 1) {
-                fclose(fptr);
-                fptr = fopen(fname,"ab");
-            }
-        }
-
-        int cur_size = (int) ftell(fptr);
-        int written = fwrite(frame->data.data8, 1, COM_FRAME_MAX_LEN, fptr);
-
-        LOGI(tag, "current file size: %d, %d", cur_size, written);
-
-        fclose(fptr);
-#endif
-    }
     else
     {
         LOGW(tag, "Undefined telemetry type %d!", frame->type);
@@ -288,5 +268,33 @@ static void com_receive_tm(csp_packet_t *packet)
         print_buff_fmt(packet->data32, packet->length/sizeof(uint32_t), "%d, ");
         print_buff_ascii(packet->data, packet->length);
         osSemaphoreGiven(&log_mutex);
+    }
+}
+
+static void com_receive_file(csp_packet_t *packet)
+{
+    cmd_t *cmd_parse_file;
+    com_frame_file_t *frame = (com_frame_file_t *)packet->data;
+
+    frame->nframe = csp_ntoh16(frame->nframe);
+    frame->total = csp_ntoh16(frame->total);
+    frame->fileid = csp_ntoh16(frame->fileid);
+
+    LOGI(tag, "Received: %d bytes", packet->length);
+    LOGI(tag, "Node    : %d", frame->node);
+    LOGI(tag, "File ID : %d", frame->fileid);
+    LOGI(tag, "Type    : %d", frame->type);
+    LOGI(tag, "Frame   : %d", frame->nframe);
+    LOGI(tag, "Last    : %d", frame->total);
+
+    if(frame->type >= TM_TYPE_FILE_START && frame->type <= TM_TYPE_FILE_END)
+    {
+        cmd_parse_file = cmd_get_str("tm_parse_file");
+        cmd_add_params_raw(cmd_parse_file, frame, sizeof(com_frame_file_t));
+        cmd_send(cmd_parse_file);
+    }
+    else
+    {
+        LOGW(tag, "Undefined file telemetry type %d!", frame->type);
     }
 }

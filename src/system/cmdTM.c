@@ -1,7 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ void cmd_tm_init(void)
     cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
 #ifdef LINUX
     cmd_add("tm_send_file", tm_send_file, "%s %u", 2);
+    cmd_add("tm_parse_file", tm_parse_file, "", 0);
 #endif
 }
 
@@ -461,36 +462,114 @@ int tm_send_file(char *fmt, char *params, int nparams)
     }
 
     char file_name[100];
-    uint32_t node;
+    int node;
     if(nparams == sscanf(params, fmt, file_name, &node))
     {
-
+        // Open file
         FILE *fptr;
-
         fptr = fopen(file_name,"rb");  // r for read, b for binary
-
+        if(fptr == NULL)
+        {
+            LOGE(tag, "Error reading file %s", file_name);
+            return CMD_ERROR;
+        }
+        // Determine file size
         fseek(fptr, 0L, SEEK_END);
         long sz = ftell(fptr);
         fseek(fptr, 0L, SEEK_SET);
-
-        uint32_t n_frame =  (int)sz/COM_FRAME_MAX_LEN + 1;
-        if ( (int)sz % COM_FRAME_MAX_LEN == 0 && sz != 0 ) {
-            n_frame -= n_frame;
-        }
-        char * buffer = malloc((int)sz );
+        // Read file
+        char *buffer = malloc((int)sz);
+        if(buffer == NULL)
+            return CMD_ERROR;
         fread(buffer, (int)sz,1, fptr);
-
-         // read 10 bytes to our buffer
-        print_buff(buffer, (int)sz);
-        int rc = _com_send_data((int) node, (void*) buffer, (int)sz, TM_TYPE_FILE, n_frame, 1);
-
-        free(buffer);
         fclose(fptr);
-
+        // Send file using CSP
+        char *bname = basename(file_name);
+        int rc = com_send_file(node, bname, buffer, sz);
+        // Clean and return
+        free(buffer);
         return rc;
     }
     else
         return CMD_SYNTAX_ERROR;
 
+}
+
+int tm_parse_file(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+        return CMD_SYNTAX_ERROR;
+
+    com_frame_file_t *frame = (com_frame_file_t *)params;
+    int type = frame->type;
+
+    char *bname = "recv_files/";
+    static char *fname = NULL;
+    static int last_id = 0;
+    static int last_frame = 0;
+
+    if(type == TM_TYPE_FILE_START)
+    {
+        char *rname = (char *)frame->data;
+        char idname[10];
+        snprintf(idname, 10, "%d_", frame->fileid);
+        size_t path_len = strlen(bname) + strlen(idname) + strlen(rname) + 1;
+        fname = calloc(path_len, 1);
+        assert(fname != NULL);
+        strncat(fname, bname, path_len);
+        strncat(fname, idname, path_len);
+        strncat(fname, rname, path_len);
+        last_id = frame->fileid;
+        last_frame = frame->nframe;
+        LOGI(tag, "New file! Id: %d. Frame: %d/%d. Name: %s", frame->fileid, frame->nframe, frame->total, fname);
+    }
+
+    if(type == TM_TYPE_FILE_DATA || type == TM_TYPE_FILE_END)
+    {
+        LOGI(tag, "Id: %d. Frame: %d/%d", frame->fileid, frame->nframe, frame->total, fname);
+        if(fname == NULL || last_id != frame->fileid || last_frame != frame->nframe-1)
+        {
+            LOGE(tag, "Invalid file frame! Last Id: %d. Last frame: %d", last_id, last_frame);
+            return CMD_ERROR;
+        }
+
+        int nbytes = COM_FRAME_MAX_LEN;
+        if(type == TM_TYPE_FILE_END)
+        {
+            // Remove file tail
+            int i;
+            for(i=COM_FRAME_MAX_LEN-1; i>0; i--)
+                if(frame->data[i] != 0xAA)
+                    break;
+            nbytes = i+1;
+        }
+
+        FILE *fptr;
+        fptr = fopen(fname,"ab");
+        if(fptr == NULL)
+        {
+            LOGE(tag, "Error opening file! %s", fname);
+            return CMD_ERROR;
+        }
+
+        last_id = frame->fileid;
+        last_frame = frame->nframe;
+        int cur_size = (int)ftell(fptr);
+        int written = fwrite(frame->data, 1, nbytes, fptr);
+        LOGI(tag, "Written %d. Current file size: %d.", written, cur_size);
+        fclose(fptr);
+    }
+
+    if(type == TM_TYPE_FILE_END)
+    {
+        LOGR(tag, "Closing file! Id: %d. Frames: %d/%d. Name: %s", frame->fileid, frame->nframe, frame->total, fname);
+        if(fname != NULL)
+            free(fname);
+        fname = NULL;
+        last_id = 0;
+        last_frame = 0;
+    }
+
+    return CMD_OK;
 }
 #endif
