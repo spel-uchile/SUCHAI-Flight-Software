@@ -307,6 +307,7 @@ int com_send_telemetry(int node, int port, int type, void *data, size_t n_bytes,
         // Process more data
         n_bytes -= bytes_sent;
         n_structs -= structs_sent;
+        data += bytes_sent;
 
         if(nframe%SCH_COM_MAX_PACKETS == 0)
             osDelay(SCH_COM_TX_DELAY_MS);
