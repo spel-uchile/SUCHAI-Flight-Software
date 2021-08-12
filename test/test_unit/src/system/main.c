@@ -24,9 +24,9 @@
 
 #include <string.h>
 #include "CUnit/Basic.h"
-#include "suchai/math_utils.h"
-#include "suchai/repoCommand.h"
-#include "suchai/storage.h"
+#include "math_utils.h"
+#include "repoCommand.h"
+#include "data_storage.h"
 
 
 /** SUIT 2: Command repository **/
@@ -321,12 +321,12 @@ void test_payload_data(void)
         data_temp.timestamp = time_test+i;
         data_temp.index = (uint32_t)i;
         data_temp.obc_temp_1 = float_test+i;
-        /*data_temp.obc_temp_2 = float_test+i;
-        data_temp.obc_temp_3 = float_test+i;*/
+        data_temp.obc_temp_2 = float_test+i;
+        data_temp.obc_temp_3 = float_test+i;
         rc = dat_add_payload_sample(&data_temp, temp_sensors);
         CU_ASSERT(rc > 0);
 
-        /*eps_data_t data_eps;
+        eps_data_t data_eps;
         data_eps.timestamp = time_test+i;
         data_eps.index = (uint32_t)i;
         data_eps.cursun = uint_test+i;
@@ -339,12 +339,12 @@ void test_payload_data(void)
         data_eps.temp5 = int_test+i;
         data_eps.temp6 = int_test+i;
         rc = dat_add_payload_sample(&data_eps, eps_sensors);
-        CU_ASSERT(rc > 0);*/
+        CU_ASSERT(rc > 0);
     }
 
     // Test storage payload index
     CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_temp), n_test);
-    /*CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_eps), n_test);*/
+    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_eps), n_test);
 
     // Read N data samples to the storage system
     for(i=0; i<n_test; i++)
@@ -356,10 +356,10 @@ void test_payload_data(void)
         printf("obc_temp_1: %f\n", data_temp.obc_temp_1);
         CU_ASSERT_EQUAL(data_temp.timestamp, time_test+i);
         CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_1, float_test+i, 1e-6);
-        /*CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_2, float_test+i, 1e-6);
-        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_3, float_test+i, 1e-6);*/
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_2, float_test+i, 1e-6);
+        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_3, float_test+i, 1e-6);
 
-        /*eps_data_t data_eps;
+        eps_data_t data_eps;
         //dat_add_payload_sample(&data_eps, eps_sensors);
         rc = dat_get_recent_payload_sample(&data_eps, eps_sensors, n_test-i-1);
         CU_ASSERT_EQUAL(rc, 0);
@@ -372,7 +372,7 @@ void test_payload_data(void)
         CU_ASSERT_EQUAL(data_eps.temp3, int_test+i);
         CU_ASSERT_EQUAL(data_eps.temp4, int_test+i);
         CU_ASSERT_EQUAL(data_eps.temp5, int_test+i);
-        CU_ASSERT_EQUAL(data_eps.temp6, int_test+i);*/
+        CU_ASSERT_EQUAL(data_eps.temp6, int_test+i);
     }
 }
 
