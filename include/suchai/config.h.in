@@ -52,6 +52,7 @@
 #define SCH_KISS_DEVICE             "/dev/ttyUSB0"  ///< Kiss device path
 
 /* Communications system settings */
+#define SCH_TRX_PORT_FILE            (9)   ///< Files port
 #define SCH_TRX_PORT_TC              (10)  ///< Telecommands port
 #define SCH_TRX_PORT_RPT             (11)  ///< Digirepeater port (resend packets)
 #define SCH_TRX_PORT_CMD             (12)  ///< Commands port (execute console commands)
