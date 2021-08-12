@@ -41,8 +41,7 @@ include_directories(
         /usr/include/postgresql
 )
 
-link_directories(../../src/drivers/x86/libcsp/lib)
-
+link_directories(../../src/lib/libcsp/libcsp/lib)
 
 link_libraries(-lm -lcsp -lzmq -lsqlite3 -lpq -lpthread -lcunit)
 
