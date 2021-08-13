@@ -23,13 +23,14 @@ echo ${WORKSPACE}
 # Tests for all storage modes
 cd ${WORKSPACE}/test_unit
 rm -rf build_test
+ST_TRIPLE_WR="1"
 
 for ST_MODE in "RAM" "SQLITE"
 do
     echo "Unit Test for storage ${ST_MODE}"
 
     # build the unitest with the test's parameters
-    cmake -B build_test -DSCH_ST_MODE=${ST_MODE}
+    cmake -B build_test -DSCH_ST_MODE=${ST_MODE} -DSCH_STORAGE_TRIPLE_WR=${ST_TRIPLE_WR}
     cmake --build build_test
 
     # Runs the test, saving a log file
