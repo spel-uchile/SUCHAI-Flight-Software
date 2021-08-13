@@ -11,10 +11,39 @@
 
 # Gets the current execution directory (the absolute path to this script)
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
-export WORKSPACE=${SCRIPT_PATH}/..
+export WORKSPACE=${SCRIPT_PATH}
 
 # Prints the current workspace path, for debugging purposes
 echo ${WORKSPACE}
+
+# ---------------- --TEST_UNIT ------------------
+
+# The test log is called test_unit_log.txt
+
+# Tests for all storage modes
+cd ${WORKSPACE}/test_unit
+rm -rf build_test
+
+for ST_MODE in "RAM" "SQLITE"
+do
+    echo "Unit Test for storage ${ST_MODE}"
+
+    # build the unitest with the test's parameters
+    cmake -B build_test -DSCH_ST_MODE=${ST_MODE}
+    cmake --build build_test
+
+    # Runs the test, saving a log file
+    cd build_test
+    rm -f test_unit_${ST_MODE}_log.txt
+    ./suchai-unitest #| cat >> test_unit_${ST_MODE}_log.txt
+    echo ""
+    cd -
+done
+cd ${WORKSPACE}
+
+#TODO: DELETE THIS EXIT AFTER FIXING THE REST OF THE TESTS!
+exit
+#TODO: REMEMBER TO DELETE THIS EXIT!
 
 # ---------------- --TEST_CMD ------------------
 
@@ -43,35 +72,6 @@ echo ""
 cd ..
 rm -f test_cmd_comparator_log.txt
 python logs_comparator.py | cat >> test_cmd_comparator_log.txt
-
-# ---------------- --TEST_UNIT ------------------
-
-# The test log is called test_unit_log.txt
-
-# Tests for all storage modes
-for i in "0" "1" "2"
-do
-
-    echo "Test for storage parameter ${i}"
-
-    # Compiles the project with the test's parameters
-    cd ${WORKSPACE}/src/system/include
-    python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode ${i}
-
-    # Compiles the test
-    cd ${WORKSPACE}/test/test_unit
-    rm -rf build_test
-    mkdir build_test
-    cd build_test
-    cmake ..
-    make
-
-    # Runs the test, saving a log file
-    rm -f ../test_unit_log_${i}.txt
-    ./SUCHAI_Flight_Software_Test | cat >> ../test_unit_log_${i}.txt
-    echo ""
-
-done
 
 # ---------------- --TEST_LOAD ------------------
 

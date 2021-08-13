@@ -1,48 +1,43 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16...3.19)
 project(SUCHAI_Flight_Software_Test)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 
-set(SOURCE_FILES
-        ../../src/lib/sgp4/src/c/TLE.c
-        ../../src/lib/sgp4/src/c/SGP4.c
-        #../../src/lib/storage/storage_ram.c
-        ../../src/lib/storage/storage_sqlite.c
-        ../../src/os/linux/osSemphr.c
-        ../../src/os/linux/osDelay.c
-        ../../src/system/repoData.c
-        ../../src/system/repoDataSchema.c
-        ../../src/system/repoCommand.c
-        ../../src/system/cmdOBC.c
-        ../../src/system/cmdDRP.c
-        ../../src/system/cmdFP.c
-        ../../src/system/cmdConsole.c
-        ../../src/system/cmdCOM.c
-        ../../src/system/cmdTM.c
-        ../../src/lib/utils/log_utils.c
-        ../../src/lib/utils/math_utils.c
-        ../../src/system/globals.c
-        src/system/main.c
-        )
+include(../../cmake/variables.cmake)
+
+# Generate core config.h
+get_filename_component(CONFIG_H_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../include" ABSOLUTE)
+configure_file (
+        "${CONFIG_H_PATH}/suchai/config.h.in"
+        "${CONFIG_H_PATH}/suchai/config.h"
+)
+include_directories(${CONFIG_H_PATH})
+message("Configuration file written to ${CONFIG_H_PATH}/suchai/config.h")
+
+
+####
+## INCLUDE TARGETS AND LINK
+####
 
 include_directories(
         ../../src/system/include
         ../../src/os/include
-        ../../src/os/include
         ../../src/drivers/x86/include
         ../../src/lib/storage/include
-        ../../src/lib/libcsp/include
         ../../src/lib/libcsp/libcsp/include
         ../../src/lib/sgp4/src/c
         ../../src/lib/utils/include
+        ../../src/lib/linenoise
         ../../include
-        ../../apps/simple/include
-        ../test_cmd/src/system/include
-        /usr/include/postgresql
+        include
 )
 
-link_directories(../../src/lib/libcsp/libcsp/lib)
+add_subdirectory(../../src/lib build_lib)
+add_subdirectory(../../src/os build_os)
+add_subdirectory(../../src/system build_core)
 
-link_libraries(-lm -lcsp -lzmq -lsqlite3 -lpq -lpthread -lcunit)
-
-add_executable(SUCHAI_Flight_Software_Test ${SOURCE_FILES})
+add_executable(suchai-unitest src/system/main.c)
+target_link_libraries(suchai-unitest PUBLIC suchai-fs-core)
+target_link_libraries(suchai-unitest PUBLIC suchai-fs-os)
+target_link_libraries(suchai-unitest PUBLIC suchai-fs-lib)
+target_link_libraries(suchai-unitest PUBLIC cunit)

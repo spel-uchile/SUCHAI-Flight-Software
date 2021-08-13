@@ -1,12 +1,12 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2020, Tamara Gutierrez Rojo tamigr.2293@gmail.com
- *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Camilo Rojas Milla, camrojas@uchile.cl
+ *      Copyright 2021, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2021, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2021, Tamara Gutierrez Rojo tamigr.2293@gmail.com
+ *      Copyright 2021, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "suchai/math_utils.h"
 #include "suchai/repoCommand.h"
 #include "suchai/storage.h"
+#include "repoDataSchema.h"
 
 
 /** SUIT 2: Command repository **/
@@ -193,9 +194,9 @@ int init_suite_repodata(void)
 {
     dat_repo_init();
     cmd_repo_init();
-    drp_execute_before_flight("%d", "1010", 1);
+    int rc = drp_execute_before_flight("%d", "1010", 1);
     srand(time(NULL));
-    return 0;
+    return rc == CMD_OK ? 0 : 1;
 }
 
 /* The suite cleanup function.
@@ -310,8 +311,6 @@ void test_payload_data(void)
     int rc, i;
     int n_test = 10;
     uint32_t time_test = 1596853407;
-    uint32_t uint_test = (uint32_t)rand();
-    int32_t int_test = (int32_t)rand();
     float float_test = ((float)rand()/(float)(RAND_MAX)) * 1.0;
 
     // Push N data samples to the storage system
@@ -321,30 +320,12 @@ void test_payload_data(void)
         data_temp.timestamp = time_test+i;
         data_temp.index = (uint32_t)i;
         data_temp.obc_temp_1 = float_test+i;
-        /*data_temp.obc_temp_2 = float_test+i;
-        data_temp.obc_temp_3 = float_test+i;*/
         rc = dat_add_payload_sample(&data_temp, temp_sensors);
         CU_ASSERT(rc > 0);
-
-        /*eps_data_t data_eps;
-        data_eps.timestamp = time_test+i;
-        data_eps.index = (uint32_t)i;
-        data_eps.cursun = uint_test+i;
-        data_eps.cursys = uint_test+i;
-        data_eps.vbatt = uint_test+i;
-        data_eps.temp1 = int_test+i;
-        data_eps.temp2 = int_test+i;
-        data_eps.temp3 = int_test+i;
-        data_eps.temp4 = int_test+i;
-        data_eps.temp5 = int_test+i;
-        data_eps.temp6 = int_test+i;
-        rc = dat_add_payload_sample(&data_eps, eps_sensors);
-        CU_ASSERT(rc > 0);*/
     }
 
     // Test storage payload index
-    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_temp), n_test);
-    /*CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_eps), n_test);*/
+    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_idx_temp), n_test);
 
     // Read N data samples to the storage system
     for(i=0; i<n_test; i++)
@@ -356,23 +337,6 @@ void test_payload_data(void)
         printf("obc_temp_1: %f\n", data_temp.obc_temp_1);
         CU_ASSERT_EQUAL(data_temp.timestamp, time_test+i);
         CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_1, float_test+i, 1e-6);
-        /*CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_2, float_test+i, 1e-6);
-        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_3, float_test+i, 1e-6);*/
-
-        /*eps_data_t data_eps;
-        //dat_add_payload_sample(&data_eps, eps_sensors);
-        rc = dat_get_recent_payload_sample(&data_eps, eps_sensors, n_test-i-1);
-        CU_ASSERT_EQUAL(rc, 0);
-        CU_ASSERT_EQUAL(data_eps.timestamp, time_test+i);
-        CU_ASSERT_EQUAL(data_eps.cursun, uint_test+i);
-        CU_ASSERT_EQUAL(data_eps.cursys, uint_test+i);
-        CU_ASSERT_EQUAL(data_eps.vbatt, uint_test+i);
-        CU_ASSERT_EQUAL(data_eps.temp1, int_test+i);
-        CU_ASSERT_EQUAL(data_eps.temp2, int_test+i);
-        CU_ASSERT_EQUAL(data_eps.temp3, int_test+i);
-        CU_ASSERT_EQUAL(data_eps.temp4, int_test+i);
-        CU_ASSERT_EQUAL(data_eps.temp5, int_test+i);
-        CU_ASSERT_EQUAL(data_eps.temp6, int_test+i);*/
     }
 }
 
