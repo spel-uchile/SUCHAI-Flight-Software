@@ -48,9 +48,9 @@ int storage_close(void)
     flightplan_entries = 0;
     payloads_entries = 0;
     
-    if(status_db != NULL) free(status_db);
-    if(flightplan_db != NULL) free(flightplan_db);
-    if(payload_db != NULL) free(payload_db);
+    if(status_db != NULL) { free(status_db); status_db = NULL; }
+    if(flightplan_db != NULL) { free(flightplan_db); flightplan_db = NULL; }
+    if(payload_db != NULL) { free(payload_db); payload_db = NULL; }
 
     return SCH_ST_OK;
 }
@@ -61,7 +61,7 @@ int storage_table_status_init(char *table, int n_variables, int drop)
         return SCH_ST_ERROR;
 
     if(status_db != NULL) {
-        if (drop) free(payload_db);
+        if (drop) free(status_db);
         else return SCH_ST_ERROR;
     }
 
@@ -81,7 +81,7 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
         return SCH_ST_ERROR;
 
     if(flightplan_db != NULL) {
-        if (drop) free(payload_db);
+        if (drop) free(flightplan_db);
         else return SCH_ST_ERROR;
     }
 
