@@ -197,30 +197,22 @@ int com_send_tc_frame(char *fmt, char *params, int nparams)
 
 int com_send_data(char *fmt, char *params, int nparams)
 {
-    if(params == NULL)
+    int node, port, next;
+    if(params == NULL || sscanf(params, fmt, &node, &port, &next) != nparams - 1)
     {
-        LOGE(tag, "Null arguments!");
+        LOGE(tag, "Invalid arguments!");
         return CMD_SYNTAX_ERROR;
     }
+    if(next <= 0)
+        return CMD_ERROR;
 
-    uint8_t rep[1] = {0};
-    com_data_t *data_to_send = (com_data_t *)params;
+    char *data = params + next;
+    int size = strlen(data);
+    LOGI(tag, "Sending %s (%d) to node %d port %d", data, size, node, port);
 
     // Send the data buffer to node and wait 1 seg. for the confirmation
-    int rc = csp_transaction(CSP_PRIO_NORM, data_to_send->node, SCH_TRX_PORT_TM,
-                             1000, &(data_to_send->frame),
-                             sizeof(data_to_send->frame), rep, 1);
-
-    if(rc > 0 && rep[0] == 200)
-    {
-        LOGV(tag, "Data sent successfully. (rc: %d, re: %d)", rc, rep[0]);
-        return CMD_OK;
-    }
-    else
-    {
-        LOGE(tag, "Error sending data. (rc: %d, re: %d)", rc, rep[0]);
-        return CMD_ERROR;
-    }
+    int rc = csp_transaction(CSP_PRIO_NORM, node, port,1000, data, size, NULL, 0);
+    return rc == 1 ? CMD_OK : CMD_ERROR;
 }
 
 int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame)
