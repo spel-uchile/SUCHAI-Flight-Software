@@ -33,7 +33,7 @@ void cmd_com_init(void)
     cmd_add("com_send_rpt", com_send_rpt, "%d %s", 2);
     cmd_add("com_send_cmd", com_send_cmd, "%d %n", 2);
     cmd_add("com_send_tc", com_send_tc_frame, "%d %n", 2);
-    cmd_add("com_send_data", com_send_data, "%p", 1);
+    cmd_add("com_send_data", com_send_data, "%d %d %n", 3);
     cmd_add("com_debug", com_debug, "", 0);
     cmd_add("com_set_node", com_set_node, "%d", 1);
     cmd_add("com_get_node", com_get_node, "", 0);
@@ -314,6 +314,7 @@ int com_send_telemetry(int node, int port, int type, void *data, size_t n_bytes,
         // Process more data
         n_bytes -= bytes_sent;
         n_structs -= structs_sent;
+        data += bytes_sent;
 
         if(nframe%SCH_COM_MAX_PACKETS == 0)
             osDelay(SCH_COM_TX_DELAY_MS);
