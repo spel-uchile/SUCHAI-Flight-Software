@@ -27,6 +27,9 @@
 #include "math_utils.h"
 #include "log_utils.h"
 
+/**
+ * Register ADCS commands
+ */
 void cmd_adcs_init(void);
 
 /**
