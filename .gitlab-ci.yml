@@ -74,7 +74,7 @@ test_feature_framework:
   stage: test_linux
   script:
     - echo "Testing the feature/framework branch"
-    - pwd
+    - cat test/test_unit/CMakeLists.txt
   rules:
     - if: '$CI_COMMIT_BRANCH == "feature/framework"'
 
