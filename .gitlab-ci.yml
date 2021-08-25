@@ -75,7 +75,7 @@ test_feature_framework:
   script:
     - echo "Testing the feature/framework branch"
   rules:
-    - if: '$CI_COMMIT_BRANCH == "freature/framework"'
+    - if: '$CI_COMMIT_BRANCH == "feature/framework"'
 
 test_cmd:
   stage: test_linux
