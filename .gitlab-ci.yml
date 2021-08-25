@@ -70,6 +70,13 @@ build_nanomind:
   only:
     - master
 
+test_feature_framework:
+  stage: test_linux
+  script:
+    - echo "Testing the feature/framework branch"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "freature/framework"'
+
 test_cmd:
   stage: test_linux
   script:
