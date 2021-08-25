@@ -1,7 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include "cmdCOM.h"
 
 static const char *tag = "cmdCOM";
-static char trx_node = SCH_TRX_ADDRESS;
+static char trx_node = SCH_COMM_ADDRESS;
 
 #ifdef SCH_USE_NANOCOM
 static void _com_config_help(void);
@@ -331,6 +331,110 @@ int com_send_telemetry(int node, int port, int type, void *data, size_t n_bytes,
 int com_send_debug(int node, char *data, size_t len)
 {
     com_send_telemetry(node, SCH_TRX_PORT_DBG_TM, 0, data, len, (int)len, 0);
+}
+
+int com_send_file(int node, char *name, void *data, size_t n_bytes)
+{
+    if(name == NULL || data == NULL)
+        return CMD_ERROR;
+
+    int rc_conn = 0;
+    int rc_send = 0;
+    int nframe = 0;
+    int total_frames = (int)n_bytes % COM_FRAME_MAX_LEN ? 1 : 0;
+    total_frames += (int)n_bytes / COM_FRAME_MAX_LEN;
+    uint16_t fileid = (uint16_t)(rand() % USHRT_MAX);
+
+    // New connection
+    csp_conn_t *conn;
+    conn = csp_connect(CSP_PRIO_NORM, node, SCH_TRX_PORT_FILE, 500, CSP_O_NONE);
+    if(conn == NULL)
+        return CMD_ERROR;
+
+    // Send the first packet with the file name
+    csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_file_t));
+    packet->length = sizeof(com_frame_file_t);
+    com_frame_file_t *frame = (com_frame_file_t *)(packet->data);
+    frame->node = SCH_COMM_ADDRESS;
+    frame->nframe = nframe++;
+    frame->type = TM_TYPE_FILE_START;
+    frame->fileid = csp_hton16(fileid);
+    frame->total = csp_hton16(total_frames);
+    memset(frame->data, 0, COM_FRAME_MAX_LEN);
+    strncpy((char *)(frame->data), name, COM_FRAME_MAX_LEN);
+    // Send packet
+    rc_send = csp_send(conn, packet, 500);
+    if(rc_send == 0)
+    {
+        LOGE(tag, "Error sending frame! (%d)", rc_send);
+        csp_buffer_free(packet);
+        rc_conn = csp_close(conn);
+        return CMD_ERROR;
+    }
+
+    // Send the file data
+    while(n_bytes >= COM_FRAME_MAX_LEN)
+    {
+        size_t bytes_sent = COM_FRAME_MAX_LEN;
+        // Create packet and frame
+        csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_file_t));
+        packet->length = sizeof(com_frame_file_t);
+        com_frame_file_t *frame = (com_frame_file_t *)(packet->data);
+        frame->node = SCH_COMM_ADDRESS;
+        frame->nframe = csp_hton16((uint16_t)nframe++);
+        frame->type = TM_TYPE_FILE_DATA;
+        frame->fileid = csp_hton16(fileid);
+        frame->total = csp_hton16(total_frames);
+        memcpy(frame->data, data, bytes_sent);
+        // Send packet
+        rc_send = csp_send(conn, packet, 500);
+        if(rc_send == 0)
+        {
+            LOGE(tag, "Error sending frame! (%d)", rc_send);
+            csp_buffer_free(packet);
+            rc_conn = csp_close(conn);
+            return CMD_ERROR;
+        }
+
+        // Process more data
+        n_bytes -= bytes_sent;
+        data += bytes_sent;
+
+        if(nframe%SCH_COM_MAX_PACKETS == 0)
+            osDelay(SCH_COM_TX_DELAY_MS);
+    }
+
+    // Send last frame
+    size_t bytes_sent = n_bytes;
+    packet = csp_buffer_get(sizeof(com_frame_file_t));
+    packet->length = sizeof(com_frame_file_t);
+    frame = (com_frame_file_t *)(packet->data);
+    frame->node = SCH_COMM_ADDRESS;
+    frame->nframe = csp_hton16((uint16_t)nframe++);
+    frame->type = TM_TYPE_FILE_END;
+    frame->fileid = csp_hton16(fileid);
+    frame->total = csp_hton16(total_frames);
+    memcpy(frame->data, data, bytes_sent);
+    // Fill frame
+    LOGI(tag, "Last frame include %d bytes!", bytes_sent);
+    if(bytes_sent < COM_FRAME_MAX_LEN)
+        memset(frame->data+bytes_sent, 0xAA, COM_FRAME_MAX_LEN-bytes_sent);
+    // Send packet
+    rc_send = csp_send(conn, packet, 500);
+    if(rc_send == 0)
+    {
+        LOGE(tag, "Error sending frame! (%d)", rc_send);
+        csp_buffer_free(packet);
+        rc_conn = csp_close(conn);
+        return CMD_ERROR;
+    }
+
+    // Close connection
+    rc_conn = csp_close(conn);
+    if(rc_conn != CSP_ERR_NONE)
+        LOGE(tag, "Error closing connection! (%d)", rc_conn);
+
+    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_ERROR;
 }
 
 

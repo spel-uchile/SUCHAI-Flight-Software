@@ -1,7 +1,7 @@
 /**
  * @file  cmdCOM.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2020
+ * @date 2021
  * @copyright GNU Public License.
  *
  * This header contains commands related with the communication system
@@ -10,9 +10,10 @@
 #ifndef CMD_COM_H
 #define CMD_COM_H
 
-#include "stdlib.h"
-#include "string.h"
-#include "stdint.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <limits.h>
 
 #include "config.h"
 
@@ -31,8 +32,8 @@
 #define COM_FRAME_MAX_LEN (200 - 2*sizeof(uint16_t) - sizeof(uint32_t))
 
 /**
- * A SCP frame structure. It contains data buffer and information about the data
- * such as the frame number, the telemetry type and the nubmer of data samples
+ * A CSP frame structure. It contains data buffer and information about the data
+ * such as the frame number, the telemetry type and the number of data samples
  * inside a frame.
  */
 typedef struct __attribute__((__packed__)) com_frame{
@@ -50,6 +51,24 @@ typedef struct __attribute__((__packed__)) com_frame{
         uint32_t data32[COM_FRAME_MAX_LEN / sizeof(uint32_t)];
     }data;
 }com_frame_t;
+
+/**
+ * A CSP frame structure. It contains data buffer and information about the data
+ * such as the frame number, the telemetry type and the number of data samples
+ * inside a frame.
+ */
+typedef struct __attribute__((__packed__)) com_frame_file{
+    uint16_t nframe;        ///< Frame number
+    uint8_t type;           ///< Telemetry type
+    uint8_t node;           ///< Node of origin
+    uint16_t fileid;        ///< File id
+    uint16_t total;         ///< Total frame numbers
+    /**
+     * De data buffer containing @ndata structs of payload data. The structs
+     * inside the buffer depends on the telemetry @type.
+     */
+    uint8_t data[COM_FRAME_MAX_LEN];
+}com_frame_file_t;
 
 /**
  * Parameter to com_send_data. Stores the destination node and binary data.
@@ -168,6 +187,16 @@ int com_send_data(char *fmt, char *params, int nparams);
 int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame);
 int com_send_telemetry(int node, int port, int type, void *data, size_t n_bytes, int n_structs, int n_frame);
 int com_send_debug(int node, char *data, size_t len);
+
+/**
+ * Split and send a file using CSP packets
+ * @param node Destination node
+ * @param name File name
+ * @param data File data
+ * @param n_bytes File size in bytes
+ * @return CMD_OK | CMD_ERROR
+ */
+int com_send_file(int node, char *name, void *data, size_t n_bytes);
 
 /**
  * Auxiliary function to convert an array of 32bit values to network (big) endian.

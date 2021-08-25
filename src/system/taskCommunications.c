@@ -251,7 +251,7 @@ static void com_receive_tm(csp_packet_t *packet)
             dat_add_payload_sample((frame->data.data8)+delay, payload); //Save next struct
         }
     }
-    else if(frame->type == TM_TYPE_FILE)
+    else if(frame->type == TM_TYPE_FILE_START)
     {
         print_buff(frame->data.data8, COM_FRAME_MAX_LEN);
 #ifdef LINUX

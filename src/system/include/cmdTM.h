@@ -1,7 +1,7 @@
 /**
  * @file  cmdTM.h
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
- * @date 2020
+ * @date 2021
  * @copyright GNU Public License.
  *
  * This header contains commands related with telemetry proccessing and
@@ -22,7 +22,9 @@
 #define TM_TYPE_STATUS  1
 #define TM_TYPE_HELP    2
 #define TM_TYPE_PAYLOAD 10
-#define TM_TYPE_FILE 100
+#define TM_TYPE_FILE_START 100
+#define TM_TYPE_FILE_DATA 101
+#define TM_TYPE_FILE_END 102
 
 /**
  * Register TM commands
@@ -136,7 +138,7 @@ int tm_send_cmds(char *fmt, char *params, int nparms);
 #ifdef LINUX
 
 /**
- * Send a file usign libcsp network
+ * Send a file using CSP
  *
  * @param fmt %s %u
  * @param params "<filename> <node>"
@@ -144,6 +146,16 @@ int tm_send_cmds(char *fmt, char *params, int nparms);
  * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_send_file(char *fmt, char *params, int nparams);
+
+/**
+ * Parse a file from CSP packets
+ *
+ * @param fmt ""
+ * @param params "<binary_blob>"
+ * @param nparams 0
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
+ */
+int tm_parse_file(char *fmt, char *params, int nparams);
 #endif
 
 #endif //CMDTM_H
