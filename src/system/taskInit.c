@@ -181,7 +181,7 @@ int init_setup_libcsp(void)
 
 #ifdef RPI
     csp_i2c_uart_init(SCH_COMM_ADDRESS, 0, 19200);
-    csp_rtable_set(8, 2, &csp_if_i2c_uart, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C to TRX node
+    csp_rtable_set(8, 2, &csp_if_i2c_uart, SCH_COMM_ADDRESS); // Traffic to GND (8-15) via I2C to TRX node
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c_uart, CSP_NODE_MAC); // Rest of the traffic to I2C using node i2c address
 #endif
 
@@ -199,7 +199,7 @@ int init_setup_libcsp(void)
      *  csp_rtable_load("8/2 I2C 5");
      *  csp_rtable_load("0/0 I2C");
      */
-    csp_rtable_set(8, 2, &csp_if_i2c, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C node TRX
+    csp_rtable_set(8, 2, &csp_if_i2c, SCH_COMM_ADDRESS); // Traffic to GND (8-15) via I2C node TRX
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c, CSP_NODE_MAC); // All traffic to I2C using node as i2c address
 #endif //NANOMIND
 
