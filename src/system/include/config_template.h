@@ -67,6 +67,9 @@
 
 /* Communications system settings */
 #define SCH_COMM_ADDRESS        {{SCH_COMM_NODE}}  ///< Node address
+#define SCH_TNC_ADDRESS         9                  ///< TNC node address
+#define SCH_TRX_ADDRESS         5                  ///< TRX node address
+#define SCH_EPS_ADDRESS         2                  ///< EPS node address
 #define SCH_TRX_PORT_FILE            (9)   ///< Files port
 #define SCH_TRX_PORT_TC              (10)  ///< Telecommands port
 #define SCH_TRX_PORT_RPT             (11)  ///< Digirepeater port (resend packets)
