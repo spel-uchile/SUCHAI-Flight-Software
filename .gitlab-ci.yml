@@ -37,8 +37,9 @@ configure_docker:
     - cd suchai-fs
     - docker build --no-cache -t suchai-fs .
     - docker system prune -f
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feature/framework"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
 
 build_linux:
   stage: build
@@ -70,11 +71,13 @@ build_nanomind:
   only:
     - master
 
-test_feature_framework:
+test_unit_feature_framework:
   stage: test_linux
   script:
-    - echo "Testing the feature/framework branch"
-    - cat test/test_unit/CMakeLists.txt
+    - echo "Testing the feature/framework branch in Linux"
+    - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux_framework.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux_framework.sh test_unit
+    - docker system prune -f
   rules:
     - if: '$CI_COMMIT_BRANCH == "feature/framework"'
 
