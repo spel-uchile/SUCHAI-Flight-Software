@@ -2,8 +2,9 @@
 #define _INIT_H
 
 #include "suchai/config.h"
+#include "app/system/config.h"
 #include "drivers.h"
-#include "repoData.h"
+#include "suchai/repoData.h"
 
 void sch_a3200_init_spi0(bool decode);
 void sch_a3200_init_spi1(void);
