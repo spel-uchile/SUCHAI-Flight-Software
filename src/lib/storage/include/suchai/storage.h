@@ -40,8 +40,13 @@ typedef struct __attribute__((packed)) fp_entry {
     int executions;             ///< Amount of times the command will be executed per periodic cycle
     int periodical;             ///< Period of time between executions
     int node;                   ///< Node to execute the command
+#ifndef SCH_FP_STATIC
     char* cmd;                  ///< Command to execute
     char* args;                 ///< Command's arguments
+#else
+    char cmd[SCH_CMD_MAX_STR_NAME]; ///< Command to execute
+    char args[SCH_CMD_MAX_STR_PARAMS]; ///< Command's arguments
+#endif
 } fp_entry_t;
 
 /**

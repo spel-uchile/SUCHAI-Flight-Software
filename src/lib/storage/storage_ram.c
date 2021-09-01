@@ -61,7 +61,7 @@ int storage_table_status_init(char *table, int n_variables, int drop)
         return SCH_ST_ERROR;
 
     if(status_db != NULL) {
-        if (drop) free(status_db);
+        if (drop) {free(status_db); status_db = NULL;}
         else return SCH_ST_ERROR;
     }
 
@@ -75,17 +75,17 @@ int storage_table_status_init(char *table, int n_variables, int drop)
     return SCH_ST_OK;
 }
 
-int storage_table_flight_plan_init(char *table, int n_entires, int drop)
+int storage_table_flight_plan_init(char *table, int n_entries, int drop)
 {
     if(!storage_is_open)
         return SCH_ST_ERROR;
 
     if(flightplan_db != NULL) {
-        if (drop) free(flightplan_db);
+        if (drop) {free(flightplan_db); flightplan_db = NULL;}
         else return SCH_ST_ERROR;
     }
 
-    flightplan_entries = n_entires;
+    flightplan_entries = n_entries;
     flightplan_db = (fp_entry_t *)malloc(flightplan_entries * sizeof(fp_entry_t));
     if(flightplan_db == NULL) return SCH_ST_ERROR;
 
@@ -107,7 +107,7 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
         return SCH_ST_ERROR;
 
     if(payload_db != NULL) {
-        if (drop) free(payload_db);
+        if (drop) {free(payload_db); payload_db = NULL;}
         else return SCH_ST_ERROR;
     }
 
@@ -219,7 +219,7 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 
 int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* executions, int* period, int* node)
 {
-    if(command == NULL || args == NULL)
+    if(command == NULL || args == NULL || executions == NULL || period == NULL || node == NULL)
         return SCH_ST_ERROR;
 
     fp_entry_t fp_entry;
