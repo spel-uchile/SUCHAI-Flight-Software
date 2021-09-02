@@ -187,50 +187,16 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
 /****** STATUS VARIABLES FUNCTIONS *******/
 int storage_status_get_value_idx(uint32_t index, value32_t *value, char *table)
 {
-
+    uint16_t add = (uint16_t)(index*sizeof(value32_t));
+    int rc = gs_fm33256b_fram_read(0, add, value, sizeof(value32_t));
+    return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
 }
 
 int storage_status_set_value_idx(int index, value32_t value, char *table)
 {
-
-}
-
-int storage_repo_get_value_idx(int index, char *table)
-{
-    // TODO: Check if this is necessary
-    data32_t data;
-    uint16_t len = (uint16_t)(sizeof(uint32_t));
-    uint16_t add = (uint16_t)(index*len);
-
-    gs_fm33256b_fram_read(0, add, data.data8_p, len);
-
-    LOGV(tag, "Read 0x%X", (unsigned int)data.data32);
-    return (int)(data.data32);
-}
-
-int storage_repo_get_value_str(char *name, char *table)
-{
-    // FIXME: return -1 if not implemented?
-    return 0;
-}
-
-int storage_repo_set_value_idx(int index, int value, char *table)
-{
-    // TODO: Check if this is necessary
-    data32_t data;
-    data.data32 = (uint32_t)value;
-    uint16_t len = (uint16_t)(sizeof(data));
-    uint16_t add = (uint16_t)(index*len);
-
-    LOGV(tag, "Writing 0x%X", (unsigned int)data.data32);
-    gs_fm33256b_fram_write(0, add, data.data8_p, len);
-
-    return 0;
-}
-
-int storage_repo_set_value_str(char *name, int value, char *table)
-{
-    return 0;
+    uint16_t add = (uint16_t)(index*sizeof(value32_t));
+    int rc = gs_fm33256b_fram_write(0, add, &value, sizeof(value32_t));
+    return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
 }
 
 /****** FLIGHT PLAN VARIABLES FUNCTIONS *******/
