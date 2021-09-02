@@ -232,6 +232,7 @@ int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* e
     *executions = fp_entry.executions;
     *period = fp_entry.periodical;
     *node = fp_entry.node;
+    fp_entry_clear(&fp_entry);
 
     return SCH_ST_OK;
 }
@@ -320,7 +321,7 @@ int storage_payload_get_data(int payload, int index, void *data, data_map_t *sch
 {
     if(!storage_is_open) return SCH_ST_ERROR;
     if(payload_db == NULL || payloads_sections_addresses == NULL) return SCH_ST_ERROR;
-    if(data == NULL) return SCH_ST_ERROR;
+    if(data == NULL || schema == NULL) return SCH_ST_ERROR;
 
     uint8_t *sample_address;
     int rc = _get_sample_address(payload, index, schema->size, &sample_address);
