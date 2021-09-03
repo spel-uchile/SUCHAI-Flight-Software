@@ -61,6 +61,8 @@ typedef struct __attribute__((__packed__)) map {
     char *  var_names;
 } data_map_t;
 
+#define ST_FP_NULL (-1)
+
 static inline void fp_entry_copy(fp_entry_t *src, fp_entry_t *dst)
 {
     assert(src != NULL);
@@ -91,7 +93,7 @@ static inline void fp_entry_clear(fp_entry_t *fp_entry)
     {
         if(fp_entry->cmd != NULL) free(fp_entry->cmd);
         if(fp_entry->args != NULL) free(fp_entry->args);
-        fp_entry->unixtime = -1;
+        fp_entry->unixtime = ST_FP_NULL;
         fp_entry->executions = 0;
         fp_entry->periodical = 0;
         fp_entry->node = SCH_COMM_NODE;

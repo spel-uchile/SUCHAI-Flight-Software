@@ -24,6 +24,7 @@
 
 #include "suchai/config.h"
 #include "globals.h"
+#include "drivers.h"
 #include "suchai/log_utils.h"
 #include "suchai/math_utils.h"
 #include "suchai/storage.h"

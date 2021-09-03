@@ -90,7 +90,7 @@ void dat_repo_init(void)
         for(i=0; i<SCH_FP_MAX_ENTRIES; i++)
         {
             int ok = storage_flight_plan_get_idx(i, &fp_i);
-            if(ok == SCH_ST_OK && fp_i.unixtime > time_min)  // Cunt valid entries
+            if(ok == SCH_ST_OK && fp_i.unixtime > time_min)  // Count valid entries
                 fp_entries ++;
             else if(fp_i.unixtime > 0)    // Delete old entries
                 storage_flight_plan_delete_row_idx(i);
@@ -302,7 +302,7 @@ int dat_show_fp (void)
     {
         fp_entry_t fp_i;
         int ok = storage_flight_plan_get_idx(i, &fp_i);
-        if(ok == SCH_ST_OK && fp_i.unixtime > 0)
+        if(ok == SCH_ST_OK && fp_i.unixtime != ST_FP_NULL)
         {
             time_t time_to_show = fp_i.unixtime;
             strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC", gmtime(&time_to_show));

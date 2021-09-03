@@ -20,18 +20,19 @@
 
 #include "suchai/storage.h"
 #include "suchai/log_utils.h"
+#ifdef NANOMIND
 #include "app/drivers/drivers.h"
-
+#endif
 static const char *tag = "data_storage";
 
 char* fp_table = "flightPlan";
 
 ///< Flight plan address buffer
 typedef struct fp_container{
-    uint32_t unixtime;               ///< Unix-time, sets when the command should next execute
-    uint32_t executions;             ///< Amount of times the command will be executed per periodic cycle
-    uint32_t periodical;             ///< Period of time between executions
-    uint32_t node;                   ///< Node to execute the command
+    int32_t unixtime;               ///< Unix-time, sets when the command should next execute
+    int32_t executions;             ///< Amount of times the command will be executed per periodic cycle
+    int32_t periodical;             ///< Period of time between executions
+    int32_t node;                   ///< Node to execute the command
     char cmd[SCH_CMD_MAX_STR_NAME]; ///< Command to execute
     char args[SCH_CMD_MAX_STR_PARAMS]; ///< Command's arguments
 } fp_container_t;
@@ -41,6 +42,7 @@ static int st_flightplan_base_addr = 0; // TODO: Check this, cannot be equal to 
 #define FP_CONTAINER_SIZE (sizeof(fp_container_t))
 static int st_flightplan_sections = (SCH_FP_MAX_ENTRIES * FP_CONTAINER_SIZE) / SCH_SIZE_PER_SECTION + 1;
 static int st_flightplan_entries = 0;
+static int commands_per_section = SCH_SIZE_PER_SECTION / FP_CONTAINER_SIZE;
 
 ///< Payloads storage address buffer
 static uint32_t* st_payload_addr = NULL;
@@ -50,22 +52,80 @@ static int st_payload_base_addr = 0; // TODO: Check this, cannot be equal to st_
 
 static int storage_is_open = 0;
 
+#if !defined(NANOMIND) && !defined(NDEBUG)
+static char flash[30][SCH_SIZE_PER_SECTION];
+static char *flash_p = &(flash[0][0]);
+static char fram[32*1024];
+static char *fram_p = &(fram[0]);
+#endif
+
+
 static int storage_read_flash(uint8_t partition, uint32_t addr, uint8_t *data, uint16_t len)
 {
+#if defined(NANOMIND)
     int rc = spn_fl512s_read_data(partition, addr, data, len);
     return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
+#elif !defined(NDEBUG) // Debug mode
+    memcpy(data, flash_p+addr, len);
+    return SCH_ST_OK;
+#else
+#error STORAGE FLASH ARCHITECTURE NOT VALID
+#endif
 }
 
 static int storage_write_flash(uint8_t partition, uint32_t addr, const uint8_t *data, uint16_t len){
+#if defined(NANOMIND)
     int rc = spn_fl512s_write_data(partition, addr, data, len);
     return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
+#elif !defined(NDEBUG) // Debug mode
+    memcpy(flash_p+addr, data, len);
+    return SCH_ST_OK;
+#else
+#error STORAGE FLASH ARCHITECTURE NOT VALID
+#endif
 }
 
 static int storage_erase_flash(uint8_t partition, uint32_t addr)
 {
+#if defined(NANOMIND)
     // NOTE: Deleting a section (256 kB) takes about 520 ms
     int rc = spn_fl512s_erase_block(partition, addr);
     return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
+#elif !defined(NDEBUG) // Debug mode
+    uint32_t section = addr/SCH_SIZE_PER_SECTION;
+    addr = section*SCH_SIZE_PER_SECTION;
+    memset(flash_p+addr, 0, SCH_SIZE_PER_SECTION);
+    return SCH_ST_OK;
+#else
+#error STORAGE FLASH ARCHITECTURE NOT VALID
+#endif
+}
+
+static int storage_write_fram(uint32_t add, void *value, size_t len)
+{
+#if defined(NANOMIND)
+    int rc = gs_fm33256b_fram_write(0, add, value, len);
+    return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
+#elif !defined(NDEBUG) // Debug mode
+    memcpy(fram_p+add, value, len);
+    return SCH_ST_OK;
+#else
+#error STORAGE FLASH ARCHITECTURE NOT VALID
+#endif
+}
+
+static int storage_read_fram(uint32_t add, void *value, size_t len)
+{
+#if defined(NANOMIND)
+    int rc = gs_fm33256b_fram_read(0, add, value, len);
+    return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
+#elif !defined(NDEBUG) // Debug mode
+    memcpy(value, fram_p+add, len);
+    return SCH_ST_OK;
+#else
+#error STORAGE FLASH ARCHITECTURE NOT VALID
+#endif
+
 }
 
 int storage_init(const char *file)
@@ -123,7 +183,7 @@ int storage_close(void)
 // TODO: Implement this
 int storage_table_status_init(char *table, int n_variables, int drop)
 {
-    return SCH_ST_ERROR;
+    return SCH_ST_OK;
 }
 
 int storage_table_flight_plan_init(char *table, int n_entries, int drop)
@@ -188,15 +248,15 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
 int storage_status_get_value_idx(uint32_t index, value32_t *value, char *table)
 {
     uint16_t add = (uint16_t)(index*sizeof(value32_t));
-    int rc = gs_fm33256b_fram_read(0, add, value, sizeof(value32_t));
-    return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
+    int rc = storage_read_fram(add, value, sizeof(value32_t));
+    return rc;
 }
 
 int storage_status_set_value_idx(int index, value32_t value, char *table)
 {
     uint16_t add = (uint16_t)(index*sizeof(value32_t));
-    int rc = gs_fm33256b_fram_write(0, add, &value, sizeof(value32_t));
-    return rc == GS_OK ? SCH_ST_OK : SCH_ST_ERROR;
+    int rc = storage_write_fram(add, &value, sizeof(value32_t));
+    return rc;
 }
 
 /****** FLIGHT PLAN VARIABLES FUNCTIONS *******/
@@ -216,8 +276,6 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 static int flight_plan_find_index(int timetodo)
 {
     // Calculates information on how the flight plan is stored
-    int commands_per_section = SCH_SIZE_PER_SECTION / FP_CONTAINER_SIZE;
-
     // For every index
     for (int i = 0; i < st_flightplan_entries; i++)
     {
@@ -254,13 +312,12 @@ static int flight_plan_erase_index(int index)
     }
 
     // Calculates memory address of the section
-    int commands_per_section = SCH_SIZE_PER_SECTION / FP_CONTAINER_SIZE;
     int section_index = index/commands_per_section;
     int index_in_section = index%commands_per_section;
     uint32_t addr = st_flightplan_addr[section_index] + index_in_section * FP_CONTAINER_SIZE;
 
     fp_container_t fp_empty;
-    fp_empty.unixtime = -1;
+    fp_empty.unixtime = ST_FP_NULL;
     fp_empty.executions = 0;
     fp_empty.periodical = 0;
     fp_empty.node = SCH_COMM_NODE;
@@ -278,16 +335,15 @@ int storage_flight_plan_set_st(fp_entry_t *row)
     if(row==NULL || !storage_is_open)
         return SCH_ST_ERROR;
 
-    // Finds an index with an empty entry (unixtime == -1)
-    int index = flight_plan_find_index(-1);
-    if (index >= st_flightplan_entries)
+    // Finds an index with an empty entry (unixtime == ST_FP_NULL (-1))
+    int index = flight_plan_find_index(ST_FP_NULL);
+    if (index == -1 || index >= st_flightplan_entries)
     {
         LOGE(tag, "Flight plan storage no longer has space for another command");
         return SCH_ST_ERROR;
     }
 
     // Calculates memory address
-    int commands_per_section = SCH_SIZE_PER_SECTION / FP_CONTAINER_SIZE;
     int section_index = index/commands_per_section;
     int index_in_section = index%commands_per_section;
     uint32_t addr = st_flightplan_addr[section_index] + index_in_section * FP_CONTAINER_SIZE;
@@ -304,6 +360,7 @@ int storage_flight_plan_set_st(fp_entry_t *row)
 
     // Writes fp entry value
     int rc = storage_write_flash(0, addr, (uint8_t *)&new_entry, sizeof(new_entry));
+    LOGD(tag, "Writing to addr %d, section %d (%d)", addr, section_index, rc);
     return rc;
 }
 
@@ -329,7 +386,6 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
         return SCH_ST_ERROR;
 
     // Calculates memory address
-    int commands_per_section = SCH_SIZE_PER_SECTION / FP_CONTAINER_SIZE;
     int section_index = index/commands_per_section;
     int index_in_section = index%commands_per_section;
     uint32_t addr = st_flightplan_addr[section_index] + index_in_section * FP_CONTAINER_SIZE;
@@ -337,6 +393,7 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
     // Read one entry
     fp_container_t fp_entry;
     int rc = storage_read_flash(0, addr, (uint8_t*)&fp_entry , sizeof(fp_container_t));
+    LOGD(tag, "Read addr %d, section %d, time %d (%d)", addr, section_index, fp_entry.unixtime, rc);
     if(rc != SCH_ST_OK)
         return SCH_ST_ERROR;
 
@@ -348,9 +405,7 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
     row->cmd = strdup(fp_entry.cmd);
     row->args = strdup(fp_entry.args);
 
-    // Deletes the command from storage
-    rc = flight_plan_erase_index(index);
-    return rc;
+    return SCH_ST_OK;
 }
 
 int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
@@ -511,7 +566,7 @@ int storage_payload_set_data(int payload, int index, void *data, data_map_t *sch
 
     uint32_t addr;
     int rc = _get_sample_address(payload, index, schema->size, &addr);
-    if(rc == SCH_ST_OK)
+    if(rc != SCH_ST_OK)
         return SCH_ST_ERROR;
 
     LOGI(tag, "Writing in address: %u, %d bytes\n", addr, schema->size);
