@@ -42,6 +42,9 @@ void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
 void taskInit(void *param)
 {
     int rc = 0;
+#ifdef NANOMIND
+    on_init_task(NULL);
+#endif
 
     /* Initialize system variables */
     LOGI(tag, "SETUP VARIABLES...");
