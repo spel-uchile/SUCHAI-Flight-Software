@@ -12,9 +12,17 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
-# The compiled library code is here
+# Select app or test subproject
 set(APP simple CACHE STRING "Application name")
-message("APP apps/${APP}")
-include_directories(apps/${APP}/include)
-add_subdirectory(apps/${APP})
+set(TEST off CACHE BOOL "Enable testing")
+if(TEST)
+  set(BASE_DIR test)
+else()
+  set(BASE_DIR apps)
+endif()
+message("APP ${BASE_DIR}/${APP}")
+
+# The compiled library code is here
+include_directories(${BASE_DIR}/${APP}/include)
+add_subdirectory(${BASE_DIR}/${APP})
 add_subdirectory(src)

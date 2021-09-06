@@ -27,7 +27,7 @@
 #include "suchai/math_utils.h"
 #include "suchai/repoCommand.h"
 #include "suchai/storage.h"
-#include "repoDataSchema.h"
+#include "app/system/repoDataSchema.h"
 
 
 /** SUIT 2: Command repository **/
