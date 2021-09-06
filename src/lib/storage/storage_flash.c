@@ -26,6 +26,7 @@
 static const char *tag = "data_storage";
 
 char* fp_table = "flightPlan";
+#define ST_PAGE_SIZE  512
 
 ///< Flight plan address buffer
 typedef struct fp_container{
@@ -488,61 +489,36 @@ int storage_flight_plan_reset(void)
 
 /****** PAYLOAD STORAGE FUNCTIONS *******/
 /**
- * Auxiliary function to check errors while writing
+ * Auxiliary function to check errors while writing address not aligned  with flash pages.
  */
 int write_data_with_check(uint32_t addr, uint8_t * data, uint16_t size)
 {
-    int i;
-    uint8_t data_aux[size];
-    for (i=0 ; i < 10; ++i) {
-        uint32_t add_aux = addr + i * size;
-        int ret_write = storage_write_flash(0, add_aux, data, size);
-
-        int ret_read = storage_read_flash(0, add_aux, data_aux, size);
-
-        if (ret_read != 0 || ret_write != 0 ) {
-            return SCH_ST_ERROR;
-        }
-        // Check integrity
-        int j, integrity=0;
-        for (j=0; j < size; j++) {
-            if (data[j] != data_aux[j]) {
-                integrity += 1;
-                break;
-            }
-        }
-        if (integrity == 0) {
-            return i;
-        }
+    uint32_t addr_aux = addr;
+    if( (addr + size) / ST_PAGE_SIZE  > addr / ST_PAGE_SIZE ) {
+        addr_aux  = (addr + size / ST_PAGE_SIZE) * ST_PAGE_SIZE;
     }
-    return SCH_ST_ERROR;
+    int ret_write = storage_write_flash(0, addr_aux, data, size);
+    if (ret_write != 0) {
+        return SCH_ST_ERROR;
+    }
+    return SCH_ST_OK;
 }
 
 /**
- * Auxiliary function to check errors while reading
+ * Auxiliary function to check errors while reading address not aligned with flash pages.
  */
 int read_data_with_check(uint32_t addr, uint8_t * data, uint16_t size) {
 
-    int i;
-    for (i=0 ; i < 10; ++i) {
-        uint32_t add_aux = addr + i * size;
-        int read_ret = storage_read_flash(0, add_aux, data, size);
-
-        if( read_ret != 0) {
-            return SCH_ST_ERROR;
-        }
-        int j, integity=0;
-        for (j=0; j<size/4; ++j) {
-            if ( ((uint32_t*)data)[j] == 0xffffffff) {
-                integity +=1;
-                break;
-            }
-        }
-        if (integity == 0) {
-            return i;
-        }
+    uint32_t addr_aux = addr;
+    if( (addr + size) / ST_PAGE_SIZE  > addr / ST_PAGE_SIZE ) {
+        addr_aux  = (addr + size / ST_PAGE_SIZE) * ST_PAGE_SIZE;
     }
-    return SCH_ST_ERROR;
+
+    int read_ret = storage_read_flash(0, addr_aux, data, size);
+    if( read_ret != 0) {
+        return SCH_ST_ERROR;
+    }
+    return SCH_ST_OK;
 }
 
 /**
