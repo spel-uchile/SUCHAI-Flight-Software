@@ -27,14 +27,27 @@ static const char *tag = "data_storage";
 
 char* fp_table = "flightPlan";
 
-///< Flight plan address buffer
+/**
+ * PLEASE READ THIS!
+ * Writes must be aligned to S25FL512S pages of 512 bytes.
+ * Please refer to the device datasheet (https://www.cypress.com/file/177971/download)
+ * page 94, section 9.5.2 to understand flash write limitations.
+ * In the S25FL512S, if a write operation exceeds the page address boundaries, it continues
+ * writing to the beginning of the page. Yes, it makes no sense. Yes, you must read the datasheet.
+ *
+ * So, we fixed the flight plan entry to fit in a 512 byte page
+ * and we check small writes do not exceed a page address boundary.
+ */
+#define ST_CMD_MAX_STR_PARAMS        (248)  ///< Limit for the parameters length
+#define ST_CMD_MAX_STR_NAME          (248)  ///< Limit for the length of the name of a command
+///< Flight plan entry buffer
 typedef struct fp_container{
     int32_t unixtime;               ///< Unix-time, sets when the command should next execute
     int32_t executions;             ///< Amount of times the command will be executed per periodic cycle
     int32_t periodical;             ///< Period of time between executions
     int32_t node;                   ///< Node to execute the command
-    char cmd[SCH_CMD_MAX_STR_NAME]; ///< Command to execute
-    char args[SCH_CMD_MAX_STR_PARAMS]; ///< Command's arguments
+    char cmd[ST_CMD_MAX_STR_PARAMS]; ///< Command to execute
+    char args[ST_CMD_MAX_STR_NAME]; ///< Command's arguments
 } fp_container_t;
 
 static uint32_t* st_flightplan_addr = NULL;
@@ -156,7 +169,7 @@ int storage_init(const char *file)
 //    if (error)
 //        return -1;
 #endif
-
+    assert(sizeof(fp_container_t) == 512);
     st_flightplan_base_addr = 0;
     st_payload_base_addr = st_flightplan_sections + 1;
     storage_is_open = 1;
@@ -264,7 +277,7 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
  * Function for finding the storage index of a command based on it's timetodo field.
  *
  * IMPORTANT: Flight plan entries are saved as consecutive binary values using the following scheme:
- * timetodo(uint32_t) executions(uint32_t) periodical(uint32_t) name_length(uint32_t) args_length(uint32_t) name(char*SCH_CMD_MAX_STR_NAME) args(char*SCH_CMD_MAX_STR_PARAMS)
+ * timetodo(uint32_t) executions(uint32_t) periodical(uint32_t) name_length(uint32_t) args_length(uint32_t) name(char*ST_CMD_MAX_STR_NAME) args(char*ST_CMD_MAX_STR_PARAMS)
  *
  * The total size of each command is then stored in 'max_command_size'.
  *
@@ -433,8 +446,8 @@ int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* e
     *executions = fp_entry.executions;
     *period = fp_entry.periodical;
     *node = fp_entry.node;
-    strncpy(command, fp_entry.cmd, SCH_CMD_MAX_STR_NAME);
-    strncpy(args, fp_entry.args, SCH_CMD_MAX_STR_PARAMS);
+    strncpy(command, fp_entry.cmd, ST_CMD_MAX_STR_NAME);
+    strncpy(args, fp_entry.args, ST_CMD_MAX_STR_PARAMS);
 
     fp_entry_clear(&fp_entry);
     return SCH_ST_OK;
@@ -478,10 +491,10 @@ int storage_flight_plan_reset(void)
         LOGD(tag, "Deleting FP, section %d, addr %#X (rc=%d)", i, st_flightplan_addr[i], rc);
     }
 
-    for(int i = 0; i < st_flightplan_entries; i++)
-    {
-        rc += flight_plan_erase_index(i);
-    }
+//    for(int i = 0; i < st_flightplan_entries; i++)
+//    {
+//        rc += flight_plan_erase_index(i);
+//    }
 
     return rc == SCH_ST_OK ? SCH_ST_OK : SCH_ST_ERROR;
 }
