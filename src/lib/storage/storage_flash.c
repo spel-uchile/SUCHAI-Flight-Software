@@ -33,6 +33,8 @@ typedef struct fp_container{
     int32_t executions;             ///< Amount of times the command will be executed per periodic cycle
     int32_t periodical;             ///< Period of time between executions
     int32_t node;                   ///< Node to execute the command
+    char cmd[SCH_CMD_MAX_STR_NAME]; ///< Command to execute
+    char args[SCH_CMD_MAX_STR_PARAMS]; ///< Command's arguments
 } fp_container_t;
 
 static uint32_t* st_flightplan_addr = NULL;
