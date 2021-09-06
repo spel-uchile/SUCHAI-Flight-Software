@@ -191,6 +191,12 @@ int dat_reset_fp(void);
 int dat_show_fp (void);
 
 /**
+ * Remove old entries from the flight plan
+ * @return 0 if OK
+ */
+int dat_purge_fp(void);
+
+/**
  * Gets the current system time in seconds.
  *
  * @return time_t Current system unix-time

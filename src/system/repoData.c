@@ -82,21 +82,6 @@ void dat_repo_init(void)
         LOGE(tag, "Unable to create FLIGHT-PLAN repository!. (table %s, len: %d, drop: %d)",
              DAT_TABLE_FP, SCH_FP_MAX_ENTRIES, 0);
     }
-    else // Update flight plan queue and purge old entries
-    {
-        int i, fp_entries = 0;
-        int time_min = (int)dat_get_time()+1;
-        fp_entry_t fp_i;
-        for(i=0; i<SCH_FP_MAX_ENTRIES; i++)
-        {
-            int ok = storage_flight_plan_get_idx(i, &fp_i);
-            if(ok == SCH_ST_OK && fp_i.unixtime > time_min)  // Count valid entries
-                fp_entries ++;
-            else if(fp_i.unixtime > 0)    // Delete old entries
-                storage_flight_plan_delete_row_idx(i);
-        }
-        dat_set_system_var(dat_fpl_queue, fp_entries);
-    }
 }
 
 void dat_repo_close(void)
@@ -287,6 +272,24 @@ int dat_reset_fp(void)
     if(rc == SCH_ST_OK)
         dat_set_system_var(dat_fpl_queue, 0);
     return rc;
+}
+
+int dat_purge_fp(void)
+{
+    int i, fp_entries = 0;
+    int time_min = (int)dat_get_time()+1;
+    fp_entry_t fp_i;
+    for(i=0; i<SCH_FP_MAX_ENTRIES; i++)
+    {
+        int ok = storage_flight_plan_get_idx(i, &fp_i);
+        if(ok == SCH_ST_OK && fp_i.unixtime > time_min)  // Count valid entries
+            fp_entries ++;
+        else if(fp_i.unixtime > 0)    // Delete old entries
+            storage_flight_plan_delete_row_idx(i);
+    }
+    dat_set_system_var(dat_fpl_queue, fp_entries);
+
+    return SCH_ST_OK;
 }
 
 int dat_show_fp (void)

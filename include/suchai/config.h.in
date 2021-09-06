@@ -84,7 +84,7 @@
 #define SCH_CMD_MAX_ENTRIES          (255)  ///< Max number of commands in the repository
 #define SCH_SECTIONS_PER_PAYLOAD     (10)  ///< Memory blocks for storing each payload type TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION         (256*1024)  ///< Size of each memory block in flash storage
-#define SCH_FLASH_INIT_MEMORY        0  ///< Initial address in flash storage
+#define SCH_FLASH_INIT_MEMORY        1*SCH_SIZE_PER_SECTION  ///< Initial address in flash storage
 
 /**
  * Memory settings.

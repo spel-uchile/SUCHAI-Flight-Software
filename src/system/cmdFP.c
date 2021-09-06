@@ -30,6 +30,7 @@ void cmd_fp_init(void)
     cmd_add("fp_del_cmd_unix", fp_delete_unix, "%d", 1);
     cmd_add("fp_show", fp_show, "", 0);
     cmd_add("fp_reset", fp_reset,"", 0);
+    cmd_add("fp_purge", fp_purge,"", 0);
 }
 
 int fp_set(char *fmt, char *params, int nparams)
@@ -180,12 +181,19 @@ int fp_show(char* fmt, char* params, int nparams)
 
 int fp_reset(char* fmt, char* params, int nparams)
 {
-
     int rc = dat_reset_fp();
-
     if(rc==0)
         return CMD_OK;
     else
         return CMD_ERROR;
 }
 
+
+int fp_purge(char* fmt, char* params, int nparams)
+{
+    int rc = dat_purge_fp();
+    if(rc==0)
+        return CMD_OK;
+    else
+        return CMD_ERROR;
+}

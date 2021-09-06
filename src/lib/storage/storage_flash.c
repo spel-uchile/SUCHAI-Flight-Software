@@ -30,11 +30,11 @@ char* fp_table = "flightPlan";
 ///< Flight plan address buffer
 typedef struct fp_container{
     int32_t unixtime;               ///< Unix-time, sets when the command should next execute
+    char cmd[SCH_CMD_MAX_STR_NAME]; ///< Command to execute
+    char args[SCH_CMD_MAX_STR_PARAMS]; ///< Command's arguments
     int32_t executions;             ///< Amount of times the command will be executed per periodic cycle
     int32_t periodical;             ///< Period of time between executions
     int32_t node;                   ///< Node to execute the command
-    char cmd[SCH_CMD_MAX_STR_NAME]; ///< Command to execute
-    char args[SCH_CMD_MAX_STR_PARAMS]; ///< Command's arguments
 } fp_container_t;
 
 static uint32_t* st_flightplan_addr = NULL;
@@ -318,16 +318,16 @@ static int flight_plan_erase_index(int index)
 
     fp_container_t fp_empty;
     fp_empty.unixtime = ST_FP_NULL;
-    fp_empty.executions = 0;
-    fp_empty.periodical = 0;
+    fp_empty.executions = -1;
+    fp_empty.periodical = -1;
     fp_empty.node = SCH_COMM_NODE;
     memset(fp_empty.cmd, 0, sizeof(fp_empty.cmd));
     memset(fp_empty.args, 0, sizeof(fp_empty.args));
 
-    LOGD(tag, "Deleting address %u in section %d\n", addr, section_index);
-    storage_write_flash(0, addr, (uint8_t *)&fp_empty, sizeof(fp_empty));
+    int rc =storage_write_flash(0, addr, &fp_empty, sizeof(fp_empty));
+    LOGD(tag, "Deleting index %d, at address %u, section %d (%d)\n", index, addr, section_index, rc);
 
-    return SCH_ST_OK;
+    return rc;
 }
 
 int storage_flight_plan_set_st(fp_entry_t *row)
@@ -339,7 +339,7 @@ int storage_flight_plan_set_st(fp_entry_t *row)
     int index = flight_plan_find_index(ST_FP_NULL);
     if (index == -1 || index >= st_flightplan_entries)
     {
-        LOGE(tag, "Flight plan storage no longer has space for another command");
+        LOGE(tag, "Flight plan storage has no space for another command!");
         return SCH_ST_ERROR;
     }
 
@@ -360,7 +360,7 @@ int storage_flight_plan_set_st(fp_entry_t *row)
 
     // Writes fp entry value
     int rc = storage_write_flash(0, addr, (uint8_t *)&new_entry, sizeof(new_entry));
-    LOGD(tag, "Writing to addr %d, section %d (%d)", addr, section_index, rc);
+    LOGD(tag, "Writing time %d to index %d, at addr %d, section %d (%d)", new_entry.unixtime, index, addr, section_index, rc);
     return rc;
 }
 
@@ -393,7 +393,7 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
     // Read one entry
     fp_container_t fp_entry;
     int rc = storage_read_flash(0, addr, (uint8_t*)&fp_entry , sizeof(fp_container_t));
-    LOGD(tag, "Read addr %d, section %d, time %d (%d)", addr, section_index, fp_entry.unixtime, rc);
+    LOGD(tag, "Read index %d, at addr %d, section %d, time %d (%d)", index, addr, section_index, fp_entry.unixtime, rc);
     if(rc != SCH_ST_OK)
         return SCH_ST_ERROR;
 
@@ -471,7 +471,14 @@ int storage_flight_plan_reset(void)
 
     // Deletes all flight plan memory sections
     int rc = SCH_ST_OK;
-    for (int i = 0; i < st_flightplan_entries; i++)
+    for (int i = 0; i < st_flightplan_sections; i++)
+    {
+        int res = storage_erase_flash(0, st_flightplan_addr[i]);
+        rc += res;
+        LOGD(tag, "Deleting FP, section %d, addr %#X (rc=%d)", i, st_flightplan_addr[i], rc);
+    }
+
+    for(int i = 0; i < st_flightplan_entries; i++)
     {
         rc += flight_plan_erase_index(i);
     }
