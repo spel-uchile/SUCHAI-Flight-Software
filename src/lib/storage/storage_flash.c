@@ -26,7 +26,6 @@
 static const char *tag = "data_storage";
 
 char* fp_table = "flightPlan";
-#define ST_PAGE_SIZE  512
 
 /**
  * PLEASE READ THIS!
@@ -41,8 +40,9 @@ char* fp_table = "flightPlan";
  */
 #define ST_CMD_MAX_STR_PARAMS        (248)  ///< Limit for the parameters length
 #define ST_CMD_MAX_STR_NAME          (248)  ///< Limit for the length of the name of a command
-///< Flight plan entry buffer
-typedef struct fp_container{
+#define ST_PAGE_SIZE                 (512)  ///< Flash page size in bytes
+///< Flight plan entry buffer (aligned to 512 bytes pages)
+typedef struct fp_container_s{
     int32_t unixtime;               ///< Unix-time, sets when the command should next execute
     int32_t executions;             ///< Amount of times the command will be executed per periodic cycle
     int32_t periodical;             ///< Period of time between executions
@@ -51,12 +51,21 @@ typedef struct fp_container{
     char args[ST_CMD_MAX_STR_NAME]; ///< Command's arguments
 } fp_container_t;
 
+///< Flight plan entry address cache structure (aligned to 512 bytes pages)
+typedef struct fp_addr_s{
+    uint32_t addr;
+    int32_t unixtime;
+} fp_addr_t;
+
 static uint32_t* st_flightplan_addr = NULL;
-static int st_flightplan_base_addr = 0; // TODO: Check this, cannot be equal to st_payload_base_addr
+static int st_flightplan_base_addr = 0;
 #define FP_CONTAINER_SIZE (sizeof(fp_container_t))
 static int st_flightplan_sections = (SCH_FP_MAX_ENTRIES * FP_CONTAINER_SIZE) / SCH_SIZE_PER_SECTION + 1;
 static int st_flightplan_entries = 0;
 static int commands_per_section = SCH_SIZE_PER_SECTION / FP_CONTAINER_SIZE;
+static int st_flightplan_tlb_base_addr = 0;
+static fp_addr_t st_flightplan_tlb[SCH_FP_MAX_ENTRIES+1];  ///< FP address translation look-up table (Index=0 is TLB metadata)
+static int storage_flight_load_tlb(void);
 
 ///< Payloads storage address buffer
 static uint32_t* st_payload_addr = NULL;
@@ -67,7 +76,7 @@ static int st_payload_base_addr = 0; // TODO: Check this, cannot be equal to st_
 static int storage_is_open = 0;
 
 #if !defined(NANOMIND) && !defined(NDEBUG)
-static char flash[30][SCH_SIZE_PER_SECTION];
+static char flash[256][SCH_SIZE_PER_SECTION];
 static char *flash_p = &(flash[0][0]);
 static char fram[32*1024];
 static char *fram_p = &(fram[0]);
@@ -170,9 +179,26 @@ int storage_init(const char *file)
 //    if (error)
 //        return -1;
 #endif
+
+/**
+ *                  FLASH
+ *  Section |        Usage (256 KiB)    |   Addr            |
+ *  --------------------------------------------------------|
+ *      0   |       FP TLB              |      0 -> 262143  |
+ *      1   |       FP TABLE            | 262144 -> 524287  |
+ *      2   |       PAYLOAD 1           | 524288 -> ...     |
+ *      .   |           ...             |                   |
+ *      N   |       PAYLOAD 1           |                   |
+ *    N+1   |       PAYLOAD 2           |                   |
+ *      .   |           ...             |                   |
+ *     2N   |       PAYLOAD 2           |                   |
+ *     ...  |           ...             |                   |
+ *  --------------------------------------------------------|
+ */
     assert(sizeof(fp_container_t) == 512);
-    st_flightplan_base_addr = 0;
-    st_payload_base_addr = st_flightplan_sections + 1;
+    st_flightplan_tlb_base_addr = SCH_FLASH_INIT_MEMORY;
+    st_flightplan_base_addr = st_flightplan_tlb_base_addr + SCH_SIZE_PER_SECTION;
+    st_payload_base_addr = st_flightplan_base_addr + SCH_SIZE_PER_SECTION*st_flightplan_sections;
     storage_is_open = 1;
     return SCH_ST_OK;
 }
@@ -182,6 +208,7 @@ int storage_close(void)
     storage_is_open = 0;
 
     if(st_flightplan_addr != NULL) {free(st_flightplan_addr); st_flightplan_addr = NULL;}
+    st_flightplan_tlb_base_addr = 0;
     st_flightplan_base_addr = 0;
     st_flightplan_sections = (SCH_FP_MAX_ENTRIES * FP_CONTAINER_SIZE) / SCH_SIZE_PER_SECTION + 1;
     st_flightplan_entries = 0;
@@ -194,9 +221,10 @@ int storage_close(void)
     return SCH_ST_OK;
 }
 
-// TODO: Implement this
 int storage_table_status_init(char *table, int n_variables, int drop)
 {
+    if(!storage_is_open)
+        return SCH_ST_ERROR;
     return SCH_ST_OK;
 }
 
@@ -221,9 +249,13 @@ int storage_table_flight_plan_init(char *table, int n_entries, int drop)
     st_flightplan_addr = malloc(st_flightplan_sections * sizeof(uint32_t));
     LOGD(tag, "Flight plan sections: %d", st_flightplan_sections);
     for (int i = 0; i < st_flightplan_sections; i++) {
-        st_flightplan_addr[i] = (uint32_t) SCH_FLASH_INIT_MEMORY + (st_flightplan_base_addr + i) * SCH_SIZE_PER_SECTION;
+        st_flightplan_addr[i] = st_flightplan_base_addr + i * SCH_SIZE_PER_SECTION;
         LOGD(tag, "FP section[%d]=%#X", i, st_flightplan_addr[i]);
     }
+
+    // Initialize FP translation table
+    memset(st_flightplan_tlb, -1, sizeof(st_flightplan_tlb));
+    storage_flight_load_tlb();
 
     return SCH_ST_OK;
 }
@@ -251,7 +283,7 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
 
     LOGD(tag, "Payload sections: %d", st_payload_sections);
     for (int i = 0; i < st_payload_sections; i++) {
-        st_payload_addr[i] = (uint32_t) SCH_FLASH_INIT_MEMORY + (st_payload_base_addr + i) * SCH_SIZE_PER_SECTION;
+        st_payload_addr[i] = st_payload_base_addr + i * SCH_SIZE_PER_SECTION;
         LOGD(tag, "Payload section[%d]=%#X", i, st_payload_addr[i]);
     }
 
@@ -274,6 +306,77 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 }
 
 /****** FLIGHT PLAN VARIABLES FUNCTIONS *******/
+static int storage_flight_load_tlb(void)
+{
+    return storage_read_flash(0, st_flightplan_tlb_base_addr, (uint8_t *)st_flightplan_tlb, sizeof(st_flightplan_tlb));
+}
+
+static int storage_flight_dump_tlb(void)
+{
+    assert(ST_PAGE_SIZE%sizeof(fp_addr_t) == 0); // Write aligned to page size
+    int rc = storage_erase_flash(0, st_flightplan_tlb_base_addr);
+    if(rc == SCH_ST_OK)
+    {
+        size_t total = sizeof(st_flightplan_tlb);
+        for(int len=0; len < sizeof(st_flightplan_tlb); len += ST_PAGE_SIZE)
+        {
+            // Write up to one page
+            size_t size = len + ST_PAGE_SIZE < total ? ST_PAGE_SIZE : total - len;
+            rc += storage_write_flash(0, st_flightplan_tlb_base_addr, (uint8_t *) (&st_flightplan_tlb + len), size);
+            LOGV(tag, "Dump TLB %d bytes (%d/%d)", size, len+size, total);
+        }
+    }
+    return rc != SCH_ST_OK ? SCH_ST_ERROR : SCH_ST_OK;
+}
+
+int flight_plan_rebuild_tlb(void)
+{
+    LOGI(tag, "Rebuild FP TLB");
+//    for(int i=0; i<SCH_FP_MAX_ENTRIES; i++)
+//        LOGD(tag, "OLD_TLB[%i] = {.time=%d, .addr: %u}", st_flightplan_tlb[i].unixtime, st_flightplan_tlb[i].addr);
+
+    int rc = 0;
+    // Load all flight plan entries from flash
+    fp_container_t *fp_entries = (fp_container_t *)malloc(commands_per_section*FP_CONTAINER_SIZE);
+    storage_read_flash(0, st_flightplan_addr[0], (uint8_t *)fp_entries, commands_per_section*FP_CONTAINER_SIZE);
+
+    // Erase flash
+    LOGD(tag, "Deleting FP section at address %d", st_flightplan_addr[0]);
+    storage_erase_flash(0, st_flightplan_addr[0]);
+    st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr = 0;
+
+    // Re-write only valid entries
+    for(int index_tlb=0; index_tlb < SCH_FP_MAX_ENTRIES; index_tlb++)
+    {
+        if(st_flightplan_tlb[index_tlb].unixtime != ST_FP_NULL)
+        {
+            int old_index_flash = (st_flightplan_tlb[index_tlb].addr - st_flightplan_addr[0])/FP_CONTAINER_SIZE;
+            fp_container_t fp_entry = fp_entries[old_index_flash];
+
+            // Calculates memory address
+            int new_index_flash = (int)st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr;
+            int section_index = new_index_flash / commands_per_section;
+            int index_in_section = new_index_flash % commands_per_section;
+            uint32_t new_addr = st_flightplan_addr[section_index] + index_in_section * FP_CONTAINER_SIZE;
+
+            // Update TLB
+            st_flightplan_tlb[index_tlb].addr = new_addr;
+            st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr = 1 + st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr;
+
+            // Writes fp entry value
+            rc += storage_write_flash(0, new_addr, (uint8_t *)&fp_entry, sizeof(fp_entry));
+       }
+
+    }
+
+//    for(int i=0; i<SCH_FP_MAX_ENTRIES; i++)
+//        LOGD(tag, "NEW_TLB[%i] = {.time=%d, .addr: %u}", st_flightplan_tlb[i].unixtime, st_flightplan_tlb[i].addr);
+
+    free(fp_entries);
+    rc += storage_flight_dump_tlb();
+    return rc;
+}
+
 /**
  * Function for finding the storage index of a command based on it's timetodo field.
  *
@@ -285,8 +388,18 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
  * @param timetodo Execution time of the command to find
  * @return The command's index, -1 if not found or error
  *
- * TODO: Implement a cache/TLB with a map time->address
  */
+static int flight_plan_find_index_tlb(int timetodo)
+{
+    // Search in the TLB and return flash addr
+    for (int i = 0; i < SCH_FP_MAX_ENTRIES; i++)
+    {
+        if(st_flightplan_tlb[i].unixtime == timetodo)
+            return i;
+    }
+    return -1;
+}
+
 static int flight_plan_find_index(int timetodo)
 {
     // Calculates information on how the flight plan is stored
@@ -317,31 +430,18 @@ static int flight_plan_find_index(int timetodo)
  * @param index Storage index of the entry
  * @return SCH_ST_OK if OK, SCH_ST_ERROR if Error
  */
-static int flight_plan_erase_index(int index)
+static int flight_plan_erase_index_tlb(int index)
 {
+    // TLB index = 0 is reserved for TLB metadata
     if (index < 0 || index >= st_flightplan_entries)
     {
         LOGW(tag, "Failed attempt at erasing flight plan entry index %d, out of bounds", index);
         return -1;
     }
 
-    // Calculates memory address of the section
-    int section_index = index/commands_per_section;
-    int index_in_section = index%commands_per_section;
-    uint32_t addr = st_flightplan_addr[section_index] + index_in_section * FP_CONTAINER_SIZE;
-
-    fp_container_t fp_empty;
-    fp_empty.unixtime = ST_FP_NULL;
-    fp_empty.executions = -1;
-    fp_empty.periodical = -1;
-    fp_empty.node = SCH_COMM_NODE;
-    memset(fp_empty.cmd, 0, sizeof(fp_empty.cmd));
-    memset(fp_empty.args, 0, sizeof(fp_empty.args));
-
-    int rc =storage_write_flash(0, addr, &fp_empty, sizeof(fp_empty));
-    LOGD(tag, "Deleting index %d, at address %u, section %d (%d)\n", index, addr, section_index, rc);
-
-    return rc;
+    st_flightplan_tlb[index].unixtime = ST_FP_NULL;
+    st_flightplan_tlb[index].addr = ST_FP_NULL;
+    return storage_flight_dump_tlb();
 }
 
 int storage_flight_plan_set_st(fp_entry_t *row)
@@ -349,17 +449,22 @@ int storage_flight_plan_set_st(fp_entry_t *row)
     if(row==NULL || !storage_is_open)
         return SCH_ST_ERROR;
 
-    // Finds an index with an empty entry (unixtime == ST_FP_NULL (-1))
-    int index = flight_plan_find_index(ST_FP_NULL);
-    if (index == -1 || index >= st_flightplan_entries)
+    // Check if flash has more space
+    if(st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr > commands_per_section)
+        flight_plan_rebuild_tlb();
+
+    // Finds an index with an empty entry in the TLB (unixtime == ST_FP_NULL (-1))
+    int index_tlb = flight_plan_find_index_tlb(ST_FP_NULL);
+    if (index_tlb == -1 || index_tlb >= st_flightplan_entries)
     {
-        LOGE(tag, "Flight plan storage has no space for another command!");
+        LOGE(tag, "Flight plan TLB has no space for another command!");
         return SCH_ST_ERROR;
     }
 
     // Calculates memory address
-    int section_index = index/commands_per_section;
-    int index_in_section = index%commands_per_section;
+    int index_flash = (int)st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr;
+    int section_index = index_flash / commands_per_section;
+    int index_in_section = index_flash % commands_per_section;
     uint32_t addr = st_flightplan_addr[section_index] + index_in_section * FP_CONTAINER_SIZE;
 
     fp_container_t new_entry;
@@ -372,9 +477,17 @@ int storage_flight_plan_set_st(fp_entry_t *row)
     memset(new_entry.args, 0, sizeof(new_entry.args));
     strncpy(new_entry.args, row->args, sizeof(new_entry.args));
 
+    // Writes TLB
+    st_flightplan_tlb[index_tlb].unixtime = row->unixtime;
+    st_flightplan_tlb[index_tlb].addr = addr;
+    st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr = 1 + st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr;
+    int rc = storage_flight_dump_tlb();
+    if(rc != SCH_ST_OK)
+        return SCH_ST_ERROR;
+
     // Writes fp entry value
-    int rc = storage_write_flash(0, addr, (uint8_t *)&new_entry, sizeof(new_entry));
-    LOGD(tag, "Writing time %d to index %d, at addr %d, section %d (%d)", new_entry.unixtime, index, addr, section_index, rc);
+    rc = storage_write_flash(0, addr, (uint8_t *)&new_entry, sizeof(new_entry));
+    LOGD(tag, "Writing time %d to index %d, at addr %d, section %d (%d)", new_entry.unixtime, index_flash, addr, section_index, rc);
     return rc;
 }
 
@@ -399,15 +512,14 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
     if(index > st_flightplan_entries || row == NULL)
         return SCH_ST_ERROR;
 
-    // Calculates memory address
-    int section_index = index/commands_per_section;
-    int index_in_section = index%commands_per_section;
-    uint32_t addr = st_flightplan_addr[section_index] + index_in_section * FP_CONTAINER_SIZE;
+    if(st_flightplan_tlb[index].unixtime == ST_FP_NULL)
+        return SCH_ST_ERROR;
 
+    uint32_t addr = st_flightplan_tlb[index].addr;
     // Read one entry
     fp_container_t fp_entry;
     int rc = storage_read_flash(0, addr, (uint8_t*)&fp_entry , sizeof(fp_container_t));
-    LOGD(tag, "Read index %d, at addr %d, section %d, time %d (%d)", index, addr, section_index, fp_entry.unixtime, rc);
+    LOGD(tag, "Read index %d, at addr %d, time %d (%d)", index, addr, fp_entry.unixtime, rc);
     if(rc != SCH_ST_OK)
         return SCH_ST_ERROR;
 
@@ -420,12 +532,13 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
     row->args = strdup(fp_entry.args);
 
     return SCH_ST_OK;
+
 }
 
 int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 {
     // Finds the table index for timetodo
-    int index = flight_plan_find_index(timetodo);
+    int index = flight_plan_find_index_tlb(timetodo);
     if(index < 0)
         return SCH_ST_ERROR;
 
@@ -435,7 +548,7 @@ int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* executions, int* period, int* node)
 {
     // Finds the table index for timetodo
-    int index = flight_plan_find_index(timetodo);
+    int index = flight_plan_find_index_tlb(timetodo);
     if (command == NULL || args == NULL || executions == NULL || period == NULL || node == NULL)
         return SCH_ST_ERROR;
 
@@ -457,7 +570,7 @@ int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* e
 int storage_flight_plan_delete_row(int timetodo)
 {
     // Finds the index to erase
-    int index = flight_plan_find_index(timetodo);
+    int index = flight_plan_find_index_tlb(timetodo);
     if (index < 0)
     {
         LOGW(tag, "Couldn't find command to erase %d", timetodo);
@@ -475,7 +588,7 @@ int storage_flight_plan_delete_row_idx(int index)
         return SCH_ST_ERROR;
 
     // Erases the entry in index
-    int rc = flight_plan_erase_index(index);
+    int rc = flight_plan_erase_index_tlb(index);
     return rc;
 }
 
@@ -492,10 +605,11 @@ int storage_flight_plan_reset(void)
         LOGD(tag, "Deleting FP, section %d, addr %#X (rc=%d)", i, st_flightplan_addr[i], rc);
     }
 
-//    for(int i = 0; i < st_flightplan_entries; i++)
-//    {
-//        rc += flight_plan_erase_index(i);
-//    }
+    // Reset TLB
+    memset(st_flightplan_tlb, ST_FP_NULL, sizeof(st_flightplan_tlb));
+    st_flightplan_tlb[SCH_FP_MAX_ENTRIES].unixtime = 0;
+    st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr = 0;
+    rc += storage_flight_dump_tlb();
 
     return rc == SCH_ST_OK ? SCH_ST_OK : SCH_ST_ERROR;
 }
