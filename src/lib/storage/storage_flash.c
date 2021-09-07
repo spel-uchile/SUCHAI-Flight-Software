@@ -614,17 +614,28 @@ int storage_flight_plan_reset(void)
     return rc == SCH_ST_OK ? SCH_ST_OK : SCH_ST_ERROR;
 }
 
+
 /****** PAYLOAD STORAGE FUNCTIONS *******/
+/**
+ * Auxiliary function to check address not aligned  with flash pages.
+ */
+int check_address_alignment(uint32_t addr, uint16_t size) {
+    if( (addr + size) / ST_PAGE_SIZE  > addr / ST_PAGE_SIZE ) {
+        return SCH_ST_ERROR;
+    }
+    return SCH_ST_OK;
+}
+
 /**
  * Auxiliary function to check errors while writing address not aligned  with flash pages.
  */
 int write_data_with_check(uint32_t addr, uint8_t * data, uint16_t size)
 {
-    uint32_t addr_aux = addr;
-    if( (addr + size) / ST_PAGE_SIZE  > addr / ST_PAGE_SIZE ) {
-        addr_aux  = (addr + size / ST_PAGE_SIZE) * ST_PAGE_SIZE;
+    if(check_address_alignment(addr, size) == SCH_ST_ERROR) {
+        return SCH_ST_ERROR;
     }
-    int ret_write = storage_write_flash(0, addr_aux, data, size);
+
+    int ret_write = storage_write_flash(0, addr, data, size);
     if (ret_write != 0) {
         return SCH_ST_ERROR;
     }
@@ -635,13 +646,11 @@ int write_data_with_check(uint32_t addr, uint8_t * data, uint16_t size)
  * Auxiliary function to check errors while reading address not aligned with flash pages.
  */
 int read_data_with_check(uint32_t addr, uint8_t * data, uint16_t size) {
-
-    uint32_t addr_aux = addr;
-    if( (addr + size) / ST_PAGE_SIZE  > addr / ST_PAGE_SIZE ) {
-        addr_aux  = (addr + size / ST_PAGE_SIZE) * ST_PAGE_SIZE;
+    if(check_address_alignment(addr, size) == SCH_ST_ERROR) {
+        return SCH_ST_ERROR;
     }
 
-    int read_ret = storage_read_flash(0, addr_aux, data, size);
+    int read_ret = storage_read_flash(0, addr, data, size);
     if( read_ret != 0) {
         return SCH_ST_ERROR;
     }
@@ -653,16 +662,24 @@ int read_data_with_check(uint32_t addr, uint8_t * data, uint16_t size) {
  */
 int _get_sample_address(int payload, int index, size_t size, uint32_t *address)
 {
-    int samples_per_section = SCH_SIZE_PER_SECTION / size;
+    int samples_per_page = ST_PAGE_SIZE / size;
+    if(samples_per_page == 0) {
+        return SCH_ST_ERROR;
+    }
+    int sample_page = index / samples_per_page;
+    int index_in_page = index % samples_per_page;
+    int pages_in_section = SCH_SIZE_PER_SECTION / ST_PAGE_SIZE;
+
+    int samples_per_section = samples_per_page * pages_in_section;
     int sample_section = index / samples_per_section;
-    int index_in_section = index % samples_per_section;
+
     int section_index = payload*SCH_SECTIONS_PER_PAYLOAD + sample_section;
     if(sample_section > SCH_SECTIONS_PER_PAYLOAD)
         return SCH_ST_ERROR;
-    if(section_index > st_payloads_entries * SCH_SIZE_PER_SECTION)
+    if(section_index > st_payloads_entries * SCH_SECTIONS_PER_PAYLOAD)
         return SCH_ST_ERROR;
 
-    *address = st_payload_addr[section_index] + index_in_section * size;
+    *address = st_payload_addr[section_index] + sample_page * ST_PAGE_SIZE + index_in_page * size;
     if(*address > SCH_FLASH_INIT_MEMORY + st_flightplan_base_addr + st_payloads_entries * SCH_SECTIONS_PER_PAYLOAD * SCH_SIZE_PER_SECTION)
         return SCH_ST_ERROR;
 
