@@ -115,6 +115,18 @@ int tm_send_all(char *fmt, char *params, int nparams);
 int tm_send_from(char *fmt, char *params, int nparams);
 
 /**
+ * Parses a payload data telemetry, @seealso tm_send_all.
+ * @warning Avoid using this command from command line, or tele-command
+ *
+ * @param fmt Str. Not used.
+ * @param param char *. Parameters as pointer to raw data. Receives a com_frame_t structure with an array of
+ * payload structs in frame->data
+ * @param nparams Int. Not used.
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int tm_parse_payload(char *fmt, char *params, int nparams);
+
+/**
  * Acknowledge k samples of a payload.
  * @param fmt "%u %u"
  * @param params "<payload> <k samples>"

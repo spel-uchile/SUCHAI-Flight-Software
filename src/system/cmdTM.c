@@ -42,6 +42,7 @@ void cmd_tm_init(void)
     cmd_add("tm_send_last", tm_send_last, "%u %u", 2);
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
     cmd_add("tm_send_from", tm_send_from, "%u %u %u", 3);
+    cmd_add("tm_parse_payload", tm_parse_payload, "%", 0);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
     cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
 #ifdef LINUX
@@ -392,6 +393,29 @@ int tm_send_from(char *fmt, char *params, int nparams)
     {
         return CMD_SYNTAX_ERROR;
     }
+}
+
+int tm_parse_payload(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+        return CMD_SYNTAX_ERROR;
+
+    com_frame_t *frame = (com_frame_t *)params;
+    int payload = frame->type - TM_TYPE_PAYLOAD; // Payload type
+    int j, offset, errors = 0;
+
+    _ntoh32_buff(frame->data.data32, sizeof(frame->data.data8)/ sizeof(uint32_t));
+
+    assert(frame->ndata*data_map[payload].size <= COM_FRAME_MAX_LEN);
+    for(j=0; j < frame->ndata; j++)
+    {
+        offset = j * data_map[payload].size; // Select next struct
+        int rc = dat_add_payload_sample((frame->data.data8) + offset, payload); //Save next struct
+        if(rc == -1)
+            errors ++;
+    }
+
+    return errors > 0 ? CMD_ERROR : CMD_OK;
 }
 
 int tm_set_ack(char *fmt, char *params, int nparams) {
