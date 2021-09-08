@@ -240,7 +240,7 @@ int com_debug(char *fmt, char *params, int nparams);
 int com_set_time_node(char *fmt, char *params, int nparams);
 
 /**
- * Download current TLE for <satellite_name> and send obc_set_tle <tle1>, obc_set_tle <tle2>, and obc_update_tle
+ * Download current TLE for <satellite_name> and send obc_set_tle <tle1>, tle_set <tle2>, and tle_update
  * commands to <node>
  * @param fmt "%d %s"
  * @param params <node> <satellte_name>

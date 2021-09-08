@@ -523,7 +523,7 @@ int com_set_tle_node(char *fmt, char *params, int nparams)
     memset(line+69, 0, 100-69); // Clean the string from \r, \n others
     LOGD(tag, line);
 
-    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_tle %s", node, line);
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d tle_set %s", node, line);
     LOGD(tag, cmd);
     rc = com_send_cmd("%d %n", cmd, 2);
     if(rc != CMD_OK)
@@ -539,7 +539,7 @@ int com_set_tle_node(char *fmt, char *params, int nparams)
     memset(line+69, 0, 100-69); // Clean the string from \r, \n others
     LOGD(tag, line);
 
-    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_tle %s", node, line);
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d tle_set %s", node, line);
     LOGD(tag, cmd);
     rc = com_send_cmd("%d %n", cmd, 2);
     if(rc != CMD_OK)
@@ -547,7 +547,7 @@ int com_set_tle_node(char *fmt, char *params, int nparams)
 
     // Send update tle command
     memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
-    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_update_tle", node);
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d tle_update", node);
     LOGD(tag, cmd);
     rc = com_send_cmd("%d %n", cmd, 2);
     if(rc != CMD_OK)
