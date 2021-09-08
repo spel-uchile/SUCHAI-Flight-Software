@@ -42,10 +42,14 @@ void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
 void taskInit(void *param)
 {
     int rc = 0;
+#ifdef NANOMIND
+    on_init_task(NULL);
+#endif
 
     /* Initialize system variables */
     LOGI(tag, "SETUP VARIABLES...");
     rc = init_update_status_vars();
+    rc = dat_purge_fp();
     // Init LibCSP system
     LOGI(tag, "SETUP CSP...");
     init_setup_libcsp();

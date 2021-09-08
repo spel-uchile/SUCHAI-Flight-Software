@@ -162,7 +162,7 @@ int storage_flight_plan_set_st(fp_entry_t *row)
     int i;
     for(i = 0; i < flightplan_entries; i++)
     {
-        if(flightplan_db[i].unixtime == -1)
+        if(flightplan_db[i].unixtime == ST_FP_NULL)
         {
             fp_entry_copy(row, flightplan_db + i);
             return SCH_ST_OK;

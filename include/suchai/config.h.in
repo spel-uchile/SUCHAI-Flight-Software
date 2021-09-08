@@ -84,7 +84,7 @@
 #define SCH_CMD_MAX_ENTRIES          (255)  ///< Max number of commands in the repository
 #define SCH_SECTIONS_PER_PAYLOAD     (10)  ///< Memory blocks for storing each payload type TODO: Make configurable per payload
 #define SCH_SIZE_PER_SECTION         (256*1024)  ///< Size of each memory block in flash storage
-#define SCH_FLASH_INIT_MEMORY        0  ///< Initial address in flash storage
+#define SCH_FLASH_INIT_MEMORY        0*SCH_SIZE_PER_SECTION  ///< Initial address in flash storage
 
 /**
  * Memory settings.
@@ -105,8 +105,8 @@
 #define SCH_TASK_CSP_STACK            (5*256)  ///< CSP route task stack size in words
 
 #define SCH_BUFF_MAX_LEN              (256)  ///< General buffers max length in bytes
-#define SCH_CMD_MAX_STR_PARAMS        (256)  ///< Limit for the parameters length
-#define SCH_CMD_MAX_STR_NAME          (256)  ///< Limit for the length of the name of a command
-#define SCH_CMD_MAX_STR_FORMAT        (128)  ///< Limit for the length of the format field of a command
+#define SCH_CMD_MAX_STR_PARAMS        (248)  ///< Limit for the parameters length
+#define SCH_CMD_MAX_STR_NAME          (248)  ///< Limit for the length of the name of a command
+#define SCH_CMD_MAX_STR_FORMAT        (248)  ///< Limit for the length of the format field of a command
 
 #endif //SUCHAI_CONFIG_H
