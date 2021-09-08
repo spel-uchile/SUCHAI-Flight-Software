@@ -242,21 +242,9 @@ static void com_receive_tm(csp_packet_t *packet)
     }
     else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor)
     {
-        int payload = frame->type - TM_TYPE_PAYLOAD; // Payload type
-        print_buff16(packet->data16, packet->length/2);
-        int j, delay = 0;
-
-        //FIXME: Use a command to add payloads to database
-        //Save ndata payload samples to data storage
-
-        _ntoh32_buff(frame->data.data32, sizeof(frame->data.data8)/ sizeof(uint32_t));
-
-        assert(frame->ndata*data_map[payload].size <= COM_FRAME_MAX_LEN);
-        for(j=0; j < frame->ndata; j++)
-        {
-            delay = j*data_map[payload].size; // Select next struct
-            dat_add_payload_sample((frame->data.data8)+delay, payload); //Save next struct
-        }
+        cmd_parse_tm = cmd_get_str("tm_parse_payload");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
     }
     else
     {
