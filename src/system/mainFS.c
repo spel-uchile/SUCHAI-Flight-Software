@@ -41,8 +41,8 @@ int suchai_main(void)
 
     /* Init software subsystems */
     log_init(SCH_LOG_LEVEL, -1);      // Logging system
-    cmd_repo_init(); // Command repository initialization
-    dat_repo_init(); // Update status repository
+    osSemaphoreCreate(&repo_cmd_sem);
+    osSemaphoreCreate(&repo_data_sem);
 
     /* Initializing shared Queues */
     dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));

@@ -96,7 +96,7 @@
  */
 #define SCH_TASK_DEF_STACK            (5*256)  ///< Default task stack size in words
 #define SCH_TASK_DIS_STACK            (5*256)  ///< Dispatcher task stack size in words
-#define SCH_TASK_EXE_STACK            (5*256)  ///< Executer task stack size in words
+#define SCH_TASK_EXE_STACK            (10*256)  ///< Executer task stack size in words
 #define SCH_TASK_WDT_STACK            (5*256)  ///< Watchdog task stack size in words
 #define SCH_TASK_INI_STACK            (7*256)  ///< Init task stack size in words
 #define SCH_TASK_COM_STACK            (5*256)  ///< Communications task stack size in words

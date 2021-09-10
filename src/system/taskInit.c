@@ -46,9 +46,15 @@ void taskInit(void *param)
     on_init_task(NULL);
 #endif
 
+    LOGI(tag, "SETUP REPOSITORIES...");
+    /* Initialize repositories */
+    cmd_repo_init(); // Command repository initialization
+    dat_repo_init(); // Update status repository
+
     /* Initialize system variables */
     LOGI(tag, "SETUP VARIABLES...");
     rc = init_update_status_vars();
+    LOGI(tag, "PURGE FLIGHT PLAN...");
     rc = dat_purge_fp();
     // Init LibCSP system
     LOGI(tag, "SETUP CSP...");

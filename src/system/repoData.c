@@ -284,7 +284,7 @@ int dat_purge_fp(void)
         int ok = storage_flight_plan_get_idx(i, &fp_i);
         if(ok == SCH_ST_OK && fp_i.unixtime > time_min)  // Count valid entries
             fp_entries ++;
-        else if(fp_i.unixtime > 0)    // Delete old entries
+        else if(fp_i.unixtime != ST_FP_NULL)    // Delete old entries
             storage_flight_plan_delete_row_idx(i);
     }
     dat_set_system_var(dat_fpl_queue, fp_entries);
