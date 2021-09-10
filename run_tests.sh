@@ -19,13 +19,12 @@ echo ${WORKSPACE}
 # ---------------- --TEST_UNIT ------------------
 # The test log is called test_unit_log.txt
 # Tests for all storage modes
-rm -rf build_test
 TEST_NAME="test_unit"
 
 for ST_MODE in "RAM" "SQLITE" "FLASH"
 do
     echo "Testing ${TEST_NAME} for storage ${ST_MODE}"
-
+    rm -rf build_test
     # build the unitest with the test's parameters
     cmake -B build_test -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=${ST_MODE} -DSCH_STORAGE_TRIPLE_WR=1
     cmake --build build_test
