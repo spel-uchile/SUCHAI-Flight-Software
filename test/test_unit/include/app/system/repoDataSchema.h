@@ -59,10 +59,16 @@ typedef enum dat_status_address_enum {
     dat_fpl_queue,                ///< Flight plan queue length
 
     /// Memory: Current payload memory addresses
-    dat_drp_idx_temp,                 ///< Temperature data index
+    dat_drp_idx_data1,                 ///< Data index
+    dat_drp_idx_data2,                 ///< Data index
+    dat_drp_idx_data3,                 ///< Data index
+    dat_drp_idx_data4,                 ///< Data index
 
     /// Memory: Current send acknowledge data
-    dat_drp_ack_temp,             ///< Temperature data acknowledge
+    dat_drp_ack_data1,             ///< Data acknowledge
+    dat_drp_ack_data2,             ///< Data acknowledge
+    dat_drp_ack_data3,             ///< Data acknowledge
+    dat_drp_ack_data4,             ///< Data acknowledge
 
     /// Add a new status variables address here
     //dat_custom,                 ///< Variable description
@@ -125,8 +131,14 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_fpl_queue,         "fpl_queue",         'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
         {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, -1},          ///< General operation mode
         {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, -1},          ///< RTC current unix time
-        {dat_drp_idx_temp,      "drp_idx_temp",      'u', DAT_IS_STATUS, 0},          ///< Temperature data index
-        {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
+        {dat_drp_idx_data1,      "drp_idx_data1",      'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_idx_data2,      "drp_idx_data2",      'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_idx_data3,      "drp_idx_data3",      'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_idx_data4,      "drp_idx_data4",      'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_ack_data1,      "drp_ack_data1",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
+        {dat_drp_ack_data2,      "drp_ack_data2",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
+        {dat_drp_ack_data3,      "drp_ack_data3",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
+        {dat_drp_ack_data4,      "drp_ack_data4",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
 };
 ///< The dat_status_last_var constant serves for looping through all status variables
 static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_status_list[0]);
@@ -135,15 +147,6 @@ static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_stat
 /**
  * PAYLOAD DATA DEFINITIONS
  */
-
-/**
- * Struct for storing temperature data.
- */
-typedef struct __attribute__((__packed__)) temp_data {
-    uint32_t index;
-    uint32_t timestamp;
-    float obc_temp_1;
-} temp_data_t;
 
 /**
  * Enum constants for dynamically identifying payload fields at execution time.
@@ -161,9 +164,54 @@ typedef struct __attribute__((__packed__)) temp_data {
  * @endcode
  */
 typedef enum payload_id {
-    temp_sensors=0,         ///< Temperature sensors
-    last_sensor             ///< Dummy element, the amount of payload variables
+    float_data=0,      ///< Data 1
+    half_data,        ///< Data 1
+    string_data,      ///< Data 1
+    mix_data,         ///< Data 1
+    last_sensor       ///< Dummy element, the amount of payload variables
 } payload_id_t;
+
+/**
+ * Struct for storing temperature data.
+ */
+typedef struct __attribute__((__packed__)) float_data {
+    uint32_t index;
+    uint32_t timestamp;
+    int32_t data1;
+    float data2;
+} float_data_t;
+
+/**
+ * Struct for storing int16 data.
+ */
+typedef struct __attribute__((__packed__)) half_data {
+    uint32_t index;
+    uint32_t timestamp;
+    int16_t data1;
+    int16_t data2;
+} half_data_t;
+
+/**
+ * Struct for storing string data.
+ */
+typedef struct __attribute__((__packed__)) string_data {
+    uint32_t index;
+    uint32_t timestamp;
+    char str1[SCH_ST_STR_SIZE];
+    char str2[SCH_ST_STR_SIZE];
+} string_data_t;
+
+/**
+ * Struct for storing mixed data.
+ */
+typedef struct __attribute__((__packed__)) mix_data {
+    uint32_t index;
+    uint32_t timestamp;
+    int16_t data1;
+    int16_t data2;
+    int32_t data3;
+    char str1[SCH_ST_STR_SIZE];
+} mix_data_t;
 
 /**
  * Struct for storing data collected by status variables.
@@ -175,13 +223,16 @@ typedef struct __attribute__((__packed__)) sta_data {
 } sta_data_t;
 
 static data_map_t data_map[] = {
-    {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_drp_idx_temp, dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
+    {"dat_unit_float", (uint16_t) (sizeof(float_data_t)), dat_drp_idx_data1, dat_drp_ack_data1, "%u %u %d %f", "sat_index timestamp data1 data2"},
+    {"dat_unit_half", (uint16_t) (sizeof(half_data_t)), dat_drp_idx_data2, dat_drp_ack_data2, "%u %u %h %h", "sat_index timestamp data1 data2"},
+    {"dat_unit_string", (uint16_t) (sizeof(string_data_t)), dat_drp_idx_data3, dat_drp_ack_data3, "%u %u %s %s", "sat_index timestamp data1 data2"},
+    {"dat_unit_mix", (uint16_t) (sizeof(mix_data_t)), dat_drp_idx_data4, dat_drp_ack_data4, "%u %u %h %h %d %s", "sat_index timestamp data1 data2 data3 data4"},
 };
 
 /** The repository's name */
-#define DAT_TABLE_STATUS "dat_status"      ///< Status variables table name
-#define DAT_TABLE_DATA   "dat_data"        ///< Data storage table name
-#define DAT_TABLE_FP     "dat_flightplan"  ///< Flight plan table name
+#define DAT_TABLE_STATUS "dat_unit_status"      ///< Status variables table name
+#define DAT_TABLE_DATA   "dat_unit_data"        ///< Data storage table name
+#define DAT_TABLE_FP     "dat_unit_flightplan"  ///< Flight plan table name
 
 /**
  * Search and return a status variable definition from dat_status_list by index or by name

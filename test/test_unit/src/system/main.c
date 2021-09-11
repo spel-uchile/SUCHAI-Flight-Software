@@ -304,42 +304,164 @@ void test_get_system_vars_fault_tolerant(void)
     }
 }
 
-void test_payload_data(void)
+void test_payload_data_1(void)
 {
     init_suite_repodata();
 
     int rc, i;
     int n_test = 10;
-    uint32_t time_test = 1596853407;
-    float float_test = ((float)rand()/(float)(RAND_MAX)) * 1.0;
+    uint32_t time_test = (uint32_t)time(NULL);
+    int32_t int_test = rand();
+    float float_test = rand()/(float)rand();
 
     // Push N data samples to the storage system
     for(i=0; i<n_test; i++)
     {
-        temp_data_t data_temp;
-        data_temp.timestamp = time_test+i;
-        data_temp.index = (uint32_t)i;
-        data_temp.obc_temp_1 = float_test+i;
-        rc = dat_add_payload_sample(&data_temp, temp_sensors);
-        CU_ASSERT(rc > 0);
+        float_data_t data;
+        data.timestamp = time_test + i;
+        data.index = (uint32_t)i;
+        data.data1 = int_test - i;
+        data.data2 = float_test + i;
+        rc = dat_add_payload_sample(&data, float_data);
+        CU_ASSERT(rc >= 0);
     }
 
     // Test storage payload index
-    CU_ASSERT_EQUAL(dat_get_system_var(dat_drp_idx_temp), n_test);
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[float_data].sys_index), n_test);
 
     // Read N data samples to the storage system
     for(i=0; i<n_test; i++)
     {
-        temp_data_t data_temp;
-        rc = dat_get_recent_payload_sample(&data_temp, temp_sensors, n_test-i-1);
+        float_data_t data;
+        rc = dat_get_recent_payload_sample(&data, float_data, n_test-i-1);
+        dat_print_payload_struct(&data, float_data);
         CU_ASSERT_EQUAL(rc, 0);
-        printf("timestamp: %d\n", data_temp.timestamp);
-        printf("obc_temp_1: %f\n", data_temp.obc_temp_1);
-        CU_ASSERT_EQUAL(data_temp.timestamp, time_test+i);
-        CU_ASSERT_DOUBLE_EQUAL(data_temp.obc_temp_1, float_test+i, 1e-6);
+        CU_ASSERT_EQUAL(data.timestamp, time_test+i);
+        CU_ASSERT_EQUAL(data.data1, int_test-i);
+        CU_ASSERT_DOUBLE_EQUAL(data.data2, float_test+i, 1e-6);
     }
 }
 
+void test_payload_data_2(void)
+{
+    init_suite_repodata();
+
+    int rc, i;
+    int n_test = 10;
+    uint32_t time_test = (uint32_t)time(NULL);
+    int16_t data_test = (int16_t)(rand()/2);
+
+    // Push N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        half_data_t data;
+        data.timestamp = time_test + i;
+        data.index = (uint32_t)i;
+        data.data1 = data_test - i;
+        data.data2 = data_test + i;
+        rc = dat_add_payload_sample(&data, half_data);
+        CU_ASSERT(rc >= 0);
+    }
+
+    // Test storage payload index
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[half_data].sys_index), n_test);
+
+    // Read N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        half_data_t data;
+        rc = dat_get_recent_payload_sample(&data, half_data, n_test-i-1);
+        dat_print_payload_struct(&data, half_data);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data.timestamp, time_test+i);
+        CU_ASSERT_EQUAL(data.data1, data_test-i);
+        CU_ASSERT_EQUAL(data.data2, data_test+i);
+    }
+}
+
+void test_payload_data_3(void)
+{
+    init_suite_repodata();
+
+    int rc, i;
+    int n_test = 10;
+    uint32_t time_test = (uint32_t)time(NULL);
+    char *str1 = "test short string";
+    char *str2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi scelerisque sapien velit, in tristique orci dictum vel. In duis.";
+
+    // Push N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        string_data_t data;
+        data.timestamp = time_test + i;
+        data.index = (uint32_t)i;
+        memset(data.str1, 0, SCH_ST_STR_SIZE);
+        memset(data.str2, 0, SCH_ST_STR_SIZE);
+        strcpy(data.str1, str1);
+        strcpy(data.str2, str2);
+        rc = dat_add_payload_sample(&data, string_data);
+        CU_ASSERT(rc >= 0);
+    }
+
+    // Test storage payload index
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[string_data].sys_index), n_test);
+
+    // Read N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        string_data_t data;
+        rc = dat_get_recent_payload_sample(&data, string_data, n_test-i-1);
+        dat_print_payload_struct(&data, string_data);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data.timestamp, time_test+i);
+        CU_ASSERT_STRING_EQUAL(data.str1, str1);
+        CU_ASSERT_STRING_EQUAL(data.str2, str2);
+    }
+}
+
+void test_payload_data_4(void)
+{
+    init_suite_repodata();
+
+    int rc, i;
+    int n_test = 10;
+    uint32_t time_test = (uint32_t)time(NULL);
+    int32_t int_test = rand();
+    int16_t short_test = (int16_t)(rand()/2);
+    char *str1 = "test short string";
+
+    // Push N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        mix_data_t data;
+        data.timestamp = time_test + i;
+        data.index = (uint32_t)i;
+        data.data1 = short_test + i;
+        data.data2 = short_test - i;
+        data.data3 = int_test + i;
+        memset(data.str1, 0, SCH_ST_STR_SIZE);
+        strcpy(data.str1, str1);
+        rc = dat_add_payload_sample(&data, mix_data);
+        CU_ASSERT(rc >= 0);
+    }
+
+    // Test storage payload index
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[mix_data].sys_index), n_test);
+
+    // Read N data samples to the storage system
+    for(i=0; i<n_test; i++)
+    {
+        mix_data_t data;
+        rc = dat_get_recent_payload_sample(&data, mix_data, n_test-i-1);
+        dat_print_payload_struct(&data, mix_data);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data.timestamp, time_test+i);
+        CU_ASSERT_EQUAL(data.data1, short_test + i);
+        CU_ASSERT_EQUAL(data.data2, short_test - i);
+        CU_ASSERT_EQUAL(data.data3, int_test + i);
+        CU_ASSERT_STRING_EQUAL(data.str1, str1);
+    }
+}
 
 
 /** SUIT 4 **/
@@ -525,7 +647,11 @@ int main()
     if ((NULL == CU_add_test(pSuite, "test of drp_test_system_vars", test_system_vars)) ||
             (NULL == CU_add_test(pSuite, "test of dat_set_system_var", test_set_system_vars_fault_tolerant)) ||
             (NULL == CU_add_test(pSuite, "test of dat_get_system_var", test_get_system_vars_fault_tolerant)) ||
-            (NULL == CU_add_test(pSuite, "test of payload storage", test_payload_data)))
+            (NULL == CU_add_test(pSuite, "test of payload storage 1", test_payload_data_1)) ||
+            (NULL == CU_add_test(pSuite, "test of payload storage 2", test_payload_data_2)) ||
+            (NULL == CU_add_test(pSuite, "test of payload storage 3", test_payload_data_3)) ||
+            (NULL == CU_add_test(pSuite, "test of payload storage 4", test_payload_data_4))
+        )
     {
         CU_cleanup_registry();
         return CU_get_error();

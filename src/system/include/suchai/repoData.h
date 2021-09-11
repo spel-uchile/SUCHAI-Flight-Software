@@ -226,7 +226,7 @@ int dat_set_time(int new_time);
  * 0 for ISO format or 1 for UNIX TIME format, >1 Both formats.
  *
  * @param format Format of the print
- * @return 0 if OK, 1 if the format input doesn't exist
+ * @return 0 if OK
  */
 int dat_show_time(int format);
 

@@ -21,6 +21,8 @@
 #include "suchai/storage.h"
 #include <sqlite3.h>
 
+#define ST_SQL_MAX_LEN  (1000)
+
 ///< Status variables buffer
 static size_t status_entries = 0;
 
@@ -39,7 +41,7 @@ static sqlite3 *db = NULL;
 static void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j);
 static const char* get_sql_type(char* c_type);
 static int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names);
-static void get_value_string(char* ret_string, char* c_type, const char* buff);
+static int get_value_string(char* dest, char* c_type, void *data);
 static int get_sizeof_type(char* c_type);
 
 int storage_init(const char *db_name)
@@ -476,30 +478,30 @@ const char* get_sql_type(char* c_type)
 
 void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j)
 {
-    if(strcmp(c_type, "%f") == 0) {
+    if(c_type[1] == 'f') {
         float val;
         val =(float) sqlite3_column_double(stmt, j);
         memcpy(buff, &val, sizeof(float));
     }
-    else if(strcmp(c_type, "%d") == 0) {
-        int val;
+    else if(c_type[1] == 'd' || c_type[1] == 'i') {
+        int32_t val;
         val = sqlite3_column_int(stmt, j);
-        memcpy(buff, &val, sizeof(int));
+        memcpy(buff, &val, sizeof(int32_t));
     }
-    else if(strcmp(c_type, "%u") == 0) {
-        unsigned int val;
-        val = (unsigned int) sqlite3_column_int(stmt, j);
-        memcpy(buff, &val, sizeof(unsigned int));
+    else if(c_type[1] == 'u') {
+        uint32_t val;
+        val = (uint32_t) sqlite3_column_int(stmt, j);
+        memcpy(buff, &val, sizeof(uint32_t));
     }
-    else if(strcmp(c_type, "%h") == 0) {
-        int val;
-        val = sqlite3_column_int(stmt, j);
-        memcpy(buff, &val, sizeof(int));
+    else if(c_type[1] == 'h') {
+        uint16_t val;
+        val = (uint16_t)sqlite3_column_int(stmt, j);
+        memcpy(buff, &val, sizeof(uint16_t));
     }
     else{
-        const char *val;
-        *val = sqlite3_column_text(stmt, j);
-        strcpy(buff, val);
+        const unsigned char *val;
+        val = sqlite3_column_text(stmt, j);
+        strncpy(buff, val, SCH_ST_STR_SIZE);
     }
 }
 
@@ -524,48 +526,54 @@ int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_n
     return j;
 }
 
-void get_value_string(char* ret_string, char* c_type, const char* buff)
+int get_value_string(char* dest, char* c_type, void *data)
 {
-    if(strcmp(c_type, "%f") == 0) {
-        if (*((int *)buff) == -1) {
-            sprintf(ret_string, " 'nan'");
-        } else {
-            sprintf(ret_string, " %f", *((float*)buff));
-        }
+    int size = -1;
+    switch (c_type[1]) {
+        case 'f':
+            size = sprintf(dest, " %f,", *(float*)data);
+            break;
+        case 'u':
+            size = sprintf(dest, " %u,", *(uint32_t*)data);
+        case 'i':
+        case 'd':
+            size = sprintf(dest, " %d,", *(int32_t*)data);
+            break;
+        case 'h':
+            size = sprintf(dest, " %hd,", *(int16_t*)data);
+            break;
+        case 's':
+            size = snprintf(dest, SCH_ST_STR_SIZE+5, " '%s',", (char*)data);
+        default:
+            break;
     }
-    else if(strcmp(c_type, "%d") == 0) {
-        sprintf(ret_string, " %d", *((int32_t *)buff));
-    }
-    else if(strcmp(c_type, "%u") == 0) {
-        sprintf(ret_string, " %u", *((uint32_t *)buff));
-    }
-    else if(strcmp(c_type, "%i") == 0) {
-        sprintf(ret_string," %i", *((int32_t*)buff));
-    }
-    else if(strcmp(c_type, "%h") == 0) {
-        sprintf(ret_string," %hi", *((uint16_t *)buff));
-    }
+
+    return size;
 }
 
+///< Return the size of a type like: "%f"->4, "%d"->4, "%h"->4, etc..
 int get_sizeof_type(char* c_type)
 {
-    if(strcmp(c_type, "%f") == 0) {
-        return sizeof(float);
+    int size = -1;
+    switch (c_type[1]) {
+        case 'f':
+            size = sizeof(float);
+            break;
+        case 'u':
+        case 'i':
+        case 'd':
+            size = sizeof(int32_t);
+            break;
+        case 'h':
+            size = sizeof(int16_t);
+            break;
+        case 's':
+            size = SCH_ST_STR_SIZE;
+        default:
+            break;
     }
-    else if(strcmp(c_type, "%d") == 0) {
-        return sizeof(int32_t);
-    } else if(strcmp(c_type, "%u") == 0) {
-        return sizeof(uint32_t);
-    } else if(strcmp(c_type, "%i") == 0) {
-        return sizeof(int32_t);
-    } else if(strcmp(c_type, "%h") == 0) {
-        return sizeof(int16_t);
-    } else if(strcmp(c_type, "%s") == 0) {
-        return SCH_ST_STR_SIZE;
-    }
-    else {
-        return -1;
-    }
+
+    return size;
 }
 
 
@@ -574,56 +582,67 @@ int storage_payload_set_data(int payload, int index, void *data, data_map_t *sch
     if(data == NULL || schema == NULL)
         return SCH_ST_ERROR;
 
-    char* tok_sym[300];
-    char* tok_var[300];
-    char *order = (char *)malloc(300);
-    strcpy(order, schema->data_order);
-    char *var_names = (char *)malloc(1000);
-    strcpy(var_names, schema->var_names);
-    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names);
+    char *sql_values = (char *) calloc(ST_SQL_MAX_LEN,1 );
+    char *sql_names = (char *) calloc(ST_SQL_MAX_LEN,1 );
+    char *sql_values_p = sql_values;
+    char *sql_names_p = sql_names;
 
-    char *values = (char *)malloc(1000);
-    char *names = (char *)malloc(1000);
-    strcpy(names, "(id, tstz,");
-    sprintf(values, "(%d, current_timestamp,", index);
+    char *var_types = strdup(schema->data_order);
+    char *var_names = strdup(schema->var_names);
 
-    for(int j=0; j < nparams; ++j) {
-        int param_size = get_sizeof_type(tok_sym[j]);
-        char buff[param_size];
-        memcpy(buff, data+(j*param_size), param_size);
+    const char *sep = " ";
+    char *tmp_type, *tmp_var;
+    char *tok_type = strtok_r(var_types, sep, &tmp_type);
+    char *tok_var = strtok_r(var_names, sep, &tmp_var);
 
-        char name[20];
-        sprintf(name, " %s", tok_var[j]);
-        strcat(names, name);
+    /**
+     * Prepare names and values to sql query, ej:
+     * "index var1 var2" -> "(id, tstz, index, var1, var2)"
+     * {1 31.1212 -125} -> "(0, current_timestamp, 1, 31.1213, -125)"
+     */
+    int len = sprintf(sql_names, "%s", "(id, tstz,");
+    sql_names += len;
+    len = sprintf(sql_values, "(%d, current_timestamp,", index);
+    sql_values += len;
 
-        char val[20];
-        get_value_string(val, tok_sym[j], buff);
-        strcat(values, val);
+    while(tok_type != NULL && tok_var != NULL) {
+        int name_len = sprintf(sql_names, " %s,", tok_var);
+        sql_names += name_len;
 
-        if(j != nparams-1){
-            strcat(names, ",");
-            strcat(values, ",");
-        }
+        int value_size = get_sizeof_type(tok_type);
+        int value_len = get_value_string(sql_values, tok_type, data);
+        data += value_size;
+        sql_values += value_len;
+
+        tok_type = strtok_r(NULL, sep, &tmp_type);
+        tok_var = strtok_r(NULL, sep, &tmp_var);
     }
 
-    strcat(names, ")");
-    strcat(values, ")");
-    char*  insert_row = (char *)malloc(2000);
-    sprintf(insert_row, "INSERT INTO %s %s VALUES %s", schema->table , names, values);
-    free(order);
-    free(var_names);
-    free(values);
-    free(names);
+    // Remove final ',' and replace with ')' to close the statement
+    sql_names[-1]=')';
+    sql_values[-1]=')';
 
+    assert(sql_values - sql_values_p < ST_SQL_MAX_LEN);
+    assert(sql_names - sql_names_p < ST_SQL_MAX_LEN);
+
+    // Create the INSERT VALUES SQL query
+    char*  insert_row = (char *)malloc(2*ST_SQL_MAX_LEN);
+    snprintf(insert_row, 2*ST_SQL_MAX_LEN, "INSERT INTO %s %s VALUES %s", schema->table , sql_names_p, sql_values_p);
+
+    // Execute
     char* err_msg;
-    int rc;
-    rc = sqlite3_exec(db, insert_row, 0, 0, &err_msg);
+    int rc = sqlite3_exec(db, insert_row, 0, 0, &err_msg);
 
-    if (rc != SQLITE_OK ) {
+    if (rc != SQLITE_OK )
         sqlite3_free(err_msg);
-        return SCH_ST_ERROR;
-    }
-    return SCH_ST_OK;
+
+    free(var_types);
+    free(var_names);
+    free(sql_values_p);
+    free(sql_names_p);
+    free(insert_row);
+
+    return rc != SQLITE_OK ? SCH_ST_ERROR : SCH_ST_OK;
 }
 
 int storage_payload_get_data(int payload, int index, void *data, data_map_t *schema)
@@ -631,55 +650,53 @@ int storage_payload_get_data(int payload, int index, void *data, data_map_t *sch
     if(data == NULL || schema == NULL)
         return SCH_ST_ERROR;
 
-    char* tok_sym[300];
-    char* tok_var[300];
-    char order[300];
-    strcpy(order, schema->data_order);
-    char var_names[1000];
-    strcpy(var_names, schema->var_names);
-    int nparams = get_payloads_tokens(tok_sym, tok_var, order, var_names);
+    /**
+     * Prepare names to sql string, ej: "index var1 var2" -> "index,var1,var2"
+     */
+    char *var_names2 = strdup(schema->var_names);
+    for(int i=0; i< strlen(var_names2); i++)
+        if(var_names2[i] == ' ')
+            var_names2[i] = ',';
 
-    char values[1000];
-    char names[1000];
-
-    strcpy(names, "");
-    int j;
-    for(j=0; j < nparams; ++j) {
-
-        char name[20];
-        sprintf(name, " %s", tok_var[j]);
-        strcat(names, name);
-
-        if(j != nparams-1){
-            strcat(names, ",");
-        }
-    }
-
-    char get_value[2000];
-    sprintf(get_value,"SELECT %s FROM %s WHERE id=%d LIMIT 1", names, schema->table, index);
+    // Create the SELECT FROM SQL query
+    char *get_value_sql = malloc(2*ST_SQL_MAX_LEN);
+    sprintf(get_value_sql, "SELECT %s FROM %s WHERE id=%d LIMIT 1", var_names2, schema->table, index);
 
     char* err_msg;
     int rc;
     sqlite3_stmt* stmt = NULL;
 
-    // execute statement
-    rc = sqlite3_prepare_v2(db, get_value, -1, &stmt, 0);
+    // Execute statement
+    rc = sqlite3_prepare_v2(db, get_value_sql, -1, &stmt, 0);
+    free(get_value_sql);
+    free(var_names2);
     if(rc != SQLITE_OK) return SCH_ST_ERROR;
 
-    // fetch only one row's status
+    // Fetch only one row's status
     rc = sqlite3_step(stmt);
-    int val;
-    if(rc == SQLITE_ROW) {
-        for(j=0; j < nparams; ++j) {
-            int param_size = get_sizeof_type(tok_sym[j]);
-            get_sqlite_value(tok_sym[j], &val, stmt, j);
-            // TODO: sum data pointer with accumulative param sizes
-            memcpy(data+(j*4), &val, param_size);
-        }
-    } else {
+    if(rc != SQLITE_ROW) {
         sqlite3_finalize(stmt);
         return SCH_ST_ERROR;
     }
+
+    /**
+     * Process row, from a string of value to the structure.
+     * Convert string to values and copy data to the structure.
+     */
+    char *types = strdup(schema->data_order);
+    const char *sep = " ";
+    char *type_tmp;
+    char *tok_type = strtok_r(types, sep, &type_tmp);
+    int column = 0;
+    while(tok_type != NULL) {
+        int param_size = get_sizeof_type(tok_type);
+        char value_buffer[param_size];
+        get_sqlite_value(tok_type, value_buffer, stmt, column++);
+        memcpy(data, value_buffer, param_size);
+        data += param_size;
+        tok_type = strtok_r(NULL, sep, &type_tmp);
+    }
+
     sqlite3_finalize(stmt);
     return SCH_ST_OK;
 }

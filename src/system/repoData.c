@@ -415,10 +415,9 @@ int dat_add_payload_sample(void* data, int payload)
     // Update index
     if (ret >= SCH_ST_OK)
     {
-        // Ret contains how many indexes was skipped due to flash errors
-        index += 1+ret;
+        index += 1;
         dat_set_system_var(data_map[payload].sys_index, index);
-        return index;
+        return 0;
     }
     else
     {
@@ -506,13 +505,16 @@ int dat_print_payload_struct(void* data, unsigned int payload)
             case 'h':
                 printf("%hi", *(int16_t *)data);
                 data += sizeof(int16_t);
+                break;
             case 's':
                 tmp = strndup((char *)data, SCH_ST_STR_SIZE);
                 printf(type, tmp);
                 free(tmp);
                 data += SCH_ST_STR_SIZE;
+                break;
             default:
                 data ++;
+                break;
         }
         printf("\r\n");
 
