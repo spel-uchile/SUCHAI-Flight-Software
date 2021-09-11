@@ -467,6 +467,8 @@ const char* get_sql_type(char* c_type)
         return "INTEGER";
     } else if(strcmp(c_type, "%u") == 0) {
         return "BIGINT";
+    } else if(strcmp(c_type, "%h") == 0) {
+        return "INTEGER";
     } else {
         return "TEXT";
     }
@@ -488,6 +490,16 @@ void get_sqlite_value(char* c_type, void* buff, sqlite3_stmt* stmt, int j)
         unsigned int val;
         val = (unsigned int) sqlite3_column_int(stmt, j);
         memcpy(buff, &val, sizeof(unsigned int));
+    }
+    else if(strcmp(c_type, "%h") == 0) {
+        int val;
+        val = sqlite3_column_int(stmt, j);
+        memcpy(buff, &val, sizeof(int));
+    }
+    else{
+        const char *val;
+        *val = sqlite3_column_text(stmt, j);
+        strcpy(buff, val);
     }
 }
 
@@ -522,12 +534,16 @@ void get_value_string(char* ret_string, char* c_type, const char* buff)
         }
     }
     else if(strcmp(c_type, "%d") == 0) {
-        sprintf(ret_string, " %d", *((int*)buff));
+        sprintf(ret_string, " %d", *((int32_t *)buff));
     }
     else if(strcmp(c_type, "%u") == 0) {
-        sprintf(ret_string, " %u", *((unsigned int*)buff));
-    } else if(strcmp(c_type, "%i") == 0) {
-        sprintf(ret_string," %i", *((int*)buff));
+        sprintf(ret_string, " %u", *((uint32_t *)buff));
+    }
+    else if(strcmp(c_type, "%i") == 0) {
+        sprintf(ret_string," %i", *((int32_t*)buff));
+    }
+    else if(strcmp(c_type, "%h") == 0) {
+        sprintf(ret_string," %hi", *((uint16_t *)buff));
     }
 }
 
@@ -537,11 +553,15 @@ int get_sizeof_type(char* c_type)
         return sizeof(float);
     }
     else if(strcmp(c_type, "%d") == 0) {
-        return sizeof(int);
+        return sizeof(int32_t);
     } else if(strcmp(c_type, "%u") == 0) {
-        return sizeof(int);
+        return sizeof(uint32_t);
     } else if(strcmp(c_type, "%i") == 0) {
-        return sizeof(int);
+        return sizeof(int32_t);
+    } else if(strcmp(c_type, "%h") == 0) {
+        return sizeof(int16_t);
+    } else if(strcmp(c_type, "%s") == 0) {
+        return SCH_ST_STR_SIZE;
     }
     else {
         return -1;

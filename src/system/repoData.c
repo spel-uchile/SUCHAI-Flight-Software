@@ -488,6 +488,7 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     char *type_tmp, *name_tmp;
     char *type = strtok_r(types, sep, &type_tmp);
     char *name = strtok_r(names, sep, &name_tmp);
+    char *tmp;
     while(type != NULL && name != NULL)
     {
         printf("%s: ", name);
@@ -502,8 +503,16 @@ int dat_print_payload_struct(void* data, unsigned int payload)
                 printf(type, *(int32_t *)data);
                 data += sizeof(int32_t);
                 break;
+            case 'h':
+                printf("%hi", *(int16_t *)data);
+                data += sizeof(int16_t);
+            case 's':
+                tmp = strndup((char *)data, SCH_ST_STR_SIZE);
+                printf(type, tmp);
+                free(tmp);
+                data += SCH_ST_STR_SIZE;
             default:
-                data += sizeof(int);
+                data ++;
         }
         printf("\r\n");
 

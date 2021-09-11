@@ -22,6 +22,7 @@
 
 #define SCH_ST_OK    (0)
 #define SCH_ST_ERROR (-1)
+#define SCH_ST_STR_SIZE (128)
 
 /**
  * A 32 bit variable that can be interpreted as int, uint or float
