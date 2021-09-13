@@ -10,8 +10,11 @@ set(SOURCE_FILES
 )
 
 if(${SCH_ARCH} STREQUAL RPI)
-    list(APPEND SOURCE_FILES rpi/libcsp/src/drivers/i2c_usart_linux.c
-            rpi/libcsp/src/interfaces/csp_if_i2c_uart.c)
+    list(APPEND SOURCE_FILES
+            rpi/i2c.c
+            rpi/libcsp/src/drivers/i2c_usart_linux.c
+            rpi/libcsp/src/interfaces/csp_if_i2c_uart.c
+            )
 endif()
 
 add_library(suchai-fs-drivers ${SOURCE_FILES})
