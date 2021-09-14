@@ -1,9 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2018, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
- *      Copyright 2018, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2018, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *      Copyright 2021, Gustavo Diaz H., g.hernan.diaz@ing.uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+#include <errno.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 #include "i2c.h"
-//#define RPI_I2C_DEBUG
 
 char *deviceName = (char*)"/dev/i2c-1";
 
@@ -183,7 +189,7 @@ int8_t i2c_read_from_n(uint8_t dev_id, uint8_t *reg_data, uint8_t len)
     @brief  write i2c addr and 1 byte data over I2C
 */
 /**************************************************************************/
-int8_t i2c_write_addr(uint8_t addr, uint8_t data)
+int8_t i2c_write_addr(uint8_t dev_id, uint8_t addr, uint8_t data)
 {
     int i2cHandle;
     int res_tmp;
