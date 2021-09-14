@@ -439,11 +439,12 @@ void _ntoh32_buff(uint32_t *buff, int len)
 
 int com_debug(char *fmt, char *params, int nparams)
 {
-    LOGD(tag, "Route table");
+    LOGR(tag, "CSP Node %d", csp_get_address());
+    LOGR(tag, "Route table");
     csp_route_print_table();
-    LOGD(tag, "Interfaces");
+    LOGR(tag, "Interfaces");
     csp_route_print_interfaces();
-    LOGD(tag, "Connections")
+    LOGR(tag, "Connections")
     csp_conn_print_table();
 
     return CMD_OK;

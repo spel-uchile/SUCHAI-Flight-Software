@@ -22,21 +22,10 @@
 static const char *tag = "taskInit";
 
 int init_update_status_vars(void);
-int init_setup_libcsp(void);
-int init_setup_trx(void);
 int init_create_task(void);
-int init_antenna_deploy(void);
 
 #if SCH_COMM_ENABLE
-static csp_iface_t *csp_if_zmqhub;
-static csp_iface_t csp_if_kiss;
 
-#ifdef GROUNDSTATION
-static csp_kiss_handle_t csp_kiss_driver;
-void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
-        csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
-    }
-#endif //GROUNDSTATION
 #endif //SCH_COMM_ENABLE
 
 void taskInit(void *param)
@@ -57,8 +46,10 @@ void taskInit(void *param)
     LOGI(tag, "PURGE FLIGHT PLAN...");
     rc = dat_purge_fp();
     // Init LibCSP system
+#if SCH_COMM_ENABLE
     LOGI(tag, "SETUP CSP...");
-    init_setup_libcsp();
+    init_setup_libcsp(SCH_COMM_NODE);
+#endif
     // Create tasks
     LOGI(tag, "CREATE TASKS...");
     rc = init_create_task();
@@ -83,16 +74,15 @@ int init_update_status_vars(void) {
     return rc;
 }
 
-int init_setup_libcsp(void)
+int init_setup_libcsp(int node)
 {
-#if SCH_COMM_ENABLE
     /* Init communications */
     LOGI(tag, "Initialising CSP...");
 
     csp_debug_set_level(CSP_ERROR, 1);
     csp_debug_set_level(CSP_WARN, 1);
     csp_debug_set_level(CSP_INFO, 1);
-    csp_debug_set_level(CSP_BUFFER, 1);
+    csp_debug_set_level(CSP_BUFFER, 0);
     csp_debug_set_level(CSP_PACKET, 1);
     csp_debug_set_level(CSP_PROTOCOL, 1);
     csp_debug_set_level(CSP_LOCK, 0);
@@ -104,35 +94,18 @@ int init_setup_libcsp(void)
 
     /* Init CSP */
     csp_set_hostname(SCH_NAME);
-    csp_init(SCH_COMM_NODE); // Init CSP with address MY_ADDRESS
-
-    /**
-     * Set interfaces and routes
-     *  Platform dependent
-     */
-#if defined(X86)
-    /* Set ZMQ interface as a default route*/
-    uint8_t addr = (uint8_t)SCH_COMM_NODE;
-    uint8_t *rxfilter = &addr;
-    unsigned int rxfilter_count = 1;
-
-    csp_zmqhub_init_w_name_endpoints_rxfilter(CSP_ZMQHUB_IF_NAME,
-                                              rxfilter, rxfilter_count,
-                                              SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN,
-                                              &csp_if_zmqhub);
-    csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
-#endif //X86
+    csp_init(node); // Init CSP with address MY_ADDRESS
 
     /* Start router task with SCH_TASK_CSP_STACK word stack, OS task priority 1 */
     t_ok = csp_route_start_task(SCH_TASK_CSP_STACK, 1);
     if(t_ok != 0) LOGE(tag, "Task router not created!");
 
-    LOGI(tag, "Route table");
-    csp_route_print_table();
-    LOGI(tag, "Interfaces");
-    csp_route_print_interfaces();
-#endif //SCH_COMM_ENABLE
+    /**
+     * Add CSP INTERFACES in initAppHook, for example call to
+     * csp_add_zmq_iface(SCH_COMM_NODE)
+     */
 
+    LOGI(tag, "CSP Node: %d", csp_get_address());
     return 0;
 }
 
@@ -157,4 +130,21 @@ int init_create_task(void) {
 #endif
 
     return t_ok;
+}
+
+/**
+ * Set ZMQ interfaces as default route
+ */
+void csp_add_zmq_iface(int node)
+{
+    /* Set ZMQ interface as a default route*/
+    uint8_t addr = (uint8_t)node;
+    uint8_t *rxfilter = &addr;
+    unsigned int rxfilter_count = 1;
+
+    csp_zmqhub_init_w_name_endpoints_rxfilter(CSP_ZMQHUB_IF_NAME,
+                                              rxfilter, rxfilter_count,
+                                              SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN,
+                                              &csp_if_zmqhub);
+    csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
 }
