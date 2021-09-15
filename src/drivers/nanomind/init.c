@@ -1,9 +1,24 @@
-#include "init.h"
-
 #ifndef __linux
 /* This is a required to enable CPP linking */
 // void *__dso_handle __attribute__((used)) = 0;
 #endif
+
+#include "drivers.h"
+#include "suchai/init.h"
+#include "suchai/config.h"
+#include "app/system/config.h"
+#include "suchai/repoData.h"
+
+void sch_a3200_init_spi0(bool decode);
+void sch_a3200_init_spi1(void);
+void sch_a3200_init_twi0(gs_avr32_i2c_mode_t mode, uint8_t addr, uint32_t bps);
+void sch_a3200_init_twi2(void);
+void sch_a3200_init_can(bool enable);
+gs_error_t sch_a3200_uart_init(uint8_t uart, bool enable, uint32_t bps);
+static gs_error_t sch_init_rtc(void);
+gs_error_t sch_a3200_init_fram(void);
+gs_error_t sch_a3200_init_flash(void);
+void test_sdram(int size, int do_free);
 
 static const char *tag = "init";
 

@@ -66,14 +66,10 @@ void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds)
 
 int osSetTimeUnix(int64_t time)
 {
-    char cmd[64];
-    memset(cmd, 0, 64);
-    snprintf(cmd, 64, "%s%ld", "sudo date +%s -s @", time);
-    int rc = system(cmd);
-    return rc != 0 ? 1 : 0;
+    return set_unixtime(time);
 }
 
 int64_t osGetTimeUnix(void)
 {
-    return (int64_t) time(NULL);
+    return get_unixtime();
 }

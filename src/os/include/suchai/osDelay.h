@@ -15,6 +15,7 @@
 #include "os/os.h"
 #include "stdint.h"
 #include "suchai/config.h"
+#include "suchai/cpu.h"
 
 #ifdef FREERTOS
 	#include "FreeRTOS.h"

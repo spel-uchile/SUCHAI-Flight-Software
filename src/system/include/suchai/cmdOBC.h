@@ -13,17 +13,18 @@
 #define CMD_OBC_H
 
 #include <signal.h>
-
-#include "drivers.h"
 #include "suchai/config.h"
 
 #ifdef SCH_HAVE_MALLOC
 #include <malloc.h>
 #endif
 
+#include "drivers.h"
+#include "TLE.h"
 #include "suchai/osDelay.h"
 #include "suchai/repoCommand.h"
 #include "suchai/repoData.h"
+
 
 /**
  * Register on board computer related (OBC) commands

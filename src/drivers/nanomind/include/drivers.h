@@ -9,8 +9,6 @@
 
 #ifndef _DRIVERS_H
 #define _DRIVERS_H
-//SPEL
-#include "TLE.h"
 
 // MCU Drivers
 #include <board.h>
@@ -68,5 +66,7 @@
 // GSSB
 #include <gs/gssb/gssb_all_devices.h>
 #include <gs/gssb/gssb_autodeploy.h>
+
+void on_init_task(void * param);
 
 #endif

@@ -30,7 +30,7 @@
 
 /* Global includes */
 #include "drivers.h"
-#include "init.h"
+#include "suchai/init.h"
 #include "suchai/log_utils.h"
 
 /* OS includes */

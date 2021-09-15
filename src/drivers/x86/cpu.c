@@ -1,8 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "suchai/init.h"
+#include "suchai/cpu.h"
+#include <time.h>
 
-void on_reset(void)
+int64_t get_unixtime(void)
 {
-    /* Register INT/TERM signals */
-    struct sigaction act;
-    act.sa_handler = on_close;
-    sigaction(SIGINT, &act, NULL);  // Register CTR+C signal handler
-    sigaction(SIGTERM, &act, NULL);
+    return (int64_t)time(NULL);
+}
+
+int set_unixtime(int64_t time)
+{
+    char cmd[64];
+    memset(cmd, 0, 64);
+    snprintf(cmd, 64, "%s%ld", "sudo date +%s -s @", time);
+    int rc = system(cmd);
+    return rc != 0 ? 1 : 0;
 }

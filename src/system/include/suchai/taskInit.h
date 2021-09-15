@@ -13,7 +13,7 @@
 
 #include "suchai/log_utils.h"
 #include "suchai/config.h"
-#include "init.h"
+#include "suchai/init.h"
 #include "drivers.h"
 
 #include "suchai/osThread.h"

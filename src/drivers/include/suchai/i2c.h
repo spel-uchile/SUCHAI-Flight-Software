@@ -8,8 +8,8 @@
  * (RW) features.
  */
 
-#ifndef I2C_H
-#define I2C_H
+#ifndef SCH_I2C_H
+#define SCH_I2C_H
 
 #include "drivers.h"
 
@@ -38,6 +38,6 @@ int8_t i2c_read_from_n(uint8_t dev_id, uint8_t *reg_data, uint8_t len);
  *    @return err_code
  */
 
-int8_t i2c_write_addr(uint8_t addr, uint8_t data);
+int8_t i2c_write_addr(uint8_t dev_id, uint8_t addr, uint8_t data);
 
-#endif /* CMD_RW_H */
+#endif /* SCH_I2C_H */
