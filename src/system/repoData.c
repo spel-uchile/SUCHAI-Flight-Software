@@ -316,18 +316,12 @@ int dat_show_fp (void)
 
 time_t dat_get_time(void)
 {
-    (time_t)osGetTimeUnix();
+    return (time_t)osGetTimeUnix();
 }
 
 int dat_set_time(int new_time)
 {
-#if defined(NANOMIND)
-    timestamp_t timestamp = {(uint32_t)new_time, 0};
-    clock_set_time(&timestamp);
-    return 0;
-#else
     return osSetTimeUnix((int64_t)new_time);
-#endif
 }
 
 int dat_show_time(int format)
@@ -338,11 +332,11 @@ int dat_show_time(int format)
     {
         char buffer[80];
         strftime(buffer, 80, "%Y-%m-%d %H:%M:%S UTC\n", gmtime(&time_to_show));
-        LOGR("%s", buffer);
+        LOGR(tag, "%s", buffer);
     }
     if(format >= 1)
     {
-        LOGR(tag, "%u\n", (unsigned int)time_to_show);
+        LOGR(tag, "%ld", time_to_show);
     }
 
     return 0;
