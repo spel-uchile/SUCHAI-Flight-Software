@@ -1,7 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 202, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,11 @@
 
 #include "suchai/osDelay.h"
 
-static portTick ticks_us;
+static portTick ticks_us = 0;
+static int64_t unixtime = 0;
 pthread_cond_t delay_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t tick_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t time_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 portTick osDefineTime(uint32_t mseconds)
 {
@@ -75,4 +77,19 @@ void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds)
 
     // Tag last delay ticks
     *lastTime = osTaskGetTickCount();
+}
+
+int osSetTimeUnix(int64_t time)
+{
+    pthread_mutex_lock(&time_mutex);
+    unixtime = time;
+    pthread_mutex_unlock(&time_mutex);
+}
+
+int64_t osGetTimeUnix(void)
+{
+    pthread_mutex_lock(&time_mutex);
+    int64_t current_time = unixtime;
+    pthread_mutex_unlock(&time_mutex);
+    return current_time;
 }

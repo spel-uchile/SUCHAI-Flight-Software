@@ -28,15 +28,19 @@ int osCreateTask(void (*functionTask)(void *), char* name, unsigned short size, 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setstacksize(&attr, size);
+    pthread_t tmp_thread_id;
+    pthread_t *thread_id = &tmp_thread_id;
+    if(thread != NULL)
+        thread_id = (pthread_t *)thread;
 
-    int created = pthread_create(thread , &attr , (void *)(*functionTask) , parameters);
-    pthread_setname_np(*thread, name);
+    int created = pthread_create(thread_id , &attr , (void *)(*functionTask) , parameters);
+    pthread_setname_np(*thread_id, name);
 
     // Set Real Time scheduling and thread priority
     // Only with proper permissions
     const struct sched_param _priority = {(int) priority};
-    if(pthread_setschedparam(*thread, SCHED_FIFO, &_priority) != 0)
-        printf("[WARN] (%s) Failed to assign task priority, try as root\n", name);
+    if(pthread_setschedparam(*thread_id, SCHED_FIFO, &_priority) != 0)
+        printf("[WARN] (%s) Failed to assign task priority, try as root\r\n", name);
 
     pthread_attr_destroy(&attr);
 
@@ -51,8 +55,8 @@ void osTaskDelete(void *task_handle)
     else
         thread = *(pthread_t *)task_handle;
 
-    printf("[INFO] Canceling thread %lu\n", thread);
+    printf("[INFO] Canceling thread %lu\r\n", thread);
     int s = pthread_cancel(thread);
-    if (s != 0) printf("[WARN] Failed to cancel thread %lu\n", thread);
+    if (s != 0) printf("[WARN] Failed to cancel thread %lu\r\n", thread);
 }
 

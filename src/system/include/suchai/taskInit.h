@@ -29,6 +29,12 @@
 #include "suchai/taskFlightPlan.h"
 #endif
 
+static csp_iface_t *csp_if_zmqhub;
+
+void csp_add_zmq_iface(int node);
+int init_setup_libcsp(int node);
+
+
 void taskInit(void *param);
 
 /**

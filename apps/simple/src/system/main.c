@@ -37,6 +37,9 @@ void initAppHook(void *params)
     /** Include app commands */
     cmd_app_init();
 
+    /** Initialize custom CSP interfaces */
+    csp_add_zmq_iface(SCH_COMM_NODE);
+
     /** Init app tasks */
     int t_ok = osCreateTask(taskHousekeeping, "housekeeping", 1024, NULL, 2, NULL);
     if(t_ok != 0) LOGE("simple-app", "Task housekeeping not created!");
