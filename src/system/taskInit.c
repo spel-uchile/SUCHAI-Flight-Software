@@ -135,6 +135,7 @@ int init_create_task(void) {
 /**
  * Set ZMQ interfaces as default route
  */
+#ifdef LINUX
 void csp_add_zmq_iface(int node)
 {
     /* Set ZMQ interface as a default route*/
@@ -148,3 +149,4 @@ void csp_add_zmq_iface(int node)
                                               &csp_if_zmqhub);
     csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
 }
+#endif
