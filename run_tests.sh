@@ -9,37 +9,68 @@
 #           Diego Ortego P.
 #           Carlos Gonzalez C.
 
+test_build_enabled=1
+test_unit_enabled=1
+
 # Gets the current execution directory (the absolute path to this script)
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
-export WORKSPACE=${SCRIPT_PATH}
+WORKSPACE=${SCRIPT_PATH}
 
 # Prints the current workspace path, for debugging purposes
 echo ${WORKSPACE}
 
+# ---------------- --TEST BUILD ------------------
+# The test log is called test_unit_log.txt
+# Tests for all storage modes
+if [ $test_build_enabled -eq 1 ]
+then
+  TEST_NAME="test_build"
+
+  for ARCH in "X86" "RPI"
+  do
+    for ST_MODE in "RAM" "SQLITE" "FLASH"
+    do
+      echo ""
+      echo "**** Testing ${TEST_NAME} for arch ${ARCH}, storage ${ST_MODE} ****"
+      rm -rf build_test
+      # Just build the simple app with the test's parameters
+      cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=${ARCH} -DAPP=simple -DTEST=0 -DSCH_ST_MODE=${ST_MODE} -DSCH_STORAGE_TRIPLE_WR=1 && cmake --build build_test -j4
+      status=$?
+      [ $status -eq 0 ] || exit 1
+    done
+  done
+  cd ${WORKSPACE}
+fi
+
 # ---------------- --TEST_UNIT ------------------
 # The test log is called test_unit_log.txt
 # Tests for all storage modes
-TEST_NAME="test_unit"
+if [ $test_unit_enabled -eq 1 ]
+then
+  TEST_NAME="test_unit"
 
-for ST_MODE in "RAM" "SQLITE" "FLASH"
-do
-    echo "Testing ${TEST_NAME} for storage ${ST_MODE}"
-    rm -rf build_test
-    # build the unitest with the test's parameters
-    cmake -B build_test -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=${ST_MODE} -DSCH_STORAGE_TRIPLE_WR=1
-    cmake --build build_test
+  for ST_MODE in "RAM" "SQLITE" "FLASH"
+  do
+      echo ""
+      echo "**** Testing ${TEST_NAME} for storage ${ST_MODE} ****"
+      rm -rf build_test
+      # build the unitest with the test's parameters
+      cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=${ST_MODE} -DSCH_STORAGE_TRIPLE_WR=1 && cmake --build build_test -j4
+      [ $? -eq 0 ] || exit $?
 
-    # Runs the test, saving a log file
-    cd build_test/test/${TEST_NAME}
-    rm -f ${TEST_NAME}_${ST_MODE}_log.txt
-    ./suchai-test #| cat >> ${TEST_NAME}_${ST_MODE}_log.txt
-    echo ""
-    cd -
-done
-cd ${WORKSPACE}
+      # Runs the test, saving a log file
+      cd build_test/test/${TEST_NAME}
+      rm -f ${TEST_NAME}_${ST_MODE}_log.txt
+      ./suchai-test #| cat >> ${TEST_NAME}_${ST_MODE}_log.txt
+      [ $? -eq 0 ] || exit $?
+      echo ""
+      cd -
+  done
+  cd ${WORKSPACE}
+fi
 
 #TODO: DELETE THIS EXIT AFTER FIXING THE REST OF THE TESTS!
-exit
+exit 0
 #TODO: REMEMBER TO DELETE THIS EXIT!
 
 ## ---------------- --TEST_CMD ------------------
