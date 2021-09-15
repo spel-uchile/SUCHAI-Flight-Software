@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "init.h"
+#include "suchai/init.h"
 
 void on_reset(void)
 {
