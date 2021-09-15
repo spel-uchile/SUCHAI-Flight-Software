@@ -62,4 +62,17 @@ void osDelay(uint32_t mseconds);
  */
 void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds);
 
+/**
+ * Set current system time
+ * @param time Unix time (64 bit integer)
+ * @return 1 if ok, 0 on error
+ */
+int osSetTimeUnix(int64_t time);
+
+/**
+ * Get current system time formatted as 64 bit integer Unix time
+ * @return Unix time
+ */
+int64_t osGetTimeUnix(void);
+
 #endif

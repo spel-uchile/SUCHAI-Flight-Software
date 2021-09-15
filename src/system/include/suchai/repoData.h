@@ -29,6 +29,7 @@
 #include "suchai/math_utils.h"
 #include "suchai/storage.h"
 #include "suchai/osSemphr.h"
+#include "suchai/osDelay.h"
 #include "app/system/repoDataSchema.h"
 
 typedef enum dat_stmachine_action_emum {

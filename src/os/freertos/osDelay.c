@@ -37,3 +37,13 @@ void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds){
     portTick ticks = osDefineTime(mseconds);
 	vTaskDelayUntil(lastTime, ticks);
 }
+
+int osSetTimeUnix(int64_t time)
+{
+    return 0;
+}
+
+int64_t osGetTimeUnix(void)
+{
+    return 0;
+}
