@@ -30,7 +30,7 @@ int8_t i2c_write_n(uint8_t addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t l
     char tx_data[len+1];
     tx_data[0] = reg_addr;
     memcpy(tx_data+1, reg_data, len);
-    int rc = gs_i2c_master_transaction(2, addr, tx_data, len, NULL, 0, 500);
+    int rc = gs_i2c_master_transaction(2, addr, tx_data, len+1, NULL, 0, 500);
     return rc;
 }
 
