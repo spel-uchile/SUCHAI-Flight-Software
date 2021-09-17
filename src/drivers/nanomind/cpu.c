@@ -21,7 +21,7 @@
 #include "drivers.h"
 #include "time.h"
 
-int64_t get_unixtime(void)
+int64_t cpu_get_unixtime(void)
 {
 //    gs_timestamp_t timestamp;
 //    gs_clock_get_time(&timestamp);
@@ -29,9 +29,44 @@ int64_t get_unixtime(void)
     return time(NULL);
 }
 
-int set_unixtime(int64_t time)
+int cpu_set_unixtime(int64_t time)
 {
     gs_timestamp_t timestamp = {(uint32_t)time, 0};
     gs_clock_set_time(&timestamp);
     return 0;
+}
+
+int cpu_debug(int arg)
+{
+    switch (arg) {
+        case GS_A3200_LED_A:
+            gs_a3200_led_toggle(GS_A3200_LED_A);
+            break;
+        case GS_A3200_LED_CPU_OK:
+            gs_a3200_led_toggle(GS_A3200_LED_CPU_OK);
+            break;
+        default:
+            gs_a3200_led_toggle(GS_A3200_LED_CPU_OK);
+            gs_a3200_led_toggle(GS_A3200_LED_A);
+            break;
+    }
+    return 1;
+}
+
+int cpu_reset_wdt(int arg)
+{
+    wdt_clear();
+    return 1;
+}
+
+void cpu_reboot(int arg)
+{
+    switch (arg) {
+        case 0:
+        case 1:
+        default:
+            gs_sys_reset(100);
+            break;
+
+    }
 }

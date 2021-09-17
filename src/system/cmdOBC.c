@@ -32,11 +32,11 @@ void cmd_obc_init(void)
 {
     cmd_add("obc_ident", obc_ident, "", 0);
     cmd_add("obc_debug", obc_debug, "%d", 1);
-    cmd_add("obc_reset", obc_reset, "", 0);
+    cmd_add("obc_reset", obc_reset, "%d", 1);
     cmd_add("obc_get_mem", obc_get_os_memory, "", 0);
     cmd_add("obc_set_time", obc_set_time,"%d",1);
     cmd_add("obc_get_time", obc_get_time, "%d", 1);
-    cmd_add("obc_reset_wdt", obc_reset_wdt, "", 0);
+    cmd_add("obc_reset_wdt", obc_reset_wdt, "%d", 1);
     cmd_add("obc_system", obc_system, "%s", 1);
 }
 
@@ -51,64 +51,29 @@ int obc_debug(char *fmt, char *params, int nparams)
 {
     int dbg_type;
     if(params == NULL || sscanf(params, fmt, &dbg_type) != nparams)
-    {
-        LOGE(tag, "Parameter null");
-        return CMD_SYNTAX_ERROR;
-    }
+        dbg_type = 0;
 
-    #ifdef AVR32
-        switch(dbg_type)
-        {
-            case 0: LED_Toggle(LED0); break;
-            case 1: LED_Toggle(LED1); break;
-            case 2: LED_Toggle(LED2); break;
-            case 3: LED_Toggle(LED3); break;
-            default: LED_Toggle(LED0);
-        }
-    #endif
-    #ifdef NANOMIND
-        if(dbg_type <= GS_A3200_LED_A)
-            gs_a3200_led_toggle((gs_a3200_led_t)dbg_type);
-    #endif
-    #ifdef ESP32
-        static int level = 0;
-        level = ~level;
-        gpio_set_level(BLINK_GPIO, level);
-    #endif
-    #ifdef LINUX
-        LOGV(tag, "OBC Debug (%d)", dbg_type);
-    #endif
-    return CMD_OK;
+    int rc = cpu_debug(dbg_type);
+    return rc == 0 ? CMD_OK : CMD_ERROR;
 
 }
 
-int obc_reset_wdt(char *fmt, char *params, int narams)
+int obc_reset_wdt(char *fmt, char *params, int nparams)
 {
-    #ifdef NANOMIND
-       wdt_clear();
-    #endif
-    #ifdef AVR32
-       wdt_clear();
-    #endif
-    return CMD_OK;
+    int arg;
+    if (params == NULL || sscanf(params, fmt, &arg) != nparams)
+        arg = 0;
+
+    int rc = cpu_reset_wdt(arg);
+    return rc == 0 ? CMD_OK : CMD_ERROR;
 }
 
-int obc_reset(char *fmt, char *params, int nparams)
-{
-    printf("Resetting system NOW!!\r\n");
+int obc_reset(char *fmt, char *params, int nparams) {
+    int arg;
+    if (params == NULL || sscanf(params, fmt, &arg) != nparams)
+        arg = 0;
 
-    #ifdef LINUX
-        if(params != NULL && strcmp(params, "reboot")==0)
-            system("sudo reboot");
-        else
-            exit(0);
-    #endif
-    #ifdef AVR32
-        reset_do_soft_reset();
-    #endif
-    #ifdef NANOMIND
-        cpu_reset();
-    #endif
+    cpu_reboot(arg);
 
     /* Never get here */
     return CMD_OK;

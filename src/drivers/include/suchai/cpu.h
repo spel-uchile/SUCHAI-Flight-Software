@@ -12,8 +12,46 @@
 
 #include <stdint.h>
 
-int64_t get_unixtime(void);
+/**
+ * Get system/rtc time in unix timestamp format
+ * @return Unix timestamp
+ */
+int64_t cpu_get_unixtime(void);
 
-int set_unixtime(int64_t time);
+/**
+ * Set system/rtc time in unix timestamp
+ * @param time Unix timestamp
+ * @return 1 if Ok, 0 if errors.
+ */
+int cpu_set_unixtime(int64_t time);
+
+/**
+ * Debug CPU functioning, usually by blinking a LED.
+ * Arg. can be used to select different kind o debug, or select
+ * different LEDs.
+ * @param arg Debug type
+ * @return 1 if Ok, 0 if errors.
+ */
+int cpu_debug(int arg);
+
+/**
+ * Reset CPU (internal/external) watchdog timer.
+ * Use arg to determine specific operations
+ * @param arg WDT type:
+ *  0: Internal or CPU WTD
+ *  1: External WDT
+ *  2: Other
+ * @return 1 if Ok, 0 if errors.
+ */
+int cpu_reset_wdt(int arg);
+
+/**
+ * Reset (reboot) CPU.
+ * Use arg to determine specific operations
+ * @param arg Reset type:
+ *  0: Soft reset
+ *  1: Hard reset (power down/up)
+ */
+void cpu_reboot(int arg);
 
 #endif //SCH_CPU_H

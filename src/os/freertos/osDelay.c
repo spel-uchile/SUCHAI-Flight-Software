@@ -40,10 +40,10 @@ void osTaskDelayUntil(portTick *lastTime, uint32_t mseconds){
 
 int osSetTimeUnix(int64_t time)
 {
-    return set_unixtime(time);
+    return cpu_set_unixtime(time);
 }
 
 int64_t osGetTimeUnix(void)
 {
-    return get_unixtime();
+    return cpu_get_unixtime();
 }

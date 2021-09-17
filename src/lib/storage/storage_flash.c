@@ -356,7 +356,7 @@ static int storage_flightplan_load_tlb(void)
  */
 static int storage_flightplan_dump_tlb(int index)
 {
-    LOGD(tag, "Dump TLB");
+    LOGV(tag, "Dump TLB");
 #ifdef ST_FP_TLB_FRAM
     int rc;
     uint32_t tlb_addr_start = ST_FRAME_SIZE-sizeof(st_flightplan_tlb);

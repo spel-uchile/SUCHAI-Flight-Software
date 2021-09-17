@@ -14,12 +14,12 @@
 
 #include <signal.h>
 #include "suchai/config.h"
+#include "suchai/cpu.h"
 
 #ifdef SCH_HAVE_MALLOC
 #include <malloc.h>
 #endif
 
-#include "drivers.h"
 #include "TLE.h"
 #include "suchai/osDelay.h"
 #include "suchai/repoCommand.h"
@@ -44,10 +44,11 @@ int obc_ident(char* fmt, char* params, int nparams);
 /**
  * Check if the OBC is working, usually blinking a led or printing a debug
  * message. In AVR32, NANOMIND and ESP32 blink the led indicated in the
- * parameter in LINUX just print a debug message.
+ * parameter in LINUX just print a debug message. In RPI blink GPIO 16,17,22-27.
+ * Default to led_number=0
  *
  * @param fmt Str. Parameters format "d"
- * @param params Str. Parameters as string "1"
+ * @param params Str. [led_number] Optional
  * @param nparams Int. Number of parameters 1
  * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
@@ -55,32 +56,36 @@ int obc_debug(char *fmt, char *params, int nparams);
 
 /**
  * Reset the watchdog timer
+ * Use the argument to indicate the WDT to reset (if supporteed)
+ *  0 -> Internal/CPU (default)
+ *  1 -> External (if supported)
  *
- * @param fmt Str. Parameters format ""
- * @param params Str. Parameters as string ""
+ * @param fmt Str. Parameters format "%d"
+ * @param params Str. [watchdog type] Optional
  * @param nparams Int. Number of parameters 0
  * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_reset_wdt(char *fmt, char *params, int nparams);
 
 /**
- * Reset (reboot) the system.
+ * Reset (reboot) the system. Use arg to select the reboot type
+// *  0: Soft-reset   (linux: exit(), others: reset, default)
+ *  1: Hard-reset   (linux: sudo reboot, others: reset)
  *
- * @warning: In GNU/Linux if the params is the string "reboot" then "sudo reboot"
+ * @warning: In GNU/Linux if params is 1 then "sudo reboot"
  * is executed to reboot the system, if params is null or any other value then
  * just exit the application
  *
- * @param fmt Str. Parameters format: "%s"
- * @param params Str. Parameters as string: "" or "reboot" in Linux to actually
- *                    reboot the system.
- * @param nparams Int. Number of parameters 0 or 1
+ * @param fmt Str. Parameters format: "%d"
+ * @param params Str. [reset type] Optional
+ * @param nparams Int. Number of parameters 1
  * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int obc_reset(char *fmt, char *params, int nparams);
 
 /**
  * Debug system memory
- * @note: In POSIX just cat /proc/<id>/status file
+ * @note: Call mallinfo() if supported
  *
  * @param fmt Str. Parameters format ""
  * @param params Str. Parameters as string ""
@@ -90,10 +95,10 @@ int obc_reset(char *fmt, char *params, int nparams);
 int obc_get_os_memory(char *fmt, char *params, int nparams);
 
 /**
- * Set the system time only if is not running Linux
+ * Set the system time
  *
  * @param fmt Str. Parameters format "%d"
- * @param params Str. Parameters as string "<time to set>"
+ * @param params Str. Parameters as string "<unix timestamp>"
  * @param nparams Int. Number of parameters 1
  * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
