@@ -11,6 +11,7 @@
 #ifndef CMDTM_H
 #define CMDTM_H
 
+#include <string.h>
 #include "suchai/config.h"
 #include "suchai/log_utils.h"
 

@@ -166,6 +166,12 @@ int _send_tel_from_to(int start, int end, int payload, int dest_node)
     for(i=0; i < n_frames; ++i) {
 
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
+        if(packet == NULL)
+        {
+            LOGE(tag, "Error getting CSP buffer!");
+            rc_send = 0;
+            break;
+        }
         packet->length = sizeof(com_frame_t);
         memset(packet->data, 0, sizeof(com_frame_t));
         com_frame_t *frame = (com_frame_t *)(packet->data);
@@ -187,8 +193,7 @@ int _send_tel_from_to(int start, int end, int payload, int dest_node)
             memcpy(frame->data.data8 + mem_offset, buff, payload_size);
         }
 
-        int k;
-        for(k=0; k<sizeof(frame->data.data32); k++)
+        for(int k=0; k<sizeof(frame->data)/sizeof(int32_t); k++)
             frame->data.data32[k] = csp_hton32(frame->data.data32[k]);
 
         LOGI(tag, "Node    : %d", frame->node);
