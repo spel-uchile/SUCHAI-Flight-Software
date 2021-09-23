@@ -6,8 +6,15 @@
 #include "drivers.h"
 #include "suchai/init.h"
 #include "suchai/config.h"
-#include "app/system/config.h"
 #include "suchai/repoData.h"
+
+#ifndef SCH_WDT_PERIOD
+#define SCH_WDT_PERIOD      120  /// External watchdog period
+#endif
+
+#ifndef SCH_UART_BAUDRATE
+#define SCH_UART_BAUDRATE   500000  /// UART baudrate
+#endif
 
 void sch_a3200_init_spi0(bool decode);
 void sch_a3200_init_spi1(void);

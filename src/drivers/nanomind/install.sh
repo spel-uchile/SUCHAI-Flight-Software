@@ -13,15 +13,6 @@ if  [ -n "$1" ] && [ $1 = "--ssh" ]; then
     SSH_ACTIVE="TRUE"
 fi
 
-# Download SGP4
-echo "Installing SGP4..."
-if [ ! -d "./sgp4" ]; then
-  git clone https://gitlab.com/spel-uchile/sgp4.git
-  cd sgp4/src/c
-  mv TestSGP4.c TestSGP4.bak
-  cd -
-fi
-
 echo "Downloading OBC drivers SDK..."
 if [ ! -d "suchai-drivers-obc" ]; then
     if [ -z "$SSH_ACTIVE" ]; then
