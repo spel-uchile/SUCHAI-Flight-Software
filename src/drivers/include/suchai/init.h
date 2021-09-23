@@ -19,10 +19,5 @@
  */
 void on_reset(void);
 
-/**
- * Performs de-initialization actions
- */
-void on_close(int signal);
-
 #endif //SCH_INIT_H
 

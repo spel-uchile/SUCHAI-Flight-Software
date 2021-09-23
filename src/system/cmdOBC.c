@@ -32,6 +32,7 @@ void cmd_obc_init(void)
 {
     cmd_add("obc_ident", obc_ident, "", 0);
     cmd_add("obc_debug", obc_debug, "%d", 1);
+    cmd_add("obc_exit", obc_exit, "", 0);
     cmd_add("obc_reset", obc_reset, "%d", 1);
     cmd_add("obc_get_mem", obc_get_os_memory, "", 0);
     cmd_add("obc_set_time", obc_set_time,"%d",1);
@@ -68,6 +69,19 @@ int obc_reset_wdt(char *fmt, char *params, int nparams)
     return rc == 0 ? CMD_OK : CMD_ERROR;
 }
 
+int obc_exit(char *fmt, char *params, int nparams) {
+
+    /* Properly close repositories to free memory */
+    cmd_repo_close();
+    dat_repo_close();
+
+    /* Do a "soft" reset, usually exit(0) except for microcontrollers */
+    cpu_reboot(0);
+
+    /* Never gets here */
+    return CMD_OK;
+}
+
 int obc_reset(char *fmt, char *params, int nparams) {
     int arg;
     if (params == NULL || sscanf(params, fmt, &arg) != nparams)
@@ -75,7 +89,7 @@ int obc_reset(char *fmt, char *params, int nparams) {
 
     cpu_reboot(arg);
 
-    /* Never get here */
+    /* Never gets here */
     return CMD_OK;
 }
 

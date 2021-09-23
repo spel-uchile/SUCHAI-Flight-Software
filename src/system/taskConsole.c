@@ -96,15 +96,9 @@ int console_read(char *buffer, int len)
     if(line == NULL)
         return -1;
 
-    if(!strncmp(line, "/exit", 5))
-    {
-        free(line);
-        exit(0);
-    }
-
     linenoiseHistoryAdd(line);
     linenoiseHistorySave(cmd_hist);
-    strncpy(buffer, line, len);
+    strncpy(buffer, line, len-1);
     free(line);
 #else
     char *s = fgets(buffer, len, stdin);
@@ -120,6 +114,14 @@ int console_read(char *buffer, int len)
     }
 #endif
 
+    /* Parse '/exit' to do a clean exit */
+    if(!strncmp(buffer, "/exit", 5))
+    {
+        memset(buffer, 0, len);
+        strncpy(buffer, "obc_exit", len-1);
+        return 0;
+    }
+
     /* Parse remote commands mode using "<node>: command" */
     int next;
     int node;
@@ -127,15 +129,12 @@ int console_read(char *buffer, int len)
     {
         if(next < len)
         {
-            printf("(%d) %s\r\n", next, buffer + next);
-            char *tmp_buff = malloc(len + 1);
-            memset(tmp_buff, 0, len + 1);
-            strncpy(tmp_buff, buffer + next, len - next);
+            char *tmp_buff = strndup(buffer + next, len - next);
             memset(buffer, 0, len);
             snprintf(buffer, len, "com_send_cmd %d %s", node, tmp_buff);
-            printf("%s\r\n", buffer);
             free(tmp_buff);
         }
     }
+
     return 0;
 }

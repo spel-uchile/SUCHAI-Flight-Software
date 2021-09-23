@@ -19,6 +19,16 @@
  */
 
 #include "suchai/init.h"
+#include "suchai/repoData.h"
+#include "suchai/repoCommand.h"
+
+/** Perform a clean exit in case of CTRL+C */
+void on_close(int signal)
+{
+    dat_repo_close();
+    cmd_repo_close();
+    exit(signal);
+}
 
 void on_reset(void)
 {

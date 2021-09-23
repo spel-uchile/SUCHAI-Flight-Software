@@ -50,12 +50,3 @@ int main(void)
     /** Call framework main, shouldn't return */
     suchai_main();
 }
-
-void on_close(int signal)
-{
-    dat_repo_close();
-    cmd_repo_close();
-
-    LOGI(tag, "Exit system!");
-    exit(signal);
-}

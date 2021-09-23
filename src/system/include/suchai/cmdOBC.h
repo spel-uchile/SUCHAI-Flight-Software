@@ -68,8 +68,19 @@ int obc_debug(char *fmt, char *params, int nparams);
 int obc_reset_wdt(char *fmt, char *params, int nparams);
 
 /**
+ * Do a clean exit, closing repositories and freeing memory.
+ * Then, usually exit(0) (GNU/Linxu) but microcontrollers (FreeRTOS) may simply reset
+ *
+ * @param fmt Str. Parameters format: ""
+ * @param params ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK
+ */
+int obc_exit(char *fmt, char *params, int nparams);
+
+/**
  * Reset (reboot) the system. Use arg to select the reboot type
-// *  0: Soft-reset   (linux: exit(), others: reset, default)
+ *  0: Soft-reset   (linux: exit(), others: reset, default)
  *  1: Hard-reset   (linux: sudo reboot, others: reset)
  *
  * @warning: In GNU/Linux if params is 1 then "sudo reboot"
