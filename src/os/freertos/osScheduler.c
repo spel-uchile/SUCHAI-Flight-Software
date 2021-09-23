@@ -25,6 +25,11 @@
  */
 void osScheduler(os_thread* thread_id, int n_thread)
 {
+#ifdef ESP32
+    // ESP32 Framwork starts the scheduler
+    return;
+#endif
+
     printf("[INFO] Starting FreeRTOS scheduler...\n");
     vTaskStartScheduler();
 

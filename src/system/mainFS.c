@@ -69,49 +69,7 @@ int suchai_main(void)
     if(t_wdt_ok != 0) LOGE(tag, "Task watchdog not created!");
     if(t_ini_ok != 0) LOGE(tag, "Task init not created!");
 
-#ifndef ESP32
     /* Start the scheduler. Should never return */
     osScheduler(threads_id, n_threads);
     return 0;
-#endif
-
 }
-
-/* FreeRTOS Hooks */
-#if  defined(FREERTOS) && !defined(NANOMIND) && !defined(ESP32)
-/**
- * Task idle handle function. Performs operations inside the idle task
- * configUSE_IDLE_HOOK must be set to 1
- */
-void vApplicationIdleHook(void)
-{
-    //Add hook code here
-}
-
-
-/**
- * Task idle handle function. Performs operations inside the idle task
- * configUSE_TICK_HOOK must be set to 1
- */
-void vApplicationTickHook(void)
-{
-#ifdef AVR32
-    LED_Toggle(LED0);
-#endif
-}
-
-/**
- * Stack overflow handle function.
- * configCHECK_FOR_STACK_OVERFLOW must be set to 1 or 2
- *
- * @param pxTask Task handle
- * @param pcTaskName Task name
- */
-void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
-{
-    printf("[ERROR][-1][%s] Stack overflow!", (char *)pcTaskName);
-
-    /* Stack overflow handle */
-    while(1);
-}
-#endif
