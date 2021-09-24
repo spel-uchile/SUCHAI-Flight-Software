@@ -123,11 +123,11 @@ int console_read(char *buffer, int len)
     }
 
     /* Parse remote commands mode using "<node>: command" */
-    int next;
+    int next = 0;
     int node;
     if(sscanf(buffer, "%d: %n", &node, &next) == 1)
     {
-        if(next < len)
+        if(next < len && next != 0)
         {
             char *tmp_buff = strndup(buffer + next, len - next);
             memset(buffer, 0, len);
