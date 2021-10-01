@@ -18,6 +18,9 @@
  */
 
 #include "suchai/cmdTM.h"
+#ifdef LINUX
+#include <sys/stat.h>
+#endif
 
 static const char *tag = "cmdTM";
 
@@ -536,6 +539,13 @@ int tm_parse_file(char *fmt, char *params, int nparams)
     static char *fname = NULL;
     static int last_id = 0;
     static int last_frame = 0;
+
+    // Check if base directory exist
+    struct stat st = {0};
+    if (stat(bname, &st) == -1) {
+        mkdir(bname, 0700);
+    }
+
 
     if(type == TM_TYPE_FILE_START)
     {
