@@ -20,9 +20,9 @@
 
 #include "suchai/storage.h"
 #include "suchai/log_utils.h"
-//#ifdef NANOMIND
+#ifdef NANOMIND
 #include "drivers.h"
-//#endif
+#endif
 static const char *tag = "storage_flash";
 
 char* fp_table = "flightPlan";
