@@ -138,4 +138,42 @@ int obc_get_time(char *fmt, char *params, int nparams);
  */
 int obc_system(char* fmt, char* params, int nparams);
 
+/**
+ * Set current working directory
+ *
+ * @param fmt str. Parameters format: "%s"
+ * @param params  str. <path/to/new/cwd>
+ * @param nparams int. Number of parameters: 1
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int obc_set_cwd(char* fmt, char* params, int nparams);
+
+/**
+ * Print current working directory
+ * @param fmt ""
+ * @param params ""
+ * @param nparams 0
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int obc_get_cwd(char* fmt, char* params, int nparams);
+
+/**
+ * List files in path or CWD if used without parameters
+ * @param fmt "%s"
+ * @param params "[path]" Optional, list CWD if empty
+ * @param nparams 1
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int obc_ls(char* fmt, char* params, int nparams);
+
+/**
+ * Create a directory if not exists
+ * @param fmt "%s"
+ * @param params "<path>" Must be a valid path
+ * @param nparams 1
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int obc_mkdir(char* fmt, char* params, int nparams);
+
+
 #endif /* CMD_OBC_H */
