@@ -577,7 +577,7 @@ int tm_parse_file(char *fmt, char *params, int nparams)
         {
             // Remove file tail
             int i;
-            for(i=COM_FRAME_MAX_LEN-1; i>0; i--)
+            for(i=COM_FRAME_MAX_LEN-1; i>=0; i--)
                 if(frame->data[i] != 0xAA)
                     break;
             nbytes = i+1;
