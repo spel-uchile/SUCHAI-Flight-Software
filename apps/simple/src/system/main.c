@@ -38,7 +38,9 @@ void initAppHook(void *params)
     cmd_app_init();
 
     /** Initialize custom CSP interfaces */
+#ifdef LINUX
     csp_add_zmq_iface(SCH_COMM_NODE);
+#endif
 
     /** Init app tasks */
     int t_ok = osCreateTask(taskHousekeeping, "housekeeping", 1024, NULL, 2, NULL);

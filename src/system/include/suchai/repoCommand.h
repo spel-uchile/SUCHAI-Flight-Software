@@ -19,7 +19,9 @@
 /* Add files with commands */
 #include "suchai/cmdOBC.h"
 #include "suchai/cmdDRP.h"
+#if SCH_CON_ENABLED
 #include "suchai/cmdConsole.h"
+#endif
 #if SCH_FP_ENABLED
 #include "suchai/cmdFP.h"
 #endif

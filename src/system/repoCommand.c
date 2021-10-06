@@ -359,7 +359,9 @@ int cmd_repo_init(void)
     // Init repos
     cmd_obc_init();
     cmd_drp_init();
+#if SCH_CON_ENABLED
     cmd_console_init();
+#endif
 #if SCH_FP_ENABLED
     cmd_fp_init();
 #endif
