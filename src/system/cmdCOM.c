@@ -326,8 +326,7 @@ int com_send_file(int node, char *name, void *data, size_t n_bytes)
     int rc_conn = 0;
     int rc_send = 0;
     int nframe = 0;
-    int total_frames = (int)n_bytes % COM_FRAME_MAX_LEN ? 1 : 0;
-    total_frames += (int)n_bytes / COM_FRAME_MAX_LEN;
+    int total_frames = (int)n_bytes / COM_FRAME_MAX_LEN + 1;
     uint16_t fileid = (uint16_t)(rand() % USHRT_MAX);
 
     // New connection
