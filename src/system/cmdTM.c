@@ -585,7 +585,7 @@ int tm_parse_file(char *fmt, char *params, int nparams)
         }
 
         int nbytes = COM_FRAME_MAX_LEN;
-        if(type == TM_TYPE_FILE_END || type == TM_TYPE_FILE_PART)
+        if(type == TM_TYPE_FILE_END || (type == TM_TYPE_FILE_PART && frame->nframe == frame->total))
         {
             // Remove file tail
             int i;
@@ -596,7 +596,8 @@ int tm_parse_file(char *fmt, char *params, int nparams)
         }
 
         FILE *fptr;
-        fptr = fopen(fname,"ab");
+        char *mode = type == TM_TYPE_FILE_PART ? "wb" : "ab";
+        fptr = fopen(fname, mode);
         if(fptr == NULL)
         {
             LOGE(tag, "Error opening file! %s", fname);
