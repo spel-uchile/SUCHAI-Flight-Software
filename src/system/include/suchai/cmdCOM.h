@@ -197,6 +197,7 @@ int com_send_debug(int node, char *data, size_t len);
  * @return CMD_OK | CMD_ERROR
  */
 int com_send_file(int node, char *name, void *data, size_t n_bytes);
+int com_send_file_parts(int node, void *data, size_t n_bytes, int file_id, int start_part, int file_parts, int type, csp_conn_t *conn_prev);
 
 /**
  * Auxiliary function to convert an array of 32bit values to network (big) endian.

@@ -275,7 +275,7 @@ static void com_receive_file(csp_packet_t *packet)
     LOGI(tag, "Frame   : %d", frame->nframe);
     LOGI(tag, "Last    : %d", frame->total);
 
-    if(frame->type >= TM_TYPE_FILE_START && frame->type <= TM_TYPE_FILE_END)
+    if(frame->type >= TM_TYPE_FILE_START && frame->type <= TM_TYPE_FILE_PART)
     {
         cmd_parse_file = cmd_get_str("tm_parse_file");
         cmd_add_params_raw(cmd_parse_file, frame, sizeof(com_frame_file_t));

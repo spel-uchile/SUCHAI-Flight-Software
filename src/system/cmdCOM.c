@@ -326,7 +326,9 @@ int com_send_file(int node, char *name, void *data, size_t n_bytes)
     int rc_conn = 0;
     int rc_send = 0;
     int nframe = 0;
-    int total_frames = (int)n_bytes / COM_FRAME_MAX_LEN + 1;
+    int data_frames = n_bytes / COM_FRAME_MAX_LEN;
+    int n_data_bytes = (n_bytes / COM_FRAME_MAX_LEN) * COM_FRAME_MAX_LEN;
+    int n_tail_bytes = n_bytes - n_data_bytes;
     uint16_t fileid = (uint16_t)(rand() % USHRT_MAX);
 
     // New connection
@@ -336,87 +338,95 @@ int com_send_file(int node, char *name, void *data, size_t n_bytes)
         return CMD_ERROR;
 
     // Send the first packet with the file name
-    csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_file_t));
-    packet->length = sizeof(com_frame_file_t);
-    com_frame_file_t *frame = (com_frame_file_t *)(packet->data);
-    frame->node = SCH_COMM_NODE;
-    frame->nframe = nframe++;
-    frame->type = TM_TYPE_FILE_START;
-    frame->fileid = csp_hton16(fileid);
-    frame->total = csp_hton16(total_frames);
-    memset(frame->data, 0, COM_FRAME_MAX_LEN);
-    strncpy((char *)(frame->data), name, COM_FRAME_MAX_LEN);
-    // Send packet
-    rc_send = csp_send(conn, packet, 500);
-    if(rc_send == 0)
-    {
-        LOGE(tag, "Error sending frame! (%d)", rc_send);
-        csp_buffer_free(packet);
-        rc_conn = csp_close(conn);
+    rc_send = com_send_file_parts(node, name, strlen(name)+1, fileid, 0, data_frames+1, TM_TYPE_FILE_START, conn);
+
+    // Send data packets
+    if(rc_send)
+        rc_send = com_send_file_parts(node, data, n_data_bytes, fileid, 1, data_frames+1, TM_TYPE_FILE_DATA, conn);
+
+    // Send final packet
+    if(rc_send)
+        rc_send = com_send_file_parts(node, data+n_data_bytes, n_tail_bytes, fileid, data_frames+1, data_frames+1, TM_TYPE_FILE_END, conn);
+
+    // Close connection
+    rc_conn = csp_close(conn);
+    if(rc_conn != CSP_ERR_NONE)
+        LOGE(tag, "Error closing connection! (%d)", rc_conn);
+
+    return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_ERROR;
+}
+
+int com_send_file_parts(int node, void *data, size_t n_bytes, int file_id, int start_part, int file_parts, int type, csp_conn_t *conn_prev)
+{
+    if(data == NULL)
         return CMD_ERROR;
+
+    int rc_conn = 0;
+    int rc_send = 0;
+    int nframe = 0;
+    int total_frames = (int)n_bytes % COM_FRAME_MAX_LEN ? 1 : 0;
+    total_frames += (int)n_bytes / COM_FRAME_MAX_LEN;
+    uint16_t fileid = file_id;
+
+    // Existing or new connection
+    csp_conn_t *conn_curr;
+    if(conn_prev == NULL)
+    {
+        conn_curr = csp_connect(CSP_PRIO_NORM, node, SCH_TRX_PORT_FILE, 500, CSP_O_NONE);
+        if(conn_curr == NULL)
+            return CMD_ERROR;
     }
+    else
+        conn_curr = conn_prev;
 
     // Send the file data
-    while(n_bytes >= COM_FRAME_MAX_LEN)
+    while(n_bytes > 0)
     {
-        size_t bytes_sent = COM_FRAME_MAX_LEN;
+        size_t bytes_sent = n_bytes >= COM_FRAME_MAX_LEN ? COM_FRAME_MAX_LEN : n_bytes;
         // Create packet and frame
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_file_t));
         packet->length = sizeof(com_frame_file_t);
         com_frame_file_t *frame = (com_frame_file_t *)(packet->data);
         frame->node = SCH_COMM_NODE;
-        frame->nframe = csp_hton16((uint16_t)nframe++);
-        frame->type = TM_TYPE_FILE_DATA;
+        frame->nframe = csp_hton16((uint16_t)start_part++);
+        frame->type = type;
         frame->fileid = csp_hton16(fileid);
-        frame->total = csp_hton16(total_frames);
+        frame->total = csp_hton16(file_parts);
         memcpy(frame->data, data, bytes_sent);
+
+        // Fill frame
+        if(bytes_sent < COM_FRAME_MAX_LEN) {
+            LOGD(tag, "Last frame include %d bytes!", bytes_sent);
+            memset(frame->data+bytes_sent, 0xAA, COM_FRAME_MAX_LEN-bytes_sent);
+        }
+
         // Send packet
-        rc_send = csp_send(conn, packet, 500);
+        rc_send = csp_send(conn_curr, packet, 500);
         if(rc_send == 0)
         {
             LOGE(tag, "Error sending frame! (%d)", rc_send);
             csp_buffer_free(packet);
-            rc_conn = csp_close(conn);
+            if(conn_prev == NULL)
+                rc_conn = csp_close(conn_curr);
             return CMD_ERROR;
         }
 
         // Process more data
         n_bytes -= bytes_sent;
         data += bytes_sent;
+        nframe ++;
 
         if(nframe%SCH_COM_MAX_PACKETS == 0)
             osDelay(SCH_COM_TX_DELAY_MS);
     }
 
-    // Send last frame
-    size_t bytes_sent = n_bytes;
-    packet = csp_buffer_get(sizeof(com_frame_file_t));
-    packet->length = sizeof(com_frame_file_t);
-    frame = (com_frame_file_t *)(packet->data);
-    frame->node = SCH_COMM_NODE;
-    frame->nframe = csp_hton16((uint16_t)nframe++);
-    frame->type = TM_TYPE_FILE_END;
-    frame->fileid = csp_hton16(fileid);
-    frame->total = csp_hton16(total_frames);
-    memcpy(frame->data, data, bytes_sent);
-    // Fill frame
-    LOGI(tag, "Last frame include %d bytes!", bytes_sent);
-    if(bytes_sent < COM_FRAME_MAX_LEN)
-        memset(frame->data+bytes_sent, 0xAA, COM_FRAME_MAX_LEN-bytes_sent);
-    // Send packet
-    rc_send = csp_send(conn, packet, 500);
-    if(rc_send == 0)
+    // Close connection if created
+    if(conn_prev == NULL)
     {
-        LOGE(tag, "Error sending frame! (%d)", rc_send);
-        csp_buffer_free(packet);
-        rc_conn = csp_close(conn);
-        return CMD_ERROR;
+        rc_conn = csp_close(conn_curr);
+        if (rc_conn != CSP_ERR_NONE)
+            LOGE(tag, "Error closing connection! (%d)", rc_conn);
     }
-
-    // Close connection
-    rc_conn = csp_close(conn);
-    if(rc_conn != CSP_ERR_NONE)
-        LOGE(tag, "Error closing connection! (%d)", rc_conn);
 
     return rc_send == 1 && rc_conn == CSP_ERR_NONE ? CMD_OK : CMD_ERROR;
 }

@@ -51,6 +51,8 @@ void cmd_tm_init(void)
 #ifdef LINUX
     cmd_add("tm_send_file", tm_send_file, "%s %u", 2);
     cmd_add("tm_parse_file", tm_parse_file, "", 0);
+    cmd_add("tm_send_file_part", tm_send_file_parts, "%s %d %d %d %u", 5);
+    cmd_add("tm_merge_file", tm_merge_file, "%s %d", 2);
 #endif
 }
 
@@ -563,7 +565,17 @@ int tm_parse_file(char *fmt, char *params, int nparams)
         LOGI(tag, "New file! Id: %d. Frame: %d/%d. Name: %s", frame->fileid, frame->nframe, frame->total, fname);
     }
 
-    if(type == TM_TYPE_FILE_DATA || type == TM_TYPE_FILE_END)
+    if(type == TM_TYPE_FILE_PART)
+    {
+        size_t sname = strlen(bname)+20;
+        fname = calloc(sname, 1);
+        snprintf(fname, sname, "%s%d_%d_%d.part", bname, frame->fileid, frame->nframe, frame->total);
+        last_id = frame->fileid;
+        last_frame = frame->nframe-1;
+        LOGI(tag, "New part! Id: %d. Frame: %d/%d. Name: %s", frame->fileid, frame->nframe, frame->total, fname);
+    }
+
+    if(type == TM_TYPE_FILE_DATA || type == TM_TYPE_FILE_PART || type == TM_TYPE_FILE_END)
     {
         LOGI(tag, "Id: %d. Frame: %d/%d", frame->fileid, frame->nframe, frame->total, fname);
         if(fname == NULL || last_id != frame->fileid || last_frame != frame->nframe-1)
@@ -573,7 +585,7 @@ int tm_parse_file(char *fmt, char *params, int nparams)
         }
 
         int nbytes = COM_FRAME_MAX_LEN;
-        if(type == TM_TYPE_FILE_END)
+        if(type == TM_TYPE_FILE_END || type == TM_TYPE_FILE_PART)
         {
             // Remove file tail
             int i;
@@ -599,7 +611,7 @@ int tm_parse_file(char *fmt, char *params, int nparams)
         fclose(fptr);
     }
 
-    if(type == TM_TYPE_FILE_END)
+    if(type == TM_TYPE_FILE_END || type == TM_TYPE_FILE_PART)
     {
         LOGR(tag, "Closing file! Id: %d. Frames: %d/%d. Name: %s", frame->fileid, frame->nframe, frame->total, fname);
         if(fname != NULL)
@@ -610,5 +622,69 @@ int tm_parse_file(char *fmt, char *params, int nparams)
     }
 
     return CMD_OK;
+}
+
+int tm_send_file_parts(char *fmt, char *params, int nparams)
+{
+    char file_name[SCH_CMD_MAX_STR_PARAMS];
+    int file_id;
+    int start_frame;
+    int end_frame;
+    int node;
+    if(params == NULL || sscanf(params, fmt, file_name, &file_id, &start_frame, &end_frame, &node) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    // Open file
+    FILE *fptr;
+    fptr = fopen(file_name,"rb");  // r for read, b for binary
+    if(fptr == NULL)
+    {
+        LOGE(tag, "Error reading file %s", file_name);
+        return CMD_ERROR;
+    }
+
+    // Determine file size
+    fseek(fptr, 0L, SEEK_END);
+    long file_size = ftell(fptr);
+    fseek(fptr, 0L, SEEK_SET);
+
+    // Select only the required bytes
+    int start_byte = start_frame * COM_FRAME_MAX_LEN;
+    size_t read_bytes = (end_frame - start_frame) * COM_FRAME_MAX_LEN;
+    read_bytes = (start_byte + read_bytes) > file_size ? (file_size - start_byte) : read_bytes;
+    //Check file limits
+    if(start_byte > file_size || start_byte+read_bytes > file_size)
+        return CMD_SYNTAX_ERROR;
+    // Read file
+    char *buffer = malloc(read_bytes);
+    if(buffer == NULL)
+        return CMD_ERROR;
+    fseek(fptr, start_byte, SEEK_SET);
+    fread(buffer, read_bytes, 1, fptr);
+    fclose(fptr);
+
+    // Send file using CSP
+    int total_frames = file_size / COM_FRAME_MAX_LEN;
+    total_frames += file_size % COM_FRAME_MAX_LEN ? 1 : 0; // Add extra frame
+    int rc = com_send_file_parts(node, buffer, read_bytes, file_id, start_frame, total_frames-1, TM_TYPE_FILE_PART, NULL);
+
+    // Clean and return
+    free(buffer);
+    return rc;
+}
+
+int tm_merge_file(char *fmt, char *params, int nparams)
+{
+    char file_name[SCH_CMD_MAX_STR_PARAMS];
+    int file_id;
+    if(params == NULL || sscanf(params, fmt, file_name, &file_id) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    char cmd[SCH_CMD_MAX_STR_PARAMS];
+    snprintf(cmd, SCH_CMD_MAX_STR_PARAMS, "cat $(find -name \"%d_*.part\" | sort -V) > recv_files/%s", file_id, file_name);
+
+    LOGI(tag, "%s", cmd);
+    int rc = system(cmd);
+    return rc == 0 ? CMD_OK : CMD_ERROR;
 }
 #endif

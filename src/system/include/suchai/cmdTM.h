@@ -26,6 +26,7 @@
 #define TM_TYPE_FILE_START 100
 #define TM_TYPE_FILE_DATA 101
 #define TM_TYPE_FILE_END 102
+#define TM_TYPE_FILE_PART 103
 
 /**
  * Register TM commands
@@ -149,7 +150,6 @@ int tm_get_single(char *fmt, char *params, int nparams);
 int tm_send_cmds(char *fmt, char *params, int nparms);
 
 #ifdef LINUX
-
 /**
  * Send a file using CSP
  *
@@ -169,6 +169,24 @@ int tm_send_file(char *fmt, char *params, int nparams);
  * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_parse_file(char *fmt, char *params, int nparams);
+
+/**
+ * Send specific frames of a file using CSP
+ * @param fmt %s %d %d %d %u
+ * @param params "<filename> <file_id> <start> <end> <node>"
+ * @param nparams 4
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
+ */
+int tm_send_file_parts(char *fmt, char *params, int nparams);
+
+/**
+ * Merge files transferred with tm_send_file_parts
+ * @param fmt %s %d
+ * @param params "<filename> <file_id>"
+ * @param nparams 2
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
+ */
+int tm_merge_file(char *fmt, char *params, int nparams);
 #endif
 
 #endif //CMDTM_H
