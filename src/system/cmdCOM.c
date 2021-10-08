@@ -217,6 +217,12 @@ int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n
     {
         // Create packet and frame
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
+        if(packet == NULL)
+        {
+            LOGE(tag, "Cannot allocate CSP buffer!");
+            rc_send = 0;
+            break;
+        }
         packet->length = sizeof(com_frame_t);
         com_frame_t *frame = (com_frame_t *)(packet->data);
         frame->node = SCH_COMM_NODE;
@@ -279,6 +285,12 @@ int com_send_telemetry(int node, int port, int type, void *data, size_t n_bytes,
 
         // Create packet and frame
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_t));
+        if(packet == NULL)
+        {
+            LOGE(tag, "Cannot allocate CSP buffer!");
+            rc_send = 0;
+            break;
+        }
         packet->length = sizeof(com_frame_t);
         com_frame_t *frame = (com_frame_t *)(packet->data);
         frame->node = SCH_COMM_NODE;
@@ -385,6 +397,12 @@ int com_send_file_parts(int node, void *data, size_t n_bytes, int file_id, int s
         size_t bytes_sent = n_bytes >= COM_FRAME_MAX_LEN ? COM_FRAME_MAX_LEN : n_bytes;
         // Create packet and frame
         csp_packet_t *packet = csp_buffer_get(sizeof(com_frame_file_t));
+        if(packet == NULL)
+        {
+            LOGE(tag, "Cannot allocate CSP buffer!");
+            rc_send = 0;
+            break;
+        }
         packet->length = sizeof(com_frame_file_t);
         com_frame_file_t *frame = (com_frame_file_t *)(packet->data);
         frame->node = SCH_COMM_NODE;
