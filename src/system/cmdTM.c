@@ -51,10 +51,11 @@ void cmd_tm_init(void)
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
     cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
 #ifdef LINUX
-    cmd_add("tm_send_file", tm_send_file, "%s %u", 2);
+    cmd_add("tm_send_file", tm_send_file, "%s %d", 2);
     cmd_add("tm_parse_file", tm_parse_file, "", 0);
-    cmd_add("tm_send_file_part", tm_send_file_parts, "%s %d %d %d %u", 5);
+    cmd_add("tm_send_file_part", tm_send_file_parts, "%s %d %d %d %d", 5);
     cmd_add("tm_merge_file", tm_merge_file, "%s %d", 2);
+    cmd_add("tm_ls", tm_list_files, "%s %d", 2);
 #endif
 }
 
@@ -723,5 +724,34 @@ int tm_merge_file(char *fmt, char *params, int nparams)
 
     _merging_file_id = 0;
     return rc == 0 ? CMD_OK : CMD_ERROR;
+}
+
+int tm_list_files(char* fmt, char* params, int nparams)
+{
+    DIR *d;
+    struct dirent *dir;
+    struct stat fstat;
+    char path[SCH_CMD_MAX_STR_PARAMS];
+    char buff[COM_FRAME_MAX_LEN];
+    int node;
+    if(params == NULL || sscanf(params, fmt, path, &node) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    d = opendir(path);
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            snprintf(buff, COM_FRAME_MAX_LEN, "%s/%s", path, dir->d_name);
+            stat(buff, &fstat);
+            LOGR(tag, "%d\t %s", fstat.st_size, dir->d_name);
+            snprintf(buff, COM_FRAME_MAX_LEN,"%ld\t %s", fstat.st_size, dir->d_name);
+            int buff_len = strlen(buff);
+            int rc = com_send_telemetry(node, SCH_TRX_PORT_DBG_TM, 0, buff, buff_len, buff_len, 0);
+            if(rc != CMD_OK)
+                break;
+        }
+        closedir(d);
+        return CMD_OK;
+    }
+    return CMD_ERROR;
 }
 #endif

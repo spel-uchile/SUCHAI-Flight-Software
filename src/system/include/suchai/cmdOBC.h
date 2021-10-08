@@ -175,5 +175,19 @@ int obc_ls(char* fmt, char* params, int nparams);
  */
 int obc_mkdir(char* fmt, char* params, int nparams);
 
+/**
+ * Remove files or directory calling bash 'rm <params>'
+ * Ex:  obc_rm file.txt
+ *      obc_rm -rf recv_files/
+ *
+ * @warning USE WITH CAUTION. DELETING FILES AND DIRECTORIES CANNOT BE UNDONE
+ * @warning USE WITH CAUTION. PARAMETERS ARE PASSED DIRECTLY TO rm COMMAND.
+ *
+ * @param fmt "%s"
+ * @param params <params>
+ * @param nparams 1
+ * @return
+ */
+int obc_rm(char* fmt, char* params, int nparams);
 
 #endif /* CMD_OBC_H */

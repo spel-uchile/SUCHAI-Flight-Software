@@ -47,6 +47,7 @@ void cmd_obc_init(void)
     cmd_add("obc_set_cwd", obc_set_cwd, "%s", 1);
     cmd_add("obc_get_cwd", obc_get_cwd, "", 0);
     cmd_add("obc_ls", obc_ls, "%s", 1);
+    cmd_add("obc_rm", obc_rm, "%s", 1);
     cmd_add("obc_mkdir", obc_mkdir, "%s", 1);
 #endif
 }
@@ -206,14 +207,22 @@ int obc_ls(char* fmt, char* params, int nparams)
 {
     DIR *d;
     struct dirent *dir;
+    struct stat fstat;
+    char *path;
     if(params != NULL)
-        d = opendir(params);
+        path = params;
     else
-        d = opendir(".");
+        path = ".";
+    d = opendir(path);
 
     if (d) {
         while ((dir = readdir(d)) != NULL) {
-            LOGR(tag, "%s", dir->d_name);
+            int path_len = strlen(path)+strlen(dir->d_name)+2;
+            char *file_path = calloc(path_len, 1);
+            snprintf(file_path, path_len, "%s/%s", path, dir->d_name);
+            stat(file_path, &fstat);
+            LOGR(tag, "%d\t %s", fstat.st_size, dir->d_name);
+            free(file_path);
         }
         closedir(d);
         return CMD_OK;
@@ -233,6 +242,22 @@ int obc_mkdir(char* fmt, char* params, int nparams)
     if (stat(params, &st) == -1) {
         rc = mkdir(params, 0700);
     }
+
+    return rc == 0 ? CMD_OK : CMD_ERROR;
+}
+
+int obc_rm(char* fmt, char* params, int nparams)
+{
+    if(params == NULL)
+        return CMD_SYNTAX_ERROR;
+
+    char *cmd = malloc(strlen(params)+ 5);
+    if(cmd == NULL)
+        return CMD_ERROR;
+
+    sprintf(cmd, "rm %s", params);
+    int rc = system(cmd);
+    free(cmd);
 
     return rc == 0 ? CMD_OK : CMD_ERROR;
 }

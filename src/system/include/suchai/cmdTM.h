@@ -187,6 +187,19 @@ int tm_send_file_parts(char *fmt, char *params, int nparams);
  * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
 int tm_merge_file(char *fmt, char *params, int nparams);
+
+/**
+ * List a directory and send that data to a remote node
+ * Use path as . to list current working directory
+ * Similar to obc_ls command, but this send each filename to a remote node
+ * as a CSP frame.
+ *
+ * @param fmt %s %d
+ * @param params "<path> <node>"
+ * @param nparams 2
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
+ */
+int tm_list_files(char* fmt, char* params, int nparams);
 #endif
 
 #endif //CMDTM_H
