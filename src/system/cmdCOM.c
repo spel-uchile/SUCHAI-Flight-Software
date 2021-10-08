@@ -453,8 +453,8 @@ int com_debug(char *fmt, char *params, int nparams)
     csp_route_print_table();
     LOGR(tag, "Interfaces");
     csp_route_print_interfaces();
-    LOGR(tag, "Connections")
-    csp_conn_print_table();
+    //LOGR(tag, "Connections")
+    //csp_conn_print_table();
 
     return CMD_OK;
 }

@@ -76,7 +76,7 @@ int obc_reset_wdt(char *fmt, char *params, int nparams)
         arg = 0;
 
     int rc = cpu_reset_wdt(arg);
-    return rc == 0 ? CMD_OK : CMD_ERROR;
+    return rc == 1 ? CMD_OK : CMD_ERROR;
 }
 
 int obc_exit(char *fmt, char *params, int nparams) {
