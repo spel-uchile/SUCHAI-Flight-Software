@@ -20,9 +20,11 @@
 #include "suchai/cmdTM.h"
 #ifdef LINUX
 #include <sys/stat.h>
+#include <dirent.h>
 #endif
 
 static const char *tag = "cmdTM";
+static int _merging_file_id = 0;
 
 /**
  * Helper function to read and send a range of telemetry
@@ -674,18 +676,52 @@ int tm_send_file_parts(char *fmt, char *params, int nparams)
     return rc;
 }
 
+int _filter_file_part_name(const struct dirent * dir)
+{
+    int id, frame, max;
+    if(sscanf(dir->d_name, "%d_%d_%d.part", &id, &frame, &max) == 3)
+        if(id == _merging_file_id)
+            return 1;
+    return 0;
+}
+
 int tm_merge_file(char *fmt, char *params, int nparams)
 {
     char file_name[SCH_CMD_MAX_STR_PARAMS];
-    int file_id;
+    char cmd[SCH_CMD_MAX_STR_PARAMS];
+    int file_id, file_max, rc;
     if(params == NULL || sscanf(params, fmt, file_name, &file_id) != nparams)
         return CMD_SYNTAX_ERROR;
 
-    char cmd[SCH_CMD_MAX_STR_PARAMS];
-    snprintf(cmd, SCH_CMD_MAX_STR_PARAMS, "cat $(find -name \"%d_*.part\" | sort -V) > recv_files/%s", file_id, file_name);
+    // Check for missing frames
+    struct dirent **namelist;
+    _merging_file_id = file_id;
+    int n = scandir("recv_files", &namelist, _filter_file_part_name, versionsort);
+    if (n > 0)
+    {
+        int id, frame, max, last=-1;
+        for (int i=0; i<n; i++)
+        {
+            if(sscanf(namelist[i]->d_name, "%d_%d_%d.part", &id, &frame, &max) == 3)
+            {
+                // Check missing frames between last and current frame number
+                while(++last != frame)
+                    LOGW(tag, "MISSING FRAME: %d_%d_%d.part", id, last, max);
+            }
+            free(namelist[i]);
+        }
+        // Check missing frames between last file and expected frames
+        while(last++ < max)
+            LOGW(tag, "MISSING FRAME: %d_%d_%d.part", id, last, max);
+        free(namelist);
+    }
 
+    // Merge with cat and find shell commands
+    snprintf(cmd, SCH_CMD_MAX_STR_PARAMS-1, "cat $(find -name \"%d_*.part\" | sort -V) > recv_files/%s", file_id, file_name);
     LOGI(tag, "%s", cmd);
-    int rc = system(cmd);
+    rc = system(cmd);
+
+    _merging_file_id = 0;
     return rc == 0 ? CMD_OK : CMD_ERROR;
 }
 #endif
