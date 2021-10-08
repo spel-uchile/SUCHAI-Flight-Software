@@ -489,7 +489,7 @@ int com_set_time_node(char *fmt, char *params, int nparams)
     char cmd[SCH_CMD_MAX_STR_NAME];
     sprintf(cmd, "%d obc_set_time %d", node, (int)dat_get_time());
     LOGI(tag, "Sending command 'com_send_cmd %s' to %d", cmd, node);
-    com_send_cmd("%d %n", cmd, 2);
+    return com_send_cmd("%d %n", cmd, 2);
 }
 
 int com_set_tle_node(char *fmt, char *params, int nparams)
