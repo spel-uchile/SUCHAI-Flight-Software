@@ -19,8 +19,71 @@
  */
 
 #include "suchai/storage.h"
-#include
-#ifdef NANOMIND
-#include "drivers.h"
-#endif
+#include <libpq.h>
+#include <math.h>
 
+#define ST_SQL_MAX_LEN  (1000)
+
+///< Status variables buffer
+static size_t status_entries = 0;
+
+///< Flight plan buffer
+static char* fp_table = NULL;
+
+///< Payloads storage buffer
+static int payloads_entries = 0;
+static data_map_t *payloads_schema = NULL;
+static char *payloads_table = NULL;
+
+static int storage_is_open = 0;
+
+static sqlite3 *db = NULL;
+
+
+
+int storage_init(const char *db_name){
+    char *hostaddr;
+    int port;
+    char *db;
+    char *user;
+    char *password;
+
+    /* if postgresql eventualy upgrades and
+     * changes it params names, you can
+     * change here without touching
+     * everywhere else
+     * */
+    char *key_hostaddr = "hostaddr";
+    char *key_port = "port";
+    char *key_user = "user";
+    char *key_password = "password";
+    char *key_dbname = "dbname";
+
+    // Here set the keywords params name array
+
+    const char *keywords[] = {key_hostaddr,
+                             key_port,
+                             key_user,
+                             key_password,
+                             key_dbname};
+
+    char *fmt = "%s %u %s %s %s";
+
+    if(sscanf(db_name, fmt, hostaddr, &port, db, user, password) != 5){
+        return -1;
+    }
+
+    char *port_str;
+    double port_size = 1.0 * port;
+
+    double port_str_size = log10(port_size);
+
+    snprintf(port_str,port_str_size, port);
+    const char *values[] = {
+
+    };
+
+
+
+
+}
