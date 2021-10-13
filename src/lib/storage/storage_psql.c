@@ -37,11 +37,11 @@ static char *payloads_table = NULL;
 
 static int storage_is_open = 0;
 
-static sqlite3 *db = NULL;
+static PGconn *conn = NULL;
 
 
-
-int storage_init(const char *db_name){
+int storage_init(const char *db_name)
+{
     char *hostaddr;
     int port;
     char *db;
@@ -59,7 +59,7 @@ int storage_init(const char *db_name){
     char *key_password = "password";
     char *key_dbname = "dbname";
 
-    // Here set the keywords params name array
+    // Here set the keywords params names array
 
     const char *keywords[] = {key_hostaddr,
                              key_port,
@@ -70,20 +70,45 @@ int storage_init(const char *db_name){
     char *fmt = "%s %u %s %s %s";
 
     if(sscanf(db_name, fmt, hostaddr, &port, db, user, password) != 5){
-        return -1;
+        return SCH_ST_ERROR;
     }
 
     char *port_str;
-    double port_size = 1.0 * port;
+    double port_double = 1.0 * port;
 
-    double port_str_size = log10(port_size);
-
-    snprintf(port_str,port_str_size, port);
+    size_t port_str_size = log10(port_double);
+    snprintf(port_str,port_str_size,"%u", port);
     const char *values[] = {
-
+            hostaddr,
+            port_str,
+            user,
+            password,
+            dbname
     };
 
+    conn = PQconnectdbParams(keywords, values);
 
+    // Error handling
+    if (PQstatus(conn) == CONNECTION_BAD){
+        PQfinish(conn);
+        return SCH_ST_ERROR;
+    }
+    else if (PQstatus(conn) == CONNECTION_OK) {
+        storage_is_open = 1;
+        return SCH_ST_OK;
+    }
 
+}
 
+int storage_close(void)
+{
+    if (conn != NULL){
+        PGfinish(conn);
+        conn = NULL;
+        storage_is_open = 0;
+        return SCH_ST_OK;
+    }
+
+    if(fp_table != NULL) free(fp_table);
+    return SCH_ST_ERROR;
 }
