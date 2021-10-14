@@ -43,15 +43,11 @@ void taskTest(void *param)
     LOGI(tag, "---- Testing DRP commands ----");
     LOGI(tag, "Test: drp_ebf");
     test_cmd = cmd_build_from_str(("drp_ebf 1010"));
-    //test_cmd = cmd_get_str("drp_ebf");
-    //cmd_add_params_str(test_cmd, "1010");
     cmd_send(test_cmd);
     osDelay(500);
 
     LOGI(tag, "Test: drp_print_vars");
     test_cmd = cmd_build_from_str("drp_print_vars");
-    //test_cmd = cmd_get_str("drp_print_vars");
-    //cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
     osDelay(500);
 
@@ -59,9 +55,6 @@ void taskTest(void *param)
     char buf[50];
     snprintf(buf, 50, "drp_set_var %d %f", dat_obc_opmode, 123.0);
     test_cmd = cmd_build_from_str(buf);
-    //test_cmd = cmd_get_str("drp_set_var");
-    //cmd_add_params_var(test_cmd, dat_obc_opmode, 123.0);
-//    cmd_add_params_str(test_cmd, "obc_opmode 123");
     cmd_send(test_cmd);
     osDelay(500);
     // Check if the command worked
@@ -71,8 +64,6 @@ void taskTest(void *param)
     LOGI(tag, "Test: drp_add_hrs_alive");
     snprintf(buf, 50, "drp_add_hrs_alive %d", 123);
     test_cmd = cmd_build_from_str(buf);
-    //test_cmd = cmd_get_str("drp_add_hrs_alive");
-    //cmd_add_params_var(test_cmd, 123);
     cmd_send(test_cmd);
     osDelay(500);
     // Check if the command worked
@@ -81,8 +72,6 @@ void taskTest(void *param)
 
     LOGI(tag, "Test: drp_get_vars");
     test_cmd = cmd_build_from_str("drp_print_vars");
-    //test_cmd = cmd_get_str("drp_print_vars");
-    //cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
     osDelay(500);
 
