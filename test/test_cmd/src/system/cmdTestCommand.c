@@ -7,7 +7,7 @@
  * This file have tests related to commands interface
  */
 
-#include "cmdTestCommand.h"
+#include "app/system/cmdTestCommand.h"
 
 static const char *tag = "cmdTest";
 
@@ -42,7 +42,7 @@ int test_cmd_double_int(char *fmt, char *params, int nparams)
     assert(v1-1.00 < 1e-6);
     assert(v2-2.09 < 1e-6);
     assert(v3==12);
-    assert(v4=23);
+    assert(v4==23);
     return CMD_OK;
 }
 
