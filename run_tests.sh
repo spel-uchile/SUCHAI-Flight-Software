@@ -28,7 +28,7 @@ then
 
   for ARCH in "X86" "RPI"
   do
-    for ST_MODE in "RAM" "SQLITE" "FLASH"
+    for ST_MODE in "RAM" "SQLITE" "FLASH" "POSTGRES"
     do
       echo ""
       echo "**** Testing ${TEST_NAME} for arch ${ARCH}, storage ${ST_MODE} ****"

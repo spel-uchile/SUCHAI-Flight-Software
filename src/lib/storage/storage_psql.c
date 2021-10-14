@@ -19,6 +19,7 @@
  */
 
 #include "suchai/storage.h"
+#include <libpq-fe.h>
 #include <libpq.h>
 #include <math.h>
 
@@ -44,7 +45,7 @@ int storage_init(const char *db_name)
 {
     char *hostaddr;
     int port;
-    char *db;
+    char *dbname;
     char *user;
     char *password;
 
@@ -69,7 +70,7 @@ int storage_init(const char *db_name)
 
     char *fmt = "%s %u %s %s %s";
 
-    if(sscanf(db_name, fmt, hostaddr, &port, db, user, password) != 5){
+    if(sscanf(db_name, fmt, hostaddr, &port, dbname, user, password) != 5){
         return SCH_ST_ERROR;
     }
 
@@ -111,4 +112,22 @@ int storage_close(void)
 
     if(fp_table != NULL) free(fp_table);
     return SCH_ST_ERROR;
+}
+
+int storage_table_status_init(char *table, int n_variables, int drop)
+{
+    char *err_msg;
+    char *sql_stmt;
+    int rc;
+
+    char *stmt_name = "drop_on";
+
+    if(drop)
+    {
+        sql_stmt = PQprepare(conn,
+                             stmt_name,
+                             "DROP TABLE $1",
+                             1,
+                             )
+    }
 }
