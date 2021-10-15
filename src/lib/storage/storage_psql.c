@@ -43,7 +43,7 @@ static PGconn *conn = NULL;
 
 int storage_init(const char *db_name)
 {
-    char *hostaddr;
+    char *hostaddr = SCH_STORAGE_PGHOST;
     int port;
     char *dbname;
     char *user;
@@ -78,7 +78,6 @@ int storage_init(const char *db_name)
     double port_double = 1.0 * port;
 
     size_t port_str_size = log10(port_double);
-    snprintf(port_str,port_str_size,"%u", port);
     const char *values[] = {
             hostaddr,
             port_str,
