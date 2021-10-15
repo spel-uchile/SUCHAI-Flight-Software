@@ -7,7 +7,8 @@
  * This file have tests related to commands interface
  */
 
-#include "cmdTestCommand.h"
+#include "app/system/cmdTestCommand.h"
+#include "string.h"
 
 static const char *tag = "cmdTest";
 
@@ -29,6 +30,8 @@ int test_cmd_str_int(char *fmt, char *params, int nparams)
     assertf(sscanf(params,fmt, msg, &valor) == nparams, tag, "The format of parameters are: %s and parameters used are: %s",fmt, params);
     assertf(errno == 0, tag, "The format of parameters are: %s and parameters used are: %s",fmt, params);
     LOGI(tag, "%s: %s_%i","con_str_int", msg, valor);
+    assert(strncmp(msg,"STR1",10)==0);
+    assert(valor==12);
     return CMD_OK;
 }
 
@@ -42,7 +45,7 @@ int test_cmd_double_int(char *fmt, char *params, int nparams)
     assert(v1-1.00 < 1e-6);
     assert(v2-2.09 < 1e-6);
     assert(v3==12);
-    assert(v4=23);
+    assert(v4==23);
     return CMD_OK;
 }
 
@@ -55,5 +58,10 @@ int test_cmd_str_double_int(char *fmt, char *params, int nparams)
 
     assertf( sscanf(params,fmt, v1, &v2, v3, &v4, &v5) == nparams, tag, "The format of parameters are: %s and parameters used are: %s",fmt, params);
     LOGI(tag, "%s: %s_%f_%s_%f_%i","str_double_int",v1,v2,v3,v4,v5);
+    assert(strncmp(v1,"STR1",10)==0);
+    assert(v2-12.456 < 1e-6);
+    assert(strncmp(v3,"STR2",10)==0);
+    assert(v4-13.078 < 1e-6);
+    assert(v5==456);
     return CMD_OK;
 }

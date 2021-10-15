@@ -16,7 +16,7 @@
 
 #include "suchai/config.h"
 #include "suchai/log_utils.h"
-#include "repoCommand.h"
+#include "suchai/repoCommand.h"
 
 /* Function definitions */
 /**
