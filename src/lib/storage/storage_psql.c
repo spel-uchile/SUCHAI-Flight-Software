@@ -44,11 +44,18 @@ static PGconn *conn = NULL;
 int storage_init(const char *db_name)
 {
     char *hostaddr = SCH_STORAGE_PGHOST;
-    int port;
+    int port = SCH_STORAGE_PGPORT;
     char *dbname;
-    char *user;
-    char *password;
+    char *user = SCH_STORAGE_PGUSER;
+    char *password = SCH_STORAGE_PGPASS;
 
+    if (db_name == NULL){
+        return SCH_ST_ERROR;
+    }
+    strcpy(dbname, db_name);
+    if(dbname == NULL){
+        return SCH_ST_ERROR;
+    }
     /* if postgresql eventualy upgrades and
      * changes it params names, you can
      * change here without touching
