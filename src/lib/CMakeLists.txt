@@ -10,6 +10,9 @@ if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("${CSP_RESULTS}")
 endif()
 
+#define libpq path and build command
+
+
 set(SOURCE_FILES
         utils/math_utils.c
         utils/log_utils.c
@@ -45,6 +48,10 @@ target_include_directories(suchai-fs-lib PUBLIC
         sgp4/src/c
         linenoise
         libcsp/libcsp/include)
+
+if(${SCH_STORAGE_MODE} STREQUAL SCH_ST_POSTGRES)
+    target_include_directories(suchai-fs-lib AFTER PUBLIC ${SCH_STORAGE_PGLIB})
+endif()
 
 target_link_libraries(suchai-fs-lib PRIVATE suchai-fs-os)
 target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)

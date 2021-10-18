@@ -20,7 +20,6 @@
 
 #include "suchai/storage.h"
 #include <libpq-fe.h>
-#include <libpq.h>
 #include <math.h>
 
 #define ST_SQL_MAX_LEN  (1000)
@@ -67,7 +66,7 @@ int storage_init(const char *db_name)
     char *key_password = "password";
     char *key_dbname = "dbname";
 
-    // Here set the keywords params names array
+    /// Here set the keywords params names array
 
     const char *keywords[] = {key_hostaddr,
                              key_port,
@@ -84,7 +83,14 @@ int storage_init(const char *db_name)
     char *port_str;
     double port_double = 1.0 * port;
 
-    size_t port_str_size = log10(port_double);
+    size_t port_str_size = (size_t) ceil(log10(port_double));
+    snprintf(
+            port_str,
+            port_str_size,
+            "%d",
+            port
+            );
+
     const char *values[] = {
             hostaddr,
             port_str,
@@ -93,9 +99,10 @@ int storage_init(const char *db_name)
             dbname
     };
 
-    conn = PQconnectdbParams(keywords, values);
+    /// expand dbname is zero because postgresql documentation
+    conn = PQconnectdbParams(keywords, values,0);
 
-    // Error handling
+    /// Error handling
     if (PQstatus(conn) == CONNECTION_BAD){
         PQfinish(conn);
         return SCH_ST_ERROR;
@@ -110,7 +117,7 @@ int storage_init(const char *db_name)
 int storage_close(void)
 {
     if (conn != NULL){
-        PGfinish(conn);
+        PQfinish(conn);
         conn = NULL;
         storage_is_open = 0;
         return SCH_ST_OK;
@@ -123,17 +130,45 @@ int storage_close(void)
 int storage_table_status_init(char *table, int n_variables, int drop)
 {
     char *err_msg;
-    char *sql_stmt;
+    PGresult *sql_stmt;
     int rc;
 
     char *stmt_name = "drop_on";
+    const char *table_name_ok;
 
+    if (table == NULL){
+        return SCH_ST_ERROR;
+    } else {
+        strncpy(table_name_ok,table, strlen(table));
+    }
+    if (n_variables < 0){
+        return SCH_ST_ERROR;
+    }
+    if (drop < 0 ) {
+        return SCH_ST_ERROR;
+    }
     if(drop)
     {
+        /* oid for char* is 2275, according
+         * to the documentation, corresponds a cstring.
+         * The other value for null terminated arrays is
+         * unknown
+        */
+        Oid param_types = {2275};
         sql_stmt = PQprepare(conn,
                              stmt_name,
                              "DROP TABLE $1",
                              1,
-                             )
+                             &param_types);
+        if (PQresultStatus(sql_stmt) != PGRES_COMMAND_OK){
+            return SCH_ST_ERROR;
+        }
+        PQexecPrepared(conn,
+                       stmt_name,
+                       1,
+                       table,
+                       strlen(table),
+                       "%s",
+                       0);
     }
 }
