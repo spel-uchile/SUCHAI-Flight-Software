@@ -134,12 +134,12 @@ int storage_table_status_init(char *table, int n_variables, int drop)
     int rc;
 
     char *stmt_name = "drop_on";
-    const char *table_name_ok;
+    const char * const *table_name;
 
     if (table == NULL){
         return SCH_ST_ERROR;
     } else {
-        strncpy(table_name_ok,table, strlen(table));
+        strncpy(*table_name,table, strlen(table));
     }
     if (n_variables < 0){
         return SCH_ST_ERROR;
@@ -166,7 +166,7 @@ int storage_table_status_init(char *table, int n_variables, int drop)
         PQexecPrepared(conn,
                        stmt_name,
                        1,
-                       table,
+                       &table_name,
                        strlen(table),
                        "%s",
                        0);
