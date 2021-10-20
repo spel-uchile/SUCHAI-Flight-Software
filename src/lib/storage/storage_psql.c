@@ -130,10 +130,6 @@ int storage_close(void)
 int storage_table_status_init(char *table, int n_variables, int drop)
 {
     char *err_msg1;
-    char *err_msg2;
-
-
-    char *stmt_name = "drop_on";
 
     if (table == NULL){
         return SCH_ST_ERROR;
@@ -141,9 +137,10 @@ int storage_table_status_init(char *table, int n_variables, int drop)
     if (n_variables < 0){
         return SCH_ST_ERROR;
     }
-    if (drop < 0 ) {
+    if (drop < 0 || drop > 1) {
         return SCH_ST_ERROR;
     }
+    uint32_t str_len = (uint32_t) strlen(table);
     /* oid for char* is 2275, according
     * to the documentation, corresponds a cstring.
     * The other value for null terminated arrays is
@@ -152,75 +149,157 @@ int storage_table_status_init(char *table, int n_variables, int drop)
     Oid param_types = {2275};
     if(drop) {
         PGresult *sql_stmt;
-        PGresult *result;
-        sql_stmt = PQprepare(conn,
-                             stmt_name,
+
+        sql_stmt = PQexecParams(conn,
                              "DROP TABLE $1",
                              1,
-                             &param_types);
+                             &param_types,
+                             &table,
+                             &str_len,
+                             NULL,
+                             0);
         if (PQresultStatus(sql_stmt) != PGRES_COMMAND_OK) {
-            strcpy(err_msg1, PQerrorMessage(sql_stmt));
+            char *errorMessage = PQresultErrorMessage(sql_stmt);
+            strncpy(err_msg1, errorMessage,strlen(errorMessage));
             PQclear(sql_stmt);
             return SCH_ST_ERROR;
         }
-        result = PQexecPrepared(conn,
-                                stmt_name,
-                                1,
-                                table,
-                                strlen(table),
-                                NULL,
-                                0);
-        if (PQresultStatus(result) != PGRES_COMMAND_OK) {
-            strcpy(err_msg2, PQerrorMessage(result));
-            PQclear(result);
-            return SCH_ST_ERROR;
-        }
         PQclear(sql_stmt);
-        PQclear(result);
     }
-    char *create_table = "CREATE TABLE IF NOT EXISTS$1("
+    char *create_table = "CREATE TABLE IF NOT EXISTS $1("
                          "idx BIGSERIAL PRIMARY KEY,"
                          "name TEXT UNIQUE"
                          "value INTEGER)";
-    char *err_msg3;
-    PGresult *create_table_prepared = PQprepare(conn,
-                                                "create_table_status",
+    char *err_msg2;
+    PGresult *create_table_sql = PQexecParams(conn,
                                                 create_table,
                                                 1,
-                                                &param_types);
-    if(PQresultStatus(create_table_prepared) != PGRES_COMMAND_OK){
-        strcpy(err_msg3, PQerrorMessage(create_table_prepared));
-        PQclear(create_table_prepared);
+                                                &param_types,
+                                                table,
+                                                &str_len,
+                                                NULL,
+                                                0);
+    if(PQresultStatus(create_table_sql) != PGRES_COMMAND_OK){
+        char *errorMessage = PQresultErrorMessage(create_table_sql);
+        strncpy(err_msg2, errorMessage,strlen(errorMessage));
+        PQclear(create_table_sql);
         return SCH_ST_ERROR;
     }
-    char *err_msg4;
-    PGresult *create_table_executed = PQexecPrepared(conn,
-                                                     "create_table_status",
-                                                     1,
-                                                     table,
-                                                     strlen(table),
-                                                     NULL,
-                                                     0);
-    if(PQresultStatus(create_table_executed) != PGRES_COMMAND_OK){
-        strcpy(err_msg4, PQresultErrorMessage(create_table_executed));
-        PQclear(create_table_executed);
-        return SCH_ST_ERROR;
-    }
-    PQclear(create_table_prepared);
-    PQclear(create_table_executed);
+
+    PQclear(create_table_sql);
     return SCH_ST_OK;
 }
 
 int storage_table_flight_plan_init(char *table, int n_entires, int drop)
 {
     char *err_msg1;
-    char *sql;
-    int rc;
+    char *err_msg2;
+    char *sql1;
+    char *sql2;
+
+    if(table == NULL){
+        return SCH_ST_ERROR;
+    }
+    if (n_entires < 0){
+        return SCH_ST_ERROR;
+    }
+    if (drop < 0 || drop > 1){
+        return SCH_ST_ERROR;
+    }
+    Oid param_types = {2275};
+    int str_len = (int) strnlen(table,100);
 
     /* Drop table if drop variables is true */
-    if(drop == 1){
-        sql = "DROP TABLE IF EXISTS $1";
-        PGresult *drop_result = PQ
+    if(drop){
+        sql1 = "DROP TABLE IF EXISTS $1";
+        PGresult *drop_result = PQexecParams(conn,
+                                             sql1,
+                                             1,
+                                             &param_types,
+                                             &table,
+                                             &str_len,
+                                             NULL,
+                                             0);
+        if (PQresultStatus(drop_result) != PGRES_COMMAND_OK){
+            char *errorMessage = PQresultErrorMessage(drop_result);
+            strncpy(err_msg1,errorMessage,strlen(errorMessage));
+            PQclear(drop_result);
+            return SCH_ST_ERROR;
+        }
+        PQclear(drop_result);
     }
+    sql2 = "CREATE TABLE IF NOT EXISTS $1("
+          "time INTEGER PRIMARY KEY,"
+          "command TEXT,"
+          "args TEXT,"
+          "executions INTEGER,"
+          "periodical INTEGER,"
+          "node INTEGER)";
+    PGresult *create_table_result = PQexecParams(conn,
+                                                sql2,
+                                                1,
+                                                &param_types,
+                                                &table,
+                                                &str_len,
+                                                NULL,
+                                                0);
+    if(PQresultStatus(create_table_result) != PGRES_COMMAND_OK){
+        char *errorMessage = PQresultErrorMessage(create_table_result);
+        strncpy(err_msg2,errorMessage,strlen(errorMessage));
+        PQclear(create_table_result);
+        return SCH_ST_ERROR;
+    }
+    PQclear(create_table_result);
 
+    if(fp_table != NULL) free(fp_table);
+    fp_table = strdup(table);
+
+    return SCH_ST_OK;
+}
+
+int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries, int drop)
+{
+    if(table == NULL){
+        return SCH_ST_ERROR;
+    }
+    if( data_map == NULL){
+        return SCH_ST_ERROR;
+    }
+    if (n_entries < 0){ // <1 ???
+        return SCH_ST_ERROR;
+    }
+    if (drop < 0  || drop > 1){
+        return SCH_ST_ERROR;
+    }
+    Oid param_types = {2275};
+    if(drop){
+        char *err_msg;
+        char *sql;
+        for (int i = 0; i < n_entries; i++){
+            sql = "DROP TABLE IF EXISTS $1";
+            char *this_table = data_map[i].table;
+            int str_len = strlen(this_table);
+            PGresult *drop_result =PQexecParams(conn,
+                                                sql,
+                                                1,
+                                                &param_types,
+                                                &table,
+                                                &str_len,
+                                                NULL,
+                                                0);
+            if(PQresultStatus(drop_result) != PGRES_COMMAND_OK){
+                char *errorMessage = PQresultErrorMessage(drop_result);
+                strncpy(err_msg,errorMessage,strlen(errorMessage));
+                PQclear(drop_result);
+                return SCH_ST_ERROR;
+            }
+            PQclear(drop_result);
+        }
+
+        for(int i = 0; i < n_entries; i++){
+            char create_table[SCH_BUFF_MAX_LEN * 4]="CREATE TABLE IF NOT EXISTS $1(id SERIAL, tstz TIMESTAMP,";
+            memset(&create_table,0,SCH_BUFF_MAX_LEN * 4);
+
+        }
+    }
 }
