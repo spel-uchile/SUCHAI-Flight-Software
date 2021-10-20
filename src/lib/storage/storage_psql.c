@@ -129,17 +129,14 @@ int storage_close(void)
 
 int storage_table_status_init(char *table, int n_variables, int drop)
 {
-    char *err_msg;
-    PGresult *sql_stmt;
-    int rc;
+    char *err_msg1;
+    char *err_msg2;
+
 
     char *stmt_name = "drop_on";
-    const char * const *table_name;
 
     if (table == NULL){
         return SCH_ST_ERROR;
-    } else {
-        strncpy(*table_name,table, strlen(table));
     }
     if (n_variables < 0){
         return SCH_ST_ERROR;
@@ -147,28 +144,83 @@ int storage_table_status_init(char *table, int n_variables, int drop)
     if (drop < 0 ) {
         return SCH_ST_ERROR;
     }
-    if(drop)
-    {
-        /* oid for char* is 2275, according
-         * to the documentation, corresponds a cstring.
-         * The other value for null terminated arrays is
-         * unknown
-        */
-        Oid param_types = {2275};
+    /* oid for char* is 2275, according
+    * to the documentation, corresponds a cstring.
+    * The other value for null terminated arrays is
+    * unknown
+    */
+    Oid param_types = {2275};
+    if(drop) {
+        PGresult *sql_stmt;
+        PGresult *result;
         sql_stmt = PQprepare(conn,
                              stmt_name,
                              "DROP TABLE $1",
                              1,
                              &param_types);
-        if (PQresultStatus(sql_stmt) != PGRES_COMMAND_OK){
+        if (PQresultStatus(sql_stmt) != PGRES_COMMAND_OK) {
+            strcpy(err_msg1, PQerrorMessage(sql_stmt));
+            PQclear(sql_stmt);
             return SCH_ST_ERROR;
         }
-        PQexecPrepared(conn,
-                       stmt_name,
-                       1,
-                       &table_name,
-                       strlen(table),
-                       "%s",
-                       0);
+        result = PQexecPrepared(conn,
+                                stmt_name,
+                                1,
+                                table,
+                                strlen(table),
+                                NULL,
+                                0);
+        if (PQresultStatus(result) != PGRES_COMMAND_OK) {
+            strcpy(err_msg2, PQerrorMessage(result));
+            PQclear(result);
+            return SCH_ST_ERROR;
+        }
+        PQclear(sql_stmt);
+        PQclear(result);
     }
+    char *create_table = "CREATE TABLE IF NOT EXISTS$1("
+                         "idx BIGSERIAL PRIMARY KEY,"
+                         "name TEXT UNIQUE"
+                         "value INTEGER)";
+    char *err_msg3;
+    PGresult *create_table_prepared = PQprepare(conn,
+                                                "create_table_status",
+                                                create_table,
+                                                1,
+                                                &param_types);
+    if(PQresultStatus(create_table_prepared) != PGRES_COMMAND_OK){
+        strcpy(err_msg3, PQerrorMessage(create_table_prepared));
+        PQclear(create_table_prepared);
+        return SCH_ST_ERROR;
+    }
+    char *err_msg4;
+    PGresult *create_table_executed = PQexecPrepared(conn,
+                                                     "create_table_status",
+                                                     1,
+                                                     table,
+                                                     strlen(table),
+                                                     NULL,
+                                                     0);
+    if(PQresultStatus(create_table_executed) != PGRES_COMMAND_OK){
+        strcpy(err_msg4, PQresultErrorMessage(create_table_executed));
+        PQclear(create_table_executed);
+        return SCH_ST_ERROR;
+    }
+    PQclear(create_table_prepared);
+    PQclear(create_table_executed);
+    return SCH_ST_OK;
+}
+
+int storage_table_flight_plan_init(char *table, int n_entires, int drop)
+{
+    char *err_msg1;
+    char *sql;
+    int rc;
+
+    /* Drop table if drop variables is true */
+    if(drop == 1){
+        sql = "DROP TABLE IF EXISTS $1";
+        PGresult *drop_result = PQ
+    }
+
 }
