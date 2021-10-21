@@ -6,11 +6,12 @@
 #define SUCHAI_FLIGHT_SOFTWARE_TASKTEST_H
 
 #include "suchai/config.h"
-#include "globals.h"
+#include "suchai/globals.h"
 
-#include "osDelay.h"
+#include "suchai/osDelay.h"
 
-#include "repoCommand.h"
+#include "suchai/repoCommand.h"
+
 
 void taskTest(void* param);
 
