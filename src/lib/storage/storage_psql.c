@@ -44,17 +44,41 @@ void prepare_statements(PGconn *co){
      * 2275:    oid for cstring
      * 23:      oid for int4 (32 bit integer)
      */
-    int nprepared = 1;
+    int nprepared = 2;
     int nok_prepared = 0;
-    Oid params_type[2] = {2275, 23};
+    Oid params_type_storage_get_value_idx[2] = {2275, 23};
     PGresult *storage_status_get_value_idx_prepared = PQprepare(co,
                                                                 "stmt_storage_status_get_value_idx",
                                                                 "SELECT value FROM $1 WHERE idx=$2",
                                                                 2,
-                                                                params_type);
+                                                                params_type_storage_get_value_idx);
     if(PQresultStatus(storage_status_get_value_idx_prepared) != PGRES_COMMAND_OK){
         char *err = PQresultErrorMessage(storage_status_get_value_idx_prepared);
         PQclear(storage_status_get_value_idx_prepared);
+    }else{
+        nok_prepared++;
+    }
+    char * sql_storage_status_set_value_idx ="WITH mynames AS"
+                                             "(SELECT name FROM $1 WHERE idx=$2) "
+                                             "INSERT INTO dummy2(idx,name,value) "
+                                             "VALUES ($2,(SELECT name FROM mynames,$3) "
+                                             "ON CONFLICT (idx) WHERE idx=$2 "
+                                             "DO UPDATE SET (idx, name, value) = "
+                                             "($2, (SELECT name FROM mynames),$3)";
+    Oid params_type_storage_status_set_value_idx[4]={
+            2275,
+            23,
+            2275,
+            23
+    };
+    PGresult *storage_status_set_value_idx_prepared = PQprepare(co,
+                                                                "stmt_storage_set_value_idx",
+                                                                sql_storage_status_set_value_idx,
+                                                                4,
+                                                                params_type_storage_status_set_value_idx);
+    if(PQresultStatus(storage_status_set_value_idx_prepared) != PGRES_COMMAND_OK){
+        char *err = PQresultErrorMessage(storage_status_set_value_idx_prepared);
+        PQclear(storage_status_set_value_idx_prepared);
     }else{
         nok_prepared++;
     }
@@ -189,7 +213,7 @@ int storage_table_status_init(char *table, int n_variables, int drop)
         PQclear(sql_stmt);
     }
     char *create_table = "CREATE TABLE IF NOT EXISTS $1("
-                         "idx SERIAL PRIMARY KEY,"
+                         "idx INTEGER PRIMARY KEY,"
                          "name TEXT UNIQUE"
                          "value INTEGER)";
     char *err_msg2;
@@ -413,23 +437,45 @@ int storage_status_get_value_idx(uint32_t index, value32_t *value, char *table)
                                             NULL,
                                             0);
 
-    if( PQresultStatus(query_result) != PGRES_TUPLES_OK ||
-        PQntuples(query_result) != 1){
+    if( PQresultStatus(query_result) != PGRES_TUPLES_OK){
         char *err_msg = PQresultErrorMessage(query_result);
         strncpy(err,err_msg, strlen(err_msg));
+        PQclear(query_result);
+        return SCH_ST_ERROR;
+    }else if(PQntuples(query_result) != 1){
         PQclear(query_result);
         return SCH_ST_ERROR;
     }
     char *value_from_results;
     char *value_from_results2 = PQgetvalue(query_result,0,0);
+    if (value_from_results2 == NULL){
+        PQclear(query_result);
+        return SCH_ST_ERROR;
+    }
+    /// copying the retuned value form query result because the char*
+    /// lives inside the PQresult. So it should be copied
     strncpy(value_from_results, value_from_results2, strlen(value_from_results2));
-
     char *str_end;
-    value32_t val= strtol(value_from_results,&str_end,10);
+    int32_t val= (int32_t) strtol(value_from_results,&str_end,10);
     if(str_end != NULL){
         PQclear(query_result);
         char *err_msg = "could not convert value from query to integer";
         return SCH_ST_ERROR;
     }
+    *value = (value32_t) val;
+    PQclear(query_result);
+    return SCH_ST_OK;
+}
 
+int storage_status_set_value_idx(int index, value32_t value, char *table)
+{
+    if(!storage_is_open || conn == NULL || PQstatus(conn) == CONNECTION_BAD){
+        return SCH_ST_ERROR;
+    }
+
+    char *err_msg;
+    PGresult *query_result = PQexecPrepared(conn,
+                                            "stmt_storage_status_set_value_idx",
+                                            4,
+                                            )
 }
