@@ -22,90 +22,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "main.h"
-#include "taskTest.h"
+#include "suchai/mainFS.h"
+#include "suchai/taskInit.h"
+#include "suchai/osThread.h"
+#include "suchai/log_utils.h"
+#include "app/system/taskTest.h"
 
-const char *tag = "main";
-
-#ifdef ESP32
-void app_main()
-#else
-int main(void)
-#endif
-{
-    /* On reset */
-    on_reset();
-
-    /* Init software subsystems */
-    log_init(LOG_LEVEL, 0);      // Logging system
-    cmd_repo_init(); // Command repository initialization
-    dat_repo_init(); // Update status repository
-
-    /* Initializing shared Queues */
-    dispatcher_queue = osQueueCreate(10,sizeof(cmd_t *));
-    if(dispatcher_queue == 0)
-        LOGE(tag, "Error creating dispatcher queue");
-    executer_stat_queue = osQueueCreate(1,sizeof(int));
-    if(executer_stat_queue == 0)
-        LOGE(tag, "Error creating executer stat queue");
-    executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
-    if(executer_cmd_queue == 0)
-        LOGE(tag, "Error creating executer cmd queue");
-
-    int n_threads = 4;
-    os_thread threads_id[n_threads];
-
-    LOGI(tag, "Creating basic tasks...");
-    /* Crating system task (the others are created inside taskDeployment) */
-    osCreateTask(taskDispatcher,"dispatcher", 2*configMINIMAL_STACK_SIZE,NULL,3, &threads_id[0]);
-    osCreateTask(taskExecuter, "executer", 5*configMINIMAL_STACK_SIZE, NULL, 4, &threads_id[1]);
-
-    osCreateTask(taskTest, "test1", 2*configMINIMAL_STACK_SIZE, "TEST 1", 2, &threads_id[2]);
-
-#ifndef ESP32
-    /* Start the scheduler. Should never return */
-    osScheduler(threads_id, n_threads);
-    return 0;
-#endif
-
-}
-
-#ifdef FREERTOS
-#ifndef NANOMIND
-/**
- * Task idle handle function. Performs operations inside the idle task
- * configUSE_IDLE_HOOK must be set to 1
- */
-void vApplicationIdleHook(void)
-{
-    //Add hook code here
-}
-
+static char *tag = "app_main";
 
 /**
- * Task idle handle function. Performs operations inside the idle task
- * configUSE_TICK_HOOK must be set to 1
- */
-void vApplicationTickHook(void)
-{
-#ifdef AVR32
-    LED_Toggle(LED0);
-#endif
-}
-
-/**
- * Stack overflow handle function.
- * configCHECK_FOR_STACK_OVERFLOW must be set to 1 or 2
+ * App specific initialization routines
+ * This function is called by taskInit
  *
- * @param pxTask Task handle
- * @param pcTaskName Task name
+ * @param params taskInit params
  */
-void vApplicationStackOverflowHook(xTaskHandle* pxTask, signed char* pcTaskName)
+void initAppHook(void *params)
 {
-    printf("[ERROR][-1][%s] Stack overflow!", (char *)pcTaskName);
+    /** Include app commands
+     * No extra commands for this app */
 
-    /* Stack overflow handle */
-    while(1);
+    /** Initialize custom CSP interfaces */
+#ifdef LINUX
+    csp_add_zmq_iface(SCH_COMM_NODE);
+#endif
+
+    /** Init app task */
+    int t_ok = osCreateTask(taskTest, "test1", 1024, NULL, 2, NULL);
+    if(t_ok != 0) LOGE("bug-delay-test", "Task test bug delay not created!");
 }
-#endif
-#endif
+
+int main(void)
+{
+    /** Call framework main, shouldn't return */
+    suchai_main();
+}

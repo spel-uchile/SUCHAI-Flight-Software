@@ -28,9 +28,9 @@
 #include "suchai/log_utils.h"
 
 /**
- * Register ADCS commands
+ * Register TLE commands
  */
-void cmd_adcs_init(void);
+void cmd_tle_init(void);
 
 /**
  * Log current TLE lines
