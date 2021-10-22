@@ -50,7 +50,7 @@ if [ $test_unit_enabled -eq 1 ]
 then
   TEST_NAME="test_unit"
 
-  for ST_MODE in "RAM" "SQLITE" "FLASH"
+  for ST_MODE in "RAM" "SQLITE" "FLASH" "POSTGRES"
   do
       echo ""
       echo "**** Testing ${TEST_NAME} for storage ${ST_MODE} ****"

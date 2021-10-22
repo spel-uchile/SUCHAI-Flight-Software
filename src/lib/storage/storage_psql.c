@@ -43,6 +43,7 @@ static const char* get_sql_type(char* c_type);
 static int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names);
 static int get_value_string(char* dest, char* c_type, void *data);
 static int get_sizeof_type(char* c_type);
+static void get_postgres_value(char* c_type, void* buff, PGresult *stmt, int j);
 
 void prepare_statements(PGconn *co){
     /*
@@ -1010,6 +1011,52 @@ const char* get_sql_type(char* c_type)
     }
 }
 
+/**
+ * Be aware, this only works for only one row returned
+ * */
+void get_postgres_value(char* c_type, void* buff, PGresult *stmt, int j)
+{
+    if(c_type[1] == 'f') {
+        float val;
+        /// this is why, tup_num = 0 in every condition
+        char str_val[SCH_BUFF_MAX_LEN];
+        strncpy(str_val,PQgetvalue(stmt, 0,j),SCH_BUFF_MAX_LEN-1);
+        char *end_ptr;
+        val =(float) strtof(str_val,&end_ptr);
+        /*if(*end_ptr != 0){
+
+        }*/
+        memcpy(buff, &val, sizeof(float));
+    }
+    else if(c_type[1] == 'd' || c_type[1] == 'i') {
+        int32_t val;
+        char str_val[SCH_BUFF_MAX_LEN];
+        strncpy(str_val,PQgetvalue(stmt, 0,j),SCH_BUFF_MAX_LEN-1);
+        char *end_ptr;
+        val = (int32_t) strtol(str_val,&end_ptr,10);
+        memcpy(buff, &val, sizeof(int32_t));
+    }
+    else if(c_type[1] == 'u') {
+        uint32_t val;
+        char str_val[SCH_BUFF_MAX_LEN];
+        strncpy(str_val,PQgetvalue(stmt, 0,j),SCH_BUFF_MAX_LEN-1);
+        char *end_ptr;
+        val = (uint32_t) strtoul(str_val,&end_ptr,10);
+        memcpy(buff, &val, sizeof(uint32_t));
+    }
+    else if(c_type[1] == 'h') {
+        uint16_t val;
+        char str_val[SCH_BUFF_MAX_LEN];
+        strncpy(str_val,PQgetvalue(stmt, 0,j),SCH_BUFF_MAX_LEN-1);
+        char *end_ptr;
+        val = (uint16_t) strtoul(str_val,&end_ptr,10);
+        memcpy(buff, &val, sizeof(uint16_t));
+    }
+    else{
+        strncpy(buff, PQgetvalue(stmt,0,j), SCH_ST_STR_SIZE);
+    }
+}
+
 int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names)
 {
     const char s[2] = " ";
@@ -1174,5 +1221,43 @@ int storage_payload_get_data(int payload, int index, void *data, data_map_t *sch
     // Execute statement
     PGresult *select_result = PQexec(conn,
                                      get_value_sql);
-    if
+    if(PQresultErrorMessage(select_result) != PGRES_TUPLES_OK) {
+        strncpy(err_msg, PQresultErrorMessage(select_result), SCH_BUFF_MAX_LEN-1);
+        PQclear(select_result);
+        return SCH_ST_ERROR;
+    }else if(PQntuples(select_result) != 1){
+        PQclear(select_result);
+        return SCH_ST_ERROR;
+    }
+
+    /**
+     * Process row, from a string of value to the structure.
+     * Convert string to values and copy data to the structure.
+     */
+    char *types = strdup(schema->data_order);
+    const char *sep = " ";
+    char *type_tmp;
+    char *tok_type = strtok_r(types, sep, &type_tmp);
+    int column = 0;
+    while(tok_type != NULL) {
+        int param_size = get_sizeof_type(tok_type);
+        char value_buffer[param_size];
+        get_postgres_value(tok_type, value_buffer, select_result, column++);
+        memcpy(data, value_buffer, param_size);
+        data += param_size;
+        tok_type = strtok_r(NULL, sep, &type_tmp);
+    }
+
+    PQclear(select_result);
+    return SCH_ST_OK;
+}
+
+int storage_payload_reset(void)
+{
+    return storage_table_payload_init(payloads_table, payloads_schema, payloads_entries, 1);
+}
+
+int storage_payload_reset_table(int payload)
+{
+    return SCH_ST_ERROR;
 }
