@@ -197,14 +197,16 @@ int storage_init(const char *db_name)
 {
     char *hostaddr = SCH_STORAGE_PGHOST;
     int port = SCH_STORAGE_PGPORT;
-    char *dbname;
+    char dbname[SCH_BUFF_MAX_LEN];
     char *user = SCH_STORAGE_PGUSER;
     char *password = SCH_STORAGE_PGPASS;
 
     if (db_name == NULL){
         return SCH_ST_ERROR;
     }
-    strcpy(dbname, db_name);
+    if (strcmp(strcpy(dbname, db_name), dbname) != 0){
+        return SCH_ST_ERROR;
+    }
     if(dbname == NULL){
         return SCH_ST_ERROR;
     }
@@ -221,30 +223,24 @@ int storage_init(const char *db_name)
 
     /// Here set the keywords params names array
 
-    const char *keywords[] = {key_hostaddr,
+    const char *keywords[5] = {key_hostaddr,
                              key_port,
                              key_user,
                              key_password,
                              key_dbname};
 
-    char *fmt = "%s %u %s %s %s";
 
-    if(sscanf(db_name, fmt, hostaddr, &port, dbname, user, password) != 5){
-        return SCH_ST_ERROR;
-    }
-
-    char *port_str;
+    char port_str[5];
     double port_double = 1.0 * port;
 
     size_t port_str_size = (size_t) ceil(log10(port_double));
-    snprintf(
+    sprintf(
             port_str,
-            port_str_size,
             "%d",
             port
             );
 
-    const char *values[] = {
+    const char *values[5] = {
             hostaddr,
             port_str,
             user,
@@ -256,7 +252,10 @@ int storage_init(const char *db_name)
     conn = PQconnectdbParams(keywords, values,0);
 
     /// Error handling
-    if (PQstatus(conn) == CONNECTION_BAD){
+    if (conn == NULL) {
+        return SCH_ST_ERROR;
+    }
+    if ( PQstatus(conn) == CONNECTION_BAD){
         PQfinish(conn);
         return SCH_ST_ERROR;
     }

@@ -81,7 +81,8 @@
 #cmakedefine SCH_STORAGE_PGPASS           @SCH_STORAGE_PGPASS@  ///< PSQL password, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
 #cmakedefine SCH_STORAGE_PGHOST           @SCH_STORAGE_PGHOST@  ///< PSQL host, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
 #cmakedefine SCH_STORAGE_PGPORT           @SCH_STORAGE_PGPORT@  /// < PSQL port, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
-#cmakedefine SCH_STORAGE_PGLIB            @SCH_STORAGE_PGLIB@   /// PSQL  headers route, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
+#cmakedefine SCH_STORAGE_PGLIB            @SCH_STORAGE_PGLIB@   /// <PSQL  headers route, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
+#cmakedefine SCH_STORAGE_PGDBNAME         @SCH_STORAGE_PGDBNAME@ /// < PSQL db name, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
 
 #define SCH_FP_MAX_ENTRIES           (255)  ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES          (255)  ///< Max number of commands in the repository

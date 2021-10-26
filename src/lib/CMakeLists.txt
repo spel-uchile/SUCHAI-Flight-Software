@@ -10,9 +10,6 @@ if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("${CSP_RESULTS}")
 endif()
 
-#define libpq path and build command
-
-
 set(SOURCE_FILES
         utils/math_utils.c
         utils/log_utils.c
@@ -50,7 +47,9 @@ target_include_directories(suchai-fs-lib PUBLIC
         libcsp/libcsp/include)
 
 if(${SCH_STORAGE_MODE} STREQUAL SCH_ST_POSTGRES)
-    target_include_directories(suchai-fs-lib AFTER PUBLIC ${SCH_STORAGE_PGLIB})
+    target_include_directories(suchai-fs-lib BEFORE PUBLIC ${SCH_STORAGE_PGLIB})
+    #target_link_libraries(suchai-fs-lib PUBLIC -I${SCH_STORAGE_PGLIB} -lpq)
+    #find_package(PostgreSQL::PostgreSQL)
 endif()
 
 target_link_libraries(suchai-fs-lib PRIVATE suchai-fs-os)

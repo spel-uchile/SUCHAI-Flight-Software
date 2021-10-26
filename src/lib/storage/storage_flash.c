@@ -81,7 +81,7 @@ static int storage_is_open = 0;
 #if !defined(NANOMIND) && !defined(NDEBUG)
 static char flash[256][SCH_SIZE_PER_SECTION];
 static char *flash_p = &(flash[0][0]);
-static char fram[ST_FRAME_SIZE];
+static char fram[ST_FRAM_SIZE];
 static char *fram_p = &(fram[0]);
 #endif
 

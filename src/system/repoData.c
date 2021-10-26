@@ -35,7 +35,7 @@ void dat_repo_init(void)
     if(osSemaphoreCreate(&repo_data_sem) != OS_SEMAPHORE_OK)
         LOGE(tag, "Unable to create system status repository mutex");
     int rc;
-
+#if SCH_STORAGE_MODE == SCH_ST_SQLITE
     //Init storage system
     LOGD(tag, "Initializing data repositories buffers...")
     char fs_db_file[strlen(SCH_STORAGE_FILE) + 10];
@@ -43,7 +43,17 @@ void dat_repo_init(void)
     rc = storage_init(fs_db_file);
     if(rc != SCH_ST_OK)
         LOGE(tag, "Unable to initialize data storage! (mode %d, db: %s)", SCH_STORAGE_MODE, fs_db_file);
-
+#endif
+#if SCH_STORAGE_MODE == SCH_ST_POSTGRES
+    //Init storage system
+    LOGD(tag, "Initializing data repositories buffers...")
+    char fs_db_name[strlen(SCH_STORAGE_PGDBNAME) + 1];
+    sprintf(fs_db_name,"%s_%u", SCH_STORAGE_PGDBNAME, SCH_COMM_NODE);
+    rc = storage_init(fs_db_name);
+    if(rc != SCH_ST_OK){
+        LOGE(tag, "Unable to initialize data storage! (mode %d, db: %s", SCH_STORAGE_MODE, fs_db_name);
+    }
+#endif
     //Init status repo
     int status_copies = 1;
 #if SCH_STORAGE_TRIPLE_WR
