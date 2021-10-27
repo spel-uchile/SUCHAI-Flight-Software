@@ -575,7 +575,7 @@ int storage_flight_plan_set_st(fp_entry_t *row)
 
 int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int period, int node)
 {
-    if(command == NULL || args == NULL || !storage_is_open)
+    if(timetodo < 0 || command == NULL || args == NULL || !storage_is_open)
         return SCH_ST_ERROR;
 
     fp_entry_t fp_entry;
@@ -589,9 +589,19 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     return storage_flight_plan_set_st(&fp_entry);
 }
 
+int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
+{
+    // Finds the table index for timetodo
+    int index = storage_flightplan_find_index_tlb(timetodo);
+    if(index < 0)
+        return SCH_ST_ERROR;
+
+    return storage_flight_plan_get_idx(index, row);
+}
+
 int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 {
-    if(index > st_flightplan_entries || row == NULL)
+    if(index >= st_flightplan_entries || row == NULL)
         return SCH_ST_ERROR;
 
     if(st_flightplan_tlb[index].unixtime == ST_FP_NULL)
@@ -616,16 +626,6 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
     free(fp_entry);
     return rc;
 
-}
-
-int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
-{
-    // Finds the table index for timetodo
-    int index = storage_flightplan_find_index_tlb(timetodo);
-    if(index < 0)
-        return SCH_ST_ERROR;
-
-    return storage_flight_plan_get_idx(index, row);
 }
 
 int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* executions, int* period, int* node)
@@ -667,7 +667,7 @@ int storage_flight_plan_delete_row(int timetodo)
 
 int storage_flight_plan_delete_row_idx(int index)
 {
-    if(index > st_flightplan_entries)
+    if(index >= st_flightplan_entries)
         return SCH_ST_ERROR;
 
     // Erases the entry in index

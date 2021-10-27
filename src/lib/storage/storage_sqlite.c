@@ -261,11 +261,9 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 }
 
 /****** FLIGHT PLAN VARIABLES FUNCTIONS *******/
-/* TODO: Use the concept of table */
-//int storage_flight_plan_set_st(fp_entry_t *row, char *table)
 int storage_flight_plan_set_st(fp_entry_t *row)
 {
-    if(fp_table == NULL)
+    if(fp_table == NULL || row == NULL)
         return SCH_ST_ERROR;
 
     int timetodo = row->unixtime;
@@ -317,7 +315,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
 
 int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 {
-    if(fp_table == NULL)
+    if(fp_table == NULL || row == NULL)
         return SCH_ST_ERROR;
 
     char **results;
@@ -350,7 +348,7 @@ int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 
 int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 {
-    if(fp_table == NULL)
+    if(fp_table == NULL || index >= st_flightplan_entries || row == NULL)
         return SCH_ST_ERROR;
 
     char **results;
@@ -383,7 +381,7 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 
 int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* executions, int* period, int* node)
 {
-    if(command == NULL || args == NULL)
+    if(command == NULL || args == NULL || executions == NULL || period == NULL || node == NULL)
         return SCH_ST_ERROR;
 
     fp_entry_t fp_entry;
@@ -424,7 +422,7 @@ int storage_flight_plan_delete_row(int timetodo)
 
 int storage_flight_plan_delete_row_idx(int index)
 {
-    if(fp_table == NULL)
+    if(fp_table == NULL || index >= flightplan_entries)
         return SCH_ST_ERROR;
 
     char *err_msg;
