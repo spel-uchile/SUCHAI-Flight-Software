@@ -34,6 +34,16 @@
 void cmd_tm_init(void);
 
 /**
+ * Helper function to read and send a range of telemetry
+ * @param start Starting index
+ * @param end Stop index
+ * @param payload Payload id
+ * @param dest_node Node to send TM
+ * @return CMD_OK, CMD_ERROR, or CMD_SYNTAX_ERROR
+ */
+int tm_send_tel_from_to(int start, int end, int payload, int dest_node);
+
+/**
  * Send status variables as telemetry. This command collects the current value
  * of all status variables, builds a frame and downloads telemetry to the
  * specified node. To parse the data @seealso tm_parse_status
