@@ -41,9 +41,9 @@ char* fp_table = "flightPlan";
 #define ST_CMD_MAX_STR_PARAMS        (248)  ///< Limit for the parameters length
 #define ST_CMD_MAX_STR_NAME          (248)  ///< Limit for the length of the name of a command
 #define ST_PAGE_SIZE                 (512)  ///< Flash page size in bytes
-#define ST_FRAME_SIZE                (32*1024) ///< 256-Kbit ferroelectric random access memory (F-RAM) Logically organized as 32Kx8
+#define ST_FRAM_SIZE                (32*1024) ///< 256-Kbit ferroelectric random access memory (F-RAM) Logically organized as 32Kx8
 #define ST_FP_TLB_FRAM     ///< TLB is stored in FRAM
-#undef  ST_FP_TLB_FLASH    ///< TLB stored in FLASH
+//#undef  ST_FP_TLB_FLASH    ///< TLB stored in FLASH
 ///< Flight plan entry buffer (aligned to 512 bytes pages)
 typedef struct fp_container_s{
     int32_t unixtime;               ///< Unix-time, sets when the command should next execute
@@ -198,6 +198,7 @@ int storage_init(const char *file)
  *     ...  |           ...             |                   |
  *  --------------------------------------------------------|
  */
+    LOGI(tag, "sizeof(fp_container_t) = %d", sizeof(fp_container_t));
     assert(sizeof(fp_container_t) == 512);
     st_flightplan_tlb_base_addr = SCH_FLASH_INIT_MEMORY;
     st_flightplan_base_addr = st_flightplan_tlb_base_addr + SCH_SIZE_PER_SECTION;
@@ -343,7 +344,7 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 static int storage_flightplan_load_tlb(void)
 {
 #ifdef ST_FP_TLB_FRAM
-    return storage_read_fram(ST_FRAME_SIZE-sizeof(st_flightplan_tlb), (uint8_t *)st_flightplan_tlb, sizeof(st_flightplan_tlb));
+    return storage_read_fram(ST_FRAM_SIZE - sizeof(st_flightplan_tlb), (uint8_t *)st_flightplan_tlb, sizeof(st_flightplan_tlb));
 #else
     return storage_read_flash(0, st_flightplan_tlb_base_addr, (uint8_t *)st_flightplan_tlb, sizeof(st_flightplan_tlb));
 #endif
@@ -359,7 +360,7 @@ static int storage_flightplan_dump_tlb(int index)
     LOGV(tag, "Dump TLB");
 #ifdef ST_FP_TLB_FRAM
     int rc;
-    uint32_t tlb_addr_start = ST_FRAME_SIZE-sizeof(st_flightplan_tlb);
+    uint32_t tlb_addr_start = ST_FRAM_SIZE - sizeof(st_flightplan_tlb);
     if(index < 0)
         rc = storage_write_fram(tlb_addr_start, (uint8_t *)st_flightplan_tlb, sizeof(st_flightplan_tlb));
     else
@@ -397,7 +398,11 @@ static int storage_flightplan_update_tlb(int index, int32_t unixtime, uint32_t a
     // Last entry count the number of entries used in the flash
     st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr = 1 + st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr;
     // Back-up TLB
-    return storage_flightplan_dump_tlb(index);
+    int rc = storage_flightplan_dump_tlb(index);
+    if(rc == SCH_ST_OK)
+        rc = storage_flightplan_dump_tlb(SCH_FP_MAX_ENTRIES);
+
+    return rc;
 }
 
 /**
@@ -405,6 +410,7 @@ static int storage_flightplan_update_tlb(int index, int32_t unixtime, uint32_t a
  * We use 1 FLASH section (256 KiB) so up to 512 FP entries can be created before
  * actually erase 'deleted' entries to create new space. The TLB contains the valid entries
  * @return SCH_ST_OK or SCH_ST_ERROR
+ * TODO: DEBUG
  */
 int flight_plan_rebuild_tlb(void)
 {
@@ -569,7 +575,7 @@ int storage_flight_plan_set_st(fp_entry_t *row)
 
 int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int period, int node)
 {
-    if(command == NULL || args == NULL || !storage_is_open)
+    if(timetodo < 0 || command == NULL || args == NULL || !storage_is_open)
         return SCH_ST_ERROR;
 
     fp_entry_t fp_entry;
@@ -583,9 +589,19 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     return storage_flight_plan_set_st(&fp_entry);
 }
 
+int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
+{
+    // Finds the table index for timetodo
+    int index = storage_flightplan_find_index_tlb(timetodo);
+    if(index < 0)
+        return SCH_ST_ERROR;
+
+    return storage_flight_plan_get_idx(index, row);
+}
+
 int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 {
-    if(index > st_flightplan_entries || row == NULL)
+    if(index >= st_flightplan_entries || row == NULL)
         return SCH_ST_ERROR;
 
     if(st_flightplan_tlb[index].unixtime == ST_FP_NULL)
@@ -610,16 +626,6 @@ int storage_flight_plan_get_idx(int index, fp_entry_t *row)
     free(fp_entry);
     return rc;
 
-}
-
-int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
-{
-    // Finds the table index for timetodo
-    int index = storage_flightplan_find_index_tlb(timetodo);
-    if(index < 0)
-        return SCH_ST_ERROR;
-
-    return storage_flight_plan_get_idx(index, row);
 }
 
 int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* executions, int* period, int* node)
@@ -661,7 +667,7 @@ int storage_flight_plan_delete_row(int timetodo)
 
 int storage_flight_plan_delete_row_idx(int index)
 {
-    if(index > st_flightplan_entries)
+    if(index >= st_flightplan_entries)
         return SCH_ST_ERROR;
 
     // Erases the entry in index
@@ -683,6 +689,7 @@ int storage_flight_plan_reset(void)
     }
 
     // Reset TLB
+    LOGD(tag, "Resetting TLB");
     memset(st_flightplan_tlb, ST_FP_NULL, sizeof(st_flightplan_tlb));
     st_flightplan_tlb[SCH_FP_MAX_ENTRIES].unixtime = 0;
     st_flightplan_tlb[SCH_FP_MAX_ENTRIES].addr = 0;

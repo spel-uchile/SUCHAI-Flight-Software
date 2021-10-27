@@ -210,7 +210,7 @@ int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 
 int storage_flight_plan_get_idx(int index, fp_entry_t *row)
 {
-    if(!storage_is_open || flightplan_db == NULL || row == NULL || index > flightplan_entries)
+    if(!storage_is_open || flightplan_db == NULL || row == NULL || index >= flightplan_entries)
         return SCH_ST_ERROR;
 
     fp_entry_copy(flightplan_db + index, row);

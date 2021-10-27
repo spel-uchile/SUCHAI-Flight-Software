@@ -25,6 +25,7 @@ osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
 log_level_t log_lvl;
 uint8_t log_node;
+static char log_file_name[SCH_BUFF_MAX_LEN];
 
 void log_print(const char *lvl, const char *tag, const char *msg, ...)
 {
@@ -63,12 +64,39 @@ void log_send(const char *lvl, const char *tag, const char *msg, ...)
         csp_buffer_free((void *)packet);
 }
 
+void log_file(const char *lvl, const char *tag, const char *msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    char *fname = log_file_name;
+    FILE *fptr = fopen(fname, "a");
+    if(fptr != NULL)
+    {
+        fprintf(fptr,"[%s][%lu][%s] ", lvl, (unsigned long)dat_get_time(), tag);
+        vfprintf(fptr, msg, args);
+        fprintf(fptr, CRLF); fflush(fptr);
+        fclose(fptr);
+    }
+    va_end(args);
+}
+
 void log_set(log_level_t level, int node)
 {
     osSemaphoreTake(&log_mutex, portMAX_DELAY);
     log_lvl = level;
-    log_node = (uint8_t)node;
-    log_function = node > 0 ? log_send : log_print;
+    if(node == 0)
+        log_function = log_print;
+    else if(node > 0)
+    {
+        log_function = log_send;
+        log_node = (uint8_t) node;
+    }
+    else
+    {
+        snprintf(log_file_name, SCH_BUFF_MAX_LEN, "suchai_%d.log", -node);
+        log_function = log_file;
+    }
+
     osSemaphoreGiven(&log_mutex);
 }
 

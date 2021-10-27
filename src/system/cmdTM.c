@@ -26,16 +26,6 @@
 static const char *tag = "cmdTM";
 static int _merging_file_id = 0;
 
-/**
- * Helper function to read and send a range of telemetry
- * @param start Starting index
- * @param end Stop index
- * @param payload Payload id
- * @param dest_node Node to send TM
- * @return CMD_OK, CMD_ERROR, or CMD_SYNTAX_ERROR
- */
-static int _send_tel_from_to(int start, int end, int payload, int dest_node);
-
 void cmd_tm_init(void)
 {
     cmd_add("tm_parse_status", tm_parse_status, "", 0);
@@ -145,7 +135,7 @@ int tm_parse_string(char *fmt, char *params, int nparams)
     return CMD_OK;
 }
 
-int _send_tel_from_to(int start, int end, int payload, int dest_node)
+int tm_send_tel_from_to(int start, int end, int payload, int dest_node)
 {
     int rc_send = 0;
     int structs_per_frame = (COM_FRAME_MAX_LEN) / data_map[payload].size;
@@ -332,7 +322,7 @@ int tm_send_last(char *fmt, char *params, int nparams)
             structs_per_frame = index_pay;
         }
 
-        int rc = _send_tel_from_to(index_pay - structs_per_frame, index_pay, payload, dest_node);
+        int rc = tm_send_tel_from_to(index_pay - structs_per_frame, index_pay, payload, dest_node);
         return rc;
     }
     else
@@ -360,7 +350,7 @@ int tm_send_all(char *fmt, char *params, int nparams)
         }
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
         int index_ack = dat_get_system_var(data_map[payload].sys_ack);
-        int rc = _send_tel_from_to(index_ack, index_pay, payload, dest_node);
+        int rc = tm_send_tel_from_to(index_ack, index_pay, payload, dest_node);
         return rc;
     }
     else
@@ -399,7 +389,7 @@ int tm_send_from(char *fmt, char *params, int nparams)
             des = index_pay;
         }
 
-        int rc = _send_tel_from_to(index_ack, des, payload, dest_node);
+        int rc = tm_send_tel_from_to(index_ack, des, payload, dest_node);
         return rc;
     }
     else

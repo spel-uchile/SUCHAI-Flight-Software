@@ -25,7 +25,7 @@
     #include <unistd.h>
     #include <sys/time.h>
     #include <pthread.h>
- 	typedef  __useconds_t portTick; // Always useconds (uint32_t)
+ 	typedef  unsigned long portTick; // Always useconds (unsigned long)
 #endif
 
 /**
