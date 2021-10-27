@@ -40,7 +40,7 @@ int suchai_main(void)
     printf("-----------------------------------------\r\n\r\n");
 
     /* Init software subsystems */
-    log_init(SCH_LOG_LEVEL, -1);      // Logging system
+    log_init(SCH_LOG_LEVEL, 0);      // Logging system
     osSemaphoreCreate(&repo_cmd_sem);
     osSemaphoreCreate(&repo_data_sem);
 

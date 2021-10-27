@@ -64,15 +64,20 @@ extern osSemaphore log_mutex;  ///< Sync logging functions, require initializati
 int log_init(log_level_t level, int node);
 
 /**
- * Set the log level and node to send logs. If node = -1, then print to stdout,
- * else send logs to another node using CSP
+ * Set the log function and level.
+ * If node = 0, then print to stdout,
+ * if node > 0, send logs to another <node> using CSP
+ * If node < 0, write logs to a file named suchai_<node>.log
+ *
  * @param level Log level
- * @param node CSP node to send logs. Set to -1 to use stdout.
+ * @param node Log type or node to send logs. 0: stdout, >0 CSP, <0 file.
  */
 void log_set(log_level_t level, int node);
 
+/** Available log functions */
 void log_print(const char *lvl, const char *tag, const char *msg, ...);
 void log_send(const char *lvl, const char *tag, const char *msg, ...);
+void log_file(const char *lvl, const char *tag, const char *msg, ...);
 
 extern void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
 extern log_level_t log_lvl;
