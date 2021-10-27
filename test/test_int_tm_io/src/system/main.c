@@ -48,7 +48,6 @@ void initAppHook(void *params)
 
     /** Init app task */
     int t_ok = osCreateTask(taskTest, "test_tm_io", 1024, NULL, 2, NULL);
-    // It had 3 prio
     if(t_ok != 0) LOGE("cmd-tm_io", "Task test tm io not created!");
 }
 
@@ -57,8 +56,3 @@ int main(void)
     /** Call framework main, shouldn't return */
     suchai_main();
 }
-
-//    int t_inv_ok = osCreateTask(taskDispatcher,"invoker", SCH_TASK_DIS_STACK, NULL, 3, &threads_id[1]);
-//    int t_exe_ok = osCreateTask(taskExecuter, "receiver", SCH_TASK_EXE_STACK, NULL, 4, &threads_id[2]);
-//    int t_wdt_ok = osCreateTask(taskWatchdog, "watchdog", SCH_TASK_WDT_STACK, NULL, 2, &threads_id[0]);
-//    int t_ini_ok = osCreateTask(taskInit, "init", SCH_TASK_INI_STACK, NULL, 3, &threads_id[3]);
