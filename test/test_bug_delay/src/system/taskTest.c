@@ -48,7 +48,7 @@ void taskTest(void *param)
     LOGI(tag, "Test executed in %u us, expected ~%f us",
          xFinalTime - xStartTime, TEST_MAX_SECONDS*1000000.0)
     assert(xFinalTime - xStartTime >= 0.999*TEST_MAX_SECONDS*1000000.0);
-    //exit(0);
+
     cmd_t *test_cmd = cmd_get_str("obc_reset");
     cmd_add_params_str(test_cmd, "");
     cmd_send(test_cmd);
