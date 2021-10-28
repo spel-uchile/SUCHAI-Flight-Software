@@ -3,6 +3,7 @@ stages:
   - configure_docker
   - build
   - test_linux
+  - test_prueba
 
 create_vis:
   stage: create_vis
@@ -140,3 +141,11 @@ test_fuzz:
     - docker system prune -f
   only:
     - master
+
+test_sofi:
+  stage: test_prueba
+  script:
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_dummy.sh 
+  only:
+    - master
+
