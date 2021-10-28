@@ -2,8 +2,9 @@ stages:
   - create_vis
   - configure_docker
   - build
-  - test_linux
   - test_prueba
+  - test_linux
+  
 
 create_vis:
   stage: create_vis
