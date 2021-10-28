@@ -78,7 +78,7 @@ fi
 #
 if [ $test_cmd_enabled -eq 1 ]
 then
-  TEST_NAME="test_cmd"
+  TEST_NAME="test_int_cmd"
   rm -rf build_test
   # build the cmdtest with the test's parameters
   cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM -DSCH_STORAGE_TRIPLE_WR=1 && cmake --build build_test -j4
