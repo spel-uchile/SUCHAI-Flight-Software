@@ -36,7 +36,7 @@ void cmd_tm_init(void)
     cmd_add("tm_get_single", tm_get_single, "%u %u", 2);
     cmd_add("tm_send_last", tm_send_last, "%u %u", 2);
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
-    cmd_add("tm_send_from", tm_send_from, "%u %u %u", 3);
+    cmd_add("tm_send_n", tm_send_from, "%u %u %u", 3);
     cmd_add("tm_parse_payload", tm_parse_payload, "%", 0);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
     cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
