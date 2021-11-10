@@ -65,7 +65,7 @@ void taskCommunications(void *param)
             continue; /* Try again later */
 
         /* Read packets. Timeout is 500 ms */
-        while ((packet = csp_read(conn, 500)) != NULL)
+        while ((packet = csp_read(conn, 100)) != NULL)
         {
             count_tc = dat_get_system_var(dat_com_count_tc) + 1;
             dat_set_system_var(dat_com_count_tc, count_tc);
@@ -152,7 +152,8 @@ void taskCommunications(void *param)
                         taskCommunicationsHook(conn, packet);
                     #endif
                     /* Let the service handler reply pings, buffer use, etc. */
-                    csp_service_handler(conn, packet);
+                    if(packet != NULL)
+                        csp_service_handler(conn, packet);
                     break;
             }
         }
