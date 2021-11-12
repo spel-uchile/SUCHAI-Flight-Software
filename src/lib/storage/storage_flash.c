@@ -804,7 +804,7 @@ int storage_payload_get_data(int payload, int index, void *data, data_map_t *sch
 
 int storage_payload_reset_table(int payload)
 {
-    if(!storage_is_open || st_payload_addr == NULL) return SCH_ST_ERROR;
+    if(!storage_is_open || st_payload_addr == NULL || payload >= st_payloads_entries) return SCH_ST_ERROR;
     for(int i = 0; i<SCH_SECTIONS_PER_PAYLOAD; i++) {
         int section_idx = i + payload*SCH_SECTIONS_PER_PAYLOAD;
         uint32_t section_addr = st_payload_addr[section_idx];

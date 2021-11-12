@@ -339,7 +339,7 @@ int storage_payload_reset(void)
 
 int storage_payload_reset_table(int payload)
 {
-    if(!storage_is_open) return SCH_ST_ERROR;
+    if(!storage_is_open || payload >= payloads_entries) return SCH_ST_ERROR;
     if(payload_db == NULL || payloads_sections_addresses == NULL) return SCH_ST_ERROR;
 
     uint8_t *payload_address = payloads_sections_addresses[payload*SCH_SECTIONS_PER_PAYLOAD];

@@ -58,11 +58,7 @@ void dat_repo_init(void)
 #if SCH_STORAGE_MODE == SCH_ST_RAM
     else // Reset variables (we do not have persistent storage here)
     {
-        int index;
-        for(index=0; index < dat_status_last_address; index++)
-        {
-            dat_set_status_var(index, dat_get_status_var_def(index).value);
-        }
+        dat_reset_status_vars();
     }
 #endif
 
@@ -206,6 +202,17 @@ value32_t dat_get_status_var_name(char *name)
 {
     dat_sys_var_t var = dat_get_status_var_def_name(name);
     return dat_get_status_var(var.address);
+}
+
+int dat_reset_status_vars(void)
+{
+    int rc = SCH_ST_OK;
+    for(int index=0; index < dat_status_last_address; index++)
+    {
+        rc += dat_set_status_var(index, dat_get_status_var_def(index).value);
+    }
+
+    return rc == SCH_ST_OK ? SCH_ST_OK : SCH_ST_ERROR;
 }
 
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
@@ -404,6 +411,26 @@ int dat_get_recent_payload_sample(void* data, int payload, int offset)
     osSemaphoreGiven(&repo_data_sem);
 
     return ret;
+}
+
+int dat_delete_payload(int payload)
+{
+    if(payload >= last_sensor)
+        return SCH_ST_ERROR;
+
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //Enter critical zone
+    int rc = storage_payload_reset_table(payload);
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+
+    if(rc == SCH_ST_OK)
+    {
+        dat_set_system_var(data_map[payload].sys_index, 0);
+        dat_set_system_var(data_map[payload].sys_ack, 0);
+    }
+
+    return rc;
 }
 
 int dat_delete_memory_sections(void)

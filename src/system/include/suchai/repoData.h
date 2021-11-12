@@ -133,6 +133,11 @@ value32_t dat_get_status_var(dat_status_address_t index);
  */
 value32_t dat_get_status_var_name(char *name);
 
+/**
+ * Reset status variables to their default values
+ * @return 0 if OK, else -1
+ */
+int dat_reset_status_vars(void);
 
 /**
  * Gets an executable command from the flight plan repo.
@@ -258,6 +263,13 @@ int dat_get_payload_sample(void*data, int payload, int index);
  * @return 0 if OK, -1 if and error occurred
  */
 int dat_get_recent_payload_sample(void* data, int payload, int offset);
+
+/**
+ * Delete a payload table content
+ * @param payload Payload id to delete
+ * @return 0 if OK, -1 if and error occurred
+ */
+int dat_delete_payload(int payload);
 
 /**
  * Deletes all memory sections in NOR FLASH.

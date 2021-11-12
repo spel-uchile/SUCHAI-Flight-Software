@@ -29,6 +29,8 @@ static const char *tag = "cmdDRP";
 void cmd_drp_init(void)
 {
     cmd_add("drp_ebf", drp_execute_before_flight, "%d", 1);
+    cmd_add("drp_reset_payload", drp_reset_payload, "%d %d", 2);
+    cmd_add("drp_reset_status", drp_reset_status, "%d", 1);
     cmd_add("drp_print_vars", drp_print_system_vars, "", 0);
     cmd_add("drp_set_var", drp_update_sys_var_idx, "%d %f", 2);
     cmd_add("drp_set_var_name", drp_update_sys_var_name, "%s %f", 2);
@@ -39,50 +41,54 @@ void cmd_drp_init(void)
 
 int drp_execute_before_flight(char *fmt, char *params, int nparams)
 {
-    if(params == NULL)
+    int magic;
+    if(params == NULL || sscanf(params, fmt, &magic) != nparams || magic != SCH_DRP_MAGIC)
         return CMD_SYNTAX_ERROR;
 
-    int magic;
-    if(nparams == sscanf(params, fmt, &magic))
+    int index;
+    int rc = 0;
+    // Reset all status variables values to default values
+    dat_reset_status_vars();
+    // Update relevant status variables
+    rc += dat_set_system_var(dat_rtc_date_time, (int)dat_get_time());
+    // Delete memory sections
+    rc += dat_delete_memory_sections();
+    // Reset flight plan
+    rc += dat_reset_fp();
+
+    if(rc == 0)
     {
-        if(magic == SCH_DRP_MAGIC)
-        {
-            int index;
-            int rc = 0;
-            // Reset all status variables values to default values
-            for(index=0; index < dat_status_last_address; index++)
-            {
-                rc += dat_set_status_var(index, dat_get_status_var_def(index).value);
-            }
-
-            // Update relevant status variables
-            rc += dat_set_system_var(dat_rtc_date_time, (int) time(NULL));
-
-            // Delete memory sections
-            rc += dat_delete_memory_sections();
-
-            if(rc == 0)
-            {
-                LOGR(tag, "drp_ebf ok!");
-                return CMD_OK;
-            }
-            else
-            {
-                LOGE(tag, "%d errors in drp_ebf!", -rc);
-                return CMD_ERROR;
-            }
-        }
-        else
-        {
-            LOGW(tag, "EBF executed with incorrect magic number!")
-            return CMD_SYNTAX_ERROR;
-        }
+        LOGR(tag, "drp_ebf ok!");
+        return CMD_OK;
     }
     else
     {
-        LOGW(tag, "EBF executed with invalid parameter!")
-        return CMD_SYNTAX_ERROR;
+        LOGE(tag, "%d errors in drp_ebf!", -rc);
+        return CMD_ERROR;
     }
+}
+
+int drp_reset_payload(char *fmt, char *params, int nparams)
+{
+    int payload, magic = 0;
+    if(params == NULL || sscanf(params, fmt, &payload, &magic) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    if(payload >= last_sensor || magic != SCH_DRP_MAGIC)
+        return CMD_SYNTAX_ERROR;
+
+    int rc = dat_delete_payload(payload);
+    return rc == SCH_ST_OK ? CMD_OK : CMD_ERROR;
+}
+
+int drp_reset_status(char *fmt, char *params, int nparams)
+{
+    int magic = 0;
+    if(params == NULL || sscanf(params, fmt, &magic) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    int rc = dat_reset_status_vars();
+    return rc == SCH_ST_OK ? CMD_OK : CMD_ERROR;
 }
 
 int drp_print_system_vars(char *fmt, char *params, int nparams)
