@@ -297,4 +297,12 @@ void _set_sat_quaterion(quaternion_t *q,  dat_status_address_t index);
 void _get_sat_vector(vector3_t *r, dat_status_address_t index);
 void _set_sat_vector(vector3_t *r, dat_status_address_t index);
 
+/**
+ * Saves an fp_entry of index index
+ * @param index Index of the fp entry
+ * @param fp_entry Structure
+ * @return CMD_OK if executed correctly
+ */
+int dat_get_fp_st_index(int index, fp_entry_t *fp_entry);
+
 #endif // DATA_REPO_H

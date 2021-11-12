@@ -241,6 +241,12 @@ static void com_receive_tm(csp_packet_t *packet)
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }
+    else if(frame->type == TM_TYPE_FP)
+    {
+        cmd_parse_tm = cmd_get_str("tm_print_fp");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
     else if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor)
     {
         cmd_parse_tm = cmd_get_str("tm_parse_payload");

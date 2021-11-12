@@ -40,6 +40,8 @@ void cmd_tm_init(void)
     cmd_add("tm_parse_payload", tm_parse_payload, "%", 0);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
     cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
+    cmd_add("tm_send_fp", tm_send_fp, "%d", 1);
+    cmd_add("tm_print_fp", tm_print_fp, "", 0);
 #ifdef LINUX
     cmd_add("tm_send_file", tm_send_file, "%s %d", 2);
     cmd_add("tm_parse_file", tm_parse_file, "", 0);
@@ -346,6 +348,7 @@ int tm_send_all(char *fmt, char *params, int nparams)
     if(nparams == sscanf(params, fmt, &payload, &dest_node)) {
 
         if(payload >= last_sensor) {
+            LOGE(tag, "incorrect payload");
             return CMD_SYNTAX_ERROR;
         }
         int index_pay = dat_get_system_var(data_map[payload].sys_index);
@@ -479,6 +482,53 @@ int tm_send_cmds(char *fmt, char *params, int nparams)
     return _com_send_data(node, cmd_save_all(), strlen(cmd_save_all()), TM_TYPE_HELP, 1, 0);
 }
 
+int tm_send_fp(char *fmt, char *params, int nparams)
+{
+    int node;
+    if(params == NULL || sscanf(params, fmt, &node) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    int fp_entries = dat_get_system_var(dat_fpl_queue);
+    LOGI(tag, "print fp_entries %d", fp_entries);
+    fp_container_t fp_send[fp_entries];
+    int i, entry_idx = 0;
+
+    for(i = 0; i < SCH_FP_MAX_ENTRIES; i++)
+    {
+        fp_entry_t fp_entry;
+        int ok = dat_get_fp_st_index(i, &fp_entry);
+        if(ok == SCH_ST_OK && fp_entry.unixtime != ST_FP_NULL && entry_idx < fp_entries)
+        {
+            fp_send[entry_idx].unixtime = csp_hton32(fp_entry.unixtime);
+            fp_send[entry_idx].node = csp_hton32(fp_entry.node);
+            fp_send[entry_idx].executions = csp_hton32(fp_entry.executions);
+            fp_send[entry_idx].periodical = csp_hton32(fp_entry.periodical);
+            memset(fp_send[entry_idx].cmd_args, '\0', FP_CMDARGS_MAX_LEN);
+            snprintf(fp_send[entry_idx].cmd_args, FP_CMDARGS_MAX_LEN, "%s %s", fp_entry.cmd, fp_entry.args);
+            entry_idx ++;
+        }
+    }
+    // Send all data over one connection
+    int rc = com_send_telemetry(node, SCH_TRX_PORT_TM, TM_TYPE_FP, &fp_send, sizeof(fp_send), fp_entries, 0);
+    return rc;
+}
+
+int tm_print_fp(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+        return CMD_SYNTAX_ERROR;
+
+    int max_buff_len = FP_CMDARGS_MAX_LEN + 50; //Maximum length of commands, parameters, unixtime, node, executions,
+            // periodical as concatenated string
+    char buff[max_buff_len];
+    com_frame_t *frame = (com_frame_t *)params;
+    fp_container_t *fp_recv = (fp_entry_t *)frame->data.data8;
+
+    snprintf(buff, max_buff_len, "%s\t%d\t%d\t%d\t%d", fp_recv->cmd_args, csp_ntoh32(fp_recv->unixtime),
+             csp_ntoh32(fp_recv->node), csp_ntoh32(fp_recv->executions), csp_ntoh32(fp_recv->periodical));
+    LOGI(tag, "Flight plan entry is %s\n", buff);
+    return CMD_OK;
+}
 #ifdef LINUX
 int tm_send_file(char *fmt, char *params, int nparams)
 {

@@ -321,6 +321,17 @@ int dat_show_fp (void)
     return rc;
 }
 
+int dat_get_fp_st_index(int index, fp_entry_t *fp_entry)
+{
+    int rc;
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //Enter critical zone
+    rc = storage_flight_plan_get_idx(index, fp_entry);
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+    return rc;
+}
+
 time_t dat_get_time(void)
 {
     return (time_t)osGetTimeUnix();
