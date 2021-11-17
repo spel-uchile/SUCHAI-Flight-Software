@@ -256,6 +256,7 @@ int storage_init(const char *db_name)
         return SCH_ST_ERROR;
     }
     if ( PQstatus(conn) == CONNECTION_BAD){
+        char *err = PQerrorMessage(conn);
         PQfinish(conn);
         return SCH_ST_ERROR;
     }
@@ -319,10 +320,10 @@ int storage_table_status_init(char *table, int n_variables, int drop)
         }
         PQclear(sql_stmt);
     }
-    char *create_table = "CREATE TABLE IF NOT EXISTS $1("
-                         "idx INTEGER PRIMARY KEY,"
-                         "name TEXT UNIQUE"
-                         "value INTEGER)";
+    char *create_table = "CREATE TABLE IF NOT EXISTS $1 ("
+                         "idx INTEGER PRIMARY KEY, "
+                         "name TEXT UNIQUE, "
+                         "value INTEGER);";
     char err_msg2[SCH_BUFF_MAX_LEN];
     const char *params_values[1] = {table};
     PGresult *create_table_sql = PQexecParams(conn,
