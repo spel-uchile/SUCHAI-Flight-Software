@@ -1,0 +1,11 @@
+syntax = "proto2";
+messsage simple_message{
+    required string table_name = 1;
+    required int32 data = 2;
+}
+
+message simple_message_request{
+    required int32 id = 1;
+    required string query = 2;
+    required SimpleMessage result = 3;
+}
