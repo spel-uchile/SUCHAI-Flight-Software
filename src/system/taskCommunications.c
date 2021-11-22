@@ -60,16 +60,16 @@ void taskCommunications(void *param)
     while(1)
     {
         /* CSP SERVER */
-        /* Wait for connection, 1000 ms timeout */
-        if((conn = csp_accept(sock, 1000)) == NULL)
+        /* Wait for connection, 1000 ms timeout by default*/
+        if((conn = csp_accept(sock, SCH_CSP_CONN_TIMEOUT)) == NULL)
             continue; /* Try again later */
 
-        /* Read packets. Timeout is 500 ms */
-        while ((packet = csp_read(conn, 100)) != NULL)
+        /* Read packets. Timeout is 100 ms by default*/
+        while ((packet = csp_read(conn, SCH_CSP_READ_TIMEOUT)) != NULL)
         {
             count_tc = dat_get_system_var(dat_com_count_tc) + 1;
             dat_set_system_var(dat_com_count_tc, count_tc);
-            dat_set_system_var(dat_com_last_tc, (int) time(NULL));
+            dat_set_system_var(dat_com_last_tc, (int)dat_get_time());
 
             switch (csp_conn_dport(conn))
             {
@@ -99,7 +99,7 @@ void taskCommunications(void *param)
                         if (rc != 0)
                             csp_buffer_free(packet); // Free the packet in case of errors
                     }
-                    // If i am receiving a broadcast packet just print
+                    // If I am receiving a broadcast packet just print
                     else
                     {
                         LOGI(tag, "RPT: %s", (char *)(packet->data));
