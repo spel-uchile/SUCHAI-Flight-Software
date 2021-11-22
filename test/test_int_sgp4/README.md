@@ -16,3 +16,17 @@ The main sources of errors is the TLE epoch calculated in the Python and C code.
 C code uses an integer (long) with milliseconds precision, while Python uses a floating 
 point value (double). Therefore there is a difference in the argument passed to the
 propagator: `tsince` in minutes (floating point) since epoch.
+
+### Compiling parameters
+
+To compile the test it's necessary to add the following compilation parameters.
+
+>-DAPP=test_int_sgp4
+>
+>-DTEST=1
+
+## Expected results
+
+All the Command result's numbers must be 1, otherwise the test will fail.
+
+The expected console output is in the test_int_sgp4_log_base.txt file.

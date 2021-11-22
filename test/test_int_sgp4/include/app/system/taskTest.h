@@ -12,6 +12,8 @@
 #include "suchai/osDelay.h"
 #include "suchai/repoCommand.h"
 
+#include "suchai/variables.h"
+
 void taskTest(void* param);
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_TASKTEST_H
