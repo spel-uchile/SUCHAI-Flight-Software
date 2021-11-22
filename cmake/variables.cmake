@@ -73,6 +73,8 @@ set(SCH_CSP_BUFFERS 100 CACHE STRING "Available CSP buffers")
 set(SCH_CSP_SOCK_LEN 100 CACHE STRING "Max number of packets in a connection queue")
 set(SCH_COMM_ZMQ_IN  \"tcp://127.0.0.1:8001\" CACHE STRING "CSP ZMQ IN socket URI")
 set(SCH_COMM_ZMQ_OUT \"tcp://127.0.0.1:8002\" CACHE STRING "CSP ZMQ OUT socket URI")
+set(SCH_CSP_CONN_TIMEOUT 1000 CACHE STRING "CSP connection accept timeout")
+set(SCH_CSP_READ_TIMEOUT 100 CACHE STRING "CSP connection read timeout")
 ##
 # Data repository system settings
 ##

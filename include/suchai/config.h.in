@@ -69,6 +69,8 @@
 #cmakedefine SCH_CSP_SOCK_LEN             @SCH_CSP_SOCK_LEN@  ///< Max number of packets in a connection queue
 #cmakedefine SCH_COMM_ZMQ_IN              @SCH_COMM_ZMQ_IN@  ///< CSP ZMQ In socket URI
 #cmakedefine SCH_COMM_ZMQ_OUT             @SCH_COMM_ZMQ_OUT@  ///< CSP ZMQ Out socket URI
+#cmakedefine SCH_CSP_CONN_TIMEOUT         @SCH_CSP_CONN_TIMEOUT@  ///< CSP connection accept timeout
+#cmakedefine SCH_CSP_READ_TIMEOUT         @SCH_CSP_READ_TIMEOUT@  ///< CSP connection read timeout
 
 /* Data repository settings */
 #cmakedefine SCH_ST_RAM                   0
