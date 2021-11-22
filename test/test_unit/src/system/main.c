@@ -194,9 +194,10 @@ int init_suite_repodata(void)
 {
     dat_repo_init();
     cmd_repo_init();
-    int rc = drp_execute_before_flight("%d", "1010", 1);
+    int rc = dat_delete_memory_sections();
+    rc += dat_reset_status_vars();
     srand(time(NULL));
-    return rc == CMD_OK ? 0 : 1;
+    return rc;
 }
 
 /* The suite cleanup function.
@@ -334,7 +335,7 @@ void test_payload_data_1(void)
     {
         float_data_t data;
         rc = dat_get_recent_payload_sample(&data, float_data, n_test-i-1);
-        dat_print_payload_struct(&data, float_data);
+        //dat_print_payload_struct(&data, float_data);
         CU_ASSERT_EQUAL(rc, 0);
         CU_ASSERT_EQUAL(data.timestamp, time_test+i);
         CU_ASSERT_EQUAL(data.data1, int_test-i);
@@ -371,7 +372,7 @@ void test_payload_data_2(void)
     {
         half_data_t data;
         rc = dat_get_recent_payload_sample(&data, half_data, n_test-i-1);
-        dat_print_payload_struct(&data, half_data);
+        //dat_print_payload_struct(&data, half_data);
         CU_ASSERT_EQUAL(rc, 0);
         CU_ASSERT_EQUAL(data.timestamp, time_test+i);
         CU_ASSERT_EQUAL(data.data1, data_test-i);
@@ -411,7 +412,7 @@ void test_payload_data_3(void)
     {
         string_data_t data;
         rc = dat_get_recent_payload_sample(&data, string_data, n_test-i-1);
-        dat_print_payload_struct(&data, string_data);
+        //dat_print_payload_struct(&data, string_data);
         CU_ASSERT_EQUAL(rc, 0);
         CU_ASSERT_EQUAL(data.timestamp, time_test+i);
         CU_ASSERT_STRING_EQUAL(data.str1, str1);
@@ -445,15 +446,12 @@ void test_payload_data_4(void)
         CU_ASSERT(rc >= 0);
     }
 
-    // Test storage payload index
-    CU_ASSERT_EQUAL(dat_get_system_var(data_map[mix_data].sys_index), n_test);
-
     // Read N data samples to the storage system
     for(i=0; i<n_test; i++)
     {
         mix_data_t data;
         rc = dat_get_recent_payload_sample(&data, mix_data, n_test-i-1);
-        dat_print_payload_struct(&data, mix_data);
+        //dat_print_payload_struct(&data, mix_data);
         CU_ASSERT_EQUAL(rc, 0);
         CU_ASSERT_EQUAL(data.timestamp, time_test+i);
         CU_ASSERT_EQUAL(data.data1, short_test + i);
@@ -463,6 +461,86 @@ void test_payload_data_4(void)
     }
 }
 
+void test_payload_delete(void)
+{
+    /*
+     * Fill payloads A and B with data, delete payload A one, check A status variables are consistent
+     * Check status variables and data for payload B were not affected
+     * Re-fill delete payload and check A status variables are consistent
+     */
+
+    init_suite_repodata();
+
+    int rc, i;
+    int n_test = 10;
+    uint32_t time_test = (uint32_t)time(NULL);
+    int32_t int_test = rand();
+    float float_test = rand()/(float)rand();
+    int16_t data_test = (int16_t)(rand()/2);
+
+
+    // Push N data samples to payload A storage system
+    for(i=0; i<n_test; i++)
+    {
+        float_data_t data;
+        data.timestamp = time_test + i;
+        data.index = (uint32_t)i;
+        data.data1 = int_test - i;
+        data.data2 = float_test + i;
+        rc = dat_add_payload_sample(&data, float_data);
+        CU_ASSERT(rc >= 0);
+    }
+
+    // Push N data samples to payload B the storage system
+    for(i=0; i<n_test; i++)
+    {
+        half_data_t data;
+        data.timestamp = time_test + i;
+        data.index = (uint32_t)i;
+        data.data1 = data_test - i;
+        data.data2 = data_test + i;
+        rc = dat_add_payload_sample(&data, half_data);
+        CU_ASSERT(rc >= 0);
+    }
+
+    // Test status variables for A and B
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[float_data].sys_index), n_test);
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[half_data].sys_index), n_test);
+
+    // Delete payload A
+    rc = dat_delete_payload(float_data);
+    CU_ASSERT_EQUAL(rc, SCH_ST_OK);
+
+    // Test status variables for A and B
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[float_data].sys_index), 0);
+    CU_ASSERT_EQUAL(dat_get_system_var(data_map[half_data].sys_index), n_test);
+
+    // Push N new data samples to payload A storage system
+    time_test += 1;
+    int_test = rand();
+    float_test = rand()/(float)rand();
+    for(i=0; i<n_test; i++)
+    {
+        float_data_t data;
+        data.timestamp = time_test + i;
+        data.index = (uint32_t)i;
+        data.data1 = int_test - i;
+        data.data2 = float_test + i;
+        rc = dat_add_payload_sample(&data, float_data);
+        CU_ASSERT(rc >= 0);
+    }
+
+    // Read N data samples to the storage system and check these are the new values, not the deleted one
+    for(i=0; i<n_test; i++)
+    {
+        float_data_t data;
+        rc = dat_get_payload_sample(&data, float_data, i);
+        CU_ASSERT_EQUAL(rc, 0);
+        CU_ASSERT_EQUAL(data.timestamp, time_test+i);
+        CU_ASSERT_EQUAL(data.data1, int_test-i);
+        CU_ASSERT_DOUBLE_EQUAL(data.data2, float_test+i, 1e-6);
+    }
+}
 
 /** SUIT 4 **/
 /* The suite initialization function.
@@ -650,7 +728,8 @@ int main()
             (NULL == CU_add_test(pSuite, "test of payload storage 1", test_payload_data_1)) ||
             (NULL == CU_add_test(pSuite, "test of payload storage 2", test_payload_data_2)) ||
             (NULL == CU_add_test(pSuite, "test of payload storage 3", test_payload_data_3)) ||
-            (NULL == CU_add_test(pSuite, "test of payload storage 4", test_payload_data_4))
+            (NULL == CU_add_test(pSuite, "test of payload storage 4", test_payload_data_4)) ||
+            (NULL == CU_add_test(pSuite, "test of payload storage delete", test_payload_delete))
         )
     {
         CU_cleanup_registry();

@@ -133,6 +133,11 @@ value32_t dat_get_status_var(dat_status_address_t index);
  */
 value32_t dat_get_status_var_name(char *name);
 
+/**
+ * Reset status variables to their default values
+ * @return 0 if OK, else -1
+ */
+int dat_reset_status_vars(void);
 
 /**
  * Gets an executable command from the flight plan repo.
@@ -260,6 +265,13 @@ int dat_get_payload_sample(void*data, int payload, int index);
 int dat_get_recent_payload_sample(void* data, int payload, int offset);
 
 /**
+ * Delete a payload table content
+ * @param payload Payload id to delete
+ * @return 0 if OK, -1 if and error occurred
+ */
+int dat_delete_payload(int payload);
+
+/**
  * Deletes all memory sections in NOR FLASH.
  *
  * @return 0 if OK, -1 if an error occurred
@@ -294,5 +306,13 @@ void _get_sat_quaterion(quaternion_t *q,  dat_status_address_t index);
 void _set_sat_quaterion(quaternion_t *q,  dat_status_address_t index);
 void _get_sat_vector(vector3_t *r, dat_status_address_t index);
 void _set_sat_vector(vector3_t *r, dat_status_address_t index);
+
+/**
+ * Saves an fp_entry of index index
+ * @param index Index of the fp entry
+ * @param fp_entry Structure
+ * @return CMD_OK if executed correctly
+ */
+int dat_get_fp_st_index(int index, fp_entry_t *fp_entry);
 
 #endif // DATA_REPO_H

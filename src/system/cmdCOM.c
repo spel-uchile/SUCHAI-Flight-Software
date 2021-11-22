@@ -200,6 +200,7 @@ int com_send_data(char *fmt, char *params, int nparams)
     return rc == 1 ? CMD_OK : CMD_ERROR;
 }
 
+//TODO: DEPRECATE
 int _com_send_data(int node, void *data, size_t len, int type, int n_data, int n_frame)
 {
     int rc_conn = 0;
