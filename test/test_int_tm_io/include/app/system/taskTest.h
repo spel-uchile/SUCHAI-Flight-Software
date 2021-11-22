@@ -1,18 +1,15 @@
 //
-// Created by gedoix on 10-01-19.
+// Created by lurrea on 27-10-21.
 //
 
-#ifndef SUCHAI_FLIGHT_SOFTWARE_TASKTEST_H
-#define SUCHAI_FLIGHT_SOFTWARE_TASKTEST_H
-
 #include "suchai/config.h"
-#include "suchai/globals.h"
-
+#include "suchai/osThread.h"
 #include "suchai/osDelay.h"
-
 #include "suchai/repoCommand.h"
+
+#include "suchai/math_utils.h"
+#include <assert.h>
+#include <string.h>
 
 
 void taskTest(void* param);
-
-#endif //SUCHAI_FLIGHT_SOFTWARE_TASKTEST_H

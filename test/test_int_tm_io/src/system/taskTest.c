@@ -1,50 +1,55 @@
 //
-// Created by gedoix on 10-01-19.
+// Created by lurrea on 27-10-21.
 //
-
 #include "app/system/taskTest.h"
 
-#define TEST_FAILS 0
+static const char* tag = "test_tm_io_task";
 
-static const char* tag = "tm_io_test_task";
+void taskTest(void *params){
 
-void taskTest(void* param)
-{
-    LOGI(tag, "Started");
-    LOGI(tag, "---- Telemetries Input/Output test ----");
+    cmd_t *reset = cmd_build_from_str("drp_ebf 1010");
+    cmd_send(reset);
 
-    int test_amount = 5;
+    cmd_t *ping = cmd_build_from_str("com_ping 3");
+    cmd_send(ping);
 
-    cmd_t *drp_ebf = cmd_get_str("drp_ebf");
-    cmd_add_params_var(drp_ebf, 1010);
-    cmd_send(drp_ebf);
+    int sampleNum = 1;
+    float floatStored[sampleNum];
+    int16_t intStored[sampleNum];
+    char *stringStored = "KAJLSJALKSJLK";
+    char buf[127];
 
-    for(int current_test = 0; current_test < test_amount; current_test++)
-    {
+    cmd_t *cmd;
+
+    // Store dummy data in the Dummy payload
+    for (int i = 0; i < sampleNum; ++i) {
         osDelay(1000);
+        int16_t int_test = rand();
+        float float_test = rand()/(float)rand();
+        snprintf(buf, 127, "sto_dum %s %hi %f", stringStored, int_test, float_test);
+        cmd = cmd_build_from_str(buf);
+        cmd_send(cmd);
 
-        LOGI(tag, "---- Sending Telemetry %d ----", current_test+1);
+        intStored[i] = int_test;
+        floatStored[i] = float_test;
+    }
 
-        for (dat_status_address_t i = 0; i < dat_status_last_address; i++)
-        {
-            value32_t value;
-            int test_value = (current_test+1)*100 + (int)i;
-            value.i = test_value;
-            if(dat_get_status_var_def(i).type == 'f')
-                value.f = (float)test_value;
-            dat_set_status_var(i, value);
-        }
+    //Send all dummy data generated to the same node
+    char buf2[32];
+    int payload = dummy_sensor;
+    int actNode = 3;
+    snprintf(buf2, 32, "tm_send_all %d %d", payload, actNode);
+    cmd = cmd_build_from_str(buf2);
+    cmd_send(cmd);
 
-        cmd_t* cmd = cmd_get_str("tm_send_status");
-        cmd_add_params_var(cmd, 1);
-
+    //Compare all the data received with the expected results
+    for(int i = 0; i < sampleNum; i++){
+        snprintf(buf, 127, "cmp_dum %s %hi %f %d %d", stringStored, intStored[i], floatStored[i], payload,  i+sampleNum);
+        cmd = cmd_build_from_str(buf);
         cmd_send(cmd);
     }
 
-    osDelay(1000);
-
-    LOGI(tag, "---- Sending Exit Command ----");
-
-    cmd_t *cmd_exit = cmd_get_str("obc_reset");
-    cmd_send(cmd_exit);
+    LOGI(tag, "---- Finish test ----");
+    osTaskDelete(NULL);
 }
+

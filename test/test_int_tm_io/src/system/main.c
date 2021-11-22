@@ -1,12 +1,7 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2020, Tamara Gutierrez Rojo tamigr.2293@gmail.com
- *      Copyright 2020, Ignacio Ibanez Aliaga, ignacio.ibanez@usach.cl
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +21,10 @@
 #include "suchai/taskInit.h"
 #include "suchai/osThread.h"
 #include "suchai/log_utils.h"
+
+
 #include "app/system/taskTest.h"
+#include "app/system/cmdDummy.h"
 
 static char *tag = "app_main";
 
@@ -38,17 +36,15 @@ static char *tag = "app_main";
  */
 void initAppHook(void *params)
 {
-    /** Include app commands
-     * No extra commands for this app*/
+    /** Include app commands */
+    cmd_app_dummy_init();
 
-    /** Initialize custom CSP interfaces */
-#ifdef LINUX
-    csp_add_zmq_iface(SCH_COMM_NODE);
-#endif
+    /** Init app tasks */
 
-    /** Init app task */
-    int t_ok = osCreateTask(taskTest, "test_tm_io", 1024, NULL, 2, NULL);
-    if(t_ok != 0) LOGE("cmd-tm_io", "Task test tm io not created!");
+    /** Example task */
+    int t_ok_cos = osCreateTask(taskTest, "test", 1024, NULL, 2, NULL);
+    if(t_ok_cos != 0) LOGE("test-tle", "Task test TLE not created!");
+
 }
 
 int main(void)
