@@ -27,11 +27,6 @@
 
 static const char* tag = "cmdOBC";
 
-#define TLE_BUFF_LEN 70
-TLE tle;
-static char tle1[TLE_BUFF_LEN]; //"1 42788U 17036Z   20054.20928660  .00001463  00000-0  64143-4 0  9996";
-static char tle2[TLE_BUFF_LEN]; //"2 42788  97.3188 111.6825 0013081  74.6084 285.6598 15.23469130148339";
-
 void cmd_obc_init(void)
 {
     cmd_add("obc_ident", obc_ident, "", 0);
