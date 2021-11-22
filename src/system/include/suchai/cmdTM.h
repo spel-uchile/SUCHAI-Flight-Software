@@ -159,7 +159,17 @@ int tm_get_single(char *fmt, char *params, int nparams);
 
 int tm_send_cmds(char *fmt, char *params, int nparms);
 
-#ifdef LINUX
+#if defined(LINUX) || defined(SIM)
+/**
+ * Write payload data to a file.
+ * @param fmt "%d %s"
+ * @param params "<payload> <filename>"
+ * @param nparams 2
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
+ */
+int tm_dump(char *fmt, char *params, int nparams);
+
+
 /**
  * Send a file using CSP
  *

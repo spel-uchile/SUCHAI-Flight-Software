@@ -230,7 +230,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     int entries = dat_get_system_var(dat_fpl_queue);
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
-    rc =storage_flight_plan_get_args(elapsed_sec, command, args, executions, period, &node);
+    rc = storage_flight_plan_get_args(elapsed_sec, command, args, executions, period, &node);
     if(rc == SCH_ST_OK)
         rc = storage_flight_plan_delete_row(elapsed_sec);
     else
@@ -473,6 +473,51 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     free(types);
     free(names);
 
+    return 0;
+}
+
+int dat_fprint_payload_struct(FILE *stream, void* data, unsigned int payload)
+{
+    if(stream == NULL)
+        return -1;
+
+    char *types = strdup(data_map[payload].data_order);
+    const char *sep = " ";
+    char *type_tmp;
+    char *type = strtok_r(types, sep, &type_tmp);
+    char *tmp;
+    while(type != NULL)
+    {
+        switch (type[1]) {
+            case 'f':
+                fprintf(stream, type, *(float *)data);
+                data += sizeof(float);
+                break;
+            case 'u':
+            case 'i':
+            case 'd':
+                fprintf(stream, type, *(int32_t *)data);
+                data += sizeof(int32_t);
+                break;
+            case 'h':
+                fprintf(stream, "%hi", *(int16_t *)data);
+                data += sizeof(int16_t);
+                break;
+            case 's':
+                tmp = strndup((char *)data, SCH_ST_STR_SIZE);
+                fprintf(stream, type, tmp);
+                free(tmp);
+                data += SCH_ST_STR_SIZE;
+                break;
+            default:
+                data ++;
+                break;
+        }
+        fprintf(stream, ",");
+        type = strtok_r(NULL, sep, &type_tmp);
+    }
+    fprintf(stream, "\n");
+    free(types);
     return 0;
 }
 

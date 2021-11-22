@@ -276,6 +276,16 @@ int dat_delete_memory_sections(void);
 int dat_print_payload_struct(void* data, unsigned int payload);
 
 /**
+ * Print payload struct to stream as comma separated value.
+ * Useful to dump telemetry to a CSV file.
+ * @param stream Stream
+ * @param data Payload struct
+ * @param payload Payload type
+ * @return 0 if OK, -1 if an error occurred
+ */
+int dat_fprint_payload_struct(FILE *stream, void* data, unsigned int payload);
+
+/**
  * Auxiliary function to read/set vectors and queaternions.
  * These functions only read/set 3 (vector) or 4 (quaternions)
  * variables starting from the given index.

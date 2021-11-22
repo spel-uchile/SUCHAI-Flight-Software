@@ -18,7 +18,7 @@
  */
 
 #include "suchai/cmdTM.h"
-#ifdef LINUX
+#if defined(LINUX) || defined(SIM)
 #include <sys/stat.h>
 #include <dirent.h>
 #endif
@@ -40,7 +40,8 @@ void cmd_tm_init(void)
     cmd_add("tm_parse_payload", tm_parse_payload, "%", 0);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
     cmd_add("tm_send_cmds", tm_send_cmds, "%d", 1);
-#ifdef LINUX
+#if defined(LINUX) || defined(SIM)
+    cmd_add("tm_dump", tm_dump, "%d %s", 2);
     cmd_add("tm_send_file", tm_send_file, "%s %d", 2);
     cmd_add("tm_parse_file", tm_parse_file, "", 0);
     cmd_add("tm_send_file_part", tm_send_file_parts, "%s %d %d %d %d", 5);
@@ -280,7 +281,6 @@ int tm_get_last(char *fmt, char *params, int nparams)
         char buff[payload_size];
         int ret;
         ret = dat_get_recent_payload_sample(buff, payload,0);
-        //FIXME: Check memory usage
         dat_print_payload_struct(buff, payload);
 
         if( ret == -1) {
@@ -479,7 +479,42 @@ int tm_send_cmds(char *fmt, char *params, int nparams)
     return _com_send_data(node, cmd_save_all(), strlen(cmd_save_all()), TM_TYPE_HELP, 1, 0);
 }
 
-#ifdef LINUX
+#if defined(LINUX) || defined(SIM)
+int tm_dump(char *fmt, char *params, int nparams)
+{
+    int payload_id;
+    char filename[SCH_CMD_MAX_STR_PARAMS];
+
+    if(params == NULL || sscanf(params, fmt, &payload_id, filename) != nparams)
+        return CMD_SYNTAX_ERROR;
+
+    FILE *outfile = fopen(filename,"w");
+    if(outfile == NULL)
+        return CMD_ERROR;
+
+    // Write header (comma separated)
+    char *header = strdup(data_map[payload_id].var_names);
+    for(int i=0; i<strlen(header); i++)
+        if(header[i] == ' ') header[i]=','; // Replace spaces with ','
+    fprintf(outfile, "%s,\n", header);
+    free(header);
+
+    // Write data
+    int ret;
+    int payload_len = dat_get_system_var(data_map[payload_id].sys_index);
+    int payload_size = data_map[payload_id].size;
+    char buff[payload_size];
+    for(int i=0; i<payload_len; i++)
+    {
+        ret = dat_get_payload_sample(buff, payload_id,i);
+        if(ret == 0)
+            dat_fprint_payload_struct(outfile, buff, payload_id);
+    }
+
+    fclose(outfile);
+    return CMD_OK;
+}
+
 int tm_send_file(char *fmt, char *params, int nparams)
 {
     if(params == NULL)
