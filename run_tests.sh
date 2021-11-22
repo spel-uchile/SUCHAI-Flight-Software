@@ -12,6 +12,10 @@
 test_build_enabled=1
 test_unit_enabled=1
 test_cmd_enabled=1
+test_bug_delay_enabled=1
+test_load_enabled=1
+test_sgp4_enabled=1
+test_tm_io_enabled=1
 
 # Gets the current execution directory (the absolute path to this script)
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -43,6 +47,7 @@ then
   cd ${WORKSPACE}
 fi
 
+
 # ---------------- --TEST_UNIT ------------------
 # The test log is called test_unit_log.txt
 # Tests for all storage modes
@@ -70,18 +75,19 @@ then
   cd ${WORKSPACE}
 fi
 
-## ---------------- --TEST_CMD ------------------
+
+## ---------------- --TEST_INT_CMD ------------------
 #
-## The main test log is called test_cmd_log.txt
-## That log is compares with test_cmd_log_base.txt
-## The result of the comparison is in test_cmd_comparator_log.txt
+## The main test log is called test_int_cmd_log.txt
+## That log is compares with test_int_cmd_log_base.txt
+## The result of the comparison is in test_int_cmd_comparator_log.txt
 #
 if [ $test_cmd_enabled -eq 1 ]
 then
   TEST_NAME="test_int_cmd"
   rm -rf build_test
   # build the cmdtest with the test's parameters
-  cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM -DSCH_STORAGE_TRIPLE_WR=1 && cmake --build build_test -j4
+  cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM && cmake --build build_test -j4
   [ $? -eq 0 ] || exit $?
 
   # Runs the test, saving a log file
@@ -94,74 +100,109 @@ then
   #
   ## Makes result comparison
   cd test/${TEST_NAME}
-  rm -f test_cmd_comparator_log.txt
-  python logs_comparator.py | cat >> test_cmd_comparator_log.txt
+  rm -f ${TEST_NAME}_comparator_log.txt
+  python logs_comparator.py | cat >> ${TEST_NAME}_comparator_log.txt
   echo ""
   cd ${WORKSPACE}
   #
 fi
 
-#TODO: DELETE THIS EXIT AFTER FIXING THE REST OF THE TESTS!
-exit 0
-#TODO: REMEMBER TO DELETE THIS EXIT!
 
 ## ---------------- --TEST_LOAD ------------------
 #
-## The test log is called test_load_log.txt
+## The test log is called test_int_load_log.txt
 #
-## Compiles the project with the test's parameters
-#cd ${WORKSPACE}/src/system/include
-#python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode "0"
+if [ $test_load_enabled -eq 1 ]
+then
+  TEST_NAME="test_int_load"
+
+    echo ""
+    echo "**** Testing ${TEST_NAME} ****"
+    rm -rf build_test
+    # build the test with the test's parameters
+    cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM  && cmake --build build_test -j4
+    [ $? -eq 0 ] || exit $?
+
+    ./build_test/test/${TEST_NAME}/suchai-test > test/${TEST_NAME}/${TEST_NAME}_log.txt
+    [ $? -eq 0 ] || exit $?
+    echo ""
+    cd -
+
+  cd ${WORKSPACE}
+fi
+
+
+## ---------------- --TEST_INT_BUG_DELAY ------------------
 #
-## Compiles the test
-#cd ${WORKSPACE}/test/test_load
-#rm -rf build_test
-#mkdir build_test
-#cd build_test
-#cmake ..
-#make
+## The test log is called test_int_bug_delay_log.txt
+
+if [ $test_bug_delay_enabled -eq 1 ]
+then
+  TEST_NAME="test_int_bug_delay"
+
+    echo ""
+    echo "**** Testing ${TEST_NAME} ****"
+    rm -rf build_test
+    # build the test with the test's parameters
+    cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM  && cmake --build build_test -j4
+    [ $? -eq 0 ] || exit $?
+
+    ./build_test/test/${TEST_NAME}/suchai-test > test/${TEST_NAME}/${TEST_NAME}_log.txt
+    [ $? -eq 0 ] || exit $?
+    echo ""
+    cd -
+
+  cd ${WORKSPACE}
+fi
+
+## ---------------- --TEST_INT_SGP4 ------------------
 #
-## Runs the test, saving a log file
-#rm -f ../test_load_log.txt
-#./SUCHAI_Flight_Software_Test | cat >> ../test_load_log.txt
-#echo ""
+## The test log is called test_int_sgp4_log.txt
+
+if [ $test_sgp4_enabled -eq 1 ]
+then
+  TEST_NAME="test_int_sgp4"
+
+    echo ""
+    echo "**** Testing ${TEST_NAME} ****"
+    rm -rf build_test
+    # build the test with the test's parameters
+    cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM  && cmake --build build_test -j4
+    [ $? -eq 0 ] || exit $?
+
+    ./build_test/test/${TEST_NAME}/suchai-test > test/${TEST_NAME}/${TEST_NAME}_log.txt
+    [ $? -eq 0 ] || exit $?
+    echo ""
+    cd -
+
+  cd ${WORKSPACE}
+fi
+
+
+## ---------------- --TEST_INT_TM_IO ------------------
 #
-## ---------------- --TEST_BUG_DELAY ------------------
-#
-## The test log is called test_bug_delay_log.txt
-#
-## Compiles the project with the test's parameters
-#cd ${WORKSPACE}/src/system/include
-#python3 configure.py "LINUX" --log_lvl "LOG_LVL_INFO"  --comm "0"  --fp "0"  --hk "0"  --test "0"  --st_mode "0"
-#
-## Compiles the test
-#cd ${WORKSPACE}/test/test_bug_delay
-#rm -rf build_test
-#mkdir build_test
-#cd build_test
-#cmake ..
-#make
-#
-## Runs the test, saving a log file
-#rm -f ../test_bug_delay_log.txt
-#./SUCHAI_Flight_Software_Test | cat >> ../test_bug_delay_log.txt
-#
-## ---------------- --TEST_TM_IO ------------------
-#
-## The test log is called test_tm_io_log.txt
-#
-## Compiles the project with the test's parameters
-#cd ${WORKSPACE}/src/system/include
-#python3 configure.py "LINUX" --log_lvl "LOG_LVL_NONE"  --comm "1" --con "0" --fp "0"  --hk "0"  --test "0"  --st_mode "0"  --node "1"
-#
-## Compiles the test
-#cd ${WORKSPACE}/test/test_tm_io
-#rm -rf build_test
-#mkdir build_test
-#cd build_test
-#cmake ..
-#make
-#
-## Runs the test, saving a log file
-#rm -f ../test_tm_io_log.txt
-#./SUCHAI_Flight_Software_Test | cat >> ../test_tm_io_log.txt
+## The test log is called test_int_tm_io_log.txt
+
+if [ $test_tm_io_enabled -eq 1 ]
+then
+  TEST_NAME="test_int_tm_io"
+
+    echo ""
+    echo "**** Testing ${TEST_NAME} ****"
+    rm -rf build_test
+    # build the test with the test's parameters
+    cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM  && cmake --build build_test -j4
+    [ $? -eq 0 ] || exit $?
+
+    ./build_test/test/${TEST_NAME}/suchai-test > test/${TEST_NAME}/${TEST_NAME}_log.txt
+    [ $? -eq 0 ] || exit $?
+    echo ""
+    cd -
+
+  cd ${WORKSPACE}
+fi
+
+
+#TODO: DELETE THIS EXIT AFTER FIXING THE REST OF THE TESTS!
+exit 0
+#TODO: REMEMBER TO DELETE THIS EXIT!
