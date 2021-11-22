@@ -51,6 +51,7 @@ int storage_close(void)
     if(status_db != NULL) { free(status_db); status_db = NULL; }
     if(flightplan_db != NULL) { free(flightplan_db); flightplan_db = NULL; }
     if(payload_db != NULL) { free(payload_db); payload_db = NULL; }
+    if(payloads_sections_addresses != NULL) { free(payloads_sections_addresses); payloads_sections_addresses == NULL; }
 
     return SCH_ST_OK;
 }
@@ -190,7 +191,7 @@ int storage_flight_plan_set(int timetodo, char* command, char* args, int executi
     return storage_flight_plan_set_st(&row);
 }
 
-int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
+int storage_flight_plan_get(int timetodo, fp_entry_t *row)
 {
     if(!storage_is_open || flightplan_db == NULL || row == NULL)
         return SCH_ST_ERROR;
@@ -223,7 +224,7 @@ int storage_flight_plan_get_args(int timetodo, char* command, char* args, int* e
         return SCH_ST_ERROR;
 
     fp_entry_t fp_entry;
-    int rc = storage_flight_plan_get_st(timetodo, &fp_entry);
+    int rc = storage_flight_plan_get(timetodo, &fp_entry);
     if(rc != SCH_ST_OK)
         return rc;
 
