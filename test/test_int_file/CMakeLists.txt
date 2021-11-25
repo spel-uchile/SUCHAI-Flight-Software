@@ -8,6 +8,8 @@ set(SOURCE_FILES
         )
 set(CURRENT_DIR ${CMAKE_CURRENT_BINARY_DIR})
 configure_file(text.txt ${CMAKE_CURRENT_BINARY_DIR}/text.txt)
+configure_file(image.jpeg ${CMAKE_CURRENT_BINARY_DIR}/image.jpeg)
+configure_file(alice29.txt ${CMAKE_CURRENT_BINARY_DIR}/alice29.txt)
 add_executable(suchai-test ${SOURCE_FILES})
 target_include_directories(suchai-test PUBLIC include)
 target_link_libraries(suchai-test PUBLIC suchai-fs-core)
