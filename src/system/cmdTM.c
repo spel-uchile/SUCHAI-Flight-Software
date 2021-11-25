@@ -641,8 +641,8 @@ int tm_parse_file(char *fmt, char *params, int nparams)
 
         expectedfname = calloc(path_len, 1);
         assert(expectedfname != NULL);
-        strncat(fname, bname, path_len);
-        strncat(fname, rname, path_len);
+        strncat(expectedfname, bname, path_len);
+        strncat(expectedfname, rname, path_len);
         if(access(expectedfname, F_OK) == 0 ) {
             //file exists
             strncat(fname, bname, path_len);
