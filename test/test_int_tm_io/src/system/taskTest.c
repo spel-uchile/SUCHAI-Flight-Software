@@ -41,7 +41,8 @@ void taskTest(void *params){
     cmd_send(cmd);
 
     // Wait some time to receive all the data
-    sleep(5);
+    while(dat_get_status_var(dat_drp_idx_dummy).i < 2*sampleNum )
+        sleep(1);
 
     //Compare all the data received with the expected results
     for(int i = 0; i < sampleNum; i++){
