@@ -12,10 +12,11 @@
 test_build_enabled=1
 test_unit_enabled=1
 test_cmd_enabled=1
-test_bug_delay_enabled=1
+test_bug_delay_enabled=0
 test_load_enabled=1
 test_sgp4_enabled=1
 test_tm_io_enabled=1
+test_file_enabled=0
 
 # Gets the current execution directory (the absolute path to this script)
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -191,7 +192,30 @@ then
     echo "**** Testing ${TEST_NAME} ****"
     rm -rf build_test
     # build the test with the test's parameters
-    cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM  && cmake --build build_test -j4
+    cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_ST_MODE=RAM -DSCH_COMM_NODE=3 && cmake --build build_test -j4
+    [ $? -eq 0 ] || exit $?
+
+    ./build_test/test/${TEST_NAME}/suchai-test > test/${TEST_NAME}/${TEST_NAME}_log.txt
+    [ $? -eq 0 ] || exit $?
+    echo ""
+    cd -
+
+  cd ${WORKSPACE}
+fi
+
+## ---------------- --TEST_INT_FILE-- ------------------
+#
+## The test log is called test_int_file_log.txt
+
+if [ $test_file_enabled -eq 1 ]
+then
+  TEST_NAME="test_int_file"
+
+    echo ""
+    echo "**** Testing ${TEST_NAME} ****"
+    rm -rf build_test
+    # build the test with the test's parameters
+    cmake -B build_test -G Ninja -DSCH_OS=LINUX -DSCH_ARCH=X86 -DAPP=${TEST_NAME} -DTEST=1 -DSCH_COMM_NODE=3  && cmake --build build_test -j4
     [ $? -eq 0 ] || exit $?
 
     ./build_test/test/${TEST_NAME}/suchai-test > test/${TEST_NAME}/${TEST_NAME}_log.txt

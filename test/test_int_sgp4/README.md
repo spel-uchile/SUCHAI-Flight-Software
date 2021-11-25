@@ -1,4 +1,4 @@
-# SGP4 Test
+# Test Int SGP4
 
 This test compares the SUCHAI SGP4 propagator results with Python 
 Skyfield SGP4 propagator (https://pypi.org/project/sgp4).

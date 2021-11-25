@@ -32,11 +32,9 @@ void taskTest(void* param)
     char line[255];
     char fname_data[255];
     sprintf(fname_data, "%s/data.csv", current_dir);
-    LOGI(tag,fname_data);
     base_file = fopen(fname_data, "r");
     char fname_test[255];
     sprintf(fname_test, "%s/test_%ld.csv", current_dir, time(NULL));
-    LOGI(tag, fname_test)
 
     time_t dt;
     double r[3];
