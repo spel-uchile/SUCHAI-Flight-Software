@@ -3,6 +3,7 @@ stages:
   - configure_docker
   - build
   - test_linux
+  - test_fuzz
 
 create_vis:
   stage: create_vis
@@ -141,6 +142,14 @@ test_sequences:
     - cd $HOME/suchai-docker
     - docker-compose -f sat-gnd-com.yml  run  suchai_sat sh install_test_linux.sh test_fuzz
     - docker-compose -f sat-gnd-com.yml down
+    - docker system prune -f
+  only:
+    - master
+
+test_fuzzing:
+  stage: test_fuzz
+  script:
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_fuzzy-framework.sh
     - docker system prune -f
   only:
     - master
