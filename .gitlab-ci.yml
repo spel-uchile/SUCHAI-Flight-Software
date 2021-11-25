@@ -133,7 +133,7 @@ test_sgp4:
   only:
     - master
 
-test_fuzz:
+test_sequences:
   stage: test_linux
   script:
     - echo "Testing in Linux"
