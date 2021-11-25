@@ -632,13 +632,26 @@ int tm_parse_file(char *fmt, char *params, int nparams)
     {
         char *rname = (char *)frame->data;
         char idname[10];
+        static char *expectedfname = NULL;
+
         snprintf(idname, 10, "%d_", frame->fileid);
         size_t path_len = strlen(bname) + strlen(idname) + strlen(rname) + 1;
         fname = calloc(path_len, 1);
         assert(fname != NULL);
+
+        expectedfname = calloc(path_len, 1);
+        assert(expectedfname != NULL);
         strncat(fname, bname, path_len);
-        strncat(fname, idname, path_len);
         strncat(fname, rname, path_len);
+        if(access(expectedfname, F_OK) == 0 ) {
+            //file exists
+            strncat(fname, bname, path_len);
+            strncat(fname, idname, path_len);
+            strncat(fname, rname, path_len);
+        } else
+            //file doesn't exist
+            strcpy(fname, expectedfname);
+
         last_id = frame->fileid;
         last_frame = frame->nframe;
         LOGI(tag, "New file! Id: %d. Frame: %d/%d. Name: %s", frame->fileid, frame->nframe, frame->total, fname);
@@ -731,7 +744,12 @@ int tm_send_file_parts(char *fmt, char *params, int nparams)
     // Select only the required bytes
     int start_byte = start_frame * COM_FRAME_MAX_LEN;
     size_t read_bytes = (end_frame - start_frame) * COM_FRAME_MAX_LEN;
-    read_bytes = (start_byte + read_bytes) > file_size ? (file_size - start_byte) : read_bytes;
+
+    if(end_frame < 0)   // end_frame = 1, send all file
+        read_bytes = file_size;
+    else
+        read_bytes = (start_byte + read_bytes) > file_size ? (file_size - start_byte) : read_bytes;
+
     //Check file limits
     if(start_byte > file_size || start_byte+read_bytes > file_size)
         return CMD_SYNTAX_ERROR;

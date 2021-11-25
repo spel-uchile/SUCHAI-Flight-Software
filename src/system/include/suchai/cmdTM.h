@@ -19,6 +19,8 @@
 #include "suchai/repoData.h"
 #include "suchai/cmdCOM.h"
 
+#include "unistd.h"
+
 #define TM_TYPE_GENERIC 0
 #define TM_TYPE_STATUS  1
 #define TM_TYPE_HELP    2
