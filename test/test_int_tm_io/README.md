@@ -13,3 +13,14 @@ To compile the test it's necessary to add the following compilation parameters.
 >-DAPP=test_int_tm_io
 >
 >-DTEST=1
+>
+>-DSCH_ST_MODE=SQLITE
+>
+>-DSCH_COMM_NODE=3
+
+## Expected results
+
+The Command result number of all the commands called by the test must be 1, if any of those is 0,
+the test will failed.
+
+The expected console output is in the test_int_tm_io_log_base.txt file.

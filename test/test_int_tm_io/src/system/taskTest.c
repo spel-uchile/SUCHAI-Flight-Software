@@ -7,13 +7,11 @@ static const char* tag = "test_tm_io_task";
 
 void taskTest(void *params){
 
+    //reset the db to prevent problems with the new stored data
     cmd_t *reset = cmd_build_from_str("drp_ebf 1010");
     cmd_send(reset);
 
-    cmd_t *ping = cmd_build_from_str("com_ping 3");
-    cmd_send(ping);
-
-    int sampleNum = 1;
+    int sampleNum = 20;
     float floatStored[sampleNum];
     int16_t intStored[sampleNum];
     char *stringStored = "KAJLSJALKSJLK";
@@ -35,12 +33,15 @@ void taskTest(void *params){
     }
 
     //Send all dummy data generated to the same node
-    char buf2[32];
+    char buf2[64];
     int payload = dummy_sensor;
     int actNode = 3;
-    snprintf(buf2, 32, "tm_send_all %d %d", payload, actNode);
+    snprintf(buf2, 64, "tm_send_all %d %d", payload, actNode);
     cmd = cmd_build_from_str(buf2);
     cmd_send(cmd);
+
+    // Wait some time to receive all the data
+    sleep(5);
 
     //Compare all the data received with the expected results
     for(int i = 0; i < sampleNum; i++){
@@ -48,8 +49,8 @@ void taskTest(void *params){
         cmd = cmd_build_from_str(buf);
         cmd_send(cmd);
     }
-
-    LOGI(tag, "---- Finish test ----");
-    osTaskDelete(NULL);
+    // Terminate the execution of the test
+    cmd = cmd_build_from_str("obc_reset");
+    cmd_send(cmd);
 }
 

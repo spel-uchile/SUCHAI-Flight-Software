@@ -1,0 +1,530 @@
+
+
+--------- FLIGHT SOFTWARE START ---------
+	 Version: 2.2.0-224-g74fdd
+	 Device : 1 (SUCHAI-FS)
+-----------------------------------------
+
+[INFO ][1637807103][fs_main] Creating basic tasks...
+[INFO ][1637807103][Dispatcher] Started
+[WARN] (invoker) Failed to assign task priority, try as root
+[WARN] (receiver) Failed to assign task priority, try as root
+[INFO ][1637807103][Executer] Started
+[INFO ][1637807103][WDT] Started
+[WARN] (watchdog) Failed to assign task priority, try as root
+[WARN] (init) Failed to assign task priority, try as root
+[INFO ][1637807103][taskInit] SETUP REPOSITORIES...
+[INFO ][1637807103][taskInit] SETUP VARIABLES...
+[INFO ][1637807103][taskInit] PURGE FLIGHT PLAN...
+[INFO ][1637807103][taskInit] SETUP CSP...
+[INFO ][1637807103][taskInit] Initialising CSP...
+[INFO ][1637807103][taskInit] CSP Node: 3
+[INFO ][1637807103][taskInit] CREATE TASKS...
+[WARN] (console) Failed to assign task priority, try as root
+[INFO ][1637807103][Console] Started
+[WARN] (comm) Failed to assign task priority, try as root
+[INFO ][1637807103][Communications] Started
+[1;32mBinding socket 0x563407cafe90 to port 32
+[0;0mIndex Name                    Params
+    0 obc_ident
+    1 obc_debug %d
+    2 obc_exit
+    3 obc_reset %d
+    4 obc_get_mem
+    5 obc_set_time %d
+    6 obc_get_time %d
+    7 obc_reset_wdt[WARN] (flightplan) Failed to assign task priority, try as root
+ %d
+    8 obc_system %s
+    9 obc_set_cwd %s
+   10 obc_get_cwd
+   11 obc_ls %s
+   12 obc_rm %s
+   13 obc_mkdir %s
+   14 drp_ebf %d
+   15 drp_reset_payload %d %d
+   16 drp_reset_status %d
+   17 drp_print_vars
+   18 drp_set_var %d %f
+   19 drp_set_var_name %s %f
+   20 drp_get_var_name %s
+   21 drp_add_hrs_alive %d
+   22 drp_clear_gnd_wdt
+   23 test %s
+   24 help
+   25 log_set %d %d
+   26 fp_set_cmd %d %d %d %d %d %d %d %d %s %n
+   27 fp_set_cmd_unix %d %d %d %s %n 
+   28 fp_set_cmd_dt %d %d %d %s %n
+   29 fp_del_cmd %d %d %d %d %d %d
+   30 fp_del_cmd_unix %d
+   31 fp_show
+   32 fp_reset
+   33 fp_purge
+   34 com_ping %d
+   35 com_send_rpt %d %s
+   36 com_send_cmd %d %n
+   37 com_send_tc %d %n
+   38 com_send_data %d %d %n
+   39 com_debug
+   40 com_set_time_node %d
+   41 com_set_tle_node %d %s
+   42 tm_parse_status
+   43 tm_parse_string
+   44 tm_send_status %d
+   45 tm_send_var %d %s
+   46 tm_get_last %u
+   47 tm_get_single %u %u
+   48 tm_send_last %u %u
+   49 tm_send_all %u %u
+   50 tm_send_n %u %u %u
+   51 tm_parse_payload %
+   52 tm_set_ack %u %u
+   53 tm_send_cmds %d
+   54 tm_send_fp %d
+   55 tm_print_fp
+   56 tm_dump %d %s
+   57 tm_send_file %s %d
+   58 tm_parse_file
+   59 tm_send_file_part %s %d %d %d %d
+   60 tm_merge_file %s %d
+   61 tm_ls %s %d
+[INFO ][1637807103][Console] 
+______________________________________________________________________________
+                     ___ _   _  ___ _  _   _   ___ 
+                    / __| | | |/ __| || | /_\ |_ _|
+                    \__ \ |_| | (__| __ |/ _ \ | | 
+                    |___/\___/ \___|_||_/_/ \_\___|
+______________________________________________________________________________
+
+
+[INFO ][1637807103][FlightPlan] Started
+[WARN] (test) Failed to assign task priority, try as root
+[INFO ][1637807103][taskInit] EXIT INIT TASK
+[INFO] Canceling thread 140297159169792
+[INFO ][1637807103][Executer] Running the command: drp_ebf...
+[RES  ][1637807103][cmdDRP] drp_ebf ok!
+[INFO ][1637807103][Executer] Command result: 1
+[6n[INFO ][1637807104][Executer] Running the command: sto_dum...
+[INFO ][1637807104][repoData] Adding sample 0 for payload 1 in index 0
+[INFO ][1637807104][Executer] Command result: 1
+[INFO ][1637807105][Executer] Running the command: sto_dum...
+[INFO ][1637807105][repoData] Adding sample 1 for payload 1 in index 1
+[INFO ][1637807105][Executer] Command result: 1
+[INFO ][1637807106][Executer] Running the command: sto_dum...
+[INFO ][1637807106][repoData] Adding sample 2 for payload 1 in index 2
+[INFO ][1637807106][Executer] Command result: 1
+[INFO ][1637807107][Executer] Running the command: sto_dum...
+[INFO ][1637807107][repoData] Adding sample 3 for payload 1 in index 3
+[INFO ][1637807107][Executer] Command result: 1
+[INFO ][1637807108][Executer] Running the command: sto_dum...
+[INFO ][1637807108][repoData] Adding sample 4 for payload 1 in index 4
+[INFO ][1637807108][Executer] Command result: 1
+[INFO ][1637807109][Executer] Running the command: sto_dum...
+[INFO ][1637807109][repoData] Adding sample 5 for payload 1 in index 5
+[INFO ][1637807109][Executer] Command result: 1
+[INFO ][1637807110][Executer] Running the command: sto_dum...
+[INFO ][1637807110][repoData] Adding sample 6 for payload 1 in index 6
+[INFO ][1637807110][Executer] Command result: 1
+[INFO ][1637807111][Executer] Running the command: sto_dum...
+[INFO ][1637807111][repoData] Adding sample 7 for payload 1 in index 7
+[INFO ][1637807111][Executer] Command result: 1
+[INFO ][1637807112][Executer] Running the command: sto_dum...
+[INFO ][1637807112][repoData] Adding sample 8 for payload 1 in index 8
+[INFO ][1637807112][Executer] Command result: 1
+[INFO ][1637807113][Executer] Running the command: sto_dum...
+[INFO ][1637807113][repoData] Adding sample 9 for payload 1 in index 9
+[INFO ][1637807113][Executer] Command result: 1
+[INFO ][1637807114][Executer] Running the command: sto_dum...
+[INFO ][1637807114][repoData] Adding sample 10 for payload 1 in index 10
+[INFO ][1637807114][Executer] Command result: 1
+[INFO ][1637807115][Executer] Running the command: sto_dum...
+[INFO ][1637807115][repoData] Adding sample 11 for payload 1 in index 11
+[INFO ][1637807115][Executer] Command result: 1
+[INFO ][1637807116][Executer] Running the command: sto_dum...
+[INFO ][1637807116][repoData] Adding sample 12 for payload 1 in index 12
+[INFO ][1637807116][Executer] Command result: 1
+[INFO ][1637807117][Executer] Running the command: sto_dum...
+[INFO ][1637807117][repoData] Adding sample 13 for payload 1 in index 13
+[INFO ][1637807117][Executer] Command result: 1
+[INFO ][1637807118][Executer] Running the command: sto_dum...
+[INFO ][1637807118][repoData] Adding sample 14 for payload 1 in index 14
+[INFO ][1637807118][Executer] Command result: 1
+[INFO ][1637807119][Executer] Running the command: sto_dum...
+[INFO ][1637807119][repoData] Adding sample 15 for payload 1 in index 15
+[INFO ][1637807119][Executer] Command result: 1
+[INFO ][1637807120][Executer] Running the command: sto_dum...
+[INFO ][1637807120][repoData] Adding sample 16 for payload 1 in index 16
+[INFO ][1637807120][Executer] Command result: 1
+[INFO ][1637807121][Executer] Running the command: sto_dum...
+[INFO ][1637807121][repoData] Adding sample 17 for payload 1 in index 17
+[INFO ][1637807121][Executer] Command result: 1
+[INFO ][1637807122][Executer] Running the command: sto_dum...
+[INFO ][1637807122][repoData] Adding sample 18 for payload 1 in index 18
+[INFO ][1637807122][Executer] Command result: 1
+[INFO ][1637807123][Executer] Running the command: sto_dum...
+[INFO ][1637807123][repoData] Adding sample 19 for payload 1 in index 19
+[INFO ][1637807123][Executer] Command result: 1
+[INFO ][1637807123][Executer] Running the command: tm_send_all...
+[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 0
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 1
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 2
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 3
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 0
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 4
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 1
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 2
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 3
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 4
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 5
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 6
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 5
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 6
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 7
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 8
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][cmdTM] Node    : 3
+[INFO ][1637807123][cmdTM] Frame   : 9
+[INFO ][1637807123][cmdTM] Type    : 11
+[INFO ][1637807123][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 7
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 8
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807123][Communications] Received: 200 bytes
+[INFO ][1637807123][Communications] Node    : 3
+[INFO ][1637807123][Communications] Frame   : 9
+[INFO ][1637807123][Communications] Type    : 11
+[INFO ][1637807123][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 10
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 11
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 10
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 12
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 11
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 12
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 13
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 14
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 13
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 15
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 14
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 16
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 15
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 17
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 16
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 18
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 17
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][cmdTM] Node    : 3
+[INFO ][1637807126][cmdTM] Frame   : 19
+[INFO ][1637807126][cmdTM] Type    : 11
+[INFO ][1637807126][cmdTM] Samples : 0
+[0;32mOUT: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[0;32mINP: S 3, D 3, Dp 15, Sp 43, Pr 2, Fl 0x00, Sz 200 VIA: LOOP
+[0;0m[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 18
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807126][Communications] Received: 200 bytes
+[INFO ][1637807126][Communications] Node    : 3
+[INFO ][1637807126][Communications] Frame   : 19
+[INFO ][1637807126][Communications] Type    : 11
+[INFO ][1637807126][Communications] Samples : 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 0 for payload 1 in index 20
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 1 for payload 1 in index 21
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 2 for payload 1 in index 22
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 3 for payload 1 in index 23
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 4 for payload 1 in index 24
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 5 for payload 1 in index 25
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 6 for payload 1 in index 26
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 7 for payload 1 in index 27
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 8 for payload 1 in index 28
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 9 for payload 1 in index 29
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 10 for payload 1 in index 30
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 11 for payload 1 in index 31
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 12 for payload 1 in index 32
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 13 for payload 1 in index 33
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 14 for payload 1 in index 34
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 15 for payload 1 in index 35
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 16 for payload 1 in index 36
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 17 for payload 1 in index 37
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 18 for payload 1 in index 38
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: tm_parse_payload...
+[INFO ][1637807129][repoData] Adding sample 19 for payload 1 in index 39
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807129][Executer] Running the command: cmp_dum...
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807129][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: cmp_dum...
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: cmp_dum...
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: cmp_dum...
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: cmp_dum...
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: cmp_dum...
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: cmp_dum...
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: cmp_dum...
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][test_tm_io_cmd] KAJLSJALKSJLK 1
+[INFO ][1637807130][Executer] Command result: 1
+[INFO ][1637807130][Executer] Running the command: obc_reset...
