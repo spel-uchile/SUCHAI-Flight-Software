@@ -3,11 +3,10 @@
 //
 
 #include "suchai/config.h"
-#include "suchai/globals.h"
-
-#include "suchai/osQueue.h"
+#include "suchai/osThread.h"
 #include "suchai/osDelay.h"
-
 #include "suchai/repoCommand.h"
+
+#include "suchai/variables.h"
 
 void taskTest(void *param);

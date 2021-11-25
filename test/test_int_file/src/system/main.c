@@ -28,7 +28,7 @@
 #include "suchai/log_utils.h"
 
 #include "app/system/taskTest.h"
-#include "suchai/cmdTM.h"
+#include "app/system/cmdFile.h"
 
 static char *tag = "app_main";
 
@@ -41,7 +41,7 @@ static char *tag = "app_main";
 void initAppHook(void *params)
 {
     /** Include app commands */
-    cmd_test_init();
+    cmd_file_init();
 
     /** Initialize custom CSP interfaces */
 #ifdef LINUX
@@ -49,8 +49,8 @@ void initAppHook(void *params)
 #endif
 
     /** Init app task */
-    int t_ok = osCreateTask(taskTest, "test_cmd", 1024, NULL, 2, NULL);
-    if(t_ok != 0) LOGE("cmd-test", "Task test cmd not created!");
+    int t_ok = osCreateTask(taskTest, "test_int_file", 1024, NULL, 2, NULL);
+    if(t_ok != 0) LOGE("file-test", "Task test file not created!");
 }
 
 int main(void)
