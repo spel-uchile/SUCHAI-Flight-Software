@@ -151,5 +151,5 @@ test_fuzzing:
   script:
     - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_fuzzy-framework.sh
     - docker system prune -f
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feature/framework"'
