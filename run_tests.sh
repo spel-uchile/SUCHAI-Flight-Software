@@ -18,6 +18,42 @@ test_sgp4_enabled=1
 test_tm_io_enabled=1
 test_file_enabled=0
 
+while getopts ":b:u:c:d:l:s:t:f:h" opt; do
+    case ${opt} in
+        b )
+            test_build_enabled=$OPTARG
+            ;;
+        u )
+            test_unit_enabled=$OPTARG
+            ;;
+        c )
+            test_cmd_enabled=$OPTARG
+            ;;
+        d )
+            test_bug_delay_enabled=$OPTARG
+            ;;
+        l )
+            test_load_enabled=$OPTARG
+            ;;
+        s )
+            test_sgp4_enabled=$OPTARG
+            ;;
+        t )
+            test_tm_io_enabled=$OPTARG
+            ;;
+        f )
+            test_file_enabled=$OPTARG
+            ;;
+        \? )
+            echo "Invalid option: $OPTARG" 1>&2
+            ;;
+        : )
+            echo "Invalid option: $OPTARG requires an argument" 1>&2
+            ;;
+    esac
+done
+shift $((OPTIND -1))
+
 # Gets the current execution directory (the absolute path to this script)
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 WORKSPACE=${SCRIPT_PATH}
