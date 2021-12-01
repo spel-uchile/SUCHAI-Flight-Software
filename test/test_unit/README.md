@@ -8,19 +8,22 @@ and invalid commands and with or without arguments.
 - check commands related to the flight plan, the data repository, the quaternions 
 library and matrices usage.
 
-## Compiling parameters
+## Compile
 
-To compile the test it's necessary to add the following compilation parameters.
-
->-DAPP=test_unit
->
->-DTEST=1
-> 
->-DSCH_STORAGE_TRIPLE_WR=1
-
-It's also necessary to install CUnit library, use:
+Before compiling, it's necessary to install CUnit, to do this use:
 
 > sudo apt-get install libcunit1 libcunit1-doc libcunit1-dev
+
+To compile the test type:
+> cmake -B build-test -DAPP=test_unit -DTEST=1 -DSCH_STORAGE_TRIPLE_WR=1 && cmake --build build-test
+
+the build-test folder can be replaced by any desired name.
+
+## Run
+
+To run the experiment type
+
+> ./build-test/test/test_unit/suchai-test
 
 ## Expected results
 

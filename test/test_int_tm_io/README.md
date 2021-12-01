@@ -6,17 +6,20 @@ The purpose of the test y to verify that sending and receiving telemetry is work
 To achieve this, a payload is created, data is loaded (emulating the data collection) and sent
 to the same node, then it is checked that it has arrived correctly.
 
-### Compiling parameters
+## Compile
 
-To compile the test it's necessary to add the following compilation parameters.
+To compile the test type:
+> cmake -B build-test -DAPP=test_int_tm_io -DTEST=1 -DSCH_ST_MODE=SQLITE - DSCH_COMM_NODE=3 && cmake --build build-test
 
->-DAPP=test_int_tm_io
->
->-DTEST=1
->
->-DSCH_ST_MODE=SQLITE
->
->-DSCH_COMM_NODE=3
+the build-test folder can be replaced by any desired name.
+
+## Run
+
+To run the experiment type
+
+> ./build-test/test/test_int_tm_io/suchai-test
+
+the build-test folder must be the same as the one used to compile the test
 
 ## Expected results
 

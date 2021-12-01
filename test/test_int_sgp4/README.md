@@ -17,13 +17,20 @@ C code uses an integer (long) with milliseconds precision, while Python uses a f
 point value (double). Therefore there is a difference in the argument passed to the
 propagator: `tsince` in minutes (floating point) since epoch.
 
-### Compiling parameters
+## Compile
 
-To compile the test it's necessary to add the following compilation parameters.
+To compile the test type:
+> cmake -B build-test -DAPP=test_int_sgp4 -DTEST=1 && cmake --build build-test
 
->-DAPP=test_int_sgp4
->
->-DTEST=1
+the build-test folder can be replaced by any desired name.
+
+## Run
+
+To run the experiment type
+
+> ./build-test/test/test_int_sgp4/suchai-test
+
+the build-test folder must be the same as the one used to compile the test
 
 ## Expected results
 

@@ -2,18 +2,23 @@
 
 ## Objective
 
-The purpose of the test is to send and receive files with tm_send_file, tm_senf_file_parts and tm_merge_file and 
+The purpose of the test is to send and receive files with tm_send_file, tm_send_file_parts and tm_merge_file and 
 check the received data.
 
-### Compiling parameters
+## Compile
 
-To compile the test it's necessary to add the following compilation parameters.
+To compile the test type:
+> cmake -B build-test -DAPP=test_int_file -DTEST=1 -DSCH_COMM_NODE=3 && cmake --build build-test
 
->-DAPP=test_int_file
->
->-DTEST=1
-> 
->-DSCH_COMM_NODE=3
+the build-test folder can be replaced by any desired name.
+
+## Run
+
+To run the experiment type
+
+> ./build-test/test/test_int_file/suchai-test
+
+the build-test folder must be the same as the one used to compile the test
 
 ## Expected results
 
