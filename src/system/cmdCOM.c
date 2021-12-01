@@ -30,7 +30,6 @@ void cmd_com_init(void)
     cmd_add("com_send_data", com_send_data, "%d %d %n", 3);
     cmd_add("com_debug", com_debug, "", 0);
     cmd_add("com_set_time_node", com_set_time_node, "%d", 1);
-    cmd_add("com_set_tle_node", com_set_tle_node, "%d %s", 2);
 }
 
 int com_ping(char *fmt, char *params, int nparams)
@@ -488,102 +487,7 @@ int com_set_time_node(char *fmt, char *params, int nparams)
     }
 
     char cmd[SCH_CMD_MAX_STR_NAME];
-    sprintf(cmd, "%d obc_set_time %d", node, (int)dat_get_time());
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_time %d", node, (int)dat_get_time());
     LOGI(tag, "Sending command 'com_send_cmd %s' to %d", cmd, node);
     return com_send_cmd("%d %n", cmd, 2);
-}
-
-int com_set_tle_node(char *fmt, char *params, int nparams)
-{
-    char sat[50]; // TLE sat max name is 24
-    int rc, node;
-    memset(sat, 0, 50);
-    // fmt: %s
-    if(params == NULL || sscanf(params, fmt, &node, sat) != nparams)
-    {
-        LOGE(tag, "Error parsing params!");
-        return CMD_SYNTAX_ERROR;
-    }
-
-    // Download cubesat TLE file
-    rc = system("wget https://www.celestrak.com/NORAD/elements/cubesat.txt -O /tmp/cubesat.tle");
-    if(rc < 0)
-    {
-        LOGW(tag, "Error downloading TLE file (%d)", rc);
-        return CMD_ERROR;
-    }
-
-    // Search the required satellite tle
-    char line[100];
-    snprintf(line, 100, "cat /tmp/cubesat.tle | grep -A 2 %s > /tmp/%s.tle", sat, sat);
-    LOGI(tag, "%s", line);
-    rc = system(line);
-    if(rc < 0)
-    {
-        LOGE(tag, "Error grep TLE for %s (%d)", sat, rc);
-        return CMD_ERROR;
-    }
-
-    // Read the required TLE file
-    memset(line, 0, 100);
-    snprintf(line, 100, "/tmp/%s.tle", sat);
-    LOGI(tag, "%s", line);
-    FILE *file = fopen(line, "r");
-    if(file == NULL)
-    {
-        LOGE(tag, "Error reading file %s", line);
-    }
-
-    char cmd[SCH_CMD_MAX_STR_NAME];
-    // Read satellite name... skip
-    memset(line, 0, 100);
-    char *tle = fgets(line, 100, file);
-    if(tle == NULL)
-        return CMD_ERROR;
-    LOGD(tag, line);
-
-    // Read and send first TLE line
-    memset(line, 0, 100);
-    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
-
-    tle = fgets(line, 100, file);
-    if(tle == NULL)
-        return CMD_ERROR;
-    memset(line+69, 0, 100-69); // Clean the string from \r, \n others
-    LOGD(tag, line);
-
-    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d tle_set %s", node, line);
-    LOGD(tag, cmd);
-    rc = com_send_cmd("%d %n", cmd, 2);
-    if(rc != CMD_OK)
-        return CMD_ERROR;
-
-    // Read and send second TLE line
-    memset(line, 0, 100);
-    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
-
-    tle = fgets(line, 100, file);
-    if(tle == NULL)
-        return CMD_ERROR;
-    memset(line+69, 0, 100-69); // Clean the string from \r, \n others
-    LOGD(tag, line);
-
-    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d tle_set %s", node, line);
-    LOGD(tag, cmd);
-    rc = com_send_cmd("%d %n", cmd, 2);
-    if(rc != CMD_OK)
-        return CMD_ERROR;
-
-    // Send update tle command
-    memset(cmd, 0, SCH_CMD_MAX_STR_NAME);
-    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d tle_update", node);
-    LOGD(tag, cmd);
-    rc = com_send_cmd("%d %n", cmd, 2);
-    if(rc != CMD_OK)
-        return CMD_ERROR;
-
-    fclose(file);
-
-    LOGR(tag, "TLE sent ok!")
-    return CMD_OK;
 }
