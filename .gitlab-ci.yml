@@ -75,7 +75,7 @@ build_nanomind:
 test_unit_feature_framework:
   stage: test_linux
   script:
-    - echo "Unit testing the feature/framework branch in Linux"
+    - echo "Unit testing of the feature/framework branch in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux_framework.sh
     - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux_framework.sh test_unit
     - docker system prune -f
@@ -85,7 +85,7 @@ test_unit_feature_framework:
 test_integration_feature_framework:
   stage: test_linux
   script:
-    - echo "Integration testing the feature/framework branch in Linux"
+    - echo "Integration testing of the feature/framework branch in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux_framework.sh
     - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux_framework.sh test_int
     - docker system prune -f
