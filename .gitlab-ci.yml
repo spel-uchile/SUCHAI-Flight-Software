@@ -153,3 +153,11 @@ test_fuzzing:
     - docker system prune -f
   rules:
     - if: '$CI_COMMIT_BRANCH == "feature/framework"'
+
+test_build_framework:
+  stage: build
+  script:
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_framework.sh
+    - docker system prune -f
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feature/framework"'
