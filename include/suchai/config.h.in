@@ -61,7 +61,7 @@
 #define SCH_TRX_PORT_DBG             (13)  ///< Debug port, logs output
 #define SCH_TRX_PORT_DBG_TM          (14)  ///< Debug telemetry port, logs frames
 #define SCH_TRX_PORT_TM              (15)  ///< Telemetry port
-#define SCH_TRX_PORT_APP             (16)  ///< Telemetry port
+#define SCH_TRX_PORT_APP                  @SCH_TRX_PORT_APP@  ///< Apps telemetries starting port
 #cmakedefine SCH_COMM_NODE                @SCH_COMM_NODE@  ///< Node address
 #cmakedefine SCH_COM_MAX_PACKETS          @SCH_COM_MAX_PACKETS@  /// Max number of packets to transmit in a row before a small pause
 #cmakedefine SCH_COM_TX_DELAY_MS          @SCH_COM_TX_DELAY_MS@  /// Delay (ms) between continuous transmissions

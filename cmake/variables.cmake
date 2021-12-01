@@ -66,6 +66,7 @@ set(SCH_MAX_GND_WDT_TIMER 48*3600 CACHE STRING "Software watchdog timer")
 ##
 # Communication system settings
 ##
+set(SCH_TRX_PORT_APP 15 CACHE STRING "Application custom telemetry port number")
 set(SCH_COMM_NODE 1 CACHE STRING "This CSP node address")
 set(SCH_COM_MAX_PACKETS 10 CACHE STRING "Max. packets to transmit in a row")
 set(SCH_COM_TX_DELAY_MS 3000 CACHE STRING "Delay (ms) between continuous transmissions")

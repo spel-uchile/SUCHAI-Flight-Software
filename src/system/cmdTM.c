@@ -156,7 +156,7 @@ int tm_send_tel_from_to(int start, int end, int payload, int dest_node)
 
     // New connection
     csp_conn_t *conn;
-    conn = csp_connect(CSP_PRIO_NORM, dest_node, SCH_TRX_PORT_TM, 500, CSP_O_NONE);
+    conn = csp_connect(CSP_PRIO_NORM, dest_node, SCH_TRX_PORT_APP, 500, CSP_O_NONE);
     if(conn == NULL)
     {
         LOGE(tag, "Cannot create connection!");
@@ -409,6 +409,9 @@ int tm_parse_payload(char *fmt, char *params, int nparams)
     com_frame_t *frame = (com_frame_t *)params;
     int payload = frame->type - TM_TYPE_PAYLOAD; // Payload type
     int j, offset, errors = 0;
+
+    if(payload >= last_sensor)
+        return CMD_SYNTAX_ERROR;
 
     _ntoh32_buff(frame->data.data32, sizeof(frame->data.data8)/ sizeof(uint32_t));
 
