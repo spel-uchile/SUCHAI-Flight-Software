@@ -6,6 +6,7 @@ static const char* tag = "cmdFile";
 
 void cmd_file_init(void){
     cmd_add("file_cmp", file_cmp, "%s %s", 2);
+    cmd_add("file_del", file_delete, "%s", 1);
 }
 
 int file_cmp(char *fmt, char *params, int nparams){
@@ -23,6 +24,8 @@ int file_cmp(char *fmt, char *params, int nparams){
         LOGE(tag, "distinct number of params");
         return CMD_SYNTAX_ERROR;
     }
+    //TODO check both files exists
+
     FILE *file1;
     file1 = fopen(filename1, "r");
     FILE *file2;
@@ -48,4 +51,33 @@ int file_cmp(char *fmt, char *params, int nparams){
     else
         return CMD_ERROR;
 
+}
+
+int _unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
+    int rv = remove(fpath);
+
+    if (rv)
+        perror(fpath);
+
+    return rv;
+}
+
+int file_delete(char *fmt, char *params, int nparams){
+
+    if(params == NULL)
+    {
+        LOGE(tag, "params is null!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    char *path;
+    if(sscanf(params, fmt, path) != nparams)
+    {
+        LOGE(tag, "distinct number of params");
+        return CMD_SYNTAX_ERROR;
+    }
+    int rc = nftw(path, _unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
+
+    return rc == 0 ? CMD_OK : CMD_ERROR;
 }
