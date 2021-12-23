@@ -40,10 +40,8 @@ void initAppHook(void *params)
     cmd_app_dummy_init();
 
     /** Init app tasks */
-
-    /** Example task */
-    int t_ok_cos = osCreateTask(taskTest, "test", 1024, NULL, 2, NULL);
-    if(t_ok_cos != 0) LOGE("test-tle", "Task test TLE not created!");
+    int t_ok = osCreateTask(taskTest, "test-tm-io", 1024, NULL, 2, NULL);
+    if(t_ok != 0) LOGE("test-tm-io", "Task test tm-io not created!");
 
 }
 
