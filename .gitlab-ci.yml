@@ -159,7 +159,7 @@ test_sequences:
 test_fuzzing:
   stage: test_fuzz
   script:
-    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_fuzzy-framework.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs bash install_test_fuzzy-framework.sh
     - docker system prune -f
   rules:
     - if: '$CI_COMMIT_BRANCH == "feature/framework"'
