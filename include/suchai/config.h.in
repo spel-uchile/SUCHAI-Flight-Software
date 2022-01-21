@@ -21,6 +21,7 @@
 /* Select one operating system */
 #cmakedefine LINUX                       1
 #cmakedefine FREERTOS                    2
+#cmakedefine SIM                         3
 #cmakedefine SCH_OS                      @SCH_OS@  ///< Operating system port | FREERTOS
 /* Select the correct architecture */
 #cmakedefine X86                         10
@@ -60,7 +61,7 @@
 #define SCH_TRX_PORT_DBG             (13)  ///< Debug port, logs output
 #define SCH_TRX_PORT_DBG_TM          (14)  ///< Debug telemetry port, logs frames
 #define SCH_TRX_PORT_TM              (15)  ///< Telemetry port
-#define SCH_TRX_PORT_APP             (16)  ///< Telemetry port
+#define SCH_TRX_PORT_APP                  @SCH_TRX_PORT_APP@  ///< Apps telemetries starting port
 #cmakedefine SCH_COMM_NODE                @SCH_COMM_NODE@  ///< Node address
 #cmakedefine SCH_COM_MAX_PACKETS          @SCH_COM_MAX_PACKETS@  /// Max number of packets to transmit in a row before a small pause
 #cmakedefine SCH_COM_TX_DELAY_MS          @SCH_COM_TX_DELAY_MS@  /// Delay (ms) between continuous transmissions
@@ -68,6 +69,8 @@
 #cmakedefine SCH_CSP_SOCK_LEN             @SCH_CSP_SOCK_LEN@  ///< Max number of packets in a connection queue
 #cmakedefine SCH_COMM_ZMQ_IN              @SCH_COMM_ZMQ_IN@  ///< CSP ZMQ In socket URI
 #cmakedefine SCH_COMM_ZMQ_OUT             @SCH_COMM_ZMQ_OUT@  ///< CSP ZMQ Out socket URI
+#cmakedefine SCH_CSP_CONN_TIMEOUT         @SCH_CSP_CONN_TIMEOUT@  ///< CSP connection accept timeout
+#cmakedefine SCH_CSP_READ_TIMEOUT         @SCH_CSP_READ_TIMEOUT@  ///< CSP connection read timeout
 
 /* Data repository settings */
 #cmakedefine SCH_ST_RAM                   0

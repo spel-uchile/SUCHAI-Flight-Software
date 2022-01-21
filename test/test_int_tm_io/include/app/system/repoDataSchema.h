@@ -14,17 +14,6 @@
 #include "suchai/log_utils.h"
 #include "suchai/storage.h"
 
-///**
-// * Struct for storing a single timed command, set to execute in the future.
-// */
-//typedef struct __attribute__((packed)) fp_entry {
-//    int unixtime;               ///< Unix-time, sets when the command should next execute
-//    char* cmd;                  ///< Command to execute
-//    char* args;                 ///< Command's arguments
-//    int executions;             ///< Amount of times the command will be executed per periodic cycle
-//    int periodical;             ///< Period of time between executions
-//} fp_entry_t;
-
 /**
  * Enum constants for dynamically identifying system status fields at execution time.
  *
@@ -69,11 +58,20 @@ typedef enum dat_status_address_enum {
     dat_fpl_last,                 ///< Last executed flight plan (unix time)
     dat_fpl_queue,                ///< Flight plan queue length
 
+    /// ADS: Attitude determination system
+    dat_ads_pos_x,                ///< Satellite orbit position x (ECI)
+    dat_ads_pos_y,                ///< Satellite orbit position y (ECI)
+    dat_ads_pos_z,                ///< Satellite orbit position z (ECI)
+    dat_ads_tle_epoch,            ///< Current TLE epoch, 0 if TLE is invalid
+    dat_ads_tle_last,             ///< Las time position was propagated
+
     /// Memory: Current payload memory addresses
     dat_drp_idx_temp,                 ///< Temperature data index
+    dat_drp_idx_dummy,                ///< Dummy data index
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
+    dat_drp_ack_dummy,            ///< Dummy data acknowledge
 
     /// Add a new status variables address here
     //dat_custom,                 ///< Variable description
@@ -145,8 +143,15 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_fpl_queue,         "fpl_queue",         'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
         {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, -1},          ///< General operation mode
         {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, -1},          ///< RTC current unix time
+        {dat_ads_pos_x,         "ads_pos_x",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position x (ECI)
+        {dat_ads_pos_y,         "ads_pos_y",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position y (ECI)
+        {dat_ads_pos_z,         "ads_pos_z",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position z (ECI)
+        {dat_ads_tle_epoch,     "ads_tle_epoch",     'd', DAT_IS_STATUS, 0},          ///< Current TLE epoch, 0 if TLE is invalid
+        {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, 0},          ///< Last time position was propagated
         {dat_drp_idx_temp,      "drp_idx_temp",      'u', DAT_IS_STATUS, 0},          ///< Temperature data index
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
+        {dat_drp_idx_dummy,     "drp_idx_dummy",     'u', DAT_IS_STATUS, 0},          ///< Dummy data index
+        {dat_drp_ack_dummy,     "drp_ack_dummy",     'u', DAT_IS_CONFIG, 0},          ///< Dummy data acknowledge
 };
 ///< The dat_status_last_var constant serves for looping through all status variables
 static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_status_list[0]);
@@ -166,6 +171,19 @@ typedef struct __attribute__((__packed__)) temp_data {
 } temp_data_t;
 
 /**
+ * Struck for storing dummy data.
+ */
+typedef struct __attribute__((__packed__)) dummy_data {
+    uint32_t index;
+    uint32_t timestamp;
+    int16_t v1;
+    int16_t v2;
+    float v3;
+    int32_t v4;
+    char str1[SCH_ST_STR_SIZE];
+} dummy_data_t;
+
+/**
  * Enum constants for dynamically identifying payload fields at execution time.
  *
  * Also permits adding payload fields cheaply.
@@ -182,6 +200,7 @@ typedef struct __attribute__((__packed__)) temp_data {
  */
 typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
+    dummy_sensor,           ///< Dummy sensors
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
 
@@ -196,6 +215,7 @@ typedef struct __attribute__((__packed__)) sta_data {
 
 static data_map_t data_map[] = {
     {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_drp_idx_temp, dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
+    {"dummy_data",     (uint16_t) (sizeof(dummy_data_t)), dat_drp_idx_dummy, dat_drp_ack_dummy,"%u %u %h %h %f %d %s", "sat_index timestamp v1 v2 v3 v4 str1"},
 };
 
 /** The repository's name */

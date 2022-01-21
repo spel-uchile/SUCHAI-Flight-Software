@@ -58,11 +58,7 @@ void dat_repo_init(void)
 #if SCH_STORAGE_MODE == SCH_ST_RAM
     else // Reset variables (we do not have persistent storage here)
     {
-        int index;
-        for(index=0; index < dat_status_last_address; index++)
-        {
-            dat_set_status_var(index, dat_get_status_var_def(index).value);
-        }
+        dat_reset_status_vars();
     }
 #endif
 
@@ -208,6 +204,17 @@ value32_t dat_get_status_var_name(char *name)
     return dat_get_status_var(var.address);
 }
 
+int dat_reset_status_vars(void)
+{
+    int rc = SCH_ST_OK;
+    for(int index=0; index < dat_status_last_address; index++)
+    {
+        rc += dat_set_status_var(index, dat_get_status_var_def(index).value);
+    }
+
+    return rc == SCH_ST_OK ? SCH_ST_OK : SCH_ST_ERROR;
+}
+
 int dat_set_fp(int timetodo, char* command, char* args, int executions, int periodical)
 {
     int entries = dat_get_system_var(dat_fpl_queue);
@@ -230,7 +237,7 @@ int dat_get_fp(int elapsed_sec, char* command, char* args, int* executions, int*
     int entries = dat_get_system_var(dat_fpl_queue);
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     //Enter critical zone
-    rc =storage_flight_plan_get_args(elapsed_sec, command, args, executions, period, &node);
+    rc = storage_flight_plan_get_args(elapsed_sec, command, args, executions, period, &node);
     if(rc == SCH_ST_OK)
         rc = storage_flight_plan_delete_row(elapsed_sec);
     else
@@ -309,6 +316,17 @@ int dat_show_fp (void)
             LOGR(tag, "%s\t%s\t%s\t%d\t%d\t%d\n", buffer, fp_i.cmd, fp_i.args, fp_i.executions, fp_i.periodical, fp_i.node);
         }
     }
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+    return rc;
+}
+
+int dat_get_fp_st_index(int index, fp_entry_t *fp_entry)
+{
+    int rc;
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //Enter critical zone
+    rc = storage_flight_plan_get_idx(index, fp_entry);
     //Exit critical zone
     osSemaphoreGiven(&repo_data_sem);
     return rc;
@@ -406,6 +424,26 @@ int dat_get_recent_payload_sample(void* data, int payload, int offset)
     return ret;
 }
 
+int dat_delete_payload(int payload)
+{
+    if(payload >= last_sensor)
+        return SCH_ST_ERROR;
+
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    //Enter critical zone
+    int rc = storage_payload_reset_table(payload);
+    //Exit critical zone
+    osSemaphoreGiven(&repo_data_sem);
+
+    if(rc == SCH_ST_OK)
+    {
+        dat_set_system_var(data_map[payload].sys_index, 0);
+        dat_set_system_var(data_map[payload].sys_ack, 0);
+    }
+
+    return rc;
+}
+
 int dat_delete_memory_sections(void)
 {
     int ret;
@@ -473,6 +511,51 @@ int dat_print_payload_struct(void* data, unsigned int payload)
     free(types);
     free(names);
 
+    return 0;
+}
+
+int dat_fprint_payload_struct(FILE *stream, void* data, unsigned int payload)
+{
+    if(stream == NULL)
+        return -1;
+
+    char *types = strdup(data_map[payload].data_order);
+    const char *sep = " ";
+    char *type_tmp;
+    char *type = strtok_r(types, sep, &type_tmp);
+    char *tmp;
+    while(type != NULL)
+    {
+        switch (type[1]) {
+            case 'f':
+                fprintf(stream, type, *(float *)data);
+                data += sizeof(float);
+                break;
+            case 'u':
+            case 'i':
+            case 'd':
+                fprintf(stream, type, *(int32_t *)data);
+                data += sizeof(int32_t);
+                break;
+            case 'h':
+                fprintf(stream, "%hi", *(int16_t *)data);
+                data += sizeof(int16_t);
+                break;
+            case 's':
+                tmp = strndup((char *)data, SCH_ST_STR_SIZE);
+                fprintf(stream, type, tmp);
+                free(tmp);
+                data += SCH_ST_STR_SIZE;
+                break;
+            default:
+                data ++;
+                break;
+        }
+        fprintf(stream, ",");
+        type = strtok_r(NULL, sep, &type_tmp);
+    }
+    fprintf(stream, "\n");
+    free(types);
     return 0;
 }
 

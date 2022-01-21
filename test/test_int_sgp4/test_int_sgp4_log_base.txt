@@ -1,0 +1,627 @@
+
+
+--------- FLIGHT SOFTWARE START ---------
+	 Version: 3.0.0-rc.1-3-g9e60
+	 Device : 1 (SUCHAI-FS)
+-----------------------------------------
+
+[INFO ][1637201928][fs_main] Creating basic tasks...
+[INFO ][1637201928][Dispatcher] Started
+[WARN] (invoker) Failed to assign task priority, try as root
+[WARN] (receiver) Failed to assign task priority, try as root
+[INFO ][1637201928][Executer] Started
+[WARN] (watchdog) Failed to assign task priority, try as root
+[INFO ][1637201928][WDT] Started
+[INFO ][1637201928][taskInit] SETUP REPOSITORIES...
+[WARN] (init) Failed to assign task priority, try as root
+[INFO ][1637201928][taskInit] SETUP VARIABLES...
+[INFO ][1637201928][taskInit] PURGE FLIGHT PLAN...
+[INFO ][1637201928][taskInit] SETUP CSP...
+[INFO ][1637201928][taskInit] Initialising CSP...
+[INFO ][1637201928][taskInit] CSP Node: 1
+[INFO ][1637201928][taskInit] CREATE TASKS...
+[INFO ][1637201928][Console] Started
+[WARN] (console) Failed to assign task priority, try as root
+Index Name                    Params
+    0 obc_ident[WARN] (comm) Failed to assign task priority, try as root
+
+    1 obc_debug %d
+    2 obc_exit
+    3 obc_reset %d
+    4 obc_get_mem
+    5 obc_set_time %d
+    6 obc_get_time %d
+    7 obc_reset_wdt %d
+    8 obc_system %s
+    9 obc_set_cwd %s
+   10 obc_get_cwd
+   11 obc_ls %s
+   12 obc_rm %s
+   13 obc_mkdir %s
+   14 drp_ebf %d
+   15 drp_reset_payload %d %d
+   16 drp_reset_status %d
+   17 drp_print_vars
+   18 drp_set_var %d %f
+   19 drp_set_var_name %s %f
+   20 drp_get_var_name %s
+   21 drp_add_hrs_alive %d
+   22 drp_clear_gnd_wdt
+   23 test %s
+   24 help
+   25 log_set %d %d
+   26 fp_set_cmd %d %d %d %d %d %d %d %d %s %n
+   27 fp_set_cmd_unix %d %d %d %s %n 
+   28 fp_set_cmd_dt %d %d %d %s %n
+   29 fp_del_cmd %d %d %d %d %d %d
+   30 fp_del_cmd_unix %d
+   31 fp_show
+   32 fp_reset
+   33 fp_purge
+   34 com_ping %d
+   35 com_send_rpt %d %s
+   36 com_send_cmd %d %n
+   37 com_send_tc %d %n
+   38 com_send_data %d %d %n
+   39 com_debug
+   40 com_set_time_node %d
+   41 com_set_tle_node %d %s
+   42 tm_parse_status
+   43 tm_parse_string
+   44 tm_send_status %d
+   45 tm_send_var %d %s
+   46 tm_get_last %u
+   47 tm_get_single %u %u
+   48 tm_send_last %u %u
+   49 tm_send_all %u %u
+   50 tm_send_n %u %u %u
+   51 tm_parse_payload %
+   52 tm_set_ack %u %u
+   53 tm_send_cmds %d
+   54 tm_send_fp %d
+   55 tm_print_fp
+   56 tm_send_file %s %d
+   57 tm_parse_file
+   58 tm_send_file_part %s %d %d %d %d
+   59 tm_merge_file %s %d
+   60 tm_ls %s %d
+[INFO ][1637201928][Console] 
+______________________________________________________________________________
+                     ___ _   _  ___ _  _   _   ___ 
+                    / __| | | |/ __| || | /_\ |_ _|
+                    \__ \ |_| | (__| __ |/ _ \ | | 
+                    |___/\___/ \___|_||_/_/ \_\___|
+______________________________________________________________________________
+
+
+[WARN] (flightplan) Failed to assign task priority, try as root
+[INFO ][1637201928][Communications] Started
+[INFO ][1637201928][FlightPlan] Started
+[1;32mBinding socket 0x55ed0b7dabd0 to port 32
+[0;0m[1;32mINIT ZMQHUB: pub(tx): [tcp://127.0.0.1:8002], sub(rx): [tcp://127.0.0.1:8001], rx filters: 1
+[0;0m[1;32mRX ZMQHUB started
+[0;0m[INFO ][1637201928][sgp4_test_task] Started
+[INFO ][1637201928][sgp4_test_task] ----SGP4 propagator test ----
+[WARN] (test_sgp4) Failed to assign task priority, try as root
+[INFO ][1637201928][taskInit] EXIT INIT TASK
+[INFO] Canceling thread 140001302775552
+[INFO ][1637201928][sgp4_test_task] /home/lurrea/Desktop/suchai-flight-software/build-test/test/test_int_sgp4/data.csv
+[INFO ][1637201928][sgp4_test_task] /home/lurrea/Desktop/suchai-flight-software/build-test/test/test_int_sgp4/test_1637201928.csv
+[INFO ][1637201928][sgp4_test_task] ---- Sending PROP Commands ----
+[INFO ][1637201928][Executer] Running the command: tle_set...
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: tle_set...
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: tle_update...
+[RES  ][1637201928][cmdTLE] TLE updated to epoch 1600976420075.52001953 (1600976420)
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: tle_get...
+[RES  ][1637201928][cmdTLE] 1 42788U 17036Z   20268.81967680  .00001527  00000-0  65841-4 0  9992
+[RES  ][1637201928][cmdTLE] 2 42788  97.2921 320.6805 0012366  42.2734 317.9454 15.23993159181016
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: -75.520020 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.012000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.083000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 59924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.006000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.017000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 119924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.005000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.013000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 179924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.010000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 239924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 299924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.003000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.012000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 359924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.004000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.016000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 419924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 479924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 539924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 599924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 659924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.003000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 719924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.003000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 779924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 839924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 899924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 959924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.003000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1019924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1079924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1139924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1199924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1259924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1319924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1379924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1439924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1499924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1559924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1619924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1679924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.003000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1739924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1799924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1859924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1919924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 1979924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2039924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.003000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.009000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2099924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.008000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2159924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2219924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2279924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2339924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2399924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2459924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2519924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2579924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2639924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2699924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2759924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.007000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2819924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2879924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2939924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 2999924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3059924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3119924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3179924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3239924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3299924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3359924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3419924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3479924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3539924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.000000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.003000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3599924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3659924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3719924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3779924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.003000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3839924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.003000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3899924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 3959924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4019924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4079924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4139924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4199924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4259924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4319924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.003000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4379924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.000000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.003000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+[INFO ][1637201928][sgp4_test_task] ---- Sending CMP Command ----
+diff: 4439924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.009000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.012000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][sgp4_test_task] ---- Sending Exit Command ----
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4499924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4559924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4619924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4679924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4739924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4799924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4859924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.015000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.035000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4919924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 4979924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.005000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5039924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.005000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5099924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.005000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5159924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.002000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.005000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5219924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5279924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5339924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5399924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5459924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5519924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.018000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5579924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.005000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5639924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.005000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5699924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5759924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5819924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5879924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.003000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_prop...
+diff: 5939924.479980 
+[INFO ][1637201928][cmdTestTLE] getRVForDate: 0.001000 ms
+[INFO ][1637201928][cmdTestTLE] Total time  : 0.004000 ms
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: _test_tle_comp...
+[INFO ][1637201928][cmdTestTLE] Typical errors r=3.958718e+03 mm, v=4.383888e+00 mm/s
+[INFO ][1637201928][Executer] Command result: 1
+[INFO ][1637201928][Executer] Running the command: obc_reset...

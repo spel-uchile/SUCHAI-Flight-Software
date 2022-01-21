@@ -164,10 +164,10 @@ static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_stat
  * @endcode
  */
 typedef enum payload_id {
-    float_data=0,      ///< Data 1
-    half_data,        ///< Data 1
-    string_data,      ///< Data 1
-    mix_data,         ///< Data 1
+    float_data=0,     ///< Data 1
+    half_data,        ///< Data 2
+    string_data,      ///< Data 3
+    mix_data,         ///< Data 4
     last_sensor       ///< Dummy element, the amount of payload variables
 } payload_id_t;
 
@@ -222,7 +222,7 @@ typedef struct __attribute__((__packed__)) sta_data {
     uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
 } sta_data_t;
 
-static data_map_t data_map[] = {
+static data_map_t data_map[last_sensor] = {
     {"dat_unit_float", (uint16_t) (sizeof(float_data_t)), dat_drp_idx_data1, dat_drp_ack_data1, "%u %u %d %f", "sat_index timestamp data1 data2"},
     {"dat_unit_half", (uint16_t) (sizeof(half_data_t)), dat_drp_idx_data2, dat_drp_ack_data2, "%u %u %h %h", "sat_index timestamp data1 data2"},
     {"dat_unit_string", (uint16_t) (sizeof(string_data_t)), dat_drp_idx_data3, dat_drp_ack_data3, "%u %u %s %s", "sat_index timestamp data1 data2"},

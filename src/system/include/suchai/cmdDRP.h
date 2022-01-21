@@ -40,6 +40,28 @@ void cmd_drp_init(void);
 int drp_execute_before_flight(char *fmt, char *params, int nparams);
 
 /**
+ * This command resets a specific payload table, deleting all its content.
+ * The command is executed with a "Magic Number" as a parameter to avoid
+ * unintended calls. See @SCH_DRP_MAGIC.
+ * @param fmt "%d %d"
+ * @param params <payload> <MAGIC_NUMBER>
+ * @param nparams Number of parameters: 2
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int drp_reset_payload(char *fmt, char *params, int nparams);
+
+/**
+ * This command resets all status variables to their default values
+ * The command is executed with a "Magic Number" as a parameter to avoid
+ * unintended calls. See @SCH_DRP_MAGIC.
+ * @param fmt "%d%
+ * @param params <MAGIC_NUMBER>
+ * @param nparams Number of parameters: 1
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int drp_reset_status(char *fmt, char *params, int nparams);
+
+/**
  * Display system related variables. Variables are read from system variables
  * data repository
  *

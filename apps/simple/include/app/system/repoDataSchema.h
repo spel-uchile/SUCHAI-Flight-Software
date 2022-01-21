@@ -194,7 +194,7 @@ typedef struct __attribute__((__packed__)) sta_data {
     uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
 } sta_data_t;
 
-static data_map_t data_map[] = {
+static data_map_t data_map[last_sensor] = {
     {"temp_data",      (uint16_t) (sizeof(temp_data_t)), dat_drp_idx_temp, dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
 };
 

@@ -66,6 +66,7 @@ set(SCH_MAX_GND_WDT_TIMER 48*3600 CACHE STRING "Software watchdog timer")
 ##
 # Communication system settings
 ##
+set(SCH_TRX_PORT_APP 15 CACHE STRING "Application custom telemetry port number")
 set(SCH_COMM_NODE 1 CACHE STRING "This CSP node address")
 set(SCH_COM_MAX_PACKETS 10 CACHE STRING "Max. packets to transmit in a row")
 set(SCH_COM_TX_DELAY_MS 3000 CACHE STRING "Delay (ms) between continuous transmissions")
@@ -73,6 +74,8 @@ set(SCH_CSP_BUFFERS 100 CACHE STRING "Available CSP buffers")
 set(SCH_CSP_SOCK_LEN 100 CACHE STRING "Max number of packets in a connection queue")
 set(SCH_COMM_ZMQ_IN  \"tcp://127.0.0.1:8001\" CACHE STRING "CSP ZMQ IN socket URI")
 set(SCH_COMM_ZMQ_OUT \"tcp://127.0.0.1:8002\" CACHE STRING "CSP ZMQ OUT socket URI")
+set(SCH_CSP_CONN_TIMEOUT 1000 CACHE STRING "CSP connection accept timeout")
+set(SCH_CSP_READ_TIMEOUT 100 CACHE STRING "CSP connection read timeout")
 ##
 # Data repository system settings
 ##

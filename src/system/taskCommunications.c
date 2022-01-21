@@ -60,16 +60,16 @@ void taskCommunications(void *param)
     while(1)
     {
         /* CSP SERVER */
-        /* Wait for connection, 1000 ms timeout */
-        if((conn = csp_accept(sock, 1000)) == NULL)
+        /* Wait for connection, 1000 ms timeout by default*/
+        if((conn = csp_accept(sock, SCH_CSP_CONN_TIMEOUT)) == NULL)
             continue; /* Try again later */
 
-        /* Read packets. Timeout is 500 ms */
-        while ((packet = csp_read(conn, 500)) != NULL)
+        /* Read packets. Timeout is 100 ms by default*/
+        while ((packet = csp_read(conn, SCH_CSP_READ_TIMEOUT)) != NULL)
         {
             count_tc = dat_get_system_var(dat_com_count_tc) + 1;
             dat_set_system_var(dat_com_count_tc, count_tc);
-            dat_set_system_var(dat_com_last_tc, (int) time(NULL));
+            dat_set_system_var(dat_com_last_tc, (int)dat_get_time());
 
             switch (csp_conn_dport(conn))
             {
@@ -99,7 +99,7 @@ void taskCommunications(void *param)
                         if (rc != 0)
                             csp_buffer_free(packet); // Free the packet in case of errors
                     }
-                    // If i am receiving a broadcast packet just print
+                    // If I am receiving a broadcast packet just print
                     else
                     {
                         LOGI(tag, "RPT: %s", (char *)(packet->data));
@@ -152,7 +152,8 @@ void taskCommunications(void *param)
                         taskCommunicationsHook(conn, packet);
                     #endif
                     /* Let the service handler reply pings, buffer use, etc. */
-                    csp_service_handler(conn, packet);
+                    if(packet != NULL)
+                        csp_service_handler(conn, packet);
                     break;
             }
         }
@@ -237,6 +238,12 @@ static void com_receive_tm(csp_packet_t *packet)
     else if(frame->type == TM_TYPE_HELP)
     {
         cmd_parse_tm = cmd_get_str("tm_parse_string");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
+    else if(frame->type == TM_TYPE_FP)
+    {
+        cmd_parse_tm = cmd_get_str("tm_print_fp");
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }

@@ -706,5 +706,22 @@ int storage_payload_reset(void)
 
 int storage_payload_reset_table(int payload)
 {
-    return SCH_ST_ERROR;
+    if(db == NULL || payloads_schema == NULL || storage_is_open == 0 || payload >= payloads_entries)
+        return SCH_ST_ERROR;
+
+    char *err_msg;
+    char *sql = sqlite3_mprintf("DELETE FROM %s", payloads_schema[payload].table);
+
+    /* Execute SQL statement */
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+
+    if (rc != SQLITE_OK) {
+        sqlite3_free(err_msg);
+        sqlite3_free(sql);
+        return SCH_ST_ERROR;
+    }
+
+    sqlite3_free(err_msg);
+    sqlite3_free(sql);
+    return SCH_ST_OK;
 }

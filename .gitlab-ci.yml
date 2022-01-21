@@ -3,6 +3,7 @@ stages:
   - configure_docker
   - build
   - test_linux
+  - test_fuzz
 
 create_vis:
   stage: create_vis
@@ -74,9 +75,19 @@ build_nanomind:
 test_unit_feature_framework:
   stage: test_linux
   script:
-    - echo "Testing the feature/framework branch in Linux"
+    - echo "Unit testing of the feature/framework branch in Linux"
     - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux_framework.sh
     - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux_framework.sh test_unit
+    - docker system prune -f
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feature/framework"'
+
+test_integration_feature_framework:
+  stage: test_linux
+  script:
+    - echo "Integration testing of the feature/framework branch in Linux"
+    - echo "Going to execute the following commands" && docker run -i suchai-fs cat install_test_linux_framework.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_test_linux_framework.sh test_int
     - docker system prune -f
   rules:
     - if: '$CI_COMMIT_BRANCH == "feature/framework"'
@@ -133,7 +144,7 @@ test_sgp4:
   only:
     - master
 
-test_fuzz:
+test_sequences:
   stage: test_linux
   script:
     - echo "Testing in Linux"
@@ -144,3 +155,19 @@ test_fuzz:
     - docker system prune -f
   only:
     - master
+
+test_fuzzing:
+  stage: test_fuzz
+  script:
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs bash install_test_fuzzy-framework.sh
+    - docker system prune -f
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feature/framework"'
+
+test_build_framework:
+  stage: build
+  script:
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs sh install_build_framework.sh
+    - docker system prune -f
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "feature/framework"'

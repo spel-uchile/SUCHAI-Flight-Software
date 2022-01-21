@@ -1,4 +1,4 @@
-# SGP4 Test
+# Test Int SGP4
 
 This test compares the SUCHAI SGP4 propagator results with Python 
 Skyfield SGP4 propagator (https://pypi.org/project/sgp4).
@@ -16,3 +16,24 @@ The main sources of errors is the TLE epoch calculated in the Python and C code.
 C code uses an integer (long) with milliseconds precision, while Python uses a floating 
 point value (double). Therefore there is a difference in the argument passed to the
 propagator: `tsince` in minutes (floating point) since epoch.
+
+## Compile
+
+To compile the test type:
+> cmake -B build-test -DAPP=test_int_sgp4 -DTEST=1 && cmake --build build-test
+
+the build-test folder can be replaced by any desired name.
+
+## Run
+
+To run the experiment type
+
+> ./build-test/test/test_int_sgp4/suchai-test
+
+the build-test folder must be the same as the one used to compile the test
+
+## Expected results
+
+All the Command result's numbers must be 1, otherwise the test will fail.
+
+The expected console output is in the test_int_sgp4_log_base.txt file.

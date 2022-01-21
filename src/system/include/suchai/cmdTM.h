@@ -19,6 +19,8 @@
 #include "suchai/repoData.h"
 #include "suchai/cmdCOM.h"
 
+#include "unistd.h"
+
 #define TM_TYPE_GENERIC 0
 #define TM_TYPE_STATUS  1
 #define TM_TYPE_HELP    2
@@ -27,6 +29,16 @@
 #define TM_TYPE_FILE_DATA 101
 #define TM_TYPE_FILE_END 102
 #define TM_TYPE_FILE_PART 103
+#define TM_TYPE_FP 105
+
+#define FP_CMDARGS_MAX_LEN (192-16) //COM_FRAME_MAX_LEN - 16
+typedef struct fp_container_s{
+    int32_t unixtime;               ///< Unix-time, sets when the command should next execute
+    int32_t executions;             ///< Amount of times the command will be executed per periodic cycle
+    int32_t periodical;             ///< Period of time between executions
+    int32_t node;                   ///< Node to execute the command
+    char cmd_args[FP_CMDARGS_MAX_LEN]; ///< Command and arguments to execute
+} fp_container_t;
 
 /**
  * Register TM commands
@@ -157,9 +169,37 @@ int tm_set_ack(char *fmt, char *params, int nparams);
  */
 int tm_get_single(char *fmt, char *params, int nparams);
 
-int tm_send_cmds(char *fmt, char *params, int nparms);
+int tm_send_cmds(char *fmt, char *params, int nparams);
 
-#ifdef LINUX
+/**
+ * Sends flight plan entry as string to node
+ * @param fmt "%d
+ * @param params <node>
+ * @param nparams 1
+ * @return CMD_OK if got the fp entry correctly
+ */
+int tm_send_fp(char *fmt, char *params, int nparams);
+
+/**
+ * Parses and prints flight plan
+ * @param fmt ""
+ * @param params <>
+ * @param nparams 0
+ * @return CMD_OK
+ */
+int tm_print_fp(char *fmt, char *params, int nparams);
+
+#if defined(LINUX) || defined(SIM)
+/**
+ * Write payload data to a file.
+ * @param fmt "%d %s"
+ * @param params "<payload> <filename>"
+ * @param nparams 2
+ * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
+ */
+int tm_dump(char *fmt, char *params, int nparams);
+
+
 /**
  * Send a file using CSP
  *
