@@ -2,7 +2,10 @@
 
 #ifndef _IGRF13_H
 int TransMagaxisToECI(const double* mag, double* pos, double lonrad, double thetarad, double gmst);
-void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double* mag);
+int RotationX(const double* bfr, double* aft, double theta);
+int RotationY(const double* bfr, double* aft, double theta);
+int RotationZ(const double* bfr, double* aft, double theta);
+void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double side, double* mag);
 void read_model();
 void calc_mag_coords();
 int interpsh(double date, double dte1, int nmax1, double dte2,int nmax2, int gh);

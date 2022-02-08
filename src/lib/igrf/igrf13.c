@@ -197,17 +197,69 @@ static double fdot, hdot, idot, xdot, ydot, zdot;
 static double warn_H_val, warn_H_strong_val;
 static double gccolat;
 
-//int TransMagaxisToECI(const double* mag, double* pos, double lonrad, double thetarad, double gmst)
-//{
-//    RotationY(mag, pos, 180 * DEG2RAD - thetarad);
-//    RotationZ(pos, pos, -lonrad);
-//    RotationZ(pos, pos, -gmst);
-//
-//    return 0;
-//}
+int TransMagaxisToECI(const double* mag, double* pos, double lonrad, double thetarad, double gmst)
+{
+    RotationY(mag, pos, 180 * DEG2RAD - thetarad);
+    RotationZ(pos, pos, -lonrad);
+    RotationZ(pos, pos, -gmst);
+
+    return 0;
+}
+
+// For coordinate conversion
+// Rotation function z-axis circumference [rad]
+int RotationZ(const double* bfr, double* aft, double theta)
+{
+    double temp[3];
+
+    temp[0] = cos(theta)*bfr[0] + sin(theta)*bfr[1];
+    temp[1] = -sin(theta)*bfr[0] + cos(theta)*bfr[1];
+    temp[2] = bfr[2];
+
+    for (int i=0;i<3;i++) {
+        aft[i] = temp[i];
+    }
+
+    return 0;
+}
+
+// For coordinate conversion
+// Rotation function y-axis circumference [rad]
+int RotationY(const double* bfr, double* aft, double theta)
+{
+    double temp[3];
+
+    temp[0] = cos(theta)*bfr[0] - sin(theta)*bfr[2];
+    temp[1] = bfr[1];
+    temp[2] = sin(theta)*bfr[0] + cos(theta)*bfr[2];
+
+    for (int i=0;i<3;i++) {
+        aft[i] = temp[i];
+    }
+
+    return 0;
+}
+
+// For coordinate conversion
+// Rotation function x-axis circumference [rad]
+int RotationX(const double* bfr, double* aft, double theta)
+{
+    double temp[3];
+
+    temp[0] = bfr[0];
+    temp[1] = cos(theta)*bfr[1] + sin(theta)*bfr[2];
+    temp[2] = -sin(theta)*bfr[1] + cos(theta)*bfr[2];
+
+    for (int i=0;i<3;i++) {
+        aft[i] = temp[i];
+    }
+
+    return 0;
+}
 
 
-void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double* mag)
+
+void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double side, double* mag)
 {
     sdate= decyear;
     alt = altm;
@@ -228,7 +280,8 @@ void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double*
     testglobal[0] = mag[0];
     testglobal[1] = mag[1];
     testglobal[2] = mag[2];
-//    TransMagaxisToECI(mag, mag, lonrad, gccolat, side);
+
+    TransMagaxisToECI(mag, mag, lonrad, gccolat, side);
 }
 
 void calc_mag_coords()
@@ -337,7 +390,7 @@ void calc_mag_coords()
 
 void read_model()
 {
-    char model_file_name[] = "../SatAttSim/src/Library/igrf/IGRF13.COF";
+    char model_file_name[] = "IGRF13.COF";
     strncpy(mdfile, model_file_name, MAXREAD);
     stream=fopen(mdfile, "rt");
 
