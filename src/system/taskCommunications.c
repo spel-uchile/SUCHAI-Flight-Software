@@ -148,7 +148,7 @@ void taskCommunications(void *param)
                 default:
                     #ifdef SCH_HOOK_COMM
                     /* Let user application handle a packet */
-                    if(csp_conn_dport(conn) >= SCH_TRX_PORT_APP)
+                    if(csp_conn_dport(conn) > SCH_TRX_PORT_TM)
                         taskCommunicationsHook(conn, packet);
                     #endif
                     /* Let the service handler reply pings, buffer use, etc. */
