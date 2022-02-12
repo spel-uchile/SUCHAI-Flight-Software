@@ -92,3 +92,7 @@ set(SCH_STORAGE_FILE \"/tmp/suchai.db\" CACHE STRING "File to store the database
 set(SCH_STORAGE_PGUSER 0 CACHE STRING "PSQL User, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES")
 set(SCH_STORAGE_PGPASS 0 CACHE STRING "PSQL password, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES")
 set(SCH_STORAGE_PGHOST 0 CACHE STRING "PSQL password, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES")
+##
+# Buffer sizes
+##
+set(SCH_CMD_QUEUE_LEN 50 CACHE STRING "Command queue len")
