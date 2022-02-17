@@ -197,27 +197,30 @@ static double fdot, hdot, idot, xdot, ydot, zdot;
 static double warn_H_val, warn_H_strong_val;
 static double gccolat;
 
-int TransMagaxisToECI(const double* mag, double* pos, double lonrad, double thetarad, double gmst)
+int TransMagaxisToECI(vector3_t mag_ned,vector3_t * mag_eci, double lonrad, double thetarad, double gmst)
 {
-    RotationY(mag, pos, 180 * DEG2RAD - thetarad);
-    RotationZ(pos, pos, -lonrad);
-    RotationZ(pos, pos, -gmst);
+    vector3_t temp1;
+    vector3_t temp2;
+
+    RotationY(mag_ned, &temp1, 180 * DEG2RAD - thetarad);
+    RotationZ(temp1, &temp2, -lonrad);
+    RotationZ(temp2, mag_eci, -gmst);
 
     return 0;
 }
 
 // For coordinate conversion
 // Rotation function z-axis circumference [rad]
-int RotationZ(const double* bfr, double* aft, double theta)
+int RotationZ(vector3_t bfr, vector3_t * aft, double theta)
 {
     double temp[3];
+    theta = theta;
+    temp[0] = cos(theta) * bfr.v[0] - sin(theta) * bfr.v[1];
+    temp[1] = sin(theta) * bfr.v[0] + cos(theta) * bfr.v[1];
+    temp[2] = bfr.v[2];
 
-    temp[0] = cos(theta)*bfr[0] + sin(theta)*bfr[1];
-    temp[1] = -sin(theta)*bfr[0] + cos(theta)*bfr[1];
-    temp[2] = bfr[2];
-
-    for (int i=0;i<3;i++) {
-        aft[i] = temp[i];
+    for (int i = 0; i < 3 ;i++) {
+        aft->v[i] = temp[i];
     }
 
     return 0;
@@ -225,16 +228,16 @@ int RotationZ(const double* bfr, double* aft, double theta)
 
 // For coordinate conversion
 // Rotation function y-axis circumference [rad]
-int RotationY(const double* bfr, double* aft, double theta)
+int RotationY(vector3_t bfr, vector3_t * aft, double theta)
 {
     double temp[3];
+    theta = theta;
+    temp[0] = cos(theta) * bfr.v[0] + sin(theta) * bfr.v[2];
+    temp[1] = bfr.v[1];
+    temp[2] = - sin(theta) * bfr.v[0] + cos(theta) * bfr.v[2];
 
-    temp[0] = cos(theta)*bfr[0] - sin(theta)*bfr[2];
-    temp[1] = bfr[1];
-    temp[2] = sin(theta)*bfr[0] + cos(theta)*bfr[2];
-
-    for (int i=0;i<3;i++) {
-        aft[i] = temp[i];
+    for (int i = 0; i < 3 ;i++) {
+        aft->v[i] = temp[i];
     }
 
     return 0;
@@ -259,7 +262,7 @@ int RotationX(const double* bfr, double* aft, double theta)
 
 
 
-void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double side, double* mag)
+void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double side, vector3_t * mag)
 {
     sdate= decyear;
     alt = altm;
@@ -273,15 +276,16 @@ void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double 
     }
 
     calc_mag_coords();
-    mag[0] = x;
-    mag[1] = y;
-    mag[2] = z;
+    vector3_t mag_ned;
+    mag_ned.v0 = x;
+    mag_ned.v1 = y;
+    mag_ned.v2 = z;
 
-    testglobal[0] = mag[0];
-    testglobal[1] = mag[1];
-    testglobal[2] = mag[2];
+    //testglobal[0] = mag[0];
+    //testglobal[1] = mag[1];
+    //testglobal[2] = mag[2];
 
-    TransMagaxisToECI(mag, mag, lonrad, gccolat, side);
+    TransMagaxisToECI(mag_ned, mag, lonrad, gccolat, side);
 }
 
 void calc_mag_coords()
