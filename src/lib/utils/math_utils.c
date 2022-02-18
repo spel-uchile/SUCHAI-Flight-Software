@@ -128,7 +128,7 @@ int vec_normalize(vector3_t *vec, vector3_t *res)
 double vec_inner_product(vector3_t lhs, vector3_t rhs)
 {
     double res = 0;
-    for(int i=1; i<3; ++i) {
+    for(int i=0; i<3; ++i) {
         res += lhs.v[i] * rhs.v[i];
     }
     return res;
@@ -438,4 +438,55 @@ void eskf_update_mag(vector3_t mag_sensor, vector3_t mag_i, double P[6][6], matr
         if (i > 2) continue;
         wb->v[i] = wb1.v[i];
     }
+}
+
+quaternion_t quat_from_dcm(matrix3_t dcm){
+
+    quaternion_t q;
+
+    q.q0 = sqrt(1 + dcm.m[0][0] - dcm.m[1][1] - dcm.m[2][2]) / 2;
+    q.q1 = sqrt(1 - dcm.m[0][0] + dcm.m[1][1] - dcm.m[2][2]) / 2;
+    q.q2 = sqrt(1 - dcm.m[0][0] - dcm.m[1][1] + dcm.m[2][2]) / 2;
+    q.q3 = sqrt(1 + dcm.m[0][0] + dcm.m[1][1] + dcm.m[2][2]) / 2;
+
+    double maxval = 0;
+    int maxidx = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        // maximum value
+        if (abs_double(q.q[i]) > maxval)
+        {
+            maxval = abs_double(q.q[i]);
+            maxidx = i;
+        }
+    }
+    // Normalize by the maximum value
+    switch (maxidx)
+    {
+        case 0:
+            q.q[1] = (dcm.m[0][1] + dcm.m[1][0]) / (4 * q.q[0]);
+            q.q[2] = (dcm.m[0][2] + dcm.m[2][0]) / (4 * q.q[0]);
+            q.q[3] = (dcm.m[1][2] - dcm.m[2][1]) / (4 * q.q[0]);
+            break;
+        case 1:
+            q.q[0] = (dcm.m[0][1] + dcm.m[1][0]) / (4 * q.q[1]);
+            q.q[2] = (dcm.m[2][1] + dcm.m[1][2]) / (4 * q.q[1]);
+            q.q[3] = (dcm.m[2][0] - dcm.m[0][2]) / (4 * q.q[1]);
+            break;
+        case 2:
+            q.q[0] = (dcm.m[2][0] + dcm.m[0][2]) / (4 * q.q[2]);
+            q.q[1] = (dcm.m[2][1] + dcm.m[1][2]) / (4 * q.q[2]);
+            q.q[3] = (dcm.m[0][1] - dcm.m[1][0]) / (4 * q.q[2]);
+            break;
+        case 3:
+            q.q[0] = (dcm.m[1][2] - dcm.m[2][1]) / (4 * q.q[3]);
+            q.q[1] = (dcm.m[2][0] - dcm.m[0][2]) / (4 * q.q[3]);
+            q.q[2] = (dcm.m[0][1] - dcm.m[1][0]) / (4 * q.q[3]);
+            break;
+    }
+    return q;
+}
+
+double abs_double(double x){
+    return sqrt(pow(x, 2));
 }

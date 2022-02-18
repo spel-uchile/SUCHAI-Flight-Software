@@ -247,6 +247,10 @@ void mat_inverse(matrix3_t mat, matrix3_t* res);
  */
 void mat_transpose(matrix3_t* mat, matrix3_t* res);
 
+quaternion_t quat_from_dcm(matrix3_t dcm);
+
+double abs_double(double x);
+
 void _mat_cons_mult(double  a, double * mat, double *res, int n_x, int n_y);
 
 void _mat_vec_mult(double * mat, double * vec, double * res, int n_x, int n_y);
