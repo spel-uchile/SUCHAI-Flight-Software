@@ -353,7 +353,7 @@ int com_send_file(int node, char *name, void *data, size_t n_bytes)
     rc_send = com_send_file_parts(node, name, strlen(name)+1, fileid, 0, data_frames+1, TM_TYPE_FILE_START, conn);
 
     // Send data packets
-    if(rc_send)
+    if(rc_send && n_data_bytes > 0)
         rc_send = com_send_file_parts(node, data, n_data_bytes, fileid, 1, data_frames+1, TM_TYPE_FILE_DATA, conn);
 
     // Send final packet

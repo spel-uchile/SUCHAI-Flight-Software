@@ -84,6 +84,7 @@
 #cmakedefine SCH_STORAGE_PGPASS           @SCH_STORAGE_PGPASS@  ///< PSQL password, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
 #cmakedefine SCH_STORAGE_PGHOST           @SCH_STORAGE_PGHOST@  ///< PSQL host, only if @SCH_STORAGE_MODE is SCH_ST_POSTGRES
 
+#define SCH_CMD_QUEUE_LEN                 @SCH_CMD_QUEUE_LEN@  ///< Commands queue length
 #define SCH_FP_MAX_ENTRIES           (255)  ///< Max number of flight plan entries
 #define SCH_CMD_MAX_ENTRIES          (255)  ///< Max number of commands in the repository
 #define SCH_SECTIONS_PER_PAYLOAD     (10)  ///< Memory blocks for storing each payload type TODO: Make configurable per payload

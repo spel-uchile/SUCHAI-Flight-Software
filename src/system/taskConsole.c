@@ -22,7 +22,7 @@
 
 static const char *tag = "Console";
 static const char *cmd_hist = "/tmp/suchai_fs_history.txt";
-
+static char console_prompt[15] = "SUCHAI> ";
 const char console_banner[] =
 "\n______________________________________________________________________________\n\
                      ___ _   _  ___ _  _   _   ___ \n\
@@ -92,7 +92,7 @@ int console_read(char *buffer, int len)
 {
 #ifdef LINUX
     char *line;
-    line = linenoise("SUCHAI> ");
+    line = linenoise(console_prompt);
     if(line == NULL)
         return -1;
 
@@ -137,4 +137,12 @@ int console_read(char *buffer, int len)
     }
 
     return 0;
+}
+
+void console_set_prompt(char *prompt)
+{
+    if(prompt != NULL) {
+        strncpy(console_prompt, prompt, 12);
+        strcat(console_prompt, "> ");
+    }
 }

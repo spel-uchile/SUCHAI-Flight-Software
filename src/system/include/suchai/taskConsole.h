@@ -28,5 +28,6 @@
 void taskConsole(void *param);
 int console_init(void);
 int console_read(char *buffer, int len);
+void console_set_prompt(char *prompt);
 
 #endif //T_CONSOLE_H

@@ -45,7 +45,7 @@ int suchai_main(void)
     osSemaphoreCreate(&repo_data_sem);
 
     /* Initializing shared Queues */
-    dispatcher_queue = osQueueCreate(25,sizeof(cmd_t *));
+    dispatcher_queue = osQueueCreate(SCH_CMD_QUEUE_LEN,sizeof(cmd_t *));
     executer_stat_queue = osQueueCreate(1,sizeof(int));
     executer_cmd_queue = osQueueCreate(1,sizeof(cmd_t *));
 
