@@ -50,6 +50,19 @@ typedef union vector3 {
     };
 }vector3_t;
 
+typedef union vector7 {
+    double v[7];    ///< Vector as array [x, y, z]
+    struct {
+        double v0;  ///< Vector x
+        double v1;  ///< Vector y
+        double v2;  ///< Vector z
+        double v3;  ///< Vector z
+        double v4;  ///< Vector z
+        double v5;  ///< Vector z
+        double v6;  ///< Vector z
+    };
+}vector7_t;
+
 /**
  * 3x3 matrix structure
  */
@@ -113,6 +126,22 @@ typedef union matrix10_9 {
         double row9[9];
     };
 }matrix10_9_t;
+
+typedef union matrix10_7 {
+    double m[10][7];    ///< Matrix as array
+    struct {
+        double row0[7];
+        double row1[7];
+        double row2[7];
+        double row3[7];
+        double row4[7];
+        double row5[7];
+        double row6[7];
+        double row7[7];
+        double row8[7];
+        double row9[7];
+    };
+}matrix10_7_t;
 
 typedef union matrix9_10 {
     double m[9][10];    ///< Matrix as array
