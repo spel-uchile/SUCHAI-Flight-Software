@@ -164,9 +164,24 @@ void vec_cons_mult(double a, vector3_t *vec, vector3_t *res)
     }
 }
 
+void quat_cons_mult(double a, quaternion_t *vec, quaternion_t *res)
+{
+    for(int i=0; i<3; ++i){
+        if(res != NULL)
+            res->q[i] = vec->q[i] * a;
+        else
+            vec->q[i] = vec->q[i] * a;
+    }
+}
+
 void mat_vec_mult(matrix3_t mat, vector3_t vec, vector3_t * res)
 {
     _mat_vec_mult((double *) mat.m, (double *) vec.v, (double *) res->v,3, 3);
+}
+
+void mat_quat_mult(matrix4_t mat, quaternion_t vec, quaternion_t * res)
+{
+    _mat_vec_mult((double *) mat.m, (double *) vec.q, (double *) res->q,4, 4);
 }
 
 void mat_mat_mult(matrix3_t lhs, matrix3_t rhs, matrix3_t* res)
@@ -184,6 +199,26 @@ void mat_set_diag(matrix3_t *m, double a, double b, double c)
     m->row0[0] = a; m->row0[1] = 0; m->row0[2] = 0;
     m->row1[0] = 0; m->row1[1] = b; m->row1[2] = 0;
     m->row2[0] = 0; m->row2[1] = 0; m->row2[2] = c;
+}
+
+void mat_set_diag4x(matrix4_t *m, double a, double b, double c, double d)
+{
+    m->row0[0] = a; m->row0[1] = 0; m->row0[2] = 0; m->row0[3] = 0;
+    m->row1[0] = 0; m->row1[1] = b; m->row1[2] = 0; m->row1[3] = 0;
+    m->row2[0] = 0; m->row2[1] = 0; m->row2[2] = c; m->row2[3] = 0;
+    m->row3[0] = 0; m->row3[1] = 0; m->row3[2] = 0; m->row3[3] = d;
+}
+
+void mat_cons_mult(double a, matrix3_t * m, matrix3_t * res)
+{
+    for (int i=0; i<3; i++){
+        for (int j=0; j<3; j++){
+            if(res != NULL)
+                res->m[i][j] = m->m[i][j] * a;
+            else
+                m->m[i][j] = m->m[i][j] * a;
+        }
+    }
 }
 
 void mat_transpose(matrix3_t* mat, matrix3_t* res)

@@ -62,6 +62,115 @@ typedef union matrix3 {
     };
 }matrix3_t;
 
+typedef union matrix4 {
+    double m[4][4];    ///< Matrix as array
+    struct {
+        double row0[4];
+        double row1[4];
+        double row2[4];
+        double row3[4];
+    };
+}matrix4_t;
+
+typedef union matrix3_4 {
+    double m[4][3];    ///< Matrix as array
+    struct {
+        double row0[3];
+        double row1[3];
+        double row2[3];
+        double row3[3];
+    };
+}matrix3_4_t;
+
+typedef union matrix10 {
+    double m[10][10];    ///< Matrix as array
+    struct {
+        double row0[10];
+        double row1[10];
+        double row2[10];
+        double row3[10];
+        double row4[10];
+        double row5[10];
+        double row6[10];
+        double row7[10];
+        double row8[10];
+        double row9[10];
+    };
+}matrix10_t;
+
+typedef union matrix10_9 {
+    double m[10][9];    ///< Matrix as array
+    struct {
+        double row0[9];
+        double row1[9];
+        double row2[9];
+        double row3[9];
+        double row4[9];
+        double row5[9];
+        double row6[9];
+        double row7[9];
+        double row8[9];
+        double row9[9];
+    };
+}matrix10_9_t;
+
+typedef union matrix9_10 {
+    double m[9][10];    ///< Matrix as array
+    struct {
+        double row0[10];
+        double row1[10];
+        double row2[10];
+        double row3[10];
+        double row4[10];
+        double row5[10];
+        double row6[10];
+        double row7[10];
+        double row8[10];
+    };
+}matrix9_10_t;
+
+typedef union matrix9 {
+    double m[9][9];    ///< Matrix as array
+    struct {
+        double row0[9];
+        double row1[9];
+        double row2[9];
+        double row3[9];
+        double row4[9];
+        double row5[9];
+        double row6[9];
+        double row7[9];
+        double row8[9];
+    };
+}matrix9_t;
+
+typedef union matrix7 {
+    double m[7][7];    ///< Matrix as array
+    struct {
+        double row0[7];
+        double row1[7];
+        double row2[7];
+        double row3[7];
+        double row4[7];
+        double row5[7];
+        double row6[7];
+    };
+}matrix7_t;
+
+
+typedef union matrix7_10 {
+    double m[7][10];    ///< Matrix as array
+    struct {
+        double row0[10];
+        double row1[10];
+        double row2[10];
+        double row3[10];
+        double row4[10];
+        double row5[10];
+        double row6[10];
+    };
+}matrix7_10_t;
+
 /**
  * Calculates unit quaternion from a pure vector.
  * @param axis vector of dimension 3.
@@ -195,6 +304,9 @@ void vec_cons_mult(double a, vector3_t *vec, vector3_t *res);
  */
 void mat_vec_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
 
+void mat_quat_mult(matrix4_t mat, quaternion_t vec, quaternion_t * res);
+void quat_cons_mult(double a, quaternion_t *vec, quaternion_t *res);
+
 /**
  * Calculates (3x3) matrix product:
  * res = rhs * lhs
@@ -203,6 +315,8 @@ void mat_vec_mult(matrix3_t mat, vector3_t vec, vector3_t * res);
  * @param res matrix multiplication result (3x3).
  */
 void mat_mat_mult(matrix3_t lhs, matrix3_t rhs, matrix3_t* res);
+
+void mat_cons_mult(double a, matrix3_t * m, matrix3_t * res);
 
 /**
  * Calculates (3x3) matrix sum:
@@ -225,6 +339,8 @@ void mat_mat_sum(matrix3_t lhs, matrix3_t rhs, matrix3_t* res);
  * @param c diagonal value
  */
 void mat_set_diag(matrix3_t *m, double a, double b, double c);
+
+void mat_set_diag4x(matrix4_t *m, double a, double b, double c, double d);
 
 /**
  * Calculates skew matrix from a 3 dimension vector

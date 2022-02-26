@@ -154,15 +154,37 @@ int my_isnan(double d)
 
 #define MAXDEG 13
 #define MAXCOEFF (MAXDEG*(MAXDEG+2)+1) /* index starts with 1!, (from old Fortran?) */
-static double gh1[MAXCOEFF];
-static double gh2[MAXCOEFF];
+//static double gh1[MAXCOEFF];
+static double gh1[MAXCOEFF] = {0, -29404.80, -1450.90, 4652.50, -2499.60, 2982.00, -2991.60, 1677.00, -734.60, 1363.20,
+                                 -2381.20, -82.10, 1236.20, 241.90, 525.70, -543.40, 903.00, 809.50, 281.90, 86.30,
+                                 -158.40, -309.40, 199.70, 48.00, -349.70, -234.30, 363.20, 47.70, 187.80, 208.30, -140.70,
+                                 -121.20, -151.20, 32.30, 13.50, 98.90, 66.00, 65.50, -19.10, 72.90, 25.10, -121.50, 52.80,
+                                 -36.20, -64.50, 13.50, 8.90, -64.70, 68.10, 80.60, -76.70, -51.50, -8.20, -16.90, 56.50,
+                                 2.20, 15.80, 23.50, 6.40, -2.20, -7.20, -27.20, 9.80, -1.80, 23.70, 9.70, 8.40, -17.60,
+                                 -15.30, -0.50, 12.80, -21.10, -11.70, 15.30, 14.90, 13.70, 3.60, -16.50, -6.90, -0.30,
+                                 2.80, 5.00, 8.40, -23.40, 2.90, 11.00, -1.50, 9.80, -1.10, -5.10, -13.20, -6.30, 1.10,
+                                 7.80, 8.80, 0.40, -9.30, -1.40, -11.90, 9.60, -1.90, -6.20, 3.40, -0.10, -0.20, 1.70, 3.60,
+                                 -0.90, 4.80, 0.70, -8.60, -0.90, -0.10, 1.90, -4.30, 1.40, -3.40, -2.40, -0.10, -3.80, -8.80,
+                                 3.00, -1.40, 0.0,-2.50, 2.50, 2.30, -0.60, -0.90, -0.40, 0.30, 0.60, -0.70, -0.20, -0.10, -1.70,
+                                 1.40, -1.60, -0.60, -3.00, 0.20, -2.00, 3.10, -2.60, -2.00, -0.10, -1.20, 0.50, 0.50, 1.30,
+                                 1.40, -1.20, -1.80, 0.70, 0.10, 0.30, 0.80, 0.50, -0.20, -0.30, 0.60, -0.50, 0.20, 0.10, -0.90,
+                                 -1.10 , 0.0,-0.30, 0.50, 0.10, -0.90, -0.90, 0.50, 0.60, 0.70, 1.40, -0.30, -0.40, 0.80, -1.30,
+                                 0, -0.10, 0.80, 0.30, 0, -0.10, 0.40, 0.50, 0.10, 0.50, 0.50, -0.40, -0.50, -0.40, -0.40, -0.60};
+//static double gh2[MAXCOEFF];
+static double gh2[MAXCOEFF] = {0,05.70,7.40,-25.90,-11.00,-7.00,-30.20,-2.10,-22.40,2.20,
+                                 -5.90,6.00,3.10,-1.10,-12.00,0.50,-1.20,-1.60,-0.10,
+                                 -5.90,6.50,5.20,3.60,-5.10,-5.00,-0.30,0.50,0, -0.60,2.50,
+                                 0.20,-0.60,1.30,3.00,0.90,0.30,-0.50,-0.30,0, 0.40,-1.60,
+                                 1.30,-1.30,-1.40,0.80,0, 0, 0.90,1.00,-0.10,-0.20,0.60,0, 0.60,
+                                 0.70,-0.80,0.10,-0.20,-0.50,-1.10,-0.80,0.10,0.80,0.30,
+                                 0, 0.10,-0.20,-0.10,0.60,0.40,-0.20,-0.10,0.50,0.40,-0.30,
+                                 0.30,-0.40,-0.10,0.50,0.40};
 static double gha[MAXCOEFF];              /* Geomag global variables */
 static double ghb[MAXCOEFF];
 static double d=0,f=0,h=0,i=0;
 static double dtemp,ftemp,htemp,itemp;
 static double x=0,y=0,z=0;
 static double xtemp,ytemp,ztemp;
-
 FILE *stream = NULL;                /* Pointer to specified model data file */
 static int   warn_H, warn_H_strong, warn_P;
 static int   modelI;             /* Which model (Index) */
@@ -202,9 +224,9 @@ int TransMagaxisToECI(vector3_t mag_ned,vector3_t * mag_eci, double lonrad, doub
     vector3_t temp1;
     vector3_t temp2;
 
-    RotationY(mag_ned, &temp1, 180 * DEG2RAD - thetarad);
-    RotationZ(temp1, &temp2, -lonrad);
-    RotationZ(temp2, mag_eci, -gmst);
+    RotationY(mag_ned, &temp1, -1 * (180 * DEG2RAD - thetarad));
+    RotationZ(temp1, &temp2, lonrad);
+    RotationZ(temp2, mag_eci, gmst);
 
     return 0;
 }
@@ -269,10 +291,23 @@ void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double 
     latitude = latrad*RAD2DEG;
     longitude = lonrad*RAD2DEG;
 
-    static int first_flg = 1;
+    static int first_flg = 0;
     if (first_flg) {
         read_model();
         first_flg = 0;
+    }
+    else{
+        yrmin[0] = 2020;
+        modelI = 0;
+        minyr = 2020;
+        maxyr = 2025;
+        yrmax[0] = 2025;
+        epoch[0] = 2020;
+        max1[0] = 13;
+        max2[0] = 8;
+        max3[0] = 0;
+        altmin[0] = -1;
+        altmax[0] = 600;
     }
 
     calc_mag_coords();
@@ -280,6 +315,8 @@ void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double 
     mag_ned.v0 = x;
     mag_ned.v1 = y;
     mag_ned.v2 = z;
+
+    printf("mag NED: %f, %f, %f", x, y, z);
 
     //testglobal[0] = mag[0];
     //testglobal[1] = mag[1];
@@ -290,17 +327,17 @@ void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double 
 
 void calc_mag_coords()
 {
-    if ((sdate>maxyr)&&(sdate<maxyr+1))
-    {
-        printf("\nWarning: The date %4.2f is out of range,\n", sdate);
-        printf("         but still within one year of model expiration date.\n");
-        printf("         An updated model file is available before 1.1.%4.0f\n",maxyr);
-    }
+    //if ((sdate>maxyr)&&(sdate<maxyr+1))
+    //{
+    //    printf("\nWarning: The date %4.2f is out of range,\n", sdate);
+    //    printf("         but still within one year of model expiration date.\n");
+    //    printf("         An updated model file is available before 1.1.%4.0f\n",maxyr);
+    //}
 
     /* Pick model */
-    for (modelI=0; modelI<nmodel; modelI++)
-        if (sdate<yrmax[modelI]) break;
-    if (modelI == nmodel) modelI--;           /* if beyond end of last model use last model */
+    //for (modelI=0; modelI<nmodel; modelI++)
+    //    if (sdate<yrmax[modelI]) break;
+    //if (modelI == nmodel) modelI--;           /* if beyond end of last model use last model */
 
     /* Get altitude min and max for selected model. */
     minalt=altmin[modelI];
@@ -309,7 +346,7 @@ void calc_mag_coords()
     /* Get Coordinate prefs */
 
     igdgc= 1;
-    minalt*=1000.0;
+    minalt*=1000.0; // pass to meter
     maxalt*=1000.0;
 
     if((alt<minalt)||(alt>maxalt))
@@ -317,7 +354,7 @@ void calc_mag_coords()
         printf("\n\nEnter geodetic altitude above mean sea level in meters (%.2f to %.2f): ", minalt, maxalt);
     }
 
-    alt *= 0.001;
+    alt *= 0.001; // pass to km
 
     if (max2[modelI] == 0)
     {
@@ -330,8 +367,9 @@ void calc_mag_coords()
     }
     else
     {
-        getshc(mdfile, 1, irec_pos[modelI], max1[modelI], 1);
-        getshc(mdfile, 0, irec_pos[modelI], max2[modelI], 2);
+        //getshc(mdfile, 1, irec_pos[modelI], max1[modelI], 1);
+        //getshc(mdfile, 0, irec_pos[modelI], max2[modelI], 2);
+
         nmax = extrapsh(sdate, epoch[modelI], max1[modelI], max2[modelI], 3);
         nmax = extrapsh(sdate+1, epoch[modelI], max1[modelI], max2[modelI], 4);
     }
@@ -572,6 +610,9 @@ int getshc(char file[PATH], int iflag, long int strec, int nmax_of_gh, int gh)
                   fgets(inbuff, MAXREAD, stream);
                   sscanf(inbuff, "%d%d%lg%lg%lg%lg%s%d",
                          &n, &m, &g, &hh, &trash, &trash, irat, &line_num);
+                  if (g == 0){
+                      printf("%d, %d", n, m, "\n");
+                  }
                 }
               else
                 {
@@ -612,6 +653,22 @@ int getshc(char file[PATH], int iflag, long int strec, int nmax_of_gh, int gh)
         }
     }
   fclose(stream);
+  /**
+  if  (iflag == 1) {
+      for (int cc = 1; cc < 196; cc++) {
+          if (gh1[cc] != gh1v2[cc]) {
+              printf("ERROR gh1 %d", cc, "\n");
+          }
+      }
+  }
+  else{
+      for (int cc = 1; cc < 196; cc++) {
+          if (gh2[cc] != gh2v2[cc]) {
+              printf("ERROR gh2 %d", cc, "\n");
+          }
+      }
+  }
+   **/
   return(ios);
 }
 
