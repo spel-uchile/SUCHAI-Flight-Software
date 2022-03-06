@@ -415,5 +415,8 @@ void eskf_integrate(quaternion_t q, vector3_t omega, double dt, quaternion_t * r
 void eskf_compute_error(vector3_t omega, double dt, double P[6][6], double Q[6][6]);
 
 void eskf_update_mag(vector3_t mag_sensor, vector3_t mag_i, double P[6][6], matrix3_t * R, quaternion_t * q, vector3_t * wb);
-
+void calc_inverse_matrix(matrix7_t S_j, matrix7_t * S_j_i);
+void calc_cofactor(matrix7_t lhs, matrix7_t * res, int f);
+double calc_determinant(matrix7_t a, int k);
+matrix7_t calc_transpose(matrix7_t num, matrix7_t fac, int r);
 #endif //MATH_UTILS_H

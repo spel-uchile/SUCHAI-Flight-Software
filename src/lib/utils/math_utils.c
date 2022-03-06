@@ -13,6 +13,7 @@ void quat_sum(quaternion_t *q1, quaternion_t *q2, quaternion_t *res)
 }
 
 void quat_mult(quaternion_t *lhs, quaternion_t *rhs, quaternion_t *res) {
+    // i, j, k, 1
     res->q[0] = lhs->q[3]*rhs->q[0]-lhs->q[2]*rhs->q[1]+lhs->q[1]*rhs->q[2]+lhs->q[0]*rhs->q[3];
     res->q[1] = lhs->q[2]*rhs->q[0]+lhs->q[3]*rhs->q[1]-lhs->q[0]*rhs->q[2]+lhs->q[1]*rhs->q[3];
     res->q[2] =-lhs->q[1]*rhs->q[0]+lhs->q[0]*rhs->q[1]+lhs->q[3]*rhs->q[2]+lhs->q[2]*rhs->q[3];
@@ -45,6 +46,7 @@ void quat_inverse(quaternion_t *q, quaternion_t *res)
 
 void quat_conjugate(quaternion_t *q, quaternion_t *res)
 {
+    // i, j, k, 1
     res->q[0] = -q->q[0];
     res->q[1] = -q->q[1];
     res->q[2] = -q->q[2];
@@ -53,14 +55,30 @@ void quat_conjugate(quaternion_t *q, quaternion_t *res)
 
 void quat_frame_conv(quaternion_t *q_rot_a2b, vector3_t *v_a, vector3_t *v_b)
 {
-    double q0 = q_rot_a2b->q3; // real part
-    double q1 = q_rot_a2b->q0; // i
-    double q2 = q_rot_a2b->q1; // j
-    double q3 = q_rot_a2b->q2; // k
+    quaternion_t q_conj;
+    quat_conjugate(q_rot_a2b, &q_conj);
+    quaternion_t vec_as_quat;
+    vec_as_quat.q[0] = v_a->v[0];
+    vec_as_quat.q[1] = v_a->v[1];
+    vec_as_quat.q[2] = v_a->v[2];
+    vec_as_quat.q[3] = 0;
 
-    v_b->v[0] = (2.0 * pow(q0, 2.0) - 1.0 + 2.0 * pow(q1, 2.0)) * v_a->v[0] + (2 * q1 * q2 + 2.0 * q0 * q3) * v_a->v[1] + (2.0 * q1 * q3 - 2.0 * q0 * q2) * v_a->v[2];
-    v_b->v[1] = (2.0 * q1 * q2 - 2.0 * q0 * q3) * v_a->v[0] + (2 * pow(q2, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a->v[1] + (2.0 * q2 * q3 + 2.0 * q0 * q1) * v_a->v[2];
-    v_b->v[2] = (2.0 * q1 * q3 + 2.0 * q0 * q2) * v_a->v[0] + (2 * q2 * q3 - 2.0 * q0 * q1) * v_a->v[1] + (2.0 * pow(q3, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a->v[2];
+    quaternion_t temp;
+    quat_mult(&q_conj, &vec_as_quat, &temp);
+    quaternion_t res_vec;
+    quat_mult(&temp, q_rot_a2b, &res_vec);
+
+    v_b->v[0] = res_vec.q[0];
+    v_b->v[1] = res_vec.q[1];
+    v_b->v[2] = res_vec.q[2];
+    //double q0 = q_rot_a2b->q3; // real part
+    //double q1 = q_rot_a2b->q0; // i
+    //double q2 = q_rot_a2b->q1; // j
+    //double q3 = q_rot_a2b->q2; // k
+
+    //v_b->v[0] = (2.0 * pow(q0, 2.0) - 1.0 + 2.0 * pow(q1, 2.0)) * v_a->v[0] + (2 * q1 * q2 + 2.0 * q0 * q3) * v_a->v[1] + (2.0 * q1 * q3 - 2.0 * q0 * q2) * v_a->v[2];
+    //v_b->v[1] = (2.0 * q1 * q2 - 2.0 * q0 * q3) * v_a->v[0] + (2 * pow(q2, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a->v[1] + (2.0 * q2 * q3 + 2.0 * q0 * q1) * v_a->v[2];
+    //v_b->v[2] = (2.0 * q1 * q3 + 2.0 * q0 * q2) * v_a->v[0] + (2 * q2 * q3 - 2.0 * q0 * q1) * v_a->v[1] + (2.0 * pow(q3, 2.0) + 2.0 * pow(q0, 2.0) - 1.0) * v_a->v[2];
 }
 
 void quat_to_dcm(quaternion_t * q, matrix3_t * res)
@@ -261,6 +279,124 @@ void mat_inverse(matrix3_t mat, matrix3_t* res)
     res->m[0][0] = A/detmat; res->m[0][1] = D/detmat, res->m[0][2] = G/detmat;
     res->m[1][0] = B/detmat; res->m[1][1] = E/detmat, res->m[1][2] = H/detmat;
     res->m[2][0] = C/detmat; res->m[2][1] = F/detmat, res->m[2][2] = I/detmat;
+}
+
+void calc_inverse_matrix(matrix7_t S_j, matrix7_t * S_j_i){
+    calc_cofactor(S_j, S_j_i, 7);
+}
+
+
+// function for cofactor calculation
+void calc_cofactor(matrix7_t lhs, matrix7_t * res, int f)
+{
+    matrix7_t b, fac;
+    int p, q, m, n, i, j;
+    for (q = 0;q < f; q++)
+    {
+        for (p = 0;p < f; p++)
+        {
+            m = 0;
+            n = 0;
+            for (i = 0;i < f; i++)
+            {
+                for (j = 0;j < f; j++)
+                {
+                    if (i != q && j != p)
+                    {
+                        b.m[m][n] = lhs.m[i][j];
+                        if (n < (f - 2))
+                            n++;
+                        else
+                        {
+                            n = 0;
+                            m++;
+                        }
+                    }
+                }
+            }
+            fac.m[q][p] = pow(-1, q + p) * calc_determinant(b, f - 1);
+        }
+    }
+    matrix7_t temp1;
+    temp1 = calc_transpose(lhs, fac, f);
+    res->m[0][0] = temp1.m[0][0]; res->m[0][1] = temp1.m[0][1]; res->m[0][2] = temp1.m[0][2]; res->m[0][3] = temp1.m[0][3]; res->m[0][4] = temp1.m[0][4]; res->m[0][5] = temp1.m[0][5]; res->m[0][6] = temp1.m[0][6];
+    res->m[1][0] = temp1.m[1][0]; res->m[1][1] = temp1.m[1][1]; res->m[1][2] = temp1.m[1][2]; res->m[1][3] = temp1.m[1][3]; res->m[1][4] = temp1.m[1][4]; res->m[1][5] = temp1.m[1][5]; res->m[1][6] = temp1.m[1][6];
+    res->m[2][0] = temp1.m[2][0]; res->m[2][1] = temp1.m[2][1]; res->m[2][2] = temp1.m[2][2]; res->m[2][3] = temp1.m[2][3]; res->m[2][4] = temp1.m[2][4]; res->m[2][5] = temp1.m[2][5]; res->m[2][6] = temp1.m[2][6];
+    res->m[3][0] = temp1.m[3][0]; res->m[3][1] = temp1.m[3][1]; res->m[3][2] = temp1.m[3][2]; res->m[3][3] = temp1.m[3][3]; res->m[3][4] = temp1.m[3][4]; res->m[3][5] = temp1.m[3][5]; res->m[3][6] = temp1.m[3][6];
+    res->m[4][0] = temp1.m[4][0]; res->m[4][1] = temp1.m[4][1]; res->m[4][2] = temp1.m[4][2]; res->m[4][3] = temp1.m[4][3]; res->m[4][4] = temp1.m[4][4]; res->m[4][5] = temp1.m[4][5]; res->m[4][6] = temp1.m[4][6];
+    res->m[5][0] = temp1.m[5][0]; res->m[5][1] = temp1.m[5][1]; res->m[5][2] = temp1.m[5][2]; res->m[5][3] = temp1.m[5][3]; res->m[5][4] = temp1.m[5][4]; res->m[5][5] = temp1.m[5][5]; res->m[5][6] = temp1.m[5][6];
+    res->m[6][0] = temp1.m[6][0]; res->m[6][1] = temp1.m[6][1]; res->m[6][2] = temp1.m[6][2]; res->m[6][3] = temp1.m[6][3]; res->m[6][4] = temp1.m[6][4]; res->m[6][5] = temp1.m[6][5]; res->m[6][6] = temp1.m[6][6];
+}
+
+
+///function to find the transpose of a matrix
+matrix7_t calc_transpose(matrix7_t num, matrix7_t fac, int r)
+{
+    int i, j;
+    matrix7_t b;
+    double d;
+    matrix7_t inverse;
+
+    for (i = 0;i < r; i++)
+    {
+        for (j = 0;j < r; j++)
+        {
+            b.m[i][j] = fac.m[j][i];
+        }
+    }
+
+    d = calc_determinant(num, r);
+    for (i = 0;i < r; i++)
+    {
+        for (j = 0;j < r; j++)
+        {
+            inverse.m[i][j] = b.m[i][j] / d;
+        }
+    }
+    return inverse;
+}
+
+// function for the calculation of determinant
+double calc_determinant(matrix7_t a, int k)
+{
+    float s = 1;
+    double det;
+    matrix7_t b;
+    int i, j, m, n, c;
+    if (k == 1)
+    {
+        return (a.m[0][0]);
+    }
+    else
+    {
+        det = 0;
+        for (c = 0; c < k; c++)
+        {
+            m = 0;
+            n = 0;
+            for (i = 0;i < k; i++)
+            {
+                for (j = 0 ;j < k; j++)
+                {
+                    b.m[i][j] = 0;
+                    if (i != 0 && j != c)
+                    {
+                        b.m[m][n] = a.m[i][j];
+                        if (n < (k - 2))
+                            n++;
+                        else
+                        {
+                            n = 0;
+                            m++;
+                        }
+                    }
+                }
+            }
+            det = det + s * (a.m[0][c] * calc_determinant(b, k - 1));
+            s = -1 * s;
+        }
+    }
+    return (det);
 }
 
 void _mat_cons_mult(double  a, double * mat, double *res, int n_x, int n_y)
