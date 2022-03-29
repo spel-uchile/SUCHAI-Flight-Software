@@ -39,6 +39,9 @@ static int storage_is_open = 0;
 
 static PGconn *conn = NULL;
 
+/**
+    * Global functions for database manipulation
+*/
 static const char* get_sql_type(char* c_type);
 static int get_payloads_tokens(char** tok_sym, char** tok_var, char* order, char* var_names);
 static int get_value_string(char* dest, char* c_type, void *data);
@@ -46,24 +49,40 @@ static int get_sizeof_type(char* c_type);
 static void get_postgres_value(char* c_type, void* buff, PGresult *stmt, int j);
 
 void prepare_statements(PGconn *co){
+    
     /*
+     * Number of prepared statements, WIP: UPDATE THIS NUMBER 
+    */
+    int nprepared = 4;
+    int nok_prepared = 0;
+
+    /*
+     * oid Represents database data types for postgresql
      * 2275:    oid for cstring
      * 23:      oid for int4 (32 bit integer)
      */
-    int nprepared = 4;
-    int nok_prepared = 0;
     Oid params_type_storage_get_value_idx[2] = {2275, 23};
+
+    // Prepared statement for getting status variable by id
     PGresult *storage_status_get_value_idx_prepared = PQprepare(co,
                                                                 "stmt_storage_status_get_value_idx",
                                                                 "SELECT value FROM $1 WHERE idx=$2",
                                                                 2,
                                                                 params_type_storage_get_value_idx);
+
+    // Error handling
     if(PQresultStatus(storage_status_get_value_idx_prepared) != PGRES_COMMAND_OK){
         char *err = PQresultErrorMessage(storage_status_get_value_idx_prepared);
+
+        // Cleaning result
         PQclear(storage_status_get_value_idx_prepared);
+
     }else{
+        // OK
         nok_prepared++;
     }
+
+    // Prepared statement for setting status value by id
     char * sql_storage_status_set_value_idx ="WITH mynames AS"
                                              "(SELECT name FROM $1 WHERE idx=$2) "
                                              "INSERT INTO dummy2(idx,name,value) "
@@ -71,23 +90,44 @@ void prepare_statements(PGconn *co){
                                              "ON CONFLICT (idx) WHERE idx=$2 "
                                              "DO UPDATE SET (idx, name, value) = "
                                              "($2, (SELECT name FROM mynames),$3)";
+
+    // Parameter types for setter statement
+    /*
+     * oid Represents database data types for postgresql
+     * 2275:    oid for cstring
+     * 23:      oid for int4 (32 bit integer)
+     */                                             
     Oid params_type_storage_status_set_value_idx[3]={
             2275,
             23,
             23
     };
+
+    /*
+     * Preparing statement
+    */
     PGresult *storage_status_set_value_idx_prepared = PQprepare(co,
                                                                 "stmt_storage_set_value_idx",
                                                                 sql_storage_status_set_value_idx,
                                                                 3,
                                                                 params_type_storage_status_set_value_idx);
+
+    // Error handling
     if(PQresultStatus(storage_status_set_value_idx_prepared) != PGRES_COMMAND_OK){
+
+        // Error
         char *err = PQresultErrorMessage(storage_status_set_value_idx_prepared);
+
+        // Cleaning result
         PQclear(storage_status_set_value_idx_prepared);
     }else{
+        // OK 
         nok_prepared++;
     }
 
+    /*
+     * Prepared statement for setting flight plan
+    */
     char *sql_storage_flight_plan_set_st = "INSERT INTO $1("
                                                 "time,"
                                                 "command,"
@@ -115,11 +155,17 @@ void prepare_statements(PGconn *co){
                                                 "$5,"
                                                 "$6,"
                                                 "$7)";
-    // oid for cstring is 2275
-    // oid for int32 is 23
+    // Parameter types for flight plan setter statement
+    /*
+     * oid Represents database data types for postgresql
+     * 2275:    oid for cstring
+     * 23:      oid for int4 (32 bit integer)
+     */ 
     Oid params_type_storage_flight_plan_set_st[7] ={
             2275,23,2275,2275, 23,23,23
     };
+
+    // Preparing statement
     PGresult *storage_flight_plan_set_st_prepared = PQprepare(co,
                                                               "stmt_storage_flight_plan_set_st",
                                                               sql_storage_flight_plan_set_st,
@@ -127,80 +173,160 @@ void prepare_statements(PGconn *co){
                                                               params_type_storage_flight_plan_set_st
             );
     if (PQresultStatus(storage_flight_plan_set_st_prepared) != PGRES_COMMAND_OK){
+        
+        // Error
         char *err = PQresultErrorMessage(storage_flight_plan_set_st_prepared);
+
+        // Cleaning result 
         PQclear(storage_flight_plan_set_st_prepared);
     }else{
+        // OK 
         nok_prepared++;
     }
 
+    // Prepared statement for getting flight plan by time
     char *sql_storage_flight_plan_get_st = "SELECT * FROM $1 WHERE time=$2";
+
+    // Parameter types for flight plan getter statement
+    /*
+     * oid Represents database data types for postgresql
+     * 2275:    oid for cstring
+     * 23:      oid for int4 (32 bit integer)
+     */ 
     Oid params_type_storage_flight_plan_get_st[2] = {
             2275,
             23
     };
+
+    // Preparing statement
     PGresult *storage_flight_plan_get_st_prepared = PQprepare(co,
                                                               "stmt_storage_flight_plan_get_st",
                                                               sql_storage_flight_plan_get_st,
                                                               2,
                                                               params_type_storage_flight_plan_get_st);
+
+    // Error handling
     if (PQresultStatus(storage_flight_plan_get_st_prepared) != PGRES_COMMAND_OK){
+
+        // Error
         char *err = PQresultErrorMessage(storage_flight_plan_get_st_prepared);
+
+        // Cleaning result
         PQclear(storage_flight_plan_get_st_prepared);
     }else{
+
+        // OK
         nok_prepared++;
     }
 
+    // Prepared statement for getting flight plan by idx
     char *sql_storage_flight_plan_get_idx = "SELECT * FROM $1 WHERE idx=$2";
+
+    // Parameter types for flight plan getter statement
+    /*
+     * oid Represents database data types for postgresql
+     * 2275:    oid for cstring
+     * 23:      oid for int4 (32 bit integer)
+     */ 
     Oid params_type_storage_flight_plan_get_idx[2] = {2275,23};
+
+    // Preparing statement
     PGresult  *storage_flight_plan_get_idx_prepared = PQprepare(co,
                                                                 "stmt_storage_flight_plan_get_idx",
                                                                 sql_storage_flight_plan_get_idx,
                                                                 2,
                                                                 params_type_storage_flight_plan_get_idx);
+
+    // Error handling
     if(PQresultStatus(storage_flight_plan_get_idx_prepared) != PGRES_COMMAND_OK){
+
+        // Error
         char *err = PQresultErrorMessage(storage_flight_plan_get_idx_prepared);
+
+        // Cleaning result
         PQclear(storage_flight_plan_get_idx_prepared);
     }else{
+        // OK
         nok_prepared++;
     }
 
+    // Prepared statement for deleting flight plan row by time
     char *sql_storage_flight_plan_delete_row = "DELETE FROM $1 WHERE time=$2";
+
+    // Parameter types for flight plan getter statement
+    /*
+     * oid Represents database data types for postgresql
+     * 2275:    oid for cstring
+     * 23:      oid for int4 (32 bit integer)
+     */
     Oid params_type_storage_flight_plan_delete_row[2] = {2275, 23};
+
+    // Preparing statement
     PGresult *storage_flight_plan_delete_row_prepared = PQprepare(co,
                                                                   "stmt_storage_flight_plan_delete_row",
                                                                   sql_storage_flight_plan_delete_row,
                                                                   2,
                                                                   params_type_storage_flight_plan_delete_row);
+
+    // Error handling
     if(PQresultStatus(storage_flight_plan_delete_row_prepared) != PGRES_COMMAND_OK){
+
+        // Error
         char *err = PQresultErrorMessage(storage_flight_plan_delete_row_prepared);
+
+        // Cleaning result
         PQclear(storage_flight_plan_delete_row_prepared);
     }else{
+
+        //OK 
         nok_prepared++;
     }
 
+    // Prepared statement for deleting row by id
     char *sql_storage_flight_plan_delete_row_idx = "DELETE FROM $1 WHERE idx=$2";
+
+    // Parameter types for flight plan getter statement
+    /*
+     * oid Represents database data types for postgresql
+     * 2275:    oid for cstring
+     * 23:      oid for int4 (32 bit integer)
+     */
     Oid params_type_storage_flight_plan_delete_row_idx[2] = {2275,23};
+
+    // preparing statement
     PGresult *storage_flight_plan_delete_row_idx_prepared = PQprepare(co,
                                                                      "stmt_storage_flight_plan_delete_row_idx",
                                                                      sql_storage_flight_plan_delete_row_idx,
                                                                      2,
                                                                      params_type_storage_flight_plan_delete_row_idx);
+
+    // Error handling
     if(PQresultStatus(storage_flight_plan_delete_row_idx_prepared) != PGRES_COMMAND_OK){
+
+        // Error
         char *err = PQresultErrorMessage(storage_flight_plan_delete_row_idx_prepared);
+
+        // Cleaning result
         PQclear(storage_flight_plan_delete_row_idx_prepared);
     }else{
+
+        // OK
         nok_prepared++;
     }
 }
 
 int storage_init(const char *db_name)
 {
+    /*
+     * Storage init for PostgreSQL
+    */
     char *hostaddr = SCH_STORAGE_PGHOST;
     int port = SCH_STORAGE_PGPORT;
     char dbname[SCH_BUFF_MAX_LEN];
     char *user = SCH_STORAGE_PGUSER;
     char *password = SCH_STORAGE_PGPASS;
 
+    // Handling errors 
     if (db_name == NULL){
         return SCH_ST_ERROR;
     }
@@ -221,7 +347,7 @@ int storage_init(const char *db_name)
     char *key_password = "password";
     char *key_dbname = "dbname";
 
-    /// Here set the keywords params names array
+    /// Here is set the keywords params names array
 
     const char *keywords[5] = {key_hostaddr,
                              key_port,
@@ -229,17 +355,22 @@ int storage_init(const char *db_name)
                              key_password,
                              key_dbname};
 
+    // Setting port number size 
+    // WIP: Complete this
 
     char port_str[5];
     double port_double = 1.0 * port;
 
     size_t port_str_size = (size_t) ceil(log10(port_double));
+
+    // WIP: Change for snprintf
     sprintf(
             port_str,
             "%d",
             port
             );
 
+    // Connetion parameters as strings
     const char *values[5] = {
             hostaddr,
             port_str,
@@ -248,20 +379,24 @@ int storage_init(const char *db_name)
             dbname
     };
 
-    /// expand_dbname is zero because postgresql documentation
+    /// expand_dbname is zero (third argument) because postgresql documentation
     conn = PQconnectdbParams(keywords, values,0);
 
     /// Error handling
     if (conn == NULL) {
+        // Error
         return SCH_ST_ERROR;
     }
     if ( PQstatus(conn) == CONNECTION_BAD){
+        // Error
         char *err = PQerrorMessage(conn);
         PQfinish(conn);
         return SCH_ST_ERROR;
     }
     else if (PQstatus(conn) == CONNECTION_OK) {
+        // OK
         storage_is_open = 1;
+        // Preparing statements
         prepare_statements(conn);
         return SCH_ST_OK;
     }
@@ -270,6 +405,7 @@ int storage_init(const char *db_name)
 
 int storage_close(void)
 {
+    // Checking database connection is not null
     if (conn != NULL){
         PQfinish(conn);
         conn = NULL;
@@ -277,7 +413,10 @@ int storage_close(void)
         return SCH_ST_OK;
     }
 
+    
     if(fp_table != NULL) free(fp_table);
+
+    // Error
     return SCH_ST_ERROR;
 }
 
