@@ -424,6 +424,9 @@ int storage_table_status_init(char *table, int n_variables, int drop)
 {
     char err_msg1[SCH_BUFF_MAX_LEN];
 
+    /*
+     * Checking input conditions
+    */
     if (table == NULL){
         return SCH_ST_ERROR;
     }
@@ -433,16 +436,31 @@ int storage_table_status_init(char *table, int n_variables, int drop)
     if (drop < 0 || drop > 1) {
         return SCH_ST_ERROR;
     }
+
+    /*
+     * Checking string length max allowed, WIP: Avoid hardcode message
+     * It is needded because of PostgreSQL arguments
+    */
     int32_t str_len = (int32_t) strnlen(table,63);
+
     /* oid for char* is 2275, according
     * to the documentation, corresponds a cstring.
     * The other value for null terminated arrays is
     * unknown
     */
     Oid param_types = {2275};
+
+    /*
+     * If we need to drop suchai status tables
+    */
     if(drop) {
+
         PGresult *sql_stmt;
         const char * const param_values[1]= {table};
+
+        /*
+         * Executing prepared statements
+        */
         sql_stmt = PQexecParams(conn,
                              "DROP TABLE $1",
                              1,
@@ -451,20 +469,38 @@ int storage_table_status_init(char *table, int n_variables, int drop)
                              &str_len,
                              NULL,
                              0);
+        /*
+         * Handling error(s)
+        */
         if (PQresultStatus(sql_stmt) != PGRES_COMMAND_OK) {
             char *errorMessage = PQresultErrorMessage(sql_stmt);
             strncpy(err_msg1, errorMessage,strlen(errorMessage));
+
+            // Cleaning result
             PQclear(sql_stmt);
             return SCH_ST_ERROR;
         }
+        // Cleaning result
         PQclear(sql_stmt);
     }
+
+    /*
+     * Creating table for status data
+    */
     char *create_table = "CREATE TABLE IF NOT EXISTS $1 ("
                          "idx INTEGER PRIMARY KEY, "
                          "name TEXT UNIQUE, "
                          "value INTEGER);";
+
+    // String for handling error
     char err_msg2[SCH_BUFF_MAX_LEN];
+
     const char *params_values[1] = {table};
+    
+    /*
+     * Executing prepared statement for creating table
+     * WIP: Look for a better way to do this.
+    */
     PGresult *create_table_sql = PQexecParams(conn,
                                                 create_table,
                                                 1,
@@ -473,24 +509,35 @@ int storage_table_status_init(char *table, int n_variables, int drop)
                                                 &str_len,
                                                 NULL,
                                                 0);
+
+    // Handling error(s)
     if(PQresultStatus(create_table_sql) != PGRES_COMMAND_OK){
         char *errorMessage = PQresultErrorMessage(create_table_sql);
-        strncpy(err_msg2, errorMessage,strlen(errorMessage));
+
+        // Copying error(s) message(s)
+        strncpy(err_msg2, errorMessage, strlen(errorMessage));
+
+        // Cleaning result(s)
         PQclear(create_table_sql);
         return SCH_ST_ERROR;
     }
 
+    // Cleaning result(s)
     PQclear(create_table_sql);
     return SCH_ST_OK;
 }
 
 int storage_table_flight_plan_init(char *table, int n_entires, int drop)
 {
+    // Memory allocated for errors messages
     char err_msg1[SCH_BUFF_MAX_LEN];
     char err_msg2[SCH_BUFF_MAX_LEN];
+
+    // Pointers for statements allocation
     char *sql1;
     char *sql2;
 
+    // Checking input results
     if(table == NULL){
         return SCH_ST_ERROR;
     }
