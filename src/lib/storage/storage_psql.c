@@ -983,29 +983,37 @@ int storage_flight_plan_set_st(fp_entry_t *row)
 
 int storage_flight_plan_set(int timetodo, char* command, char* args, int executions, int period, int node)
 {
+    // Validating data
     if(timetodo < 0 || command == NULL || args == NULL)
         return SCH_ST_ERROR;
 
+    // Setting structure for saving data
     fp_entry_t row;
     row.unixtime = timetodo;
     row.executions = executions;
     row.periodical = period;
     row.node = node;
+    
     // We do not copy here, they are copied in storage_flight_plan_set_st
     // Note that the pointers are still valid here
     row.cmd = command;
     row.args = args;
+
+    // Setting data
     return storage_flight_plan_set_st(&row);
 }
 
 int storage_flight_plan_get_st(int timetodo, fp_entry_t *row)
 {
+    // Validating data
     if(fp_table == NULL || row == NULL)
         return SCH_ST_ERROR;
 
+    // Structures for saving the results
     char **results;
     char err_msg1[SCH_BUFF_MAX_LEN];
 
+    
     int row_int;
     int col;
 
