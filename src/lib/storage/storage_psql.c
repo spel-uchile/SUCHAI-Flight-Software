@@ -547,13 +547,23 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
     if (drop < 0 || drop > 1){
         return SCH_ST_ERROR;
     }
+
+    /* oid for char* is 2275, according
+    * to the documentation, corresponds a cstring.
+    * The other value for null terminated arrays is
+    * unknown
+    */
     Oid param_types = {2275};
+
+    // String length for PostgreSQL documentation
     int32_t str_len = (int32_t) strnlen(table,63);
     const char *param_values[1] = {table};
-    /* Drop table if drop variables is true */
+
+    /* Drop table if drop variable is true */
     if(drop){
         sql1 = "DROP TABLE IF EXISTS $1";
 
+        // Executing statement
         PGresult *drop_result = PQexecParams(conn,
                                              sql1,
                                              1,
@@ -562,14 +572,23 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
                                              &str_len,
                                              NULL,
                                              0);
+
+        // Handling error(s)
         if (PQresultStatus(drop_result) != PGRES_COMMAND_OK){
             char *errorMessage = PQresultErrorMessage(drop_result);
+            // Copying error message
             strncpy(err_msg1,errorMessage,strlen(errorMessage));
+
+            // Cleaning result
             PQclear(drop_result);
             return SCH_ST_ERROR;
         }
+
+        // Cleaning result
         PQclear(drop_result);
     }
+
+    // Prepared statement for creating table, WIP: change for settings file
     sql2 = "CREATE TABLE IF NOT EXISTS $1("
           "time INTEGER PRIMARY KEY,"
           "command TEXT,"
@@ -577,6 +596,8 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
           "executions INTEGER,"
           "periodical INTEGER,"
           "node INTEGER)";
+
+    // Executing statement
     PGresult *create_table_result = PQexecParams(conn,
                                                 sql2,
                                                 1,
@@ -585,22 +606,30 @@ int storage_table_flight_plan_init(char *table, int n_entires, int drop)
                                                 &str_len,
                                                 NULL,
                                                 0);
+
+    // Handling error(s)
     if(PQresultStatus(create_table_result) != PGRES_COMMAND_OK){
         char *errorMessage = PQresultErrorMessage(create_table_result);
         strncpy(err_msg2,errorMessage,strlen(errorMessage));
+
+        // Cleaning result
         PQclear(create_table_result);
         return SCH_ST_ERROR;
     }
+
+    // Cleaning result
     PQclear(create_table_result);
 
+    // Creating result
     if(fp_table != NULL) free(fp_table);
-    fp_table = strdup(table);
+    fp_table = strdup(table); // WIP: Work in this
 
     return SCH_ST_OK;
 }
 
 int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries, int drop)
 {
+    // Checking inputs
     if(table == NULL){
         return SCH_ST_ERROR;
     }
@@ -613,8 +642,17 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
     if (drop < 0  || drop > 1){
         return SCH_ST_ERROR;
     }
+
+    /* oid for char* is 2275, according
+    * to the documentation, corresponds a cstring.
+    * The other value for null terminated arrays is
+    * unknown
+    */
     Oid param_types = {2275};
+
     const char *params_values[1] = {table};
+
+    // If drop option is true
     if(drop) {
         char err_msg[SCH_BUFF_MAX_LEN];
         char *sql;
@@ -631,15 +669,23 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
                                                  &str_len,
                                                  NULL,
                                                  0);
+
+            // Handling error(s)
             if (PQresultStatus(drop_result) != PGRES_COMMAND_OK) {
                 char *errorMessage = PQresultErrorMessage(drop_result);
                 strncpy(err_msg, errorMessage, strlen(errorMessage));
+
+                // Cleaning result
                 PQclear(drop_result);
                 return SCH_ST_ERROR;
             }
+
+            // Cleaning result
             PQclear(drop_result);
         }
     }
+
+    // Creating payloads tables
     for(int i = 0; i < n_entries; i++){
         char create_table[SCH_BUFF_MAX_LEN * 4];
         memset(&create_table,0,SCH_BUFF_MAX_LEN * 4);
@@ -673,6 +719,7 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
         const char * const data_map_table[1]= {data_map[i].table};
         int32_t len_data_map_table = (int32_t) strnlen(data_map[i].table,63);
 
+        // Executing prepared statament
         PGresult  *create_table_result = PQexecParams(conn,
                                                       create_table,
                                                       1,
@@ -681,11 +728,17 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
                                                       &len_data_map_table,
                                                       NULL,
                                                       0);
+
+        // Handling error(s)
         if (PQresultStatus(create_table_result) != PGRES_COMMAND_OK ){
             strcpy(err_msg,PQresultErrorMessage(create_table_result));
+
+            // Cleaning result
             PQclear(create_table_result);
             return SCH_ST_ERROR;
         }
+
+        // Cleaning result
         PQclear(create_table_result);
     }
     payloads_entries = n_entries;
@@ -698,8 +751,10 @@ int storage_table_payload_init(char *table, data_map_t *data_map, int n_entries,
 
 int storage_status_get_value_idx(uint32_t index, value32_t *value, char *table)
 {
+    // Checking inputs
     if(!storage_is_open || conn == NULL || PQstatus(conn) != CONNECTION_OK) return SCH_ST_ERROR;
 
+    // Start copying indexes
     char index_str[11];
     int index_size_for_string = ceil(log10(index));
     char err[SCH_BUFF_MAX_LEN];
@@ -707,12 +762,18 @@ int storage_status_get_value_idx(uint32_t index, value32_t *value, char *table)
         char *err_msg = "overflow";
         return SCH_ST_ERROR;
     }
-    snprintf(index_str,10+1,"%u",index);
-    int32_t len_table = (int32_t) strnlen(table,63);
 
+    // 63 is the max value for PostgreSQL
+    snprintf(index_str,10+1,"%u",index);
+    int32_t len_table = (int32_t) strnlen(table,63); // End copying indexes
+
+    // Parameters lengths for table status statement
     int param_lengths[2] = {len_table, index_size_for_string};
 
+    // Values for statements
     const char* const param_values[2] ={table,index_str};
+
+    // Executing prepared statement
     PGresult *query_result = PQexecPrepared(conn,
                                             "stmt_storage_status_get_value_idx",
                                             2,
@@ -721,17 +782,26 @@ int storage_status_get_value_idx(uint32_t index, value32_t *value, char *table)
                                             NULL,
                                             0);
 
+    // Handling error(s)
     if( PQresultStatus(query_result) != PGRES_TUPLES_OK){
         char *err_msg = PQresultErrorMessage(query_result);
         strncpy(err,err_msg, strlen(err_msg)+1);
+
+        // Cleaning result
         PQclear(query_result);
         return SCH_ST_ERROR;
     }else if(PQntuples(query_result) != 1){
+
+        // If result is not 1, there is some error
         PQclear(query_result);
         return SCH_ST_ERROR;
-    }
+     }
+
+    // Getting the results from prepared statement, it should be only one
     char value_from_results[SCH_BUFF_MAX_LEN];
     char *value_from_results2 = PQgetvalue(query_result,0,0);
+
+    // Cleaning the result(s)
     if (value_from_results2 == NULL){
         PQclear(query_result);
         return SCH_ST_ERROR;
@@ -742,18 +812,29 @@ int storage_status_get_value_idx(uint32_t index, value32_t *value, char *table)
     char *str_end;
 
     int32_t val = (int32_t) strtol(value_from_results,&str_end,10);
+
+    // Handling error(s)
     if(*str_end != 0){
+
+        // Cleaning result
         PQclear(query_result);
         char *err_msg = "could not convert value from query to integer";
         return SCH_ST_ERROR;
     }
     *value = (value32_t) val;
+
+    // Cleaning result
     PQclear(query_result);
     return SCH_ST_OK;
 }
 
 int storage_status_set_value_idx(int index, value32_t value, char *table)
 {
+    /*
+     * Getting data from layer above, calculate what is needed
+     * this is string lengths and string params, then the statement
+     * is executed, handle the error(s) and return the command state
+    */
     /// Validation
     if(!storage_is_open || conn == NULL || PQstatus(conn) == CONNECTION_BAD){
         return SCH_ST_ERROR;
@@ -770,6 +851,7 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
     /// so we can cast it
     int32_t len_table = (int32_t) strnlen(table, 63);
 
+    // Setting additional info for executing query
     char str_index[11];
     char str_value[11];
     snprintf(str_index,11,"%d", index);
@@ -788,13 +870,18 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
                                             param_lengths,
                                             NULL,
                                             0);
+
+    // Handling error(s)
     if(PQresultStatus(query_result) != PGRES_COMMAND_OK) {
         char *err = PQresultErrorMessage(query_result);
         strncpy(err_msg, err,strlen(err));
+
+        // Cleaning result
         PQclear(query_result);
         return SCH_ST_ERROR;
     }
 
+    // Cleaning result
     PQclear(query_result);
     return SCH_ST_OK;
 }
@@ -804,6 +891,14 @@ int storage_status_set_value_idx(int index, value32_t value, char *table)
 //int storage_flight_plan_set_st(fp_entry_t *row, char *table)
 int storage_flight_plan_set_st(fp_entry_t *row)
 {
+    /*
+     * Getting data from layer above, then it calculates
+     * how many places are needed in the corresponding
+     * strings, then it computes the final string length,
+     * execute the statements, handle errors and finally
+     * return the result in both cases 
+    */
+    // Checking inputs
     if(fp_table == NULL){
         return SCH_ST_ERROR;
     }
@@ -812,10 +907,12 @@ int storage_flight_plan_set_st(fp_entry_t *row)
         return SCH_ST_ERROR;
     }
 
+    // Getting data to save to database
     int timetodo = row->unixtime;
     int executions = row->executions;
     int period = row->periodical;
     int node = row->node;
+
     // We do not copy here, they are copied in storage_flight_plan_set_st
     // Note that the pointers are still valid here
     char * command = row->cmd;
