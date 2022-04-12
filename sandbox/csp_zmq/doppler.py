@@ -42,12 +42,12 @@ class DopplerNode(CspZmqNode):
                     self.f_main = re_main.findall(data.decode('ascii'))[0]
                     print("DN:", self.f_main)
                     conn.sendall(resp_ok)
-                    self.send_message("com_set_config rx-freq {}".format(self.f_main), csp_header)
+                    self.send_message("com_set_config 1 freq {}".format(self.f_main), csp_header)
                 elif b'I' in data:
                     self.f_sub = re_sub.findall(data.decode('ascii'))[0]
                     print("UP:", self.f_sub)
                     conn.sendall(resp_ok)
-                    self.send_message("com_set_config tx-freq {}".format(self.f_sub), csp_header)
+                    self.send_message("com_set_config 5 freq {}".format(self.f_sub), csp_header)
                 elif b'f' in data:
                     resp = "{}\n".format(self.f_main).encode('ascii')
                     conn.sendall(resp)
