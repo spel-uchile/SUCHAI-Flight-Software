@@ -20,6 +20,7 @@
 
 #include "suchai/storage.h"
 #include <sqlite3.h>
+#include <math.h>
 
 #define ST_SQL_MAX_LEN  (1000)
 
@@ -529,7 +530,11 @@ int get_value_string(char* dest, char* c_type, void *data)
     int size = -1;
     switch (c_type[1]) {
         case 'f':
-            size = sprintf(dest, " %f,", *(float*)data);
+            // Fix parsing -1F as -nan, not valid in sql -> use NULL
+            if(isnan(*(float*)data))
+                size = sprintf(dest, " %s,", "NULL");
+            else
+                size = sprintf(dest, " %f,", *(float*)data);
             break;
         case 'u':
             size = sprintf(dest, " %u,", *(uint32_t*)data);
