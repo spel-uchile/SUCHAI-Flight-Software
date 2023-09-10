@@ -70,7 +70,7 @@ void taskCommunications(void *param)
             count_tc = dat_get_system_var(dat_com_count_tc) + 1;
             dat_set_system_var(dat_com_count_tc, count_tc);
             dat_set_system_var(dat_com_last_tc, (int)dat_get_time());
-
+            LOGI(tag, "port: %d =? 15 ", csp_conn_dport(conn));
             switch (csp_conn_dport(conn))
             {
                 case SCH_TRX_PORT_FILE:
@@ -145,6 +145,10 @@ void taskCommunications(void *param)
                     csp_buffer_free(packet);
                     break;
 
+                case SCH_TRX_PORT_APP:
+                    com_receive_tm(packet);
+                    csp_buffer_free(packet);
+                    break;
                 default:
                     #ifdef SCH_HOOK_COMM
                     /* Let user application handle a packet */

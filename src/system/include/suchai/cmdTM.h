@@ -129,6 +129,8 @@ int tm_send_last(char *fmt, char *params, int nparams);
  */
 int tm_send_all(char *fmt, char *params, int nparams);
 
+int tm_ask_missing(char *fmt, char *params, int nparams);
+
 /**
  * Send k structs data stored as payload in multiple csp frames form last acknowledge.
  * @param fmt "%u %u %u"

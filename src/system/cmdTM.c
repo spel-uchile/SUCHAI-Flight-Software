@@ -36,6 +36,7 @@ void cmd_tm_init(void)
     cmd_add("tm_get_single", tm_get_single, "%u %u", 2);
     cmd_add("tm_send_last", tm_send_last, "%u %u", 2);
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
+    cmd_add("tm_ask_missing", tm_ask_missing, "%d %d %d", 3); // comando agregado
     cmd_add("tm_send_n", tm_send_from, "%u %u %u", 3);
     cmd_add("tm_parse_payload", tm_parse_payload, "%", 0);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
@@ -342,8 +343,8 @@ int tm_send_all(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    uint32_t dest_node;
-    uint32_t payload;
+    int dest_node;
+    int payload;
 
     if(nparams == sscanf(params, fmt, &payload, &dest_node)) {
 
@@ -360,6 +361,50 @@ int tm_send_all(char *fmt, char *params, int nparams)
     {
         return CMD_SYNTAX_ERROR;
     }
+}
+
+int tm_ask_missing(char *fmt, char *params, int nparams){
+
+    if (params == NULL){
+        LOGE(tag, "param is null!");
+        return CMD_SYNTAX_ERROR;
+    }
+    int source, dest_node , payload;
+
+    if (nparams != sscanf(params, fmt, &source, &dest_node, &payload)){
+        LOGE(tag, "number of params does not match");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    if (payload >= last_sensor) {
+        LOGE(tag, "incorrect payload");
+    }
+    int index_ack =  dat_get_system_var(data_map[payload].sys_ack);
+    int index_pay =  dat_get_system_var(data_map[payload].sys_index);
+
+    uint16_t payload_size = data_map[payload].size;
+    char buff[payload_size];
+    LOGI(tag, "index_ack %d, index_pay %d", index_ack, index_pay);
+    int i = index_pay;
+    while( i )
+    {
+        int ret = dat_get_payload_sample(buff,payload, i);
+        if (ret == -1)
+        {
+            LOGI(tag, "payload %d sample %d is not received",payload, i);
+            char cmd_string[100];
+            snprintf(cmd_string, 100, "com_send_cmd %d tm_send_tel_from_to %d %d %d %d",source, i,i, payload, dest_node);
+            cmd_t *cmd = cmd_build_from_str(cmd_string);
+            cmd_send(cmd);
+            LOGI(tag, "asking for %d sample for payload %d", i, payload);
+        }
+        else
+        {
+            LOGI(tag, "index %d was received for payload %d", i, payload);
+            i++;
+        }
+    }
+    return CMD_OK;
 }
 
 int tm_send_from(char *fmt, char *params, int nparams)

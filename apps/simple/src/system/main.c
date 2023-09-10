@@ -24,7 +24,22 @@
 #include "app/system/taskHousekeeping.h"
 #include "app/system/cmdAPP.h"
 
+#include <csp/csp.h>
+#include <csp/arch/csp_thread.h>
+#include <csp/drivers/usart.h>
+#include <csp/drivers/can_socketcan.h>
+#include <csp/interfaces/csp_if_zmqhub.h>
+
+#define SCH_TNC_ADDRESS 9
 static char *tag = "app_main";
+
+static csp_iface_t *csp_if_zmqhub;
+static csp_iface_t csp_if_kiss;
+
+static csp_kiss_handle_t csp_kiss_driver;
+void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
+    csp_kiss_rx(&csp_if_kiss, buf, len, pxTaskWoken);
+}
 
 /**
  * App specific initialization routines
@@ -41,6 +56,7 @@ void initAppHook(void *params)
 #ifdef LINUX
     csp_add_zmq_iface(SCH_COMM_NODE);
 #endif
+
 
     /** Init app tasks */
     int t_ok = osCreateTask(taskHousekeeping, "housekeeping", 1024, NULL, 2, NULL);
