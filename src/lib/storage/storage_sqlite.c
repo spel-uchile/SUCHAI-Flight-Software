@@ -730,3 +730,144 @@ int storage_payload_reset_table(int payload)
     sqlite3_free(sql);
     return SCH_ST_OK;
 }
+
+int storage_payload_get_missing_interval_indexes(char *payload_table_name,
+                                                 int first_ack,
+                                                 int *resp,
+                                                 int max_n_pairs,
+                                                 int *actual_resp_size)
+{
+    if (db == NULL)
+    {
+        return -2;
+    }
+    if (payloads_schema == NULL)
+    {
+        return -3;
+    }
+    if (storage_is_open == 0)
+    {
+        return -4;
+    }
+    int rc;
+    char sql[ST_SQL_MAX_LEN];
+    snprintf(sql,
+             ST_SQL_MAX_LEN,
+             "WITH Gaps AS (\n"
+             "    SELECT t1.sat_index + 1 AS start_index, MIN(t2.sat_index) AS end_index\n"
+             "    FROM %s t1\n"
+             "    LEFT JOIN %s t2 ON t2.sat_index > t1.sat_index\n"
+             "    WHERE t2.sat_index IS NOT NULL AND t2.sat_index >= ?1 AND t1.sat_index >= ?2\n"
+             "    GROUP BY t1.sat_index\n"
+             "    HAVING (MIN(t2.sat_index) - t1.sat_index) > 1\n"
+             ")\n"
+             "\n"
+             "SELECT \n"
+             "    G.start_index AS gap_start,\n"
+             "    G.end_index AS gap_end\n"
+             "FROM Gaps G LIMIT ?3", payload_table_name, payload_table_name);
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt,0);
+    if (rc !=SQLITE_OK )
+    {
+        return -5;
+    }
+    rc = sqlite3_bind_int64(stmt, 1, first_ack);
+    if (rc !=SQLITE_OK )
+    {
+        return -6;
+    }
+    rc = sqlite3_bind_int64(stmt, 2, first_ack);
+    if (rc !=SQLITE_OK )
+    {
+        return -7;
+    }
+    rc = sqlite3_bind_int(stmt, 3, max_n_pairs);
+    if (rc !=SQLITE_OK )
+    {
+        return -8;
+    }
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_DONE)
+    {
+        return SCH_ST_OK;
+    }
+    if (rc != SQLITE_ROW)
+    {
+        printf("rc from database: %i", rc);
+        return -9;
+    }
+    int max_n_data = max_n_pairs * 2;
+    *actual_resp_size = 0;
+    // must free somewhere else
+    for(int i = 0; i < max_n_data ; i+= 2)
+    {
+        long long first_index = sqlite3_column_int64(stmt, 0);
+        long long second_index = sqlite3_column_int64(stmt, 1);
+        resp[i] = first_index;
+        resp[i + 1] = second_index;
+        *actual_resp_size = *actual_resp_size + 2;
+        rc = sqlite3_step(stmt);
+        if (rc == SQLITE_DONE)
+        {
+            sqlite3_finalize(stmt);
+            return SCH_ST_OK;
+        }
+        if (rc != SQLITE_ROW)
+        {
+            return -11;
+        }
+    }
+}
+
+int storage_payload_drop_duplicates(char *table_name)
+{
+    if (db == NULL)
+    {
+        return -2;
+    }
+    if (payloads_schema == NULL)
+    {
+        return -3;
+    }
+    if (storage_is_open == 0)
+    {
+        return -4;
+    }
+    if (table_name == NULL)
+    {
+        return SCH_ST_ERROR;
+    }
+    char sql[ST_SQL_MAX_LEN];
+    snprintf(sql,
+             ST_SQL_MAX_LEN,
+             "DELETE FROM %s WHERE id NOT IN (SELECT MAX(id) FROM %s GROUP BY sat_index)", table_name, table_name);
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db, sql, ST_SQL_MAX_LEN, &stmt, 0);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+        return SCH_ST_ERROR;
+    }
+    /*
+    rc = sqlite3_bind_text(stmt,1,table_name,sizeof (table_name),NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+        return SCH_ST_ERROR;
+    }
+    rc = sqlite3_bind_text(stmt, 2, table_name, sizeof(table_name), NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+        return SCH_ST_ERROR;
+    }*/
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        return SCH_ST_ERROR;
+    }
+    sqlite3_finalize(stmt);
+    return SCH_ST_OK;
+}

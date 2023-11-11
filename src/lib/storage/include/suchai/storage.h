@@ -313,4 +313,25 @@ int storage_payload_get_data(int payload, int index, void *data, data_map_t *sch
 int storage_payload_reset(void);
 int storage_payload_reset_table(int payload);
 
+/**
+ * Get the missing interval indexes of a payload.
+ *
+ * The @param resp array size must be twice @param max_n_pairs
+ *
+ * @param payload_table_name the payload table name
+ * @param first_ack the index for starting the lookup
+ * @param resp the response array
+ * @param max_n_pairs the maximum number of pairs
+ * @param actual_resp_size the actual number of PAIRS gotten (in the
+ *      case of getting less than the twice max_n_pairs
+ * */
+int storage_payload_get_missing_interval_indexes(char *payload_table_name,
+                                                 int first_ack,
+                                                 int *resp,
+                                                 int max_n_pairs,
+                                                 int *actual_resp_size);
+
+
+int storage_payload_drop_duplicates(char *table_name);
+
 #endif //SCH_STORAGE_H

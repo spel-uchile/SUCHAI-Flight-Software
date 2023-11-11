@@ -36,7 +36,6 @@ void cmd_tm_init(void)
     cmd_add("tm_get_single", tm_get_single, "%u %u", 2);
     cmd_add("tm_send_last", tm_send_last, "%u %u", 2);
     cmd_add("tm_send_all", tm_send_all, "%u %u", 2);
-    cmd_add("tm_ask_missing", tm_ask_missing, "%d %d %d", 3); // comando agregado
     cmd_add("tm_send_n", tm_send_from, "%u %u %u", 3);
     cmd_add("tm_parse_payload", tm_parse_payload, "%", 0);
     cmd_add("tm_set_ack", tm_set_ack, "%u %u", 2);
@@ -50,6 +49,8 @@ void cmd_tm_init(void)
     cmd_add("tm_send_file_part", tm_send_file_parts, "%s %d %d %d %d", 5);
     cmd_add("tm_merge_file", tm_merge_file, "%s %d", 2);
     cmd_add("tm_ls", tm_list_files, "%s %d", 2);
+    cmd_add("tm_amp", tm_ask_missing_payload, "%u %u %u", 3);
+    cmd_add("tm_ask_missing", tm_ask_missing, "%d", 1); // comando agregado
 #endif
 }
 
@@ -94,7 +95,7 @@ int tm_send_var(char *fmt, char *params, int nparams)
     status_buff[0].value.u = csp_hton32(dat_get_status_var(address).u);
 
     // Send telemetry
-    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_GENERIC, 1, 0);
+    return _com_send_data(dest_node, status_buff, sizeof(status_buff), TM_TYPE_STATUS, 1, 0);
 }
 
 int tm_parse_status(char *fmt, char *params, int nparams)
@@ -363,8 +364,17 @@ int tm_send_all(char *fmt, char *params, int nparams)
     }
 }
 
-int tm_ask_missing(char *fmt, char *params, int nparams){
+int32_t tm_calculate_iterations(int n, double_t empiric_packets_arrived_probability, double_t success_prob)
+{
+    return (int32_t) ceil(log(1 - pow(success_prob, ((double_t)1)/n)) /
+    log(1 - empiric_packets_arrived_probability));
+}
 
+int tm_ask_missing_payload(char *fmt, char *params, int nparams)
+{
+    cmd_t *cmd3 = cmd_build_from_str("obc_ident");
+    cmd_send(cmd3);
+    /// we need a way to set up the sys_ack variable
     if (params == NULL){
         LOGE(tag, "param is null!");
         return CMD_SYNTAX_ERROR;
@@ -379,30 +389,98 @@ int tm_ask_missing(char *fmt, char *params, int nparams){
     if (payload >= last_sensor) {
         LOGE(tag, "incorrect payload");
     }
-    int index_ack =  dat_get_system_var(data_map[payload].sys_ack);
-    int index_pay =  dat_get_system_var(data_map[payload].sys_index);
+    int idx_start, idx_end, first_ack;
 
-    uint16_t payload_size = data_map[payload].size;
-    char buff[payload_size];
-    LOGI(tag, "index_ack %d, index_pay %d", index_ack, index_pay);
-    int i = index_pay;
-    while( i )
+    int resp[2];
+    int max_resp_size = 2;
+    int actual_resp_size = 0;
+    int ack = dat_get_system_var(data_map[payload].sys_ack);
+    int rc = dat_get_missing_interval(payload, ack, resp, max_resp_size / 2, &actual_resp_size);
+    if (actual_resp_size == 0)
     {
-        int ret = dat_get_payload_sample(buff,payload, i);
-        if (ret == -1)
-        {
-            LOGI(tag, "payload %d sample %d is not received",payload, i);
-            char cmd_string[100];
-            snprintf(cmd_string, 100, "com_send_cmd %d tm_send_tel_from_to %d %d %d %d",source, i,i, payload, dest_node);
-            cmd_t *cmd = cmd_build_from_str(cmd_string);
-            cmd_send(cmd);
-            LOGI(tag, "asking for %d sample for payload %d", i, payload);
+        LOGI(tag, "No missing data for payload %u: %s, ack: %i", payload, data_map[payload].table, ack);
+        return CMD_OK;
+    }
+    LOGI(tag, "dat sys_ack: %i", ack);
+    LOGI(tag, "resp[0]: %i", resp[0]);
+
+    LOGI(tag, "set ack for payload %i: %s", payload, data_map[payload].table);
+    LOGI(tag, "actual_resp_size: %i", actual_resp_size);
+
+    char buff_ask[256]= {0};
+    //for(int i = 0; i < 30; i++) {
+        if (resp[0] - 1 > ack) {
+
+            //for (int i = 0; i < 5; i++)
+            //{
+                char cmd_ack[100];
+                snprintf(cmd_ack, 100, "tm_set_ack %i %i", payload, resp[0]);
+                cmd_t *cmdt_ack = cmd_build_from_str(cmd_ack);
+                cmd_send(cmdt_ack);
+
+                char cmd_ack_sat[100];
+                snprintf(cmd_ack_sat, 100, "com_send_cmd %i tm_set_ack %i %i", source, payload, resp[0]);
+                cmd_t *cmdt_ack_sat = cmd_build_from_str(cmd_ack_sat);
+                cmd_send(cmdt_ack_sat);
+                LOGI(tag, "Acknowledging up to %i sample", resp[0]);
+            //}
+
+
+            memset(&buff_ask[0], 0, sizeof(buff_ask));
+            snprintf(buff_ask, 100, "com_send_cmd %i tm_send_n %u %u %u", source, payload, SCH_COMM_NODE,
+                     resp[1] - resp[0] + 1);
+            //snprintf(buff_ask, 100, "com_ping 3");
+            cmd_t *cmd_ask = cmd_build_from_str(buff_ask);
+            if (cmd_ask == NULL) {
+                LOGE(tag, "Cannot set command for asking data");
+                return CMD_ERROR;
+            }
+            LOGI(tag, "%s", buff_ask);
+            cmd_send(cmd_ask);
+            memset(&buff_ask[0], 0, sizeof(buff_ask));
+            actual_resp_size = 0;
+            ack = dat_get_system_var(data_map[payload].sys_ack);
+            rc = dat_get_missing_interval(payload, ack, resp, max_resp_size / 2, &actual_resp_size);
+            if (rc != 0) {
+                LOGE(tag, "Cannot get missing interval for payload %i: %s", payload, data_map[payload].table);
+                return CMD_ERROR;
+            }
+            if (actual_resp_size == 0) {
+                LOGI(tag, "No missing data for payload %i: %s, ack: %i", payload, data_map[payload].table, ack);
+                return CMD_OK;
+            }
         }
-        else
-        {
-            LOGI(tag, "index %d was received for payload %d", i, payload);
-            i++;
-        }
+    //}
+    //}
+        //osDelay(500);
+    //}
+
+    //dat_drop_duplicates(data_map[payload].table);
+    return CMD_OK;
+}
+
+
+
+int tm_ask_missing(char *fmt, char *params, int nparams)
+{
+    if (params == NULL){
+        LOGE(tag, "param is null!");
+        return CMD_SYNTAX_ERROR;
+    }
+    int source;
+
+    if (nparams != sscanf(params, fmt, &source)){
+        LOGE(tag, "number of params does not match");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    for (int i = 0; i < last_sensor; i++)
+    {
+        char *cmd_string = malloc(sizeof(char) * 100);
+        snprintf(cmd_string, 100, "tm_amp %d %d %d %u", source, SCH_COMM_NODE, i, 10);
+        cmd_t *cmd = cmd_build_from_str(cmd_string);
+        cmd_send(cmd);
+        free(cmd_string);
     }
     return CMD_OK;
 }
@@ -503,6 +581,7 @@ int tm_set_ack(char *fmt, char *params, int nparams) {
         }
 
         if( ack_pay > k_samples) {
+            LOGE(tag, "ack %i is greater than samples %u", ack_pay, k_samples);
             return CMD_ERROR;
         }
 

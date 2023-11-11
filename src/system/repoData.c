@@ -559,6 +559,33 @@ int dat_fprint_payload_struct(FILE *stream, void* data, unsigned int payload)
     return 0;
 }
 
+int dat_get_missing_interval(int payload, int first_ack, int *resp, int max_n_pairs, int *actual_resp_size)
+{
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    int rc = storage_payload_get_missing_interval_indexes(data_map[payload].table, first_ack,resp, max_n_pairs, actual_resp_size);
+    osSemaphoreGiven(&repo_data_sem);
+    if (rc != SCH_ST_OK)
+    {
+        LOGE(tag, "Cannot get indexes %i", rc)
+        return -1; // ERROR
+    }
+
+    return 0; // SUCCESS
+}
+
+int dat_drop_duplicates(char *table_name)
+{
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    int rc = storage_payload_drop_duplicates(table_name);
+    osSemaphoreGiven(&repo_data_sem);
+    if (rc != SCH_ST_OK)
+    {
+        LOGE(tag, "Error while dropping duplicates from table %s", table_name);
+        return -1; // ERROR
+    }
+    return 0;
+}
+
 int dat_set_stmachine_state(dat_stmachine_action_t action, unsigned int step, int nsamples)
 {
     LOGI(tag, "Changing state to  %d %u %d", action, step, nsamples);
