@@ -408,11 +408,10 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
     LOGI(tag, "actual_resp_size: %i", actual_resp_size);
 
     char buff_ask[256]= {0};
-    //for(int i = 0; i < 30; i++) {
         if (resp[0] - 1 > ack) {
 
-            //for (int i = 0; i < 5; i++)
-            //{
+            for (int i = 0; i < 5; i++)
+            {
                 char cmd_ack[100];
                 snprintf(cmd_ack, 100, "tm_set_ack %i %i", payload, resp[0]);
                 cmd_t *cmdt_ack = cmd_build_from_str(cmd_ack);
@@ -423,12 +422,12 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
                 cmd_t *cmdt_ack_sat = cmd_build_from_str(cmd_ack_sat);
                 cmd_send(cmdt_ack_sat);
                 LOGI(tag, "Acknowledging up to %i sample", resp[0]);
-            //}
+            }
 
 
             memset(&buff_ask[0], 0, sizeof(buff_ask));
             snprintf(buff_ask, 100, "com_send_cmd %i tm_send_n %u %u %u", source, payload, SCH_COMM_NODE,
-                     resp[1] - resp[0] + 1);
+                     resp[1] - resp[0]);
             //snprintf(buff_ask, 100, "com_ping 3");
             cmd_t *cmd_ask = cmd_build_from_str(buff_ask);
             if (cmd_ask == NULL) {
@@ -450,12 +449,6 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
                 return CMD_OK;
             }
         }
-    //}
-    //}
-        //osDelay(500);
-    //}
-
-    //dat_drop_duplicates(data_map[payload].table);
     return CMD_OK;
 }
 
