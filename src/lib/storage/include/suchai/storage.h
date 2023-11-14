@@ -331,6 +331,7 @@ int storage_payload_get_missing_interval_indexes(char *payload_table_name,
                                                  int max_n_pairs,
                                                  int *actual_resp_size);
 
+int storage_get_max_sat_index(char *tablename, int *resp);
 
 int storage_payload_drop_duplicates(char *table_name);
 

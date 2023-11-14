@@ -364,16 +364,34 @@ int tm_send_all(char *fmt, char *params, int nparams)
     }
 }
 
-int32_t tm_calculate_iterations(int n, double_t empiric_packets_arrived_probability, double_t success_prob)
+int actual_size_is_zero(int payload, int source)
 {
-    return (int32_t) ceil(log(1 - pow(success_prob, ((double_t)1)/n)) /
-    log(1 - empiric_packets_arrived_probability));
+    for (int i = 0; i < 5; i++)
+    {
+        int last_sat_index;
+        int rc = dat_get_max_sat_index(data_map[payload].table, &last_sat_index);
+        if (rc != 0)
+        {
+            LOGE(tag, "Cannot get max sat_index for payload &i: %s, rc = %i", payload, data_map[payload].table, rc);
+            return CMD_ERROR;
+        }
+        char cmd_ack[100];
+        snprintf(cmd_ack, 100, "tm_set_ack %i %i", payload, last_sat_index);
+        cmd_t *cmdt_ack = cmd_build_from_str(cmd_ack);
+        cmd_send(cmdt_ack);
+
+        char cmd_ack_sat[100];
+        snprintf(cmd_ack_sat, 100, "com_send_cmd %i tm_set_ack %i %i", source, payload,last_sat_index);
+        cmd_t *cmdt_ack_sat = cmd_build_from_str(cmd_ack_sat);
+        cmd_send(cmdt_ack_sat);
+        LOGI(tag, "Acknowledging up to %i sample", last_sat_index);
+    }
 }
 
 int tm_ask_missing_payload(char *fmt, char *params, int nparams)
 {
-    cmd_t *cmd3 = cmd_build_from_str("obc_ident");
-    cmd_send(cmd3);
+    //cmd_t *cmd3 = cmd_build_from_str("obc_ident");
+    //cmd_send(cmd3);
     /// we need a way to set up the sys_ack variable
     if (params == NULL){
         LOGE(tag, "param is null!");
@@ -399,6 +417,7 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
     if (actual_resp_size == 0)
     {
         LOGI(tag, "No missing data for payload %u: %s, ack: %i", payload, data_map[payload].table, ack);
+        actual_size_is_zero(payload, source);
         return CMD_OK;
     }
     LOGI(tag, "dat sys_ack: %i", ack);
@@ -446,6 +465,8 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
             }
             if (actual_resp_size == 0) {
                 LOGI(tag, "No missing data for payload %i: %s, ack: %i", payload, data_map[payload].table, ack);
+                // acknowledging max sat_index
+                actual_size_is_zero(payload, source);
                 return CMD_OK;
             }
         }

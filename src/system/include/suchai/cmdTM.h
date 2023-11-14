@@ -129,7 +129,7 @@ int tm_send_last(char *fmt, char *params, int nparams);
  */
 int tm_send_all(char *fmt, char *params, int nparams);
 
-int32_t tm_calculate_iterations(int n, double_t empiric_packets_arrived_probability, double_t success_prob);
+
 
 /**
  * Ask to a node to receive payload data

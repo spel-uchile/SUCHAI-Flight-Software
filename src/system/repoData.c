@@ -573,6 +573,19 @@ int dat_get_missing_interval(int payload, int first_ack, int *resp, int max_n_pa
     return 0; // SUCCESS
 }
 
+int dat_get_max_sat_index(char *tablename, int *resp)
+{
+    osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
+    int rc = storage_get_max_sat_index(tablename, resp);
+    osSemaphoreGiven(&repo_data_sem);
+    if (rc != SCH_ST_OK)
+    {
+        LOGE(tag, "Cannot get max sat_index")
+        return -1;
+    }
+    return 0;
+}
+
 int dat_drop_duplicates(char *table_name)
 {
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);

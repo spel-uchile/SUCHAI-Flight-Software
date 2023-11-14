@@ -749,6 +749,26 @@ int storage_payload_get_missing_interval_indexes(char *payload_table_name,
     {
         return -4;
     }
+    if (payload_table_name == NULL)
+    {
+        return -5;
+    }
+    if (first_ack < 0)
+    {
+        return -6;
+    }
+    if (resp == NULL)
+    {
+        return -7;
+    }
+    if (max_n_pairs <= 0)
+    {
+        return -8;
+    }
+    if (actual_resp_size == NULL)
+    {
+        return -9;
+    }
     int rc;
     char sql[ST_SQL_MAX_LEN];
     snprintf(sql,
@@ -770,22 +790,22 @@ int storage_payload_get_missing_interval_indexes(char *payload_table_name,
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt,0);
     if (rc !=SQLITE_OK )
     {
-        return -5;
+        return -10;
     }
-    rc = sqlite3_bind_int64(stmt, 1, first_ack);
+    rc = sqlite3_bind_int(stmt, 1, first_ack);
     if (rc !=SQLITE_OK )
     {
-        return -6;
+        return -11;
     }
-    rc = sqlite3_bind_int64(stmt, 2, first_ack);
+    rc = sqlite3_bind_int(stmt, 2, first_ack);
     if (rc !=SQLITE_OK )
     {
-        return -7;
+        return -13;
     }
     rc = sqlite3_bind_int(stmt, 3, max_n_pairs);
     if (rc !=SQLITE_OK )
     {
-        return -8;
+        return -14;
     }
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_DONE)
@@ -795,15 +815,15 @@ int storage_payload_get_missing_interval_indexes(char *payload_table_name,
     if (rc != SQLITE_ROW)
     {
         printf("rc from database: %i", rc);
-        return -9;
+        return -15;
     }
     int max_n_data = max_n_pairs * 2;
     *actual_resp_size = 0;
     // must free somewhere else
     for(int i = 0; i < max_n_data ; i+= 2)
     {
-        long long first_index = sqlite3_column_int64(stmt, 0);
-        long long second_index = sqlite3_column_int64(stmt, 1);
+        int first_index = sqlite3_column_int(stmt, 0);
+        int second_index = sqlite3_column_int(stmt, 1);
         resp[i] = first_index;
         resp[i + 1] = second_index;
         *actual_resp_size = *actual_resp_size + 2;
@@ -815,9 +835,55 @@ int storage_payload_get_missing_interval_indexes(char *payload_table_name,
         }
         if (rc != SQLITE_ROW)
         {
-            return -11;
+            return -16;
         }
     }
+}
+
+int storage_get_max_sat_index(char *tablename, int *resp)
+{
+    if (db == NULL)
+    {
+        return -2;
+    }
+    if (payloads_schema == NULL)
+    {
+        return -3;
+    }
+    if (storage_is_open == 0)
+    {
+        return -4;
+    }
+    if (tablename == NULL)
+    {
+        return -5;
+    }
+    if (resp == NULL)
+    {
+        return -6;
+    }
+    int rc;
+    char sql[ST_SQL_MAX_LEN];
+    snprintf(sql, ST_SQL_MAX_LEN,"SELECT MAX(sat_index) FROM %s", tablename);
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql, -1,&stmt, 0);
+    if (rc !=SQLITE_OK )
+    {
+        return -7;
+    }
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_DONE)
+    {
+        return SCH_ST_OK;
+    }
+    if (rc != SQLITE_ROW)
+    {
+        printf("rc from database: %i", rc);
+        return -8;
+    }
+    *resp = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+    return SCH_ST_OK;
 }
 
 int storage_payload_drop_duplicates(char *table_name)
