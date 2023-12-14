@@ -402,7 +402,7 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
     }
     uint32_t source, dest_node , payload;
 
-    if (nparams != sscanf(params, fmt, &source, &dest_node, &payload)){
+    if (nparams != sscanf(params, fmt, &payload, &source, &dest_node)){
         LOGE(tag, "number of params does not match");
         return CMD_SYNTAX_ERROR;
     }
@@ -411,6 +411,7 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
         LOGE(tag, "incorrect payload");
         return CMD_ERROR;
     }
+
     if (source < 0)
     {
         LOGE(tag, "incorrect source, must be a valid node number");
