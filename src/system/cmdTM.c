@@ -363,7 +363,7 @@ int tm_send_all(char *fmt, char *params, int nparams)
     }
 }
 
-int actual_size_is_zero(int payload, int source)
+int actual_size_is_zero(uint32_t payload, uint32_t source)
 {
     for (int i = 0; i < 5; i++)
     {
@@ -400,17 +400,29 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
         LOGE(tag, "param is null!");
         return CMD_SYNTAX_ERROR;
     }
-    int source, dest_node , payload;
+    uint32_t source, dest_node , payload;
 
     if (nparams != sscanf(params, fmt, &source, &dest_node, &payload)){
         LOGE(tag, "number of params does not match");
         return CMD_SYNTAX_ERROR;
     }
 
-    if (0 > payload || payload >= last_sensor) {
+    if ( payload < 0 || payload >= last_sensor) {
         LOGE(tag, "incorrect payload");
         return CMD_ERROR;
     }
+    if (source < 0)
+    {
+        LOGE(tag, "incorrect source, must be a valid node number");
+        return CMD_ERROR;
+    }
+
+    if (dest_node < 0 )
+    {
+        LOGE(tag, "incorrect destination, must be a valid node number");
+        return CMD_ERROR;
+    }
+
     int idx_start, idx_end, first_ack;
 
     int resp[2];
