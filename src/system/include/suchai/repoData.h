@@ -316,7 +316,7 @@ void _set_sat_vector(vector3_t *r, dat_status_address_t index);
 int dat_get_fp_st_index(int index, fp_entry_t *fp_entry);
 
 
-int dat_get_missing_interval(int payload, int first_ack, int *resp, int max_n_pairs, int *actual_resp_size);
+int dat_get_missing_interval(uint32_t payload, int first_ack, int *resp, int max_n_pairs, int *actual_resp_size);
 int dat_get_max_sat_index(char *tablename, int *resp);
 int dat_drop_duplicates(char *table_name);
 #endif // DATA_REPO_H

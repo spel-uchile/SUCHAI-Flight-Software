@@ -559,7 +559,7 @@ int dat_fprint_payload_struct(FILE *stream, void* data, unsigned int payload)
     return 0;
 }
 
-int dat_get_missing_interval(int payload, int first_ack, int *resp, int max_n_pairs, int *actual_resp_size)
+int dat_get_missing_interval(uint32_t payload, int first_ack, int *resp, int max_n_pairs, int *actual_resp_size)
 {
     osSemaphoreTake(&repo_data_sem, portMAX_DELAY);
     int rc = storage_payload_get_missing_interval_indexes(data_map[payload].table, first_ack,resp, max_n_pairs, actual_resp_size);
