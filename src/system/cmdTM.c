@@ -50,7 +50,6 @@ void cmd_tm_init(void)
     cmd_add("tm_merge_file", tm_merge_file, "%s %d", 2);
     cmd_add("tm_ls", tm_list_files, "%s %d", 2);
     cmd_add("tm_amp", tm_ask_missing_payload, "%u %u %u", 3);
-    cmd_add("tm_ask_missing", tm_ask_missing, "%d", 1); // comando agregado
 #endif
 }
 
@@ -375,15 +374,19 @@ int actual_size_is_zero(int payload, int source)
             LOGE(tag, "Cannot get max sat_index for payload &i: %s, rc = %i", payload, data_map[payload].table, rc);
             return CMD_ERROR;
         }
-        char cmd_ack[100];
-        snprintf(cmd_ack, 100, "tm_set_ack %i %i", payload, last_sat_index);
+
+        dat_set_system_var(data_map[payload].sys_ack, last_sat_index);
+        /*char cmd_ack[100];
+        snprintf(cmd_ack, 100, "tm_set_ack %u %u", payload, last_sat_index);
+        LOGI(tag,"set ack:: %s", cmd_ack);
         cmd_t *cmdt_ack = cmd_build_from_str(cmd_ack);
         cmd_send(cmdt_ack);
-
+        */
         char cmd_ack_sat[100];
-        snprintf(cmd_ack_sat, 100, "com_send_cmd %i tm_set_ack %i %i", source, payload,last_sat_index);
+        snprintf(cmd_ack_sat, 100, "com_send_cmd %i tm_set_ack %u %u", source, payload,last_sat_index);
         cmd_t *cmdt_ack_sat = cmd_build_from_str(cmd_ack_sat);
         cmd_send(cmdt_ack_sat);
+        LOGI(tag,"set ack sat:: %s", cmd_ack_sat);
         LOGI(tag, "Acknowledging up to %i sample", last_sat_index);
     }
 }
@@ -404,8 +407,9 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    if (payload >= last_sensor) {
+    if (0 > payload || payload >= last_sensor) {
         LOGE(tag, "incorrect payload");
+        return CMD_ERROR;
     }
     int idx_start, idx_end, first_ack;
 
@@ -420,11 +424,8 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
         actual_size_is_zero(payload, source);
         return CMD_OK;
     }
-    LOGI(tag, "dat sys_ack: %i", ack);
-    LOGI(tag, "resp[0]: %i", resp[0]);
 
     LOGI(tag, "set ack for payload %i: %s", payload, data_map[payload].table);
-    LOGI(tag, "actual_resp_size: %i", actual_resp_size);
 
     char buff_ask[256]= {0};
         if (resp[0] - 1 > ack) {
@@ -470,34 +471,14 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
                 return CMD_OK;
             }
         }
+    rc = dat_drop_duplicates(data_map[payload].table);
+        if (rc != 0)
+        {
+            LOGE(tag, "Could not drop duplicates");
+        }
     return CMD_OK;
 }
 
-
-
-int tm_ask_missing(char *fmt, char *params, int nparams)
-{
-    if (params == NULL){
-        LOGE(tag, "param is null!");
-        return CMD_SYNTAX_ERROR;
-    }
-    int source;
-
-    if (nparams != sscanf(params, fmt, &source)){
-        LOGE(tag, "number of params does not match");
-        return CMD_SYNTAX_ERROR;
-    }
-
-    for (int i = 0; i < last_sensor; i++)
-    {
-        char *cmd_string = malloc(sizeof(char) * 100);
-        snprintf(cmd_string, 100, "tm_amp %d %d %d %u", source, SCH_COMM_NODE, i, 10);
-        cmd_t *cmd = cmd_build_from_str(cmd_string);
-        cmd_send(cmd);
-        free(cmd_string);
-    }
-    return CMD_OK;
-}
 
 int tm_send_from(char *fmt, char *params, int nparams)
 {
