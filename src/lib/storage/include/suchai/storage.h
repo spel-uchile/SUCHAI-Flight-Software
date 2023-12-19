@@ -318,12 +318,31 @@ int storage_payload_reset_table(int payload);
  *
  * The @param resp array size must be twice @param max_n_pairs
  *
- * @param payload_table_name the payload table name
- * @param first_ack the index for starting the lookup
- * @param resp the response array
- * @param max_n_pairs the maximum number of pairs
- * @param actual_resp_size the actual number of PAIRS gotten (in the
+ * @param payload_table_name String. The payload table name
+ * @param first_ack Integer. The index for starting the lookup
+ * @param resp Integer array . The response array
+ * @param max_n_pairs Integer. The maximum number of pairs
+ * @param actual_resp_size Integer array. The actual number of PAIRS gotten (in the
  *      case of getting less than the twice max_n_pairs
+ *
+ * It can return:
+ *       0: Success
+ *      -2: Database pointer is null (db)
+ *      -3: Payload schema is null
+ *      -4: Storage is closed
+ *      -5: Payload table name is null
+ *      -6: @param first_ack is less than zero
+ *      -7: Resp array is null
+ *      -8: @param max_n_pairs is less or equal to zero
+ *      -9: @param actual_resp_size is null
+ *      -10: Cannot prepare statement
+ *      -11: Cannot bind @param first_ack for first time
+ *      -12: Cannot bind @param first_ack for second time
+ *      -13: Cannot bind @param first_ack for third time
+ *      -14: Cannot bind @param max_n_pairs
+ *      -15: Cannot get row response from database
+ *      -16: Cannot get row response from database
+ *
  * */
 int storage_payload_get_missing_interval_indexes(char *payload_table_name,
                                                  int first_ack,
@@ -331,8 +350,39 @@ int storage_payload_get_missing_interval_indexes(char *payload_table_name,
                                                  int max_n_pairs,
                                                  int *actual_resp_size);
 
+/**
+ * Get the maximum sat_index recorded in the database
+ *
+ * @param tablename String. The table name
+ * @param resp Pointer to int. The pointer to deliver the response
+ *
+ * It can return
+ *  0: (SCH_ST_OK) Success
+ *  -2: Database pointer is null (db)
+ *  -3: Payload schema is null
+ *  -4: Storage is closed
+ *  -5: @param tablename is null
+ *  -6: @param resp is null
+ *  -7: Cannot prepare statement
+ *  -8: Cannot get row from database
+ *
+ * */
 int storage_get_max_sat_index(char *tablename, int *resp);
 
+/**
+ * Drop duplicates from database if there are any
+ *
+ * @param table_name String. The table name
+ *
+ * It can return:
+ *  0: (SCH_ST_OK) Success
+ *  -1: (SCH_ST_ERROR) @param table_name is null
+ *  -2: Database pointer is null
+ *  -3: Payloads schema is null
+ *  -4: Storage is closed
+ *  -5: Cannot prepare statement
+ *  -6: Cannot execute statement
+ * */
 int storage_payload_drop_duplicates(char *table_name);
 
 #endif //SCH_STORAGE_H

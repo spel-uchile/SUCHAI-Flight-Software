@@ -315,8 +315,37 @@ void _set_sat_vector(vector3_t *r, dat_status_address_t index);
  */
 int dat_get_fp_st_index(int index, fp_entry_t *fp_entry);
 
-
+/**
+ * Obtains the first missing interval from database since the @param first_ack
+ *
+ * @param payload The payload index
+ * @param first_ack the most recent acknowledge index
+ * @param resp The start and end indexes to ask
+ * @param max_n_pairs the maximum pairs to ask
+ * @param actual_resp_size the interval size
+ *
+ * @returns 0 on success
+ * @returns -1 on error and print it.
+ * */
 int dat_get_missing_interval(uint32_t payload, int first_ack, int *resp, int max_n_pairs, int *actual_resp_size);
+
+/**
+ * Obtains the maximum sat_index recorded in database
+ *
+ * @param tablename the table name
+ * @param tablename the response
+ *
+ * @returns 0 on success
+ * @returns -1 on error and print it.
+ * */
 int dat_get_max_sat_index(char *tablename, int *resp);
+
+/**
+ * Deletes duplicates in database
+ *
+ * @param table_name the table name
+ * @returns 0 on success
+ * @returns -1 on error and print it.
+ * */
 int dat_drop_duplicates(char *table_name);
 #endif // DATA_REPO_H

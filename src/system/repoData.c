@@ -593,7 +593,7 @@ int dat_drop_duplicates(char *table_name)
     osSemaphoreGiven(&repo_data_sem);
     if (rc != SCH_ST_OK)
     {
-        LOGE(tag, "Error while dropping duplicates from table %s", table_name);
+        LOGE(tag, "Error while dropping duplicates from table %s, %i", table_name, rc);
         return -1; // ERROR
     }
     return 0;

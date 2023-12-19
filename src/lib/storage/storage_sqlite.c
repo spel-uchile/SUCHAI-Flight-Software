@@ -913,26 +913,13 @@ int storage_payload_drop_duplicates(char *table_name)
     if (rc != SQLITE_OK)
     {
         sqlite3_finalize(stmt);
-        return SCH_ST_ERROR;
+        return -5;
     }
-    /*
-    rc = sqlite3_bind_text(stmt,1,table_name,sizeof (table_name),NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
-        return SCH_ST_ERROR;
-    }
-    rc = sqlite3_bind_text(stmt, 2, table_name, sizeof(table_name), NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
-        return SCH_ST_ERROR;
-    }*/
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE)
     {
         sqlite3_finalize(stmt);
-        return SCH_ST_ERROR;
+        return -6;
     }
     sqlite3_finalize(stmt);
     return SCH_ST_OK;
