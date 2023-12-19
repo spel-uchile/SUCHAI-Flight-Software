@@ -135,21 +135,11 @@ int tm_send_all(char *fmt, char *params, int nparams);
  * Ask to a node to receive payload data
  *
  * @param fmt "%u %u %u"
- * @param params "<source node> <destination node> <payload>
+ * @param params "<payload> <source node> <destination node>"
  * @param nparams 3
  * @return CMD_OK, CMD_ERROR OR CMD_ERROR_SYNTAX
  * */
 int tm_ask_missing_payload(char *fmt, char *params, int nparams);
-
-/**
- * Send all missing data for all payloads identifiers.
- *
- * @param fmt "%u"
- * @param params "<source node>"
- * @param nparams 1
- *
- * */
-int tm_ask_missing(char *fmt, char *params, int nparams);
 
 /**
  * Send k structs data stored as payload in multiple csp frames form last acknowledge.

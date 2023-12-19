@@ -376,12 +376,6 @@ int actual_size_is_zero(uint32_t payload, uint32_t source)
         }
 
         dat_set_system_var(data_map[payload].sys_ack, last_sat_index);
-        /*char cmd_ack[100];
-        snprintf(cmd_ack, 100, "tm_set_ack %u %u", payload, last_sat_index);
-        LOGI(tag,"set ack:: %s", cmd_ack);
-        cmd_t *cmdt_ack = cmd_build_from_str(cmd_ack);
-        cmd_send(cmdt_ack);
-        */
         char cmd_ack_sat[100];
         snprintf(cmd_ack_sat, 100, "com_send_cmd %i tm_set_ack %u %u", source, payload,last_sat_index);
         cmd_t *cmdt_ack_sat = cmd_build_from_str(cmd_ack_sat);
@@ -400,7 +394,7 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
         LOGE(tag, "param is null!");
         return CMD_SYNTAX_ERROR;
     }
-    uint32_t source, dest_node , payload;
+    uint32_t  payload,source, dest_node;
 
     if (nparams != sscanf(params, fmt, &payload, &source, &dest_node)){
         LOGE(tag, "number of params does not match");
@@ -461,13 +455,11 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
             memset(&buff_ask[0], 0, sizeof(buff_ask));
             snprintf(buff_ask, 100, "com_send_cmd %i tm_send_n %u %u %u", source, payload, SCH_COMM_NODE,
                      resp[1] - resp[0]);
-            //snprintf(buff_ask, 100, "com_ping 3");
             cmd_t *cmd_ask = cmd_build_from_str(buff_ask);
             if (cmd_ask == NULL) {
                 LOGE(tag, "Cannot set command for asking data");
                 return CMD_ERROR;
             }
-            LOGI(tag, "%s", buff_ask);
             cmd_send(cmd_ask);
             memset(&buff_ask[0], 0, sizeof(buff_ask));
             actual_resp_size = 0;
@@ -488,6 +480,7 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
         if (rc != 0)
         {
             LOGE(tag, "Could not drop duplicates");
+            return CMD_ERROR;
         }
     return CMD_OK;
 }
