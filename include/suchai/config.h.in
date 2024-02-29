@@ -21,13 +21,13 @@
 /* Select one operating system */
 #cmakedefine LINUX                       1
 #cmakedefine FREERTOS                    2
-#cmakedefine SIM                         3
 #cmakedefine SCH_OS                      @SCH_OS@  ///< Operating system port | FREERTOS
 /* Select the correct architecture */
 #cmakedefine X86                         10
 #cmakedefine RPI                         11
 #cmakedefine ESP32                       12
 #cmakedefine NANOMIND                    13
+#cmakedefine SIM                         14
 #cmakedefine SCH_ARCH                    @SCH_ARCH@  ///< Hardware port X86 | RPI | ESP32 | NANOMIND
 #cmakedefine SCH_HAVE_MALLOC
 /* Select the correct app */

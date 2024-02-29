@@ -27,14 +27,14 @@ endif()
 ##
 # Platform settings
 ##
-set(SCH_OS_LIST LINUX;FREERTOS;SIM)
+set(SCH_OS_LIST LINUX;FREERTOS)
 set(SCH_OS LINUX CACHE STRING "Select OS from ${SCH_OS_LIST}")
 if(SCH_OS IN_LIST SCH_OS_LIST)
     set(${SCH_OS} ON)
 else()
     message(FATAL_ERROR "Invalid SCH_OS selected, please select from ${SCH_OS_LIST}")
 endif()
-set(SCH_ARCH_LIST "X86;RPI;ESP32;NANOMIND")
+set(SCH_ARCH_LIST "X86;RPI;ESP32;NANOMIND;SIM")
 set(SCH_ARCH "X86" CACHE STRING "Select ARCH from ${SCH_ARCH_LIST}")
 if(SCH_ARCH IN_LIST SCH_ARCH_LIST)
     set(${SCH_ARCH} ON)
