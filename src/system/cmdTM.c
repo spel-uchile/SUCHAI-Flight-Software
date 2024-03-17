@@ -525,7 +525,7 @@ int tm_print_fp(char *fmt, char *params, int nparams)
             // periodical as concatenated string
     char buff[max_buff_len];
     com_frame_t *frame = (com_frame_t *)params;
-    fp_container_t *fp_recv = (fp_entry_t *)frame->data.data8;
+    fp_container_t *fp_recv = (fp_container_t *)frame->data.data8;
 
     snprintf(buff, max_buff_len, "%s\t%d\t%d\t%d\t%d", fp_recv->cmd_args, csp_ntoh32(fp_recv->unixtime),
              csp_ntoh32(fp_recv->node), csp_ntoh32(fp_recv->executions), csp_ntoh32(fp_recv->periodical));
