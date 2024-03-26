@@ -68,17 +68,18 @@ Currently, it has been tested in the following OS/Architectures:
 #### Requirements
 Linux's installation requires the following libraries:
 
-| Library name            | Ubuntu and family | Archlinux and family  |
-| ----------------------- | --------------- | ------------------------|
-| cmake >= 3.16           | cmake           | cmake                   |
-| gcc >= 7.5              | gcc             | gcc                     |
-| make >= 4.1             | make            | make                    |
-| python2 >= 2.7.17       | python          | python2                 |
-| zmq >= 4.2.5            | libzmq3-dev     | zeromq                  |
-| pkg-config >= 0.29.1    | pkg-config      | pkgconf                 |
-| (opt) sqlite >= 3.22    | libsqlite3-dev  | sqlite                  |
-| (opt) libpq >= 10.17    | libpq-dev       | libpq-dev               |
-| (opt) cunit >= 2.1.3    | libcunit1-dev   | postgresql              |
+| Library name         | Ubuntu and family | Archlinux and family |
+|----------------------|-------------------|----------------------|
+| cmake >= 3.16        | cmake             | cmake                |
+| gcc >= 7.5           | gcc               | gcc                  |
+| make >= 4.1          | make              | make                 |
+| python2 >= 2.7.17    | python            | python2              |
+| zmq >= 4.2.5         | libzmq3-dev       | zeromq               |
+| pkg-config >= 0.29.1 | pkg-config        | pkgconf              |
+| libmongoc >= 1.25    | libmongoc-dev     | mongo-c-driver       |
+| (opt) sqlite >= 3.22 | libsqlite3-dev    | sqlite               |
+| (opt) libpq >= 10.17 | libpq-dev         | libpq-dev            |
+| (opt) cunit >= 2.1.3 | libcunit1-dev     | postgresql           |
 
 
 #### Clone
