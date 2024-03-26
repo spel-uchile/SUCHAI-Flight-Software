@@ -25,7 +25,6 @@
 #include "os/os.h"
 #include "suchai/osSemphr.h"
 #include "csp/csp.h"
-#include "cJSON.h"
 
 /**
  * @brief Log level

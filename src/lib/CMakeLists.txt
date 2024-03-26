@@ -10,7 +10,7 @@ if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("${CSP_RESULTS}")
 endif()
 
-find_package (mongoc-1.0 1.7 REQUIRED)
+find_package (mongoc-1.0 REQUIRED)
 
 set(SOURCE_FILES
         utils/math_utils.c
