@@ -3,7 +3,7 @@
  * @author Carlos Gonzalez C - carlgonz@uchile.cl
  * @author Camilo Rojas M - camrojas@uchile.cl
  * @author Elias Obreque S - elias.obreque@uchile.cl
- * @date 2020
+ * @date 2024
  * @copyright GNU GPL v3
  *
  * This header have definitions related with general utilities such as logging,
@@ -25,6 +25,7 @@
 #include "os/os.h"
 #include "suchai/osSemphr.h"
 #include "csp/csp.h"
+#include "cJSON.h"
 
 /**
  * @brief Log level
@@ -39,6 +40,13 @@ typedef enum {
     LOG_LVL_DEBUG,      /*!< Extra information which is not necessary for normal use (values, pointers, sizes, etc). */
     LOG_LVL_VERBOSE     /*!< Bigger chunks of debugging information, or frequent messages which can potentially flood the output. */
 } log_level_t;
+
+typedef enum {
+    LOG_MODE_STDOUT,
+    LOG_MODE_FILE,
+    LOG_MODE_CSP,
+    LOG_MODE_MONGO
+} log_mode_t;
 
 // Define default log level
 #ifndef SCH_LOG_LEVEL
@@ -58,26 +66,30 @@ extern osSemaphore log_mutex;  ///< Sync logging functions, require initializati
  * Set the log level and node to send logs. If node = -1, then print to stdout,
  * else send logs to another node using CSP
  * @param level Log level
- * @param node CSP node to send logs. Set to -1 to use stdout.
+ * @param mode Log mode
+ * @param node
+ *  If mode is LOG_MODE_CSP, then it is the CSP node to send logs.
+ *  If mode is LOG_MODE_FILE, then it is the filename suffix.
+ *  Else, not used.
  * @return Int. CSP_SEMAPHORE_OK(1) or CSP_SEMAPHORE_ERROR(2)
  */
-int log_init(log_level_t level, int node);
+int log_init(log_level_t level, log_mode_t mode, int node);
 
 /**
  * Set the log function and level.
- * If node = 0, then print to stdout,
- * if node > 0, send logs to another <node> using CSP
- * If node < 0, write logs to a file named suchai_<node>.log
  *
- * @param level Log level
- * @param node Log type or node to send logs. 0: stdout, >0 CSP, <0 file.
+ * @param level Log level @see log_level_t
+ * @param mode Log mode @see log_mode_t
+ * @param args Additional arguments to the log mode
+ * @param args_size Additional arguments size
  */
-void log_set(log_level_t level, int node);
+void log_set(log_level_t level, log_mode_t mode, void *args, size_t args_size);
 
 /** Available log functions */
 void log_print(const char *lvl, const char *tag, const char *msg, ...);
 void log_send(const char *lvl, const char *tag, const char *msg, ...);
 void log_file(const char *lvl, const char *tag, const char *msg, ...);
+void log_mongodb(const char *lvl, const char *tag, const char *msg, ...);
 
 extern void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
 extern log_level_t log_lvl;

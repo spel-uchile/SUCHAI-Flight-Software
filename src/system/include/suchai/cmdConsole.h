@@ -41,24 +41,29 @@ int con_debug_msg(char *fmt, char *params, int nparams);
 int con_help(char *fmt, char *params, int nparams);
 
 /**
- * Set the log verbosity level and current node to send logs
+ * Set the log verbosity level, mode, and node. If mode is LOG_MODE_CSP then logs are send to <node>
  *  - level can be 0 to 5 @see log_level_t
- *  - node can be -1 to use stdout, or > 0 to to send log using CSP to <node>
+ *  - mode can be 0 to 3 @see log_mode_t
+ *  - node can be the destination to send log using CSP, or the file suffix when using file mode.
  *
- * @param fmt Str. Parameters format "%d %d"
- * @param params Str. Parameters as string "<level> <node>"
- * @param nparams Int. Number of parameters 2
+ * @param fmt Str. Parameters format "%d %d %d"
+ * @param params Str. Parameters as string "<level> <mode> <node>"
+ * @param nparams Int. Number of parameters 3
  * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  *
  * Example
  * @code
- * //Set log level to DEBUG using STDOUT
- * log_set 4 -1
- * con_set_logger("%d %d", "4 -1", 2);
+ * //Set log level to DEBUG (1) using STDOUT (0)
+ * log_set 5 0 0
+ * con_set_logger("%d %d %d", "4 0 0", 2);
  *
- * #Set log level to INFO and send log to CSP node 10
- * log_set 3 10
- * con_set_logger("%d %d", "3 10", 2);
+ * #Set log level to INFO (4) and send log to a FILE (1) named suchai_3.log
+ * log_set 4 1 3
+ * con_set_logger("%d %d", "4 1 3", 3);
+ *
+ * #Set log level to RESULTS (1) and send log to CSP (2) node 10
+ * log_set 1 2 10
+ * con_set_logger("%d %d", "1 2 10", 3);
  * @endcode
  */
 int con_set_logger(char *fmt, char *params, int nparams);

@@ -1,9 +1,9 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2020, Elias Obreque Sepulveda, elias.obreque@uchile.cl
+ *      Copyright 2024, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2024, Camilo Rojas Milla, camrojas@uchile.cl
+ *      Copyright 2024, Elias Obreque Sepulveda, elias.obreque@uchile.cl
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
  */
 
 #include "suchai/log_utils.h"
+#include "suchai/log_utils_mongo.h"
 
 osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
@@ -80,29 +81,57 @@ void log_file(const char *lvl, const char *tag, const char *msg, ...)
     va_end(args);
 }
 
-void log_set(log_level_t level, int node)
+void log_mongodb(const char *lvl, const char *tag, const char *msg, ...)
+{
+    // Save log to mongodb
+    va_list args;
+    va_start(args, msg);
+    mongodb_log(lvl, tag, msg, args);
+    va_end(args);
+
+    // Also print log message
+    va_start(args, msg);
+    log_print(lvl, tag, msg, args);
+    va_end(args);
+}
+
+void log_set(log_level_t level, log_mode_t mode, void *args, size_t args_size)
 {
     osSemaphoreTake(&log_mutex, portMAX_DELAY);
     log_lvl = level;
-    if(node == 0)
+
+    if(mode == LOG_MODE_STDOUT)
+    {
         log_function = log_print;
-    else if(node > 0)
+    }
+    else if(mode == LOG_MODE_FILE)
+    {
+        assert(args_size == sizeof(int));
+        snprintf(log_file_name, SCH_BUFF_MAX_LEN, "suchai_%d.log", *(int *)args);
+        log_function = log_file;
+    }
+    else if(mode == LOG_MODE_CSP)
     {
         log_function = log_send;
-        log_node = (uint8_t) node;
+        assert(args_size == sizeof(int));
+        log_node = (uint8_t)(*(int *)args);
+    }
+    else if(mode == LOG_MODE_MONGO)
+    {
+        mongodb_log_init();
+        log_function = log_mongodb;
     }
     else
     {
-        snprintf(log_file_name, SCH_BUFF_MAX_LEN, "suchai_%d.log", -node);
-        log_function = log_file;
+        fprintf(stderr, "Invalid log mode %d!", mode);
     }
 
     osSemaphoreGiven(&log_mutex);
 }
 
-int log_init(log_level_t level, int node)
+int log_init(log_level_t level, log_mode_t mode, int node)
 {
     int rc = osSemaphoreCreate(&log_mutex);
-    log_set(level, node);
+    log_set(level, mode, (void *)&node, sizeof(node));
     return rc;
 }

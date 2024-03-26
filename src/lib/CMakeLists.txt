@@ -10,9 +10,12 @@ if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("${CSP_RESULTS}")
 endif()
 
+find_package (mongoc-1.0 1.7 REQUIRED)
+
 set(SOURCE_FILES
         utils/math_utils.c
         utils/log_utils.c
+        utils/log_utils_mongo.c
         igrf/igrf13.c
         sgp4/src/c/SGP4.c
         sgp4/src/c/TLE.c
@@ -44,7 +47,7 @@ target_include_directories(suchai-fs-lib PUBLIC
         libcsp/libcsp/include)
 
 target_link_libraries(suchai-fs-lib PRIVATE suchai-fs-os)
-target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)
+target_link_libraries(suchai-fs-lib PRIVATE mongo::mongoc_shared)
 target_link_libraries(suchai-fs-lib PRIVATE -lm -lzmq)
 target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)
 # Link proper storage libraries

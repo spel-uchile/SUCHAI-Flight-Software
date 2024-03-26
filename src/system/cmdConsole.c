@@ -26,7 +26,7 @@ void cmd_console_init(void)
 {
     cmd_add("test", con_debug_msg, "%s", 1);
     cmd_add("help", con_help, "", 0);
-    cmd_add("log_set", con_set_logger, "%d %d", 2);
+    cmd_add("log_set", con_set_logger, "%d %d %d", 3);
 }
 
 /**
@@ -55,16 +55,18 @@ int con_help(char *fmt, char *params, int nparams)
 
 int con_set_logger(char *fmt, char *params, int nparams)
 {
-    int lvl;
-    int node;
+    int lvl, mode, node;
 
-    if(params == NULL || (sscanf(params, fmt, &lvl, &node) != nparams))
+    if(params == NULL || (sscanf(params, fmt, &lvl, &mode, &node) != nparams))
         return CMD_SYNTAX_ERROR;
 
-    if(lvl > LOG_LVL_VERBOSE)
+    if(lvl < 0 || lvl > LOG_LVL_VERBOSE)
         return CMD_ERROR;
 
-    log_set((log_level_t)lvl, node);
-    LOGR(tag, "Log level %d to node %d", log_lvl, log_node);
+    if(mode < 0 || mode > LOG_MODE_MONGO)
+        return CMD_ERROR;
+
+    log_set((log_level_t)lvl, (log_mode_t)mode, (void *)&node, sizeof(int));
+    LOGR(tag, "Log level %d, mode %d, node %d", log_lvl, mode, log_node);
     return CMD_OK;
 }
