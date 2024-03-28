@@ -9,7 +9,7 @@
  * @author Ignacio Ibanez A
  * @author Diego Ortego P
  *
- * @date 2021
+ * @date 2024
  * @copyright GNU GPL v3
  *
  * This header contains system wide settings to customize different submodules
@@ -34,10 +34,16 @@
 #cmakedefine SCH_APP                     @SCH_APP@
 
 /* System debug configurations */
-#cmakedefine SCH_LOG_LEVEL               @SCH_LOG_LEVEL@  ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
 #cmakedefine SCH_NAME                    @SCH_NAME@  ///< Project code name
 #cmakedefine SCH_DEVICE_ID               @SCH_DEVICE_ID@  ///< Device unique ID
 #cmakedefine SCH_SW_VERSION              @SCH_SW_VERSION@  ///< Software version
+
+/* Log system configurations*/
+#cmakedefine SCH_LOG_LEVEL               @SCH_LOG_LEVEL@  ///< LOG_LVL_INFO |  LOG_LVL_DEBUG
+#cmakedefine SCH_LOG_ENABLE_MONGODB
+#cmakedefine SCH_LOG_MONGODB_HOST        @SCH_LOG_MONGODB_HOST@  ///< Mongo db host
+#cmakedefine SCH_LOG_MONGODB_PORT        @SCH_LOG_MONGODB_PORT@  ///< Mongo db port
+#cmakedefine SCH_LOG_MONGODB_NAME        @SCH_LOG_MONGODB_NAME@  ///< Mongo db database name
 
 /* General system settings, enable/disable core tasks */
 #cmakedefine01 SCH_CON_ENABLED

@@ -21,6 +21,7 @@
 
 int mongodb_log_init(void)
 {
+    char uri[SCH_BUFF_MAX_LEN] = {0};
     mongoc_client_t *client = NULL;
     bson_error_t error = {0};
     mongoc_server_api_t *api = NULL;
@@ -33,7 +34,22 @@ int mongodb_log_init(void)
     // Initialize the MongoDB C Driver.
     mongoc_init();
 
-    client = mongoc_client_new(SCH_MONGODB_URI);
+    // Build URI
+    char *user = getenv("MONGO_USER_NAME");
+    char *pass = getenv("MONGO_PASSWORD");
+    if(user != NULL && pass != NULL)
+    {
+        int n = snprintf(uri, SCH_BUFF_MAX_LEN-1, "mongodb://%s:%s@%s:%d", user, pass, SCH_LOG_MONGODB_HOST, SCH_LOG_MONGODB_PORT);
+        assert (n < SCH_BUFF_MAX_LEN);
+    }
+    else
+    {
+        int n = snprintf(uri, SCH_BUFF_MAX_LEN-1, "mongodb://%s:%d", SCH_LOG_MONGODB_HOST, SCH_LOG_MONGODB_PORT);
+        assert (n < SCH_BUFF_MAX_LEN);
+    }
+
+    printf("Connecting to %s\n", uri);
+    client = mongoc_client_new(uri);
     if (!client) {
         fprintf(stderr, "Failed to create a MongoDB client.\n");
         rc = -1;
@@ -56,7 +72,7 @@ int mongodb_log_init(void)
     }
 
     // Get a handle on the "admin" database.
-    database = mongoc_client_get_database(client, "admin");
+    database = mongoc_client_get_database(client, SCH_LOG_MONGODB_NAME);
     if (!database) {
         fprintf(stderr, "Failed to get a MongoDB database handle.\n");
         rc = -1;
@@ -114,7 +130,7 @@ int mongodb_log(const char *lvl, const char *tag, const char *msg, ...)
 
     // Save to mongo
     bson_error_t error;
-    mongoc_collection_t *collection = mongoc_client_get_collection (mongo_log_driver.client, SCH_MONGODB_NAME, "collection");
+    mongoc_collection_t *collection = mongoc_client_get_collection (mongo_log_driver.client, SCH_LOG_MONGODB_NAME, "collection");
     if (!mongoc_collection_insert_one (collection, document, NULL, NULL, &error))
     {
         fprintf (stderr, "%s\n", error.message);
@@ -132,5 +148,5 @@ int mongodb_log(const char *lvl, const char *tag, const char *msg, ...)
     */
     bson_destroy (document);
     mongoc_collection_destroy(collection);
-   return 0;
+    return 0;
 }

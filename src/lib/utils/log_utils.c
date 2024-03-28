@@ -20,7 +20,9 @@
  */
 
 #include "suchai/log_utils.h"
+#ifdef SCH_LOG_ENABLE_MONGODB
 #include "suchai/log_utils_mongo.h"
+#endif
 
 osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
@@ -83,11 +85,13 @@ void log_file(const char *lvl, const char *tag, const char *msg, ...)
 
 void log_mongodb(const char *lvl, const char *tag, const char *msg, ...)
 {
-    // Save log to mongodb
     va_list args;
+#ifdef SCH_LOG_ENABLE_MONGODB
+    // Save log to mongodb
     va_start(args, msg);
     mongodb_log(lvl, tag, msg, args);
     va_end(args);
+#endif
 
     // Also print log message
     va_start(args, msg);
@@ -118,7 +122,6 @@ void log_set(log_level_t level, log_mode_t mode, void *args, size_t args_size)
     }
     else if(mode == LOG_MODE_MONGO)
     {
-        mongodb_log_init();
         log_function = log_mongodb;
     }
     else
@@ -132,6 +135,9 @@ void log_set(log_level_t level, log_mode_t mode, void *args, size_t args_size)
 int log_init(log_level_t level, log_mode_t mode, int node)
 {
     int rc = osSemaphoreCreate(&log_mutex);
+#ifdef SCH_LOG_ENABLE_MONGODB
+    mongodb_log_init();
+#endif
     log_set(level, mode, (void *)&node, sizeof(node));
     return rc;
 }

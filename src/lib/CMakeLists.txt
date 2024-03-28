@@ -2,7 +2,6 @@
 set(LIBCSP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libcsp)
 set(LIBCSP_PPREFIX ${LIBCSP_PATH}/libcsp)
 set(LIBCSP_BUILD_CMD python2 ./waf configure --with-os=posix --enable-if-zmqhub --enable-if-kiss --enable-crc32 --with-rtable cidr --with-driver-usart=linux --with-max-connections=100 --with-conn-queue-length=1000 --with-router-queue-length=1000 --install-csp --prefix=${LIBCSP_PPREFIX} build install)
-
 # Build libcsp if not found
 if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("Building libcsp...")
@@ -10,18 +9,16 @@ if(NOT EXISTS "${LIBCSP_PPREFIX}/lib/libcsp.a")
     message("${CSP_RESULTS}")
 endif()
 
-find_package (mongoc-1.0 REQUIRED)
-
 set(SOURCE_FILES
         utils/math_utils.c
         utils/log_utils.c
-        utils/log_utils_mongo.c
         igrf/igrf13.c
         sgp4/src/c/SGP4.c
         sgp4/src/c/TLE.c
         linenoise/linenoise.c
 )
 
+# Add the corresponding storage driver
 if( SCH_STORAGE_MODE STREQUAL "SCH_ST_RAM")
     message("Using storage/storage_ram.c")
     list(APPEND SOURCE_FILES storage/storage_ram.c)
@@ -33,6 +30,12 @@ elseif(${SCH_STORAGE_MODE} STREQUAL SCH_ST_FLASH)
     list(APPEND SOURCE_FILES storage/storage_flash.c)
 else()
     message(FATAL_ERROR "Invalid storage mode ${SCH_STORAGE_MODE}!")
+endif()
+# Enable mongodb logging system
+if( SCH_LOG_ENABLE_MONGODB )
+    message("Using utils/log_utils_mongo.c")
+    find_package (mongoc-1.0 REQUIRED)
+    list(APPEND SOURCE_FILES utils/log_utils_mongo.c)
 endif()
 
 # Use pthread_setname_np included in <features.h>
@@ -47,7 +50,6 @@ target_include_directories(suchai-fs-lib PUBLIC
         libcsp/libcsp/include)
 
 target_link_libraries(suchai-fs-lib PRIVATE suchai-fs-os)
-target_link_libraries(suchai-fs-lib PRIVATE mongo::mongoc_shared)
 target_link_libraries(suchai-fs-lib PRIVATE -lm -lzmq)
 target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)
 # Link proper storage libraries
@@ -56,4 +58,9 @@ if(SCH_STORAGE_MODE STREQUAL "SCH_ST_SQLITE")
 elseif(SCH_STORAGE_MODE STREQUAL "SCH_ST_POSTGRES")
     target_link_libraries(suchai-fs-lib PRIVATE -lpq)
 endif()
+# Link mongodb lib for logging system
+if( SCH_LOG_ENABLE_MONGODB )
+    target_link_libraries(suchai-fs-lib PRIVATE mongo::mongoc_shared)
+endif()
+
 

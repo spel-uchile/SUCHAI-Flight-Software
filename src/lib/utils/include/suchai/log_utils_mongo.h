@@ -16,8 +16,6 @@
 
 #include "suchai/config.h"
 
-#define SCH_MONGODB_URI "mongodb://localhost:27017"
-#define SCH_MONGODB_NAME "honeysat_log"
 
 typedef struct mongo_log_driver{
     mongoc_client_t *client;

@@ -43,7 +43,7 @@ else()
 endif()
 CHECK_INCLUDE_FILE(malloc.h SCH_HAVE_MALLOC)
 ##
-# Software modules settings
+# Log module settings
 ##
 set(SCH_LOG_LIST "NONE;RESULT;ERROR;WARN;INFO;DEBUG;VERBOSE")
 set(SCH_LOG "INFO" CACHE STRING "Select log level from ${SCH_LOG_LIST}")
@@ -52,6 +52,13 @@ if(SCH_LOG IN_LIST SCH_LOG_LIST)
 else()
     message(FATAL_ERROR "Invalid log level selected, please select from ${SCH_LOG_LIST}")
 endif()
+set(SCH_LOG_ENABLE_MONGODB 0 CACHE STRING "Enable MongoDB logging")
+set(SCH_LOG_MONGODB_HOST \"localhost\" CACHE STRING "MongoDB host, only if @SCH_LOG_ENABLE_MONGODB is enabled")
+set(SCH_LOG_MONGODB_PORT 27017 CACHE STRING "MongoDB port, only if @SCH_LOG_ENABLE_MONGODB is enabled")
+set(SCH_LOG_MONGODB_NAME \"suchai-log\" CACHE STRING "MongoDB database name, only if @SCH_LOG_ENABLE_MONGODB is enabled")
+##
+# Software modules settings
+##
 set(SCH_NAME \"SUCHAI-FS\" CACHE STRING "Device name")
 set(SCH_DEVICE_ID 1 CACHE STRING "Device id")
 set(SCH_SW_VERSION \"${GIT_REPO_VERSION}\" CACHE STRING "Software version")
