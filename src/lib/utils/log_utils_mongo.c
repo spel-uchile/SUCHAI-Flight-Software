@@ -117,7 +117,7 @@ int mongodb_log(const char *lvl, const char *tag, const char *msg, ...)
     // Add tag, lvl and datetime
     BSON_APPEND_UTF8(document, "id", tag);
     BSON_APPEND_UTF8(document, "log_type", lvl);
-    BSON_APPEND_TIME_T(document, "time", dat_get_time());
+    BSON_APPEND_INT64(document, "time", (unsigned long)dat_get_time());
 
     // Add message
     bson_string_t *str = bson_string_new(NULL);
