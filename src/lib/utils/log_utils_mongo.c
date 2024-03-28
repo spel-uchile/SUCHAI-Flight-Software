@@ -39,7 +39,7 @@ int mongodb_log_init(void)
     char *pass = getenv("MONGO_PASSWORD");
     if(user != NULL && pass != NULL)
     {
-        int n = snprintf(uri, SCH_BUFF_MAX_LEN-1, "mongodb://%s:%s@%s:%d", user, pass, SCH_LOG_MONGODB_HOST, SCH_LOG_MONGODB_PORT);
+        int n = snprintf(uri, SCH_BUFF_MAX_LEN-1, "mongodb://%s:%s@%s:%d?authSource=%s", user, pass, SCH_LOG_MONGODB_HOST, SCH_LOG_MONGODB_PORT, SCH_LOG_MONGODB_NAME);
         assert (n < SCH_BUFF_MAX_LEN);
     }
     else
