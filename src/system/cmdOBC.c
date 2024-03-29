@@ -38,13 +38,15 @@ void cmd_obc_init(void)
     cmd_add("obc_get_time", obc_get_time, "%d", 1);
     cmd_add("obc_reset_wdt", obc_reset_wdt, "%d", 1);
 #ifdef LINUX
-    cmd_add("obc_system", obc_system, "%s", 1);
-    cmd_add("obc_set_cwd", obc_set_cwd, "%s", 1);
-    cmd_add("obc_get_cwd", obc_get_cwd, "", 0);
     cmd_add("obc_ls", obc_ls, "%s", 1);
-    cmd_add("obc_rm", obc_rm, "%s", 1);
     cmd_add("obc_mkdir", obc_mkdir, "%s", 1);
-#endif
+    cmd_add("obc_get_cwd", obc_get_cwd, "", 0);
+    cmd_add("obc_set_cwd", obc_set_cwd, "%s", 1);
+#ifdef SCH_LINUX_UNSAFE
+    cmd_add("obc_system", obc_system, "%s", 1);
+    cmd_add("obc_rm", obc_rm, "%s", 1);
+#endif  // SCH_LINUX_UNSAFE
+#endif  // LINUX
 }
 
 int obc_ident(char* fmt, char* params, int nparams)
@@ -102,8 +104,8 @@ int obc_reset(char *fmt, char *params, int nparams) {
 int obc_get_os_memory(char *fmt, char *params, int nparams)
 {
 #ifdef SCH_HAVE_MALLOC
-    struct mallinfo mi;
-    mi = mallinfo();
+    struct mallinfo2 mi;
+    mi = mallinfo2();
     LOGR(tag, "Total non-mmapped bytes (arena):       %d", mi.arena);
     LOGR(tag, "# of free chunks (ordblks):            %d", mi.ordblks);
     LOGR(tag, "# of free fastbin blocks (smblks):     %d", mi.smblks);

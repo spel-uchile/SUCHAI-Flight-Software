@@ -42,6 +42,7 @@ else()
     message(FATAL_ERROR "Invalid SCH_ARCH selected, please select from ${SCH_ARCH_LIST}")
 endif()
 CHECK_INCLUDE_FILE(malloc.h SCH_HAVE_MALLOC)
+set(SCH_LINUX_UNSAFE 1 CACHE BOOL "Enable LINUX unsafe commands, e.g. obc_system")
 ##
 # Log module settings
 ##
