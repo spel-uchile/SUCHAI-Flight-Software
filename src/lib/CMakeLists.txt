@@ -50,8 +50,8 @@ target_include_directories(suchai-fs-lib PUBLIC
         libcsp/libcsp/include)
 
 target_link_libraries(suchai-fs-lib PRIVATE suchai-fs-os)
-target_link_libraries(suchai-fs-lib PRIVATE -lm -lzmq)
 target_link_libraries(suchai-fs-lib PUBLIC ${LIBCSP_PPREFIX}/lib/libcsp.a)
+target_link_libraries(suchai-fs-lib PUBLIC -lm -lzmq)
 # Link proper storage libraries
 if(SCH_STORAGE_MODE STREQUAL "SCH_ST_SQLITE")
     target_link_libraries(suchai-fs-lib PRIVATE -lsqlite3)
