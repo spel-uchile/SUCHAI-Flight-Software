@@ -396,7 +396,7 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
     }
     uint32_t  payload,source, dest_node;
 
-    if (nparams != sscanf(params, fmt, &payload, &source, &dest_node)){
+    if (nparams != sscanf(params, fmt, &payload, &source)){ //, &dest_node)){
         LOGE(tag, "number of params does not match");
         return CMD_SYNTAX_ERROR;
     }

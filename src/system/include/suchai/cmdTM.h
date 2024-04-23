@@ -123,7 +123,7 @@ int tm_send_last(char *fmt, char *params, int nparams);
 /**
  * Send all structs data stored as payload in multiple csp frames from last acknowledge.
  * @param fmt "%u %u"
- * @param params "<destination node> <payload>"
+ * @param params "<payload> <destination node>"
  * @param nparams 2
  * @return CMD_OK, CMD_ERROR, or CMD_ERROR_SYNTAX
  */
