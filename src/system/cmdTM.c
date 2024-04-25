@@ -49,7 +49,7 @@ void cmd_tm_init(void)
     cmd_add("tm_send_file_part", tm_send_file_parts, "%s %d %d %d %d", 5);
     cmd_add("tm_merge_file", tm_merge_file, "%s %d", 2);
     cmd_add("tm_ls", tm_list_files, "%s %d", 2);
-    cmd_add("tm_amp", tm_ask_missing_payload, "%u %u %u", 3);
+    cmd_add("tm_amp", tm_ask_missing_payload, "%u %u", 2);
 #endif
 }
 
