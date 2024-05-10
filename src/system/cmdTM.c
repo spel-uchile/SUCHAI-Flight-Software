@@ -425,10 +425,9 @@ int tm_ask_missing_payload(char *fmt, char *params, int nparams)
     int actual_resp_size = 0;
     int ack = dat_get_system_var(data_map[payload].sys_ack);
     int rc = dat_get_missing_interval(payload, ack, resp, max_resp_size / 2, &actual_resp_size);
-    if (actual_resp_size == 0)
-    {
-        LOGI(tag, "No missing data for payload %u: %s, ack: %i", payload, data_map[payload].table, ack);
+    if (actual_resp_size == 0){
         actual_size_is_zero(payload, source);
+        LOGI(tag, "No missing data for payload %u: %s, ack: %i", payload, data_map[payload].table, ack);
         return CMD_OK;
     }
 
