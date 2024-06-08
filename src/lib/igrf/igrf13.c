@@ -316,7 +316,7 @@ void IgrfCalc(double decyear, double latrad, double lonrad, double altm, double 
     mag_ned.v1 = y;
     mag_ned.v2 = z;
 
-    printf("mag NED: %f, %f, %f", x, y, z);
+    // printf("mag NED: %f, %f, %f", x, y, z);
 
     //testglobal[0] = mag[0];
     //testglobal[1] = mag[1];
