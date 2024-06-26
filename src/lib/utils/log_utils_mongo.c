@@ -19,6 +19,9 @@
 
 #include "suchai/log_utils_mongo.h"
 
+// Declared in repoData.h
+extern time_t dat_get_time(void);
+
 int mongodb_log_init(void)
 {
     char uri[SCH_BUFF_MAX_LEN] = {0};

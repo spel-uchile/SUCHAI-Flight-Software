@@ -24,6 +24,9 @@
 #include "suchai/log_utils_mongo.h"
 #endif
 
+// Declared in repoData.h
+extern time_t dat_get_time(void);
+
 osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
 log_level_t log_lvl;
