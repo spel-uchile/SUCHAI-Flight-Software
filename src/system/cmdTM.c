@@ -577,7 +577,7 @@ int tm_send_file(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    char file_name[100];
+    char file_name[SCH_CMD_MAX_STR_PARAMS] = {0};
     int node;
     if(nparams == sscanf(params, fmt, file_name, &node))
     {
