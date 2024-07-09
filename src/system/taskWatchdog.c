@@ -52,7 +52,7 @@ void taskWatchdog(void *param)
         if(elapsed_sw_timer > max_gnd_wdt)
         {
             LOGW(tag, "Software watchdog overflow")
-            cmd_t *rst_obc = cmd_get_str("obc_reset");
+            cmd_t *rst_obc = cmd_build_from_str("obc_reset 1");
             cmd_send(rst_obc);
         }
     }
