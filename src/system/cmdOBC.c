@@ -1,9 +1,10 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *     Copyright 2024, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *     Copyright 2024, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *     Copyright 2024, Matias Vidal Valladares, matias.vidal.v@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,7 +124,7 @@ int obc_get_os_memory(char *fmt, char *params, int nparams)
 
 int obc_set_time(char* fmt, char* params,int nparams)
 {
-    int time_to_set;
+    int64_t time_to_set;
     if(params == NULL || sscanf(params, fmt, &time_to_set) != nparams)
     {
         LOGE(tag, "Invalid params");

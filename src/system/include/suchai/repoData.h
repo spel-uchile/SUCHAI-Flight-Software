@@ -6,6 +6,7 @@
  * @author Matias Ramirez M  - nicoram.mt@gmail.com
  * @author Tamara Gutierrez R - tamigr.2293@gmail.com
  * @author Diego Ortego P - diortego@dcc.uchile.cl
+ * @author Matias Vidal Valladares - matias.vidal.v@gmail.com
  * @date 2020
  * @copyright GNU GPL v3
  *
@@ -203,11 +204,11 @@ int dat_show_fp (void);
 int dat_purge_fp(void);
 
 /**
- * Gets the current system time in seconds.
+ * Gets the current system time in milliseconds.
  *
- * @return time_t Current system unix-time
+ * @return int64_t Current system unix-time in ms.
  */
-time_t dat_get_time(void);
+int64_t dat_get_time(void);
 
 /**
  * Updates the system time, adding one second to it.
@@ -224,7 +225,7 @@ int dat_update_time(void);
  * @param new_time Time value to set as system time
  * @return 0 OK, 1 Error
  */
-int dat_set_time(int new_time);
+int dat_set_time(int64_t new_time);
 
 /**
  * Print the UTC system time in a given format.

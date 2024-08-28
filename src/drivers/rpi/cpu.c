@@ -1,7 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *     Copyright 2024, Carlos Gonzalez Cortes, carlgonz@ug.uchile.cl
+ *     Copyright 2024, Matias Vidal Valladares, matias.vidal.v@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +26,11 @@
 
 int64_t cpu_get_unixtime(void)
 {
-    return (int64_t)time(NULL);
+    struct timespec currTime;
+    if (!clock_gettime (CLOCK_REALTIME, &currTime)) {
+        return currTime.tv_sec*1000 + (int64_t) (currTime.tv_nsec*0.000001);
+    }
+    return (int64_t)time(NULL)*1000;
 }
 
 int cpu_set_unixtime(int64_t time)

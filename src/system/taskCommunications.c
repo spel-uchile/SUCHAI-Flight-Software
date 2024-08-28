@@ -1,7 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Matias Vidal Valladares, matias.vidal.v@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +70,7 @@ void taskCommunications(void *param)
         {
             count_tc = dat_get_system_var(dat_com_count_tc) + 1;
             dat_set_system_var(dat_com_count_tc, count_tc);
-            dat_set_system_var(dat_com_last_tc, (int)dat_get_time());
+            dat_set_system_var(dat_com_last_tc, (int64_t)dat_get_time());
 
             switch (csp_conn_dport(conn))
             {

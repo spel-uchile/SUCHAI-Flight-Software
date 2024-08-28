@@ -1,9 +1,10 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2020, Elias Obreque Sepulveda, elias.obreque@uchile.cl
+ *     Copyright 2024, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Camilo Rojas Milla, camrojas@uchile.cl
+ *     Copyright 2024, Elias Obreque Sepulveda, elias.obreque@uchile.cl
+ *     Copyright 2024, Matias Vidal Valladares, matias.vidal.v@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +32,9 @@ void log_print(const char *lvl, const char *tag, const char *msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    fprintf(LOGOUT,"[%s][%lu][%s] ", lvl, (unsigned long)dat_get_time(), tag);
+    //fprintf(LOGOUT,"[%s][%lu][%s] ", lvl, (unsigned long)dat_get_time(), tag);
+    //fprintf(LOGOUT,"[%s][%lu][%s] ", lvl, time(NULL), tag);
+    fprintf(LOGOUT,"[%s][%ld][%s] ", lvl, (int64_t)dat_get_time(), tag);
     vfprintf(LOGOUT, msg, args);
     fprintf(LOGOUT,CRLF); fflush(LOGOUT);
     va_end(args);
@@ -72,7 +75,9 @@ void log_file(const char *lvl, const char *tag, const char *msg, ...)
     FILE *fptr = fopen(fname, "a");
     if(fptr != NULL)
     {
-        fprintf(fptr,"[%s][%lu][%s] ", lvl, (unsigned long)dat_get_time(), tag);
+        //fprintf(fptr,"[%s][%lu][%s] ", lvl, (unsigned long)dat_get_time(), tag);
+        //fprintf(fptr,"[%s][%lu][%s] ", lvl, time(NULL), tag);
+        fprintf(fptr,"[%s][%ld][%s] ", lvl, (int64_t)dat_get_time(), tag);
         vfprintf(fptr, msg, args);
         fprintf(fptr, CRLF); fflush(fptr);
         fclose(fptr);

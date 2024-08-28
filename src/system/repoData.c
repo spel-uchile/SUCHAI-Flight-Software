@@ -1,12 +1,13 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2021, Tomas Opazo Toro, tomas.opazo.t@gmail.com
- *      Copyright 2021, Camilo Rojas Milla, camrojas@uchile.cl
- *      Copyright 2021, Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2021, Tamara Gutierrez Rojo tamigr.2293@gmail.com
- *      Copyright 2021, Diego Ortego Prieto, diortego@dcc.uchile.cl
+ *     Copyright 2024, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *     Copyright 2024, Camilo Rojas Milla, camrojas@uchile.cl
+ *     Copyright 2024, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *     Copyright 2024, Tamara Gutierrez Rojo tamigr.2293@gmail.com
+ *     Copyright 2024, Diego Ortego Prieto, diortego@dcc.uchile.cl
+ *     Copyright 2024, Matias Vidal Valladares, matias.vidal.v@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -281,7 +282,7 @@ int dat_reset_fp(void)
 int dat_purge_fp(void)
 {
     int i, fp_entries = 0;
-    int time_min = (int)dat_get_time()+1;
+    int time_min = (int)(dat_get_time()*0.001)+1;
     fp_entry_t fp_i;
     for(i=0; i<SCH_FP_MAX_ENTRIES; i++)
     {
@@ -332,19 +333,19 @@ int dat_get_fp_st_index(int index, fp_entry_t *fp_entry)
     return rc;
 }
 
-time_t dat_get_time(void)
+int64_t dat_get_time(void)
 {
-    return (time_t)osGetTimeUnix();
+    return osGetTimeUnix();
 }
 
-int dat_set_time(int new_time)
+int dat_set_time(int64_t new_time)
 {
-    return osSetTimeUnix((int64_t)new_time);
+    return osSetTimeUnix(new_time);
 }
 
 int dat_show_time(int format)
 {
-    time_t time_to_show = dat_get_time();
+    time_t time_to_show = (time_t) (dat_get_time()*0.001);
 
     if(format == 0 || format > 1)
     {

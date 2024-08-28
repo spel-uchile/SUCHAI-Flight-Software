@@ -107,7 +107,7 @@ int fp_set_dt(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    time_t current = dat_get_time();
+    time_t current = (time_t) (dat_get_time()*0.001);
     strncpy(args, params+next, (size_t)SCH_CMD_MAX_STR_PARAMS);
     int rc = dat_set_fp((int)current+seconds, command, args, executions, periodical);
 

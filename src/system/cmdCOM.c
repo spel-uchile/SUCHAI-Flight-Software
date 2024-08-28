@@ -1,7 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Matias Vidal Valladares, matias.vidal.v@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -487,7 +488,7 @@ int com_set_time_node(char *fmt, char *params, int nparams)
     }
 
     char cmd[SCH_CMD_MAX_STR_NAME];
-    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_time %d", node, (int)dat_get_time());
+    snprintf(cmd, SCH_CMD_MAX_STR_NAME, "%d obc_set_time %d", node, (int64_t)dat_get_time());
     LOGI(tag, "Sending command 'com_send_cmd %s' to %d", cmd, node);
     return com_send_cmd("%d %n", cmd, 2);
 }
