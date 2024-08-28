@@ -22,6 +22,8 @@
 
 #include "suchai/log_utils.h"
 
+int64_t dat_get_time(void);  // Forward declaration
+
 osSemaphore log_mutex;  ///< Sync logging functions, require initialization
 void (*log_function)(const char *lvl, const char *tag, const char *msg, ...);
 log_level_t log_lvl;
