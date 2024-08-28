@@ -26,11 +26,11 @@
 
 int64_t cpu_get_unixtime(void)
 {
-    /*struct timespec currTime;
+    struct timespec currTime;
     if (!clock_gettime (CLOCK_REALTIME, &currTime)) {
-        return currTime.tv_sec*1000L + (int64_t) (currTime.tv_nsec*0.000001L);
-    }*/
-    return 1724850296864LL;//(int64_t)time(NULL)*1000L;
+        return currTime.tv_sec*1000LL + (int64_t) (currTime.tv_nsec*0.000001L);
+    }
+    return (int64_t)time(NULL)*1000LL;
 }
 
 int cpu_set_unixtime(int64_t time)
