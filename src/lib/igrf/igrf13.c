@@ -358,8 +358,8 @@ void calc_mag_coords()
 
     if (max2[modelI] == 0)
     {
-        getshc(mdfile, 1, irec_pos[modelI], max1[modelI], 1);
-        getshc(mdfile, 1, irec_pos[modelI+1], max1[modelI+1], 2);
+        // getshc(mdfile, 1, irec_pos[modelI], max1[modelI], 1);
+        // getshc(mdfile, 1, irec_pos[modelI+1], max1[modelI+1], 2);
         nmax = interpsh(sdate, yrmin[modelI], max1[modelI],
                         yrmin[modelI+1], max1[modelI+1], 3);
         nmax = interpsh(sdate+1, yrmin[modelI] , max1[modelI],
@@ -611,7 +611,7 @@ int getshc(char file[PATH], int iflag, long int strec, int nmax_of_gh, int gh)
                   sscanf(inbuff, "%d%d%lg%lg%lg%lg%s%d",
                          &n, &m, &g, &hh, &trash, &trash, irat, &line_num);
                   if (g == 0){
-                      printf("%d, %d", n, m, "\n");
+                      printf("%d, %d\n", n, m);
                   }
                 }
               else
