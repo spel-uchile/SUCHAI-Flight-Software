@@ -11,6 +11,7 @@
 #ifndef SCH_I2C_H
 #define SCH_I2C_H
 
+#include <stdint.h>
 #include "drivers.h"
 
 

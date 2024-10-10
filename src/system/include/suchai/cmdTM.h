@@ -169,6 +169,13 @@ int tm_set_ack(char *fmt, char *params, int nparams);
  */
 int tm_get_single(char *fmt, char *params, int nparams);
 
+/**
+ * Sends the list of commands to a remote node
+ * @param fmt %d
+ * @param params <node>
+ * @param nparams 1
+ * @return CMD_OK or CMD_ERROR
+ */
 int tm_send_cmds(char *fmt, char *params, int nparams);
 
 /**
