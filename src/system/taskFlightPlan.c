@@ -1,8 +1,9 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020 Matias Ramirez Martinez, nicoram.mt@gmail.com
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2020, Matias Ramirez Martinez, nicoram.mt@gmail.com
+ *     Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *     Copyright 2024, Matías Vidal Valladares, matias.vidal.v@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +40,7 @@ void taskFlightPlan(void *param)
     {
         osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
         // Get next command in the flight plan, if any
-        elapsed_sec = dat_get_time();
+        elapsed_sec = dat_get_time()*0.001;
         int rc = dat_get_fp((int)elapsed_sec, command, args, &executions, &period);
         if(rc == -1)
             continue;
